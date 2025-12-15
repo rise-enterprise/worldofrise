@@ -55,6 +55,28 @@ export interface DashboardMetrics {
   vipGuestsCount: number;
 }
 
+export interface GuestInsightPatterns {
+  visitFrequency: 'increasing' | 'stable' | 'declining';
+  averageDaysBetweenVisits: number;
+  preferredDayOfWeek: string;
+  preferredTimeSlot: 'morning' | 'afternoon' | 'evening';
+}
+
+export interface GuestInsight {
+  guestId: string;
+  patterns: GuestInsightPatterns;
+  churnRisk: 'low' | 'medium' | 'high' | 'critical';
+  churnScore: number;
+  recommendations: string[];
+  suggestedMessage: {
+    subject: string;
+    body: string;
+    tone: 'noir' | 'sasso' | 'rise';
+    channel: 'email' | 'whatsapp' | 'sms';
+  };
+  generatedAt: string;
+}
+
 export const TIER_CONFIG: Record<Tier, TierConfig> = {
   initiation: {
     name: 'initiation',
