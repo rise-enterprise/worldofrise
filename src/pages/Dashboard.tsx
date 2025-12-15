@@ -7,6 +7,9 @@ import { Overview } from '@/components/dashboard/Overview';
 import { GuestsList } from '@/components/dashboard/GuestsList';
 import { GuestProfile } from '@/components/dashboard/GuestProfile';
 import { BulkInsightsView } from '@/components/insights/BulkInsightsView';
+import { PrivilegesView } from '@/components/dashboard/PrivilegesView';
+import { EventsView } from '@/components/dashboard/EventsView';
+import { SettingsView } from '@/components/dashboard/SettingsView';
 
 export default function Dashboard() {
   const [activeView, setActiveView] = useState('dashboard');
@@ -62,26 +65,11 @@ export default function Dashboard() {
           <BulkInsightsView onSelectGuest={handleSelectGuest} />
         )}
 
-        {activeView === 'privileges' && (
-          <div className="p-8">
-            <h2 className="font-display text-2xl font-medium text-foreground mb-4">Privileges & Rewards</h2>
-            <p className="text-muted-foreground">Privilege management coming soon...</p>
-          </div>
-        )}
+        {activeView === 'privileges' && <PrivilegesView />}
 
-        {activeView === 'events' && (
-          <div className="p-8">
-            <h2 className="font-display text-2xl font-medium text-foreground mb-4">Events & Experiences</h2>
-            <p className="text-muted-foreground">Event management coming soon...</p>
-          </div>
-        )}
+        {activeView === 'events' && <EventsView />}
 
-        {activeView === 'settings' && (
-          <div className="p-8">
-            <h2 className="font-display text-2xl font-medium text-foreground mb-4">Settings</h2>
-            <p className="text-muted-foreground">Settings panel coming soon...</p>
-          </div>
-        )}
+        {activeView === 'settings' && <SettingsView />}
       </main>
     </div>
   );
