@@ -1,13 +1,16 @@
 import { Guest, TIER_CONFIG } from '@/types/loyalty';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Coffee, UtensilsCrossed, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Crown, Coffee, UtensilsCrossed, Sparkles, ArrowLeft, LayoutDashboard, History, Calendar, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface MemberCardProps {
   guest: Guest;
 }
 
 export function MemberCard({ guest }: MemberCardProps) {
+  const navigate = useNavigate();
   const tierConfig = TIER_CONFIG[guest.tier];
   const nextTierVisits = 
     guest.tier === 'initiation' ? 5 - guest.totalVisits :
@@ -22,8 +25,32 @@ export function MemberCard({ guest }: MemberCardProps) {
     guest.tier === 'inner-circle' ? ((guest.totalVisits - 30) / 20) * 100 : 100;
 
   return (
-    <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-6">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+    <div className="min-h-screen bg-gradient-luxury flex flex-col">
+      {/* Top Navigation Header */}
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/30">
+        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/')}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Home
+          </Button>
+          <h1 
+            className="font-display text-lg font-semibold text-gradient-gold cursor-pointer"
+            onClick={() => navigate('/')}
+          >
+            RISE
+          </h1>
+          <div className="w-16" /> {/* Spacer for centering */}
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-start p-6 pt-4">
+        <div className="w-full max-w-md space-y-6 animate-fade-in">
         {/* Card */}
         <div 
           className={cn(
@@ -135,6 +162,57 @@ export function MemberCard({ guest }: MemberCardProps) {
             <UtensilsCrossed className="h-4 w-4 text-sasso-accent" />
             <span className="text-xs text-muted-foreground">SASSO</span>
           </div>
+        </div>
+
+        {/* Navigation Actions */}
+        <div className="space-y-3 animate-slide-up pt-2" style={{ animationDelay: '600ms' }}>
+          <div className="grid grid-cols-2 gap-3">
+            <Button 
+              variant="luxury" 
+              className="w-full"
+              onClick={() => navigate('/dashboard')}
+            >
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+          </div>
+          
+          {/* Quick Actions */}
+          <div className="grid grid-cols-3 gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
+            >
+              <History className="h-5 w-5 mb-1" />
+              <span className="text-xs">History</span>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
+            >
+              <Calendar className="h-5 w-5 mb-1" />
+              <span className="text-xs">Events</span>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
+            >
+              <MessageCircle className="h-5 w-5 mb-1" />
+              <span className="text-xs">Concierge</span>
+            </Button>
+          </div>
+        </div>
         </div>
       </div>
     </div>
