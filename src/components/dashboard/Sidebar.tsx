@@ -9,6 +9,7 @@ import {
   Crown,
   Coffee,
   UtensilsCrossed,
+  Sparkles,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -21,6 +22,7 @@ interface SidebarProps {
 const navigation = [
   { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
   { id: 'guests', label: 'Guests', icon: Users },
+  { id: 'insights', label: 'AI Insights', icon: Sparkles },
   { id: 'privileges', label: 'Privileges', icon: Gift },
   { id: 'events', label: 'Events', icon: Calendar },
   { id: 'settings', label: 'Settings', icon: Settings },

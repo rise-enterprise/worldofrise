@@ -6,6 +6,7 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { Overview } from '@/components/dashboard/Overview';
 import { GuestsList } from '@/components/dashboard/GuestsList';
 import { GuestProfile } from '@/components/dashboard/GuestProfile';
+import { BulkInsightsView } from '@/components/insights/BulkInsightsView';
 
 export default function Dashboard() {
   const [activeView, setActiveView] = useState('dashboard');
@@ -55,6 +56,10 @@ export default function Dashboard() {
             guest={selectedGuest}
             onBack={handleBackToGuests}
           />
+        )}
+
+        {activeView === 'insights' && (
+          <BulkInsightsView onSelectGuest={handleSelectGuest} />
         )}
 
         {activeView === 'privileges' && (

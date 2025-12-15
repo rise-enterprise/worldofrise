@@ -16,6 +16,7 @@ import {
   Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { GuestInsightsPanel } from '@/components/insights/GuestInsightsPanel';
 
 interface GuestProfileProps {
   guest: Guest;
@@ -135,9 +136,14 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
         </CardContent>
       </Card>
 
+      {/* AI Insights Panel */}
+      <div className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <GuestInsightsPanel guest={guest} />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Privileges */}
-        <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Gift className="h-5 w-5 text-primary" />
@@ -158,7 +164,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
         </Card>
 
         {/* Notes */}
-        <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+        <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <MessageSquare className="h-5 w-5 text-primary" />
@@ -179,7 +185,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
       </div>
 
       {/* Visit History */}
-      <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
+      <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '400ms' }}>
         <CardHeader>
           <CardTitle className="text-lg">Visit Timeline</CardTitle>
           <p className="text-xs text-muted-foreground">Recent experiences across RISE brands</p>
