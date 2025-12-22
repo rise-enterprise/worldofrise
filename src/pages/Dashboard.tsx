@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Brand, Guest } from '@/types/loyalty';
-import { mockGuests, mockMetrics } from '@/data/mockData';
+import { Brand, Guest, DashboardMetrics } from '@/types/loyalty';
+import { useMembers } from '@/hooks/useMembers';
+import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { Overview } from '@/components/dashboard/Overview';
@@ -10,11 +11,26 @@ import { BulkInsightsView } from '@/components/insights/BulkInsightsView';
 import { PrivilegesView } from '@/components/dashboard/PrivilegesView';
 import { EventsView } from '@/components/dashboard/EventsView';
 import { SettingsView } from '@/components/dashboard/SettingsView';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const emptyMetrics: DashboardMetrics = {
+  totalMembers: 0,
+  activeMembers: 0,
+  totalVisitsThisMonth: 0,
+  visitsByBrand: { noir: 0, sasso: 0 },
+  visitsByCountry: { doha: 0, riyadh: 0 },
+  tierDistribution: {},
+  churnRiskCount: 0,
+  vipGuestsCount: 0,
+};
 
 export default function Dashboard() {
   const [activeView, setActiveView] = useState('dashboard');
   const [activeBrand, setActiveBrand] = useState<Brand>('all');
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
+
+  const { data: guests = [], isLoading: guestsLoading } = useMembers();
+  const { data: metrics = emptyMetrics, isLoading: metricsLoading } = useDashboardMetrics();
 
   const handleSelectGuest = (guest: Guest) => {
     setSelectedGuest(guest);
@@ -25,6 +41,8 @@ export default function Dashboard() {
     setSelectedGuest(null);
     setActiveView('guests');
   };
+
+  const isLoading = guestsLoading || metricsLoading;
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,16 +57,23 @@ export default function Dashboard() {
         <DashboardHeader />
         
         {activeView === 'dashboard' && (
-          <Overview 
-            metrics={mockMetrics} 
-            guests={mockGuests}
-            activeBrand={activeBrand}
-          />
+          isLoading ? (
+            <div className="p-8 space-y-4">
+              <Skeleton className="h-32 w-full" />
+              <Skeleton className="h-64 w-full" />
+            </div>
+          ) : (
+            <Overview 
+              metrics={metrics} 
+              guests={guests}
+              activeBrand={activeBrand}
+            />
+          )
         )}
 
         {activeView === 'guests' && (
           <GuestsList 
-            guests={mockGuests}
+            guests={guests}
             activeBrand={activeBrand}
             onSelectGuest={handleSelectGuest}
           />
@@ -62,12 +87,12 @@ export default function Dashboard() {
         )}
 
         {activeView === 'insights' && (
-          <BulkInsightsView onSelectGuest={handleSelectGuest} />
+          <BulkInsightsView guests={guests} onSelectGuest={handleSelectGuest} />
         )}
 
         {activeView === 'privileges' && <PrivilegesView />}
 
-        {activeView === 'events' && <EventsView />}
+        {activeView === 'events' && <EventsView guests={guests} />}
 
         {activeView === 'settings' && <SettingsView />}
       </main>

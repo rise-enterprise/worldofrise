@@ -1,5 +1,14 @@
-export type Brand = 'noir' | 'sasso' | 'all';
-export type Country = 'qatar' | 'riyadh';
+import { Database } from '@/integrations/supabase/types';
+
+// Database types
+export type DbMember = Database['public']['Tables']['members']['Row'];
+export type DbVisit = Database['public']['Tables']['visits']['Row'];
+export type DbTier = Database['public']['Tables']['tiers']['Row'];
+export type DbLocation = Database['public']['Tables']['locations']['Row'];
+export type DbMemberTier = Database['public']['Tables']['member_tiers']['Row'];
+
+export type Brand = 'noir' | 'sasso' | 'both' | 'all';
+export type Country = 'doha' | 'riyadh';
 export type Tier = 'initiation' | 'connoisseur' | 'elite' | 'inner-circle' | 'black';
 
 export interface Visit {
@@ -14,10 +23,11 @@ export interface Visit {
 export interface Guest {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
   phone?: string;
   country: Country;
   tier: Tier;
+  tierName?: string;
   totalVisits: number;
   lifetimeVisits: number;
   lastVisit: Date;
@@ -27,13 +37,17 @@ export interface Guest {
   tags: string[];
   notes?: string;
   avatarUrl?: string;
+  totalPoints?: number;
+  status?: 'active' | 'blocked';
 }
 
 export interface TierConfig {
+  id?: string;
   name: string;
   displayName: string;
   arabicName: string;
   minVisits: number;
+  minPoints?: number;
   color: string;
   privileges: string[];
 }
@@ -47,10 +61,10 @@ export interface DashboardMetrics {
     sasso: number;
   };
   visitsByCountry: {
-    qatar: number;
+    doha: number;
     riyadh: number;
   };
-  tierDistribution: Record<Tier, number>;
+  tierDistribution: Record<string, number>;
   churnRiskCount: number;
   vipGuestsCount: number;
 }
@@ -146,3 +160,27 @@ export const TIER_CONFIG: Record<Tier, TierConfig> = {
     ],
   },
 };
+
+// Helper to map database tier name to Tier type
+export function mapDbTierToTier(tierName: string): Tier {
+  const normalized = tierName.toLowerCase().replace(/\s+/g, '-');
+  if (normalized === 'rise-black' || normalized === 'black') return 'black';
+  if (normalized === 'inner-circle') return 'inner-circle';
+  if (normalized === 'elite' || normalized === 'élite') return 'elite';
+  if (normalized === 'connoisseur') return 'connoisseur';
+  return 'initiation';
+}
+
+// Helper to map database brand to Brand type
+export function mapDbBrandToBrand(brand: string | null): Brand {
+  if (!brand) return 'both';
+  if (brand === 'noir') return 'noir';
+  if (brand === 'sasso') return 'sasso';
+  return 'both';
+}
+
+// Helper to map database city to Country type
+export function mapDbCityToCountry(city: string): Country {
+  if (city === 'riyadh') return 'riyadh';
+  return 'doha';
+}

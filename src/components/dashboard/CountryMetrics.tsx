@@ -3,13 +3,13 @@ import { MapPin } from 'lucide-react';
 
 interface CountryMetricsProps {
   visitsByCountry: {
-    qatar: number;
+    doha: number;
     riyadh: number;
   };
 }
 
 export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
-  const total = visitsByCountry.qatar + visitsByCountry.riyadh;
+  const total = (visitsByCountry.doha || 0) + (visitsByCountry.riyadh || 0) || 1;
 
   return (
     <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '400ms' }}>
@@ -29,10 +29,10 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
               <span className="text-sm font-medium text-foreground">Qatar</span>
             </div>
             <p className="font-display text-3xl font-medium text-foreground mb-1">
-              {visitsByCountry.qatar.toLocaleString()}
+              {(visitsByCountry.doha || 0).toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground">
-              {Math.round((visitsByCountry.qatar / total) * 100)}% of visits
+              {Math.round(((visitsByCountry.doha || 0) / total) * 100)}% of visits
             </p>
             <div className="mt-3 flex items-center gap-2">
               <span className="text-lg">🇶🇦</span>
