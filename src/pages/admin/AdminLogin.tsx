@@ -10,12 +10,22 @@ import { toast } from '@/hooks/use-toast';
 import { Loader2, Shield, Eye, EyeOff } from 'lucide-react';
 import { z } from 'zod';
 
+// Strong password requirements for admin accounts
+const passwordSchema = z.string()
+  .min(12, 'Password must be at least 12 characters')
+  .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Must contain at least one number')
+  .regex(/[^A-Za-z0-9]/, 'Must contain at least one special character');
+
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
-const signupSchema = loginSchema.extend({
+const signupSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: passwordSchema,
   name: z.string().min(2, 'Name must be at least 2 characters'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -250,6 +260,9 @@ export default function AdminLogin() {
                       required
                       autoComplete="new-password"
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Min 12 characters with uppercase, lowercase, number, and special character
+                    </p>
                   </div>
                   
                   <div className="space-y-2">

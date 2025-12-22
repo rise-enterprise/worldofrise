@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { logger } from '@/lib/logger';
 import {
   Users,
   Calendar,
@@ -45,7 +46,7 @@ export default function AdminOverview() {
         pendingRedemptions: redemptionsRes.count || 0,
       });
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      logger.error('Error fetching stats:', error);
     } finally {
       setLoading(false);
     }
