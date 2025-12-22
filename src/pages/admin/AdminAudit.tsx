@@ -25,9 +25,6 @@ import { format } from 'date-fns';
 import { Database } from '@/integrations/supabase/types';
 
 type AuditAction = Database['public']['Enums']['audit_action'];
-type BrandType = Database['public']['Enums']['brand_type'];
-type VisitSource = Database['public']['Enums']['visit_source'];
-import { format } from 'date-fns';
 
 interface AuditLog {
   id: string;
@@ -132,7 +129,7 @@ export default function AdminAudit() {
               <Filter className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Filters:</span>
             </div>
-            <Select value={actionFilter} onValueChange={setActionFilter}>
+            <Select value={actionFilter} onValueChange={(val) => setActionFilter(val as AuditAction | 'all')}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Action" />
               </SelectTrigger>
