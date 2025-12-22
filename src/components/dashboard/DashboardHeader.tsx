@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Bell, Search, Plus, X } from 'lucide-react';
 import {
   Dialog,
@@ -14,12 +15,40 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
+import { Guest } from '@/types/loyalty';
+import { mockGuests } from '@/data/mockData';
 
-export function DashboardHeader() {
+interface DashboardHeaderProps {
+  onSearch?: (query: string) => void;
+  onGuestAdded?: (guest: Partial<Guest>) => void;
+}
+
+export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Guest[]>([]);
   const [newGuestOpen, setNewGuestOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, message: 'New VIP guest registered', time: '2 mins ago', read: false },
+    { id: 2, message: 'Ahmed Al-Rashid reached Inner Circle', time: '1 hour ago', read: false },
+    { id: 3, message: 'Upcoming event: Chef\'s Table Experience', time: '3 hours ago', read: false },
+  ]);
+
+  // New guest form state
+  const [newGuest, setNewGuest] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    country: 'qatar' as 'qatar' | 'riyadh',
+  });
 
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -28,25 +57,67 @@ export function DashboardHeader() {
     day: 'numeric',
   });
 
-  const notifications = [
-    { id: 1, message: 'New VIP guest registered', time: '2 mins ago' },
-    { id: 2, message: 'Ahmed Al-Rashid reached Inner Circle', time: '1 hour ago' },
-    { id: 3, message: 'Upcoming event: Chef\'s Table Experience', time: '3 hours ago' },
-  ];
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      toast.info(`Searching for "${searchQuery}"...`);
-      // Search functionality would connect to real data
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim().length > 0) {
+      const results = mockGuests.filter(guest => 
+        guest.name.toLowerCase().includes(query.toLowerCase()) ||
+        guest.email.toLowerCase().includes(query.toLowerCase()) ||
+        (guest.phone && guest.phone.includes(query))
+      );
+      setSearchResults(results);
+    } else {
+      setSearchResults([]);
     }
-    setSearchOpen(false);
-    setSearchQuery('');
+    if (onSearch) {
+      onSearch(query);
+    }
   };
 
   const handleNewGuest = () => {
-    toast.success('New guest registration coming soon');
+    if (!newGuest.name.trim()) {
+      toast.error('Please enter guest name');
+      return;
+    }
+    if (!newGuest.email.trim() || !newGuest.email.includes('@')) {
+      toast.error('Please enter a valid email');
+      return;
+    }
+
+    const guest: Partial<Guest> = {
+      id: Date.now().toString(),
+      name: newGuest.name,
+      email: newGuest.email,
+      phone: newGuest.phone || undefined,
+      country: newGuest.country,
+      tier: 'initiation',
+      totalVisits: 0,
+      lifetimeVisits: 0,
+      lastVisit: new Date(),
+      joinedAt: new Date(),
+      favoriteBrand: 'noir',
+      visits: [],
+      tags: ['New Member'],
+    };
+
+    if (onGuestAdded) {
+      onGuestAdded(guest);
+    }
+
+    toast.success(`${newGuest.name} has been registered!`, {
+      description: 'Welcome to RISE loyalty program',
+    });
+    
     setNewGuestOpen(false);
+    setNewGuest({ name: '', email: '', phone: '', country: 'qatar' });
   };
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    toast.success('All notifications marked as read');
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <header className="flex items-center justify-between py-6 px-8 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30">
@@ -68,17 +139,36 @@ export function DashboardHeader() {
           <PopoverContent className="w-80" align="end">
             <div className="space-y-3">
               <h4 className="font-medium text-sm">Search Guests</h4>
-              <div className="flex gap-2">
-                <Input 
-                  placeholder="Search by name, email, or phone..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                />
-                <Button size="sm" onClick={handleSearch}>
-                  <Search className="h-4 w-4" />
-                </Button>
-              </div>
+              <Input 
+                placeholder="Search by name, email, or phone..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                autoFocus
+              />
+              {searchResults.length > 0 && (
+                <div className="max-h-64 overflow-y-auto space-y-2">
+                  {searchResults.map((guest) => (
+                    <div 
+                      key={guest.id}
+                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                      onClick={() => {
+                        setSearchOpen(false);
+                        setSearchQuery('');
+                        setSearchResults([]);
+                        toast.info(`Selected: ${guest.name}`);
+                      }}
+                    >
+                      <p className="text-sm font-medium text-foreground">{guest.name}</p>
+                      <p className="text-xs text-muted-foreground">{guest.email}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {searchQuery && searchResults.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No guests found
+                </p>
+              )}
             </div>
           </PopoverContent>
         </Popover>
@@ -88,14 +178,21 @@ export function DashboardHeader() {
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-4 w-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80" align="end">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-sm">Notifications</h4>
-                <Button variant="ghost" size="sm" className="text-xs text-muted-foreground">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-muted-foreground"
+                  onClick={markAllRead}
+                >
                   Mark all read
                 </Button>
               </div>
@@ -103,10 +200,24 @@ export function DashboardHeader() {
                 {notifications.map((notif) => (
                   <div 
                     key={notif.id} 
-                    className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                    className={`p-3 rounded-lg transition-colors cursor-pointer ${
+                      notif.read ? 'bg-muted/30' : 'bg-muted/50 hover:bg-muted'
+                    }`}
+                    onClick={() => {
+                      setNotifications(prev => 
+                        prev.map(n => n.id === notif.id ? { ...n, read: true } : n)
+                      );
+                    }}
                   >
-                    <p className="text-sm text-foreground">{notif.message}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{notif.time}</p>
+                    <div className="flex items-start gap-2">
+                      {!notif.read && (
+                        <span className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />
+                      )}
+                      <div>
+                        <p className="text-sm text-foreground">{notif.message}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{notif.time}</p>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -128,9 +239,52 @@ export function DashboardHeader() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-4">
-              <Input placeholder="Full Name" />
-              <Input placeholder="Email" type="email" />
-              <Input placeholder="Phone" type="tel" />
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name *</Label>
+                <Input 
+                  id="name"
+                  placeholder="Enter full name"
+                  value={newGuest.name}
+                  onChange={(e) => setNewGuest(prev => ({ ...prev, name: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input 
+                  id="email"
+                  placeholder="Enter email address"
+                  type="email"
+                  value={newGuest.email}
+                  onChange={(e) => setNewGuest(prev => ({ ...prev, email: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone (optional)</Label>
+                <Input 
+                  id="phone"
+                  placeholder="Enter phone number"
+                  type="tel"
+                  value={newGuest.phone}
+                  onChange={(e) => setNewGuest(prev => ({ ...prev, phone: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Country</Label>
+                <Select 
+                  value={newGuest.country} 
+                  onValueChange={(value: 'qatar' | 'riyadh') => 
+                    setNewGuest(prev => ({ ...prev, country: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="qatar">🇶🇦 Qatar</SelectItem>
+                    <SelectItem value="riyadh">🇸🇦 Saudi Arabia</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex gap-3 pt-2">
                 <Button variant="outline" className="flex-1" onClick={() => setNewGuestOpen(false)}>
                   Cancel

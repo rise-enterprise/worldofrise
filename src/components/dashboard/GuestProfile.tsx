@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Guest, TIER_CONFIG } from '@/types/loyalty';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   ArrowLeft, 
   Coffee, 
@@ -13,9 +15,17 @@ import {
   MessageSquare,
   Phone,
   Mail,
-  Star
+  Star,
+  Plus
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import { GuestInsightsPanel } from '@/components/insights/GuestInsightsPanel';
 
 interface GuestProfileProps {
@@ -24,8 +34,19 @@ interface GuestProfileProps {
 }
 
 export function GuestProfile({ guest, onBack }: GuestProfileProps) {
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [newNote, setNewNote] = useState('');
+  const [notes, setNotes] = useState<string[]>(guest.notes ? [guest.notes] : []);
   const tierConfig = TIER_CONFIG[guest.tier];
   const initials = guest.name.split(' ').map(n => n[0]).join('');
+  
+  const handleAddNote = () => {
+    if (!newNote.trim()) return;
+    setNotes(prev => [newNote, ...prev]);
+    toast.success('Note added');
+    setNewNote('');
+    setNoteOpen(false);
+  };
   
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', { 
@@ -172,17 +193,49 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {guest.notes ? (
-              <p className="text-sm text-muted-foreground leading-relaxed">{guest.notes}</p>
+            {notes.length > 0 ? (
+              <div className="space-y-3">
+                {notes.map((note, index) => (
+                  <div key={index} className="p-3 rounded-lg bg-muted/50 border border-border/50">
+                    <p className="text-sm text-foreground leading-relaxed">{note}</p>
+                  </div>
+                ))}
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground italic">No notes added for this guest.</p>
             )}
-            <Button variant="outline" className="mt-4 w-full">
+            <Button variant="outline" className="mt-4 w-full" onClick={() => setNoteOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
               Add Note
             </Button>
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Note Dialog */}
+      <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-display">Add Note for {guest.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Textarea 
+              placeholder="Enter your note..."
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              rows={4}
+            />
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => setNoteOpen(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-1" onClick={handleAddNote}>
+                Save Note
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Visit History */}
       <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '400ms' }}>

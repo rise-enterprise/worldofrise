@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Guest, TIER_CONFIG } from '@/types/loyalty';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Crown, Coffee, UtensilsCrossed, Sparkles, ArrowLeft, LayoutDashboard, History, Calendar, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { ConciergeChat } from './ConciergeChat';
 
 interface MemberCardProps {
   guest: Guest;
@@ -11,6 +13,7 @@ interface MemberCardProps {
 
 export function MemberCard({ guest }: MemberCardProps) {
   const navigate = useNavigate();
+  const [conciergeOpen, setConciergeOpen] = useState(false);
   const tierConfig = TIER_CONFIG[guest.tier];
   const nextTierVisits = 
     guest.tier === 'initiation' ? 5 - guest.totalVisits :
@@ -191,6 +194,7 @@ export function MemberCard({ guest }: MemberCardProps) {
               variant="ghost" 
               size="sm"
               className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
+              onClick={() => navigate('/member/history')}
             >
               <History className="h-5 w-5 mb-1" />
               <span className="text-xs">History</span>
@@ -199,6 +203,7 @@ export function MemberCard({ guest }: MemberCardProps) {
               variant="ghost" 
               size="sm"
               className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
+              onClick={() => navigate('/member/events')}
             >
               <Calendar className="h-5 w-5 mb-1" />
               <span className="text-xs">Events</span>
@@ -207,6 +212,7 @@ export function MemberCard({ guest }: MemberCardProps) {
               variant="ghost" 
               size="sm"
               className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
+              onClick={() => setConciergeOpen(true)}
             >
               <MessageCircle className="h-5 w-5 mb-1" />
               <span className="text-xs">Concierge</span>
@@ -215,6 +221,12 @@ export function MemberCard({ guest }: MemberCardProps) {
         </div>
         </div>
       </div>
+
+      <ConciergeChat 
+        open={conciergeOpen} 
+        onOpenChange={setConciergeOpen}
+        memberName={guest.name}
+      />
     </div>
   );
 }
