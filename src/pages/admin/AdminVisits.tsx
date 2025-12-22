@@ -223,7 +223,7 @@ export default function AdminVisits() {
               <Filter className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Filters:</span>
             </div>
-            <Select value={brandFilter} onValueChange={setBrandFilter}>
+            <Select value={brandFilter} onValueChange={(val) => setBrandFilter(val as BrandType | 'all')}>
               <SelectTrigger className="w-36">
                 <SelectValue placeholder="Brand" />
               </SelectTrigger>
@@ -233,7 +233,7 @@ export default function AdminVisits() {
                 <SelectItem value="sasso">SASSO</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={sourceFilter} onValueChange={setSourceFilter}>
+            <Select value={sourceFilter} onValueChange={(val) => setSourceFilter(val as VisitSource | 'all')}>
               <SelectTrigger className="w-36">
                 <SelectValue placeholder="Source" />
               </SelectTrigger>
