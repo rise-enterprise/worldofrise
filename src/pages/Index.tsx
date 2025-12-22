@@ -6,7 +6,19 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-6 relative">
+      {/* Admin Dashboard Button - Top Left */}
+      <Button 
+        variant="luxury" 
+        size="lg"
+        onClick={() => navigate('/dashboard')}
+        className="absolute top-6 left-6 gap-2"
+      >
+        <Users className="h-5 w-5" />
+        Admin Dashboard
+        <ArrowRight className="h-4 w-4" />
+      </Button>
+
       <div className="w-full max-w-2xl text-center space-y-12 animate-fade-in">
         {/* Logo */}
         <div className="space-y-2">
@@ -38,17 +50,7 @@ const Index = () => {
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '400ms' }}>
-          <Button 
-            variant="luxury" 
-            size="xl"
-            onClick={() => navigate('/dashboard')}
-            className="gap-3"
-          >
-            <Users className="h-5 w-5" />
-            Admin Dashboard
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+        <div className="flex justify-center animate-slide-up" style={{ animationDelay: '400ms' }}>
           
           <Button 
             variant="outline" 
