@@ -9,9 +9,10 @@ import { ConciergeChat } from './ConciergeChat';
 
 interface MemberCardProps {
   guest: Guest;
+  isHomePage?: boolean;
 }
 
-export function MemberCard({ guest }: MemberCardProps) {
+export function MemberCard({ guest, isHomePage = false }: MemberCardProps) {
   const navigate = useNavigate();
   const [conciergeOpen, setConciergeOpen] = useState(false);
   const tierConfig = TIER_CONFIG[guest.tier];
@@ -29,27 +30,29 @@ export function MemberCard({ guest }: MemberCardProps) {
 
   return (
     <div className="min-h-screen bg-gradient-luxury flex flex-col">
-      {/* Top Navigation Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/30">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Home
-          </Button>
-          <h1 
-            className="font-display text-lg font-semibold text-gradient-gold cursor-pointer"
-            onClick={() => navigate('/')}
-          >
-            RISE
-          </h1>
-          <div className="w-16" /> {/* Spacer for centering */}
-        </div>
-      </header>
+      {/* Top Navigation Header - Only show when not on home page */}
+      {!isHomePage && (
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/30">
+          <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+            <h1 
+              className="font-display text-lg font-semibold text-gradient-gold cursor-pointer"
+              onClick={() => navigate('/')}
+            >
+              RISE
+            </h1>
+            <div className="w-16" /> {/* Spacer for centering */}
+          </div>
+        </header>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-start p-6 pt-4">
@@ -169,24 +172,27 @@ export function MemberCard({ guest }: MemberCardProps) {
 
         {/* Navigation Actions */}
         <div className="space-y-3 animate-slide-up pt-2" style={{ animationDelay: '600ms' }}>
-          <div className="grid grid-cols-2 gap-3">
-            <Button 
-              variant="luxury" 
-              className="w-full"
-              onClick={() => navigate('/dashboard')}
-            >
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/')}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
-            </Button>
-          </div>
+          {/* Show navigation buttons only when not on home page */}
+          {!isHomePage && (
+            <div className="grid grid-cols-2 gap-3">
+              <Button 
+                variant="luxury" 
+                className="w-full"
+                onClick={() => navigate('/dashboard')}
+              >
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+            </div>
+          )}
           
           {/* Quick Actions */}
           <div className="grid grid-cols-3 gap-2">
