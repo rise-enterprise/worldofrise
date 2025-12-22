@@ -365,20 +365,21 @@ export function EventsView() {
   );
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-2xl font-medium text-foreground flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-primary" />
+          <h2 className="font-display text-xl md:text-2xl font-medium text-foreground flex items-center gap-2">
+            <Calendar className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             Events & Experiences
           </h2>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Curate exclusive events for RISE members
           </p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
+        <Button onClick={() => setCreateOpen(true)} size="sm" className="self-start sm:self-auto">
           <Plus className="h-4 w-4 mr-2" />
-          Create Event
+          <span className="hidden sm:inline">Create Event</span>
+          <span className="sm:hidden">Create</span>
         </Button>
       </div>
 
@@ -389,8 +390,8 @@ export function EventsView() {
           <TabsTrigger value="drafts">Drafts ({draftEvents.length})</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="upcoming" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="upcoming" className="mt-4 md:mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {upcomingEvents.map((event, index) => renderEventCard(event, index))}
           </div>
           {upcomingEvents.length === 0 && (
@@ -403,8 +404,8 @@ export function EventsView() {
           )}
         </TabsContent>
 
-        <TabsContent value="past" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="past" className="mt-4 md:mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {pastEvents.map((event, index) => (
               <Card 
                 key={event.id}
@@ -454,8 +455,8 @@ export function EventsView() {
           )}
         </TabsContent>
 
-        <TabsContent value="drafts" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="drafts" className="mt-4 md:mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {draftEvents.map((event, index) => (
               <Card 
                 key={event.id}
@@ -508,7 +509,7 @@ export function EventsView() {
 
       {/* Create Event Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="w-[calc(100vw-32px)] max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-display">Create New Event</DialogTitle>
             <DialogDescription>
@@ -638,7 +639,7 @@ export function EventsView() {
 
       {/* Event Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="w-[calc(100vw-32px)] max-w-lg">
           {selectedEvent && (
             <>
               <DialogHeader>
@@ -710,7 +711,7 @@ export function EventsView() {
 
       {/* Guest List Dialog */}
       <Dialog open={guestListOpen} onOpenChange={setGuestListOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="w-[calc(100vw-32px)] max-w-lg">
           {selectedEvent && (
             <>
               <DialogHeader>
