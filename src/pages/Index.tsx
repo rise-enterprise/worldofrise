@@ -45,7 +45,7 @@ const Index = () => {
           </div>
           <div className="px-6 py-3 rounded-full bg-card border border-border/50">
             <p className="font-display text-foreground">SASSO</p>
-            <p className="text-xs text-muted-foreground">Italian Fine Dining</p>
+            <p className="text-xs text-muted-foreground">ساسو</p>
           </div>
         </div>
 
