@@ -59,13 +59,12 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
   const recentVisits = guest.visits.slice(0, 8);
 
   return (
-    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
+    <div className="p-8 space-y-6">
       {/* Back Button */}
       <Button 
         variant="ghost" 
         onClick={onBack}
         className="gap-2 animate-fade-in"
-        size="sm"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Guests
@@ -79,28 +78,28 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
           guest.tier === 'black' && 'border-primary/30 shadow-gold'
         )}
       >
-        <CardContent className="p-4 md:p-8">
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+        <CardContent className="p-8">
+          <div className="flex flex-col md:flex-row gap-8">
             {/* Avatar & Basic Info */}
             <div className="flex flex-col items-center md:items-start gap-4">
-              <Avatar className="h-20 w-20 md:h-28 md:w-28 border-4 border-border shadow-luxury">
+              <Avatar className="h-28 w-28 border-4 border-border shadow-luxury">
                 <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-                <AvatarFallback className="bg-muted text-muted-foreground font-display text-xl md:text-3xl">
+                <AvatarFallback className="bg-muted text-muted-foreground font-display text-3xl">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               
               <div className="text-center md:text-left">
-                <h2 className="font-display text-xl md:text-2xl font-medium text-foreground">{guest.name}</h2>
-                <div className="flex items-center justify-center md:justify-start gap-2 mt-2 flex-wrap">
-                  <Badge variant={guest.tier as any} className="text-xs md:text-sm px-3 md:px-4 py-1">
+                <h2 className="font-display text-2xl font-medium text-foreground">{guest.name}</h2>
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge variant={guest.tier as any} className="text-sm px-4 py-1">
                     {tierConfig.displayName}
                   </Badge>
-                  <span className="text-xs md:text-sm text-muted-foreground">{tierConfig.arabicName}</span>
+                  <span className="text-sm text-muted-foreground">{tierConfig.arabicName}</span>
                 </div>
               </div>
 
-              <div className="flex gap-2 flex-wrap justify-center md:justify-start">
+              <div className="flex gap-2 mt-2">
                 {guest.tags.map((tag) => (
                   <Badge key={tag} variant="outline" className="text-xs">
                     {tag}
@@ -110,16 +109,16 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
             </div>
 
             {/* Stats Grid */}
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
-                <p className="font-display text-2xl md:text-3xl font-medium text-foreground">{guest.totalVisits}</p>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Total Visits</p>
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
+                <p className="font-display text-3xl font-medium text-foreground">{guest.totalVisits}</p>
+                <p className="text-xs text-muted-foreground mt-1">Total Visits</p>
               </div>
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
-                <p className="font-display text-2xl md:text-3xl font-medium text-foreground">{guest.lifetimeVisits}</p>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Lifetime</p>
+              <div className="p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
+                <p className="font-display text-3xl font-medium text-foreground">{guest.lifetimeVisits}</p>
+                <p className="text-xs text-muted-foreground mt-1">Lifetime</p>
               </div>
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
+              <div className="p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
                 <div className="flex items-center justify-center gap-2">
                   {guest.favoriteBrand === 'noir' ? (
                     <Coffee className="h-5 w-5 text-foreground" />
@@ -127,33 +126,32 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                     <UtensilsCrossed className="h-5 w-5 text-sasso-accent" />
                   )}
                 </div>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Favorite Brand</p>
+                <p className="text-xs text-muted-foreground mt-1">Favorite Brand</p>
               </div>
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
+              <div className="p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
                 <p className="flex items-center justify-center gap-1 text-lg">
                   {guest.country === 'qatar' ? '🇶🇦' : '🇸🇦'}
                 </p>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">{guest.country === 'qatar' ? 'Qatar' : 'Saudi Arabia'}</p>
+                <p className="text-xs text-muted-foreground mt-1">{guest.country === 'qatar' ? 'Qatar' : 'Saudi Arabia'}</p>
               </div>
             </div>
           </div>
 
           {/* Contact Info */}
-          <div className="flex flex-wrap gap-4 md:gap-6 mt-6 md:mt-8 pt-4 md:pt-6 border-t border-border">
-            <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-              <Mail className="h-4 w-4 shrink-0" />
-              <span className="truncate">{guest.email}</span>
+          <div className="flex flex-wrap gap-6 mt-8 pt-6 border-t border-border">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Mail className="h-4 w-4" />
+              {guest.email}
             </div>
             {guest.phone && (
-              <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-                <Phone className="h-4 w-4 shrink-0" />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Phone className="h-4 w-4" />
                 {guest.phone}
               </div>
             )}
-            <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 shrink-0" />
-              <span className="hidden sm:inline">Member since {formatDate(guest.joinedAt)}</span>
-              <span className="sm:hidden">Since {formatDate(guest.joinedAt)}</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="h-4 w-4" />
+              Member since {formatDate(guest.joinedAt)}
             </div>
           </div>
         </CardContent>
@@ -164,23 +162,23 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
         <GuestInsightsPanel guest={guest} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Privileges */}
         <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base md:text-lg flex items-center gap-2">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
               <Gift className="h-5 w-5 text-primary" />
               Active Privileges
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 md:space-y-3">
+          <CardContent className="space-y-3">
             {tierConfig.privileges.map((privilege, index) => (
               <div 
                 key={index}
-                className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg bg-muted/50 border border-border/50"
+                className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/50"
               >
                 <Star className="h-4 w-4 text-primary shrink-0" />
-                <p className="text-xs md:text-sm text-foreground">{privilege}</p>
+                <p className="text-sm text-foreground">{privilege}</p>
               </div>
             ))}
           </CardContent>
@@ -188,25 +186,25 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
 
         {/* Notes */}
         <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base md:text-lg flex items-center gap-2">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
               <MessageSquare className="h-5 w-5 text-primary" />
               Guest Notes
             </CardTitle>
           </CardHeader>
           <CardContent>
             {notes.length > 0 ? (
-              <div className="space-y-2 md:space-y-3">
+              <div className="space-y-3">
                 {notes.map((note, index) => (
-                  <div key={index} className="p-2.5 md:p-3 rounded-lg bg-muted/50 border border-border/50">
-                    <p className="text-xs md:text-sm text-foreground leading-relaxed">{note}</p>
+                  <div key={index} className="p-3 rounded-lg bg-muted/50 border border-border/50">
+                    <p className="text-sm text-foreground leading-relaxed">{note}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs md:text-sm text-muted-foreground italic">No notes added for this guest.</p>
+              <p className="text-sm text-muted-foreground italic">No notes added for this guest.</p>
             )}
-            <Button variant="outline" className="mt-4 w-full" size="sm" onClick={() => setNoteOpen(true)}>
+            <Button variant="outline" className="mt-4 w-full" onClick={() => setNoteOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Note
             </Button>
@@ -216,7 +214,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
 
       {/* Add Note Dialog */}
       <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
-        <DialogContent className="w-[calc(100vw-32px)] max-w-lg">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle className="font-display">Add Note for {guest.name}</DialogTitle>
           </DialogHeader>
@@ -241,45 +239,45 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
 
       {/* Visit History */}
       <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '400ms' }}>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base md:text-lg">Visit Timeline</CardTitle>
+        <CardHeader>
+          <CardTitle className="text-lg">Visit Timeline</CardTitle>
           <p className="text-xs text-muted-foreground">Recent experiences across RISE brands</p>
         </CardHeader>
         <CardContent>
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-border" />
+            <div className="absolute left-6 top-0 bottom-0 w-px bg-border" />
             
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-4">
               {recentVisits.map((visit, index) => (
                 <div 
                   key={visit.id}
-                  className="relative flex items-start gap-3 md:gap-4 pl-10 md:pl-12 animate-slide-up"
+                  className="relative flex items-start gap-4 pl-12 animate-slide-up"
                   style={{ animationDelay: `${400 + index * 50}ms` }}
                 >
                   {/* Timeline dot */}
                   <div className={cn(
-                    'absolute left-2 md:left-4 w-4 h-4 rounded-full border-2 border-background',
+                    'absolute left-4 w-4 h-4 rounded-full border-2 border-background',
                     visit.brand === 'noir' ? 'bg-foreground' : 'bg-sasso-accent'
                   )} />
                   
-                  <div className="flex-1 p-3 md:p-4 rounded-lg bg-muted/50 border border-border/50">
-                    <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                  <div className="flex-1 p-4 rounded-lg bg-muted/50 border border-border/50">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         {visit.brand === 'noir' ? (
                           <Coffee className="h-4 w-4" />
                         ) : (
                           <UtensilsCrossed className="h-4 w-4 text-sasso-accent" />
                         )}
-                        <span className="font-medium text-xs md:text-sm text-foreground">
+                        <span className="font-medium text-sm text-foreground">
                           {visit.brand === 'noir' ? 'NOIR Café' : 'SASSO'}
                         </span>
                       </div>
-                      <span className="text-[10px] md:text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {formatDate(visit.date)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <MapPin className="h-3 w-3" />
                       {visit.location}
                     </div>

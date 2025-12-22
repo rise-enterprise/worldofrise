@@ -153,9 +153,6 @@ function generateRecommendations(guest: GuestData, churnRisk: string): string[] 
   return recommendations.slice(0, 4);
 }
 
-// Allowed admin roles that can access this endpoint
-const ALLOWED_ROLES = ['super_admin', 'admin', 'manager'];
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -191,32 +188,6 @@ serve(async (req) => {
     }
 
     console.log('Authenticated user:', user.id);
-
-    // Verify user is an active admin with appropriate role
-    const { data: admin, error: adminError } = await supabase
-      .from('admins')
-      .select('id, role, is_active')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .single();
-
-    if (adminError || !admin) {
-      console.error('Admin lookup failed:', adminError?.message || 'No admin record found');
-      return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    if (!ALLOWED_ROLES.includes(admin.role)) {
-      console.error('Insufficient permissions: role', admin.role, 'not in allowed roles');
-      return new Response(JSON.stringify({ error: 'Forbidden: Insufficient permissions' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log('Authorized admin:', admin.id, 'with role:', admin.role);
 
     const { guest } = await req.json() as { guest: GuestData };
     
@@ -315,8 +286,8 @@ Generate ONLY the message body, no subject line or greeting.`;
     });
   } catch (error) {
     console.error('Error in guest-insights function:', error);
-    // Return generic error message without internal details
-    return new Response(JSON.stringify({ error: 'An error occurred processing the request' }), {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

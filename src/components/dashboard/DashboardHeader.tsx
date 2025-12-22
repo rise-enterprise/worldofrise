@@ -23,17 +23,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Guest, Brand } from '@/types/loyalty';
+import { Guest } from '@/types/loyalty';
 import { mockGuests } from '@/data/mockData';
 
 interface DashboardHeaderProps {
   onSearch?: (query: string) => void;
   onGuestAdded?: (guest: Partial<Guest>) => void;
-  isMobile?: boolean;
-  activeBrand?: Brand;
 }
 
-export function DashboardHeader({ onSearch, onGuestAdded, isMobile, activeBrand }: DashboardHeaderProps) {
+export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Guest[]>([]);
@@ -53,9 +51,9 @@ export function DashboardHeader({ onSearch, onGuestAdded, isMobile, activeBrand 
   });
 
   const currentDate = new Date().toLocaleDateString('en-US', {
-    weekday: isMobile ? 'short' : 'long',
+    weekday: 'long',
     year: 'numeric',
-    month: isMobile ? 'short' : 'long',
+    month: 'long',
     day: 'numeric',
   });
 
@@ -122,23 +120,23 @@ export function DashboardHeader({ onSearch, onGuestAdded, isMobile, activeBrand 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <header className={`flex items-center justify-between border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30 ${isMobile ? 'py-4 px-4' : 'py-6 px-8'}`}>
-      <div className="animate-fade-in min-w-0 flex-1">
-        <h1 className={`font-display font-medium text-foreground ${isMobile ? 'text-lg' : 'text-2xl'}`}>
+    <header className="flex items-center justify-between py-6 px-8 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30">
+      <div className="animate-fade-in">
+        <h1 className="font-display text-2xl font-medium text-foreground">
           Welcome back
         </h1>
-        <p className={`text-muted-foreground mt-0.5 truncate ${isMobile ? 'text-xs' : 'text-sm'}`}>{currentDate}</p>
+        <p className="text-sm text-muted-foreground mt-1">{currentDate}</p>
       </div>
 
-      <div className="flex items-center gap-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
+      <div className="flex items-center gap-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
         {/* Search Button */}
         <Popover open={searchOpen} onOpenChange={setSearchOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9">
+            <Button variant="ghost" size="icon" className="relative">
               <Search className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className={isMobile ? 'w-[calc(100vw-32px)]' : 'w-80'} align="end">
+          <PopoverContent className="w-80" align="end">
             <div className="space-y-3">
               <h4 className="font-medium text-sm">Search Guests</h4>
               <Input 
@@ -178,14 +176,14 @@ export function DashboardHeader({ onSearch, onGuestAdded, isMobile, activeBrand 
         {/* Notifications Button */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9">
+            <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className={isMobile ? 'w-[calc(100vw-32px)]' : 'w-80'} align="end">
+          <PopoverContent className="w-80" align="end">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-sm">Notifications</h4>
@@ -229,16 +227,11 @@ export function DashboardHeader({ onSearch, onGuestAdded, isMobile, activeBrand 
 
         {/* New Guest Button */}
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
-          <Button 
-            variant="luxury" 
-            className={`gap-2 ${isMobile ? 'px-3' : ''}`}
-            onClick={() => setNewGuestOpen(true)}
-            size={isMobile ? 'sm' : 'default'}
-          >
+          <Button variant="luxury" className="gap-2" onClick={() => setNewGuestOpen(true)}>
             <Plus className="h-4 w-4" />
-            {!isMobile && <span>New Guest</span>}
+            <span>New Guest</span>
           </Button>
-          <DialogContent className={isMobile ? 'w-[calc(100vw-32px)] max-w-lg' : ''}>
+          <DialogContent>
             <DialogHeader>
               <DialogTitle className="font-display">Register New Guest</DialogTitle>
               <DialogDescription>
@@ -292,7 +285,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, isMobile, activeBrand 
                   </SelectContent>
                 </Select>
               </div>
-              <div className={`flex gap-3 pt-2 ${isMobile ? 'flex-col' : ''}`}>
+              <div className="flex gap-3 pt-2">
                 <Button variant="outline" className="flex-1" onClick={() => setNewGuestOpen(false)}>
                   Cancel
                 </Button>

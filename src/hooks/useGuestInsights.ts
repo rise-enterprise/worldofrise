@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Guest, GuestInsight } from '@/types/loyalty';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 export function useGuestInsights() {
   const [loading, setLoading] = useState(false);
@@ -52,7 +51,7 @@ export function useGuestInsights() {
 
       return data as GuestInsight;
     } catch (error) {
-      logger.error('Failed to generate insights:', error);
+      console.error('Failed to generate insights:', error);
       toast({
         title: 'Error',
         description: 'Failed to generate insights. Please try again.',
