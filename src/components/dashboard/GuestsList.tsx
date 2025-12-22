@@ -14,6 +14,7 @@ import {
   Crown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface GuestsListProps {
   guests: Guest[];
@@ -51,27 +52,28 @@ export function GuestsList({ guests, activeBrand, onSelectGuest }: GuestsListPro
   };
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
         <div>
-          <h2 className="font-display text-2xl font-medium text-foreground">Guest Directory</h2>
+          <h2 className="font-display text-xl md:text-2xl font-medium text-foreground">Guest Directory</h2>
           <p className="text-sm text-muted-foreground mt-1">
             {filteredGuests.length} members in your circle
           </p>
         </div>
-        <Button variant="luxury" className="gap-2">
+        <Button variant="luxury" className="gap-2 self-start sm:self-auto" size="sm">
           <Crown className="h-4 w-4" />
-          Export VIP List
+          <span className="hidden sm:inline">Export VIP List</span>
+          <span className="sm:hidden">Export</span>
         </Button>
       </div>
 
       {/* Filters */}
       <Card variant="glass" className="animate-slide-up">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
+        <CardContent className="p-3 md:p-4">
+          <div className="flex flex-col gap-3">
             {/* Search */}
-            <div className="relative flex-1">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
@@ -82,20 +84,23 @@ export function GuestsList({ guests, activeBrand, onSelectGuest }: GuestsListPro
               />
             </div>
 
-            {/* Tier Filter */}
-            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-              {tierFilters.map((tier) => (
-                <Button
-                  key={tier.id}
-                  variant={selectedTier === tier.id ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedTier(tier.id)}
-                  className="whitespace-nowrap"
-                >
-                  {tier.label}
-                </Button>
-              ))}
-            </div>
+            {/* Tier Filter - Horizontal Scroll on Mobile */}
+            <ScrollArea className="w-full">
+              <div className="flex gap-2 pb-2">
+                {tierFilters.map((tier) => (
+                  <Button
+                    key={tier.id}
+                    variant={selectedTier === tier.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedTier(tier.id)}
+                    className="whitespace-nowrap shrink-0"
+                  >
+                    {tier.label}
+                  </Button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
         </CardContent>
       </Card>
@@ -117,49 +122,48 @@ export function GuestsList({ guests, activeBrand, onSelectGuest }: GuestsListPro
               style={{ animationDelay: `${index * 50}ms` }}
               onClick={() => onSelectGuest(guest)}
             >
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-14 w-14 border-2 border-border">
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <Avatar className="h-10 w-10 md:h-14 md:w-14 border-2 border-border shrink-0">
                     <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-                    <AvatarFallback className="bg-muted text-muted-foreground font-display text-lg">
+                    <AvatarFallback className="bg-muted text-muted-foreground font-display text-sm md:text-lg">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-display text-base font-medium text-foreground">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h4 className="font-display text-sm md:text-base font-medium text-foreground truncate">
                         {guest.name}
                       </h4>
-                      <Badge variant={guest.tier as any} className="text-xs">
+                      <Badge variant={guest.tier as any} className="text-[10px] md:text-xs shrink-0">
                         {tierConfig.displayName}
                       </Badge>
-                      {guest.tags.includes('VIP') && (
-                        <Badge variant="gold" className="text-xs">VIP</Badge>
-                      )}
                     </div>
                     
-                    <p className="text-sm text-muted-foreground">{guest.email}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground truncate">{guest.email}</p>
                     
-                    <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 md:gap-4 mt-1.5 md:mt-2 text-[10px] md:text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         {guest.favoriteBrand === 'noir' ? (
                           <Coffee className="h-3 w-3" />
                         ) : (
                           <UtensilsCrossed className="h-3 w-3" />
                         )}
-                        {guest.favoriteBrand === 'noir' ? 'NOIR' : 'SASSO'} preferred
+                        <span className="hidden sm:inline">{guest.favoriteBrand === 'noir' ? 'NOIR' : 'SASSO'} preferred</span>
+                        <span className="sm:hidden">{guest.favoriteBrand === 'noir' ? 'NOIR' : 'SASSO'}</span>
                       </span>
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        {guest.country === 'qatar' ? 'Qatar' : 'Saudi Arabia'}
+                        <span className="hidden sm:inline">{guest.country === 'qatar' ? 'Qatar' : 'Saudi Arabia'}</span>
+                        <span className="sm:hidden">{guest.country === 'qatar' ? 'QA' : 'SA'}</span>
                       </span>
                     </div>
                   </div>
 
-                  <div className="text-right hidden md:block">
-                    <p className="font-display text-2xl font-medium text-foreground">{guest.totalVisits}</p>
-                    <p className="text-xs text-muted-foreground">total visits</p>
+                  <div className="text-right hidden sm:block">
+                    <p className="font-display text-xl md:text-2xl font-medium text-foreground">{guest.totalVisits}</p>
+                    <p className="text-[10px] md:text-xs text-muted-foreground">visits</p>
                   </div>
 
                   <div className="text-right hidden lg:block">
@@ -167,7 +171,7 @@ export function GuestsList({ guests, activeBrand, onSelectGuest }: GuestsListPro
                     <p className="text-xs text-muted-foreground">last visit</p>
                   </div>
 
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  <ChevronRight className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground shrink-0" />
                 </div>
               </CardContent>
             </Card>
