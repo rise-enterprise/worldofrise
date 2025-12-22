@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import MemberPortal from "./pages/MemberPortal";
+import MemberHistory from "./pages/MemberHistory";
+import MemberEvents from "./pages/MemberEvents";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/member" element={<MemberPortal />} />
+          <Route path="/member/history" element={<MemberHistory />} />
+          <Route path="/member/events" element={<MemberEvents />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
