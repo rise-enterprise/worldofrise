@@ -221,6 +221,41 @@ export type Database = {
         }
         Relationships: []
       }
+      member_auth: {
+        Row: {
+          created_at: string | null
+          id: string
+          member_id: string | null
+          phone: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          member_id?: string | null
+          phone: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          member_id?: string | null
+          phone?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_auth_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       member_tiers: {
         Row: {
           assigned_at: string | null
@@ -773,7 +808,9 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["admin_role"]
       }
+      get_member_id: { Args: { _user_id: string }; Returns: string }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_member: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       admin_role: "super_admin" | "admin" | "manager" | "viewer"
