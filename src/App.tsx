@@ -3,7 +3,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import MemberPortal from "./pages/MemberPortal";
@@ -15,9 +14,9 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 
-const App = () => {
-  const [queryClient] = useState(() => new QueryClient());
+const queryClient = new QueryClient();
 
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -51,6 +50,6 @@ const App = () => {
       </TooltipProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
