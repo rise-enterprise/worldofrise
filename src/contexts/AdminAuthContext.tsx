@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Admin, AdminRole, AuditAction } from '@/types/admin';
-
+import { logger } from '@/lib/logger';
 interface AdminAuthContextType {
   user: User | null;
   session: Session | null;
@@ -67,13 +67,13 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         .maybeSingle();
 
       if (error) {
-        console.error('Error fetching admin profile:', error);
+        logger.error('Error fetching admin profile:', error);
         setAdmin(null);
       } else {
         setAdmin(data as Admin | null);
       }
     } catch (err) {
-      console.error('Error fetching admin profile:', err);
+      logger.error('Error fetching admin profile:', err);
       setAdmin(null);
     } finally {
       setIsLoading(false);
@@ -128,7 +128,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           });
 
         if (adminError) {
-          console.error('Error creating admin record:', adminError);
+          logger.error('Error creating admin record:', adminError);
           return { error: adminError };
         }
       }
@@ -190,7 +190,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
         user_agent: navigator.userAgent,
       }]);
     } catch (err) {
-      console.error('Failed to log audit:', err);
+      logger.error('Failed to log audit:', err);
     }
   };
 
