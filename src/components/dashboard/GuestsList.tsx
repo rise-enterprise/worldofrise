@@ -36,7 +36,7 @@ export function GuestsList({ guests, activeBrand, onSelectGuest }: GuestsListPro
 
   const filteredGuests = guests.filter(guest => {
     const matchesSearch = guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         guest.email.toLowerCase().includes(searchQuery.toLowerCase());
+                         (guest.email && guest.email.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesBrand = activeBrand === 'all' || guest.favoriteBrand === activeBrand;
     const matchesTier = selectedTier === 'all' || guest.tier === selectedTier;
     return matchesSearch && matchesBrand && matchesTier;
@@ -139,7 +139,7 @@ export function GuestsList({ guests, activeBrand, onSelectGuest }: GuestsListPro
                       )}
                     </div>
                     
-                    <p className="text-sm text-muted-foreground">{guest.email}</p>
+                    <p className="text-sm text-muted-foreground">{guest.email || guest.phone || 'No contact info'}</p>
                     
                     <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
