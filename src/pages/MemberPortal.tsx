@@ -1,10 +1,12 @@
-import { useMembers } from '@/hooks/useMembers';
+import { useMember } from '@/hooks/useMembers';
+import { useMemberAuthContext } from '@/contexts/MemberAuthContext';
 import { MemberCard } from '@/components/member/MemberCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function MemberPortal() {
-  const { data: guests = [], isLoading } = useMembers();
+  const { member: memberAuth } = useMemberAuthContext();
+  const { data: member, isLoading } = useMember(memberAuth?.memberId || undefined);
   
   if (isLoading) {
     return (
@@ -15,9 +17,6 @@ export default function MemberPortal() {
       </div>
     );
   }
-
-  // For demo, show the first member
-  const member = guests[0];
 
   if (!member) {
     return (
