@@ -810,6 +810,15 @@ export type Database = {
         Returns: Database["public"]["Enums"]["admin_role"]
       }
       get_member_id: { Args: { _user_id: string }; Returns: string }
+      get_my_admin_info: {
+        Args: never
+        Returns: {
+          email: string
+          id: string
+          name: string
+          role: string
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_member: { Args: { _user_id: string }; Returns: boolean }
     }
