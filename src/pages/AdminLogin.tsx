@@ -47,15 +47,11 @@ const AdminLogin = () => {
 
     setIsSubmitting(true);
     
-    // Check if email belongs to an active admin
-    const { data: adminData } = await supabase
-      .from('admins')
-      .select('id')
-      .eq('email', email.toLowerCase())
-      .eq('is_active', true)
-      .maybeSingle();
+    // Check if email belongs to an active admin using RPC (bypasses RLS)
+    const { data: isAdmin } = await supabase
+      .rpc('check_admin_email', { admin_email: email });
 
-    if (!adminData) {
+    if (!isAdmin) {
       toast({
         title: 'Email not found',
         description: 'This email is not registered as an active admin.',
@@ -139,15 +135,11 @@ const AdminLogin = () => {
   const onPasswordSubmit = async (data: PasswordFormData) => {
     setIsSubmitting(true);
     
-    // First check if email belongs to an active admin
-    const { data: adminData, error: adminError } = await supabase
-      .from('admins')
-      .select('id, is_active')
-      .eq('email', data.email.toLowerCase())
-      .eq('is_active', true)
-      .maybeSingle();
+    // First check if email belongs to an active admin using RPC (bypasses RLS)
+    const { data: isAdmin, error: adminError } = await supabase
+      .rpc('check_admin_email', { admin_email: data.email });
 
-    if (adminError || !adminData) {
+    if (adminError || !isAdmin) {
       toast({
         title: 'Access denied',
         description: 'This email is not registered as an active admin.',
