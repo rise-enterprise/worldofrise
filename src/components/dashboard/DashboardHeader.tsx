@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Bell, Search, Plus, X } from 'lucide-react';
+import { Bell, Search, Plus, Upload } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,7 @@ import {
 import { toast } from 'sonner';
 import { Guest, Country } from '@/types/loyalty';
 import { useMembers, useCreateMember } from '@/hooks/useMembers';
+import { DataImport } from './DataImport';
 
 interface DashboardHeaderProps {
   onSearch?: (query: string) => void;
@@ -36,6 +37,7 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Guest[]>([]);
   const [newGuestOpen, setNewGuestOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     { id: 1, message: 'New VIP guest registered', time: '2 mins ago', read: false },
     { id: 2, message: 'Ahmed Al-Rashid reached Inner Circle', time: '1 hour ago', read: false },
@@ -219,6 +221,12 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
           </PopoverContent>
         </Popover>
 
+        {/* Import CSV Button */}
+        <Button variant="outline" className="gap-2" onClick={() => setImportOpen(true)}>
+          <Upload className="h-4 w-4" />
+          <span>Import CSV</span>
+        </Button>
+
         {/* New Guest Button */}
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
           <Button variant="luxury" className="gap-2" onClick={() => setNewGuestOpen(true)}>
@@ -295,6 +303,9 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* CSV Import Dialog */}
+        <DataImport open={importOpen} onOpenChange={setImportOpen} />
       </div>
     </header>
   );
