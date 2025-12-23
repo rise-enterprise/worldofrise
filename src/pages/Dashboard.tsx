@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Brand, Guest, DashboardMetrics } from '@/types/loyalty';
 import { useMembers } from '@/hooks/useMembers';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { Overview } from '@/components/dashboard/Overview';
@@ -29,7 +30,9 @@ export default function Dashboard() {
   const [activeView, setActiveView] = useState('dashboard');
   const [activeBrand, setActiveBrand] = useState<Brand>('all');
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const isMobile = useIsMobile();
   const { data: guests = [], isLoading: guestsLoading } = useMembers();
   const { data: metrics = emptyMetrics, isLoading: metricsLoading } = useDashboardMetrics();
 
@@ -52,14 +55,18 @@ export default function Dashboard() {
         setActiveView={setActiveView}
         activeBrand={activeBrand}
         setActiveBrand={setActiveBrand}
+        mobileOpen={mobileMenuOpen}
+        onMobileClose={() => setMobileMenuOpen(false)}
       />
 
-      <main className="ml-64">
-        <DashboardHeader />
+      <main className={isMobile ? '' : 'ml-64'}>
+        <DashboardHeader 
+          onMenuClick={() => setMobileMenuOpen(true)}
+        />
         
         {activeView === 'dashboard' && (
           isLoading ? (
-            <div className="p-8 space-y-4">
+            <div className="p-4 md:p-8 space-y-4">
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-64 w-full" />
             </div>
