@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Bell, Search, Plus, Upload } from 'lucide-react';
+import { Bell, Search, Plus, Upload, Menu } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Dialog,
   DialogContent,
@@ -30,9 +31,11 @@ import { DataImport } from './DataImport';
 interface DashboardHeaderProps {
   onSearch?: (query: string) => void;
   onGuestAdded?: (guest: Partial<Guest>) => void;
+  onMenuClick?: () => void;
 }
 
-export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps) {
+export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: DashboardHeaderProps) {
+  const isMobile = useIsMobile();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Guest[]>([]);
@@ -56,9 +59,9 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
   });
 
   const currentDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
+    weekday: isMobile ? 'short' : 'long',
     year: 'numeric',
-    month: 'long',
+    month: isMobile ? 'short' : 'long',
     day: 'numeric',
   });
 
@@ -116,23 +119,32 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <header className="flex items-center justify-between py-6 px-8 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30">
-      <div className="animate-fade-in">
-        <h1 className="font-display text-2xl font-medium text-foreground">
-          Welcome back
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">{currentDate}</p>
+    <header className="flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30 gap-4">
+      <div className="flex items-center gap-3 animate-fade-in min-w-0">
+        {/* Mobile Menu Button */}
+        {isMobile && (
+          <Button variant="ghost" size="icon" onClick={onMenuClick} className="shrink-0">
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
+        
+        <div className="min-w-0">
+          <h1 className="font-display text-lg md:text-2xl font-medium text-foreground truncate">
+            Welcome back
+          </h1>
+          <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1 truncate">{currentDate}</p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-3 animate-fade-in" style={{ animationDelay: '100ms' }}>
+      <div className="flex items-center gap-2 md:gap-3 animate-fade-in shrink-0" style={{ animationDelay: '100ms' }}>
         {/* Search Button */}
         <Popover open={searchOpen} onOpenChange={setSearchOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10">
               <Search className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="end">
+          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80" align="end">
             <div className="space-y-3">
               <h4 className="font-medium text-sm">Search Guests</h4>
               <Input 
@@ -172,14 +184,14 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
         {/* Notifications Button */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10">
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
+                <span className="absolute top-1 right-1 md:top-1.5 md:right-1.5 w-2 h-2 bg-primary rounded-full" />
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="end">
+          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80" align="end">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-sm">Notifications</h4>
@@ -221,19 +233,27 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
           </PopoverContent>
         </Popover>
 
-        {/* Import CSV Button */}
-        <Button variant="outline" className="gap-2" onClick={() => setImportOpen(true)}>
+        {/* Import CSV Button - Icon only on mobile */}
+        <Button 
+          variant="outline" 
+          className="gap-2 h-9 md:h-10 px-3 md:px-4" 
+          onClick={() => setImportOpen(true)}
+        >
           <Upload className="h-4 w-4" />
-          <span>Import CSV</span>
+          <span className="hidden md:inline">Import CSV</span>
         </Button>
 
-        {/* New Guest Button */}
+        {/* New Guest Button - Icon only on mobile */}
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
-          <Button variant="luxury" className="gap-2" onClick={() => setNewGuestOpen(true)}>
+          <Button 
+            variant="luxury" 
+            className="gap-2 h-9 md:h-10 px-3 md:px-4" 
+            onClick={() => setNewGuestOpen(true)}
+          >
             <Plus className="h-4 w-4" />
-            <span>New Guest</span>
+            <span className="hidden md:inline">New Guest</span>
           </Button>
-          <DialogContent>
+          <DialogContent className="max-w-[calc(100vw-2rem)] md:max-w-lg">
             <DialogHeader>
               <DialogTitle className="font-display">Register New Guest</DialogTitle>
               <DialogDescription>

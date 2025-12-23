@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Guest, TIER_CONFIG, Brand, Tier } from '@/types/loyalty';
 import { usePaginatedMembers, PAGE_SIZE } from '@/hooks/usePaginatedMembers';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { 
   Search, 
   Coffee, 
@@ -14,8 +16,6 @@ import {
   ChevronRight,
   ChevronLeft,
   Crown,
-  ChevronsLeft,
-  ChevronsRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +34,7 @@ const tierFilters: { id: Tier | 'all'; label: string }[] = [
 ];
 
 export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
+  const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedTier, setSelectedTier] = useState<Tier | 'all'>('all');
@@ -68,7 +69,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
     return new Intl.DateTimeFormat('en-US', { 
       month: 'short', 
       day: 'numeric',
-      year: 'numeric'
+      year: isMobile ? '2-digit' : 'numeric'
     }).format(date);
   };
 
@@ -78,55 +79,29 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
     }
   };
 
-  const getPageNumbers = () => {
-    const pages: (number | string)[] = [];
-    const maxVisible = 5;
-    
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) pages.push(i);
-        pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1);
-        pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-        pages.push('...');
-        pages.push(totalPages);
-      }
-    }
-    
-    return pages;
-  };
-
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
         <div>
-          <h2 className="font-display text-2xl font-medium text-foreground">Guest Directory</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h2 className="font-display text-xl md:text-2xl font-medium text-foreground">Guest Directory</h2>
+          <p className="text-xs md:text-sm text-muted-foreground mt-1">
             {totalCount.toLocaleString()} members in your circle
           </p>
         </div>
-        <Button variant="luxury" className="gap-2">
+        <Button variant="luxury" className="gap-2 w-full sm:w-auto">
           <Crown className="h-4 w-4" />
-          Export VIP List
+          <span className="hidden sm:inline">Export VIP List</span>
+          <span className="sm:hidden">Export VIPs</span>
         </Button>
       </div>
 
       {/* Filters */}
       <Card variant="glass" className="animate-slide-up">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
+        <CardContent className="p-3 md:p-4">
+          <div className="flex flex-col gap-3 md:gap-4">
             {/* Search */}
-            <div className="relative flex-1">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
@@ -137,20 +112,23 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
               />
             </div>
 
-            {/* Tier Filter */}
-            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-              {tierFilters.map((tier) => (
-                <Button
-                  key={tier.id}
-                  variant={selectedTier === tier.id ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedTier(tier.id)}
-                  className="whitespace-nowrap"
-                >
-                  {tier.label}
-                </Button>
-              ))}
-            </div>
+            {/* Tier Filter - Horizontal scroll on mobile */}
+            <ScrollArea className="w-full whitespace-nowrap">
+              <div className="flex gap-2 pb-1">
+                {tierFilters.map((tier) => (
+                  <Button
+                    key={tier.id}
+                    variant={selectedTier === tier.id ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedTier(tier.id)}
+                    className="whitespace-nowrap h-8 text-xs md:text-sm"
+                  >
+                    {tier.label}
+                  </Button>
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" className="h-2" />
+            </ScrollArea>
           </div>
         </CardContent>
       </Card>
@@ -160,15 +138,14 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <Card key={i} variant="elevated">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-14 w-14 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-48" />
-                    <Skeleton className="h-3 w-32" />
-                    <Skeleton className="h-3 w-24" />
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <Skeleton className="h-12 w-12 md:h-14 md:w-14 rounded-full shrink-0" />
+                  <div className="flex-1 space-y-2 min-w-0">
+                    <Skeleton className="h-4 w-32 md:w-48" />
+                    <Skeleton className="h-3 w-24 md:w-32" />
                   </div>
-                  <Skeleton className="h-8 w-16" />
+                  <Skeleton className="h-5 w-5 shrink-0" />
                 </div>
               </CardContent>
             </Card>
@@ -177,10 +154,10 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
       ) : (
         <>
           {/* Guest List */}
-          <div className={cn("space-y-3 transition-opacity", isFetching && "opacity-60")}>
+          <div className={cn("space-y-2 md:space-y-3 transition-opacity", isFetching && "opacity-60")}>
             {guests.length === 0 ? (
               <Card variant="elevated">
-                <CardContent className="p-8 text-center">
+                <CardContent className="p-6 md:p-8 text-center">
                   <p className="text-muted-foreground">No members found matching your criteria.</p>
                 </CardContent>
               </Card>
@@ -194,63 +171,72 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                     key={guest.id}
                     variant="elevated"
                     className={cn(
-                      'cursor-pointer hover:scale-[1.01] transition-all duration-300 animate-slide-up',
+                      'cursor-pointer hover:scale-[1.01] transition-all duration-300 animate-slide-up active:scale-[0.99]',
                       guest.tier === 'black' && 'border-primary/30'
                     )}
                     style={{ animationDelay: `${index * 30}ms` }}
                     onClick={() => onSelectGuest(guest)}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-4">
-                        <Avatar className="h-14 w-14 border-2 border-border">
+                    <CardContent className="p-3 md:p-4">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <Avatar className="h-12 w-12 md:h-14 md:w-14 border-2 border-border shrink-0">
                           <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-                          <AvatarFallback className="bg-muted text-muted-foreground font-display text-lg">
+                          <AvatarFallback className="bg-muted text-muted-foreground font-display text-base md:text-lg">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-display text-base font-medium text-foreground">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h4 className="font-display text-sm md:text-base font-medium text-foreground truncate">
                               {guest.name}
                             </h4>
-                            <Badge variant={guest.tier as any} className="text-xs">
-                              {tierConfig.displayName}
+                            <Badge variant={guest.tier as any} className="text-[10px] md:text-xs shrink-0">
+                              {isMobile ? tierConfig.displayName.split(' ')[0] : tierConfig.displayName}
                             </Badge>
                             {guest.tags.includes('VIP') && (
-                              <Badge variant="gold" className="text-xs">VIP</Badge>
+                              <Badge variant="gold" className="text-[10px] md:text-xs shrink-0">VIP</Badge>
                             )}
                           </div>
                           
-                          <p className="text-sm text-muted-foreground">{guest.email || guest.phone || 'No contact info'}</p>
+                          <p className="text-xs md:text-sm text-muted-foreground truncate">
+                            {guest.email || guest.phone || 'No contact info'}
+                          </p>
                           
-                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                          {/* Mobile: Show visits inline */}
+                          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               {guest.favoriteBrand === 'noir' ? (
                                 <Coffee className="h-3 w-3" />
                               ) : (
                                 <UtensilsCrossed className="h-3 w-3" />
                               )}
-                              {guest.favoriteBrand === 'noir' ? 'NOIR' : 'SASSO'} preferred
+                              <span className="hidden sm:inline">{guest.favoriteBrand === 'noir' ? 'NOIR' : 'SASSO'}</span>
                             </span>
                             <span className="flex items-center gap-1">
                               <MapPin className="h-3 w-3" />
-                              {guest.country === 'doha' ? 'Qatar' : 'Saudi Arabia'}
+                              <span className="hidden sm:inline">{guest.country === 'doha' ? 'Qatar' : 'Saudi'}</span>
+                            </span>
+                            {/* Show visits on mobile */}
+                            <span className="md:hidden font-medium text-foreground">
+                              {guest.totalVisits} visits
                             </span>
                           </div>
                         </div>
 
+                        {/* Desktop: visits count */}
                         <div className="text-right hidden md:block">
                           <p className="font-display text-2xl font-medium text-foreground">{guest.totalVisits}</p>
                           <p className="text-xs text-muted-foreground">total visits</p>
                         </div>
 
+                        {/* Desktop: last visit */}
                         <div className="text-right hidden lg:block">
                           <p className="text-sm text-foreground">{formatDate(guest.lastVisit)}</p>
                           <p className="text-xs text-muted-foreground">last visit</p>
                         </div>
 
-                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                        <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
                       </div>
                     </CardContent>
                   </Card>
@@ -259,70 +245,44 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
             )}
           </div>
 
-          {/* Pagination */}
+          {/* Pagination - Simplified for mobile */}
           {totalPages > 1 && (
             <Card variant="glass" className="animate-fade-in">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">
-                    Showing {((currentPage - 1) * PAGE_SIZE) + 1} - {Math.min(currentPage * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()} members
+              <CardContent className="p-3 md:p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
+                    {((currentPage - 1) * PAGE_SIZE) + 1} - {Math.min(currentPage * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground sm:hidden">
+                    Page {currentPage} of {totalPages}
                   </p>
                   
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => goToPage(1)}
-                      disabled={currentPage === 1}
-                      className="h-8 w-8 p-0"
-                    >
-                      <ChevronsLeft className="h-4 w-4" />
-                    </Button>
+                  <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => goToPage(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="h-8 w-8 p-0"
+                      className="h-9 px-3"
                     >
                       <ChevronLeft className="h-4 w-4" />
+                      <span className="hidden sm:inline ml-1">Prev</span>
                     </Button>
                     
-                    <div className="flex items-center gap-1 mx-2">
-                      {getPageNumbers().map((page, i) => (
-                        page === '...' ? (
-                          <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground">...</span>
-                        ) : (
-                          <Button
-                            key={page}
-                            variant={currentPage === page ? 'default' : 'ghost'}
-                            size="sm"
-                            onClick={() => goToPage(page as number)}
-                            className="h-8 w-8 p-0"
-                          >
-                            {page}
-                          </Button>
-                        )
-                      ))}
-                    </div>
+                    {/* Page indicator for mobile */}
+                    <span className="text-sm font-medium px-2 min-w-[3rem] text-center">
+                      {currentPage} / {totalPages}
+                    </span>
 
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => goToPage(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="h-8 w-8 p-0"
+                      className="h-9 px-3"
                     >
+                      <span className="hidden sm:inline mr-1">Next</span>
                       <ChevronRight className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => goToPage(totalPages)}
-                      disabled={currentPage === totalPages}
-                      className="h-8 w-8 p-0"
-                    >
-                      <ChevronsRight className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

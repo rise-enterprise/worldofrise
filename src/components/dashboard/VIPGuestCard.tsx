@@ -9,9 +9,10 @@ interface VIPGuestCardProps {
   guest: Guest;
   onClick?: () => void;
   delay?: number;
+  compact?: boolean;
 }
 
-export function VIPGuestCard({ guest, onClick, delay = 0 }: VIPGuestCardProps) {
+export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIPGuestCardProps) {
   const tierConfig = TIER_CONFIG[guest.tier];
   const initials = guest.name.split(' ').map(n => n[0]).join('');
   
@@ -21,6 +22,43 @@ export function VIPGuestCard({ guest, onClick, delay = 0 }: VIPGuestCardProps) {
       day: 'numeric' 
     }).format(date);
   };
+
+  if (compact) {
+    return (
+      <Card 
+        variant="elevated"
+        className={cn(
+          'cursor-pointer hover:scale-[1.02] transition-all duration-300 animate-slide-up h-full',
+          guest.tier === 'black' && 'border-primary/30 shadow-gold'
+        )}
+        style={{ animationDelay: `${delay}ms` }}
+        onClick={onClick}
+      >
+        <CardContent className="p-3">
+          <div className="flex items-center gap-3 mb-2">
+            <Avatar className="h-10 w-10 border-2 border-border shrink-0">
+              <AvatarImage src={guest.avatarUrl} alt={guest.name} />
+              <AvatarFallback className="bg-muted text-muted-foreground font-display text-sm">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <h4 className="font-display text-sm font-medium text-foreground truncate">
+                {guest.name}
+              </h4>
+              <Badge variant={guest.tier as any} className="text-[10px]">
+                {tierConfig.displayName.split(' ')[0]}
+              </Badge>
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{guest.totalVisits} visits</span>
+            <span>{formatDate(guest.lastVisit)}</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card 

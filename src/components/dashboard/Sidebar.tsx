@@ -1,6 +1,13 @@
 import { cn } from '@/lib/utils';
 import { Brand } from '@/types/loyalty';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import {
   LayoutDashboard,
   Users,
@@ -20,6 +27,8 @@ interface SidebarProps {
   setActiveView: (view: string) => void;
   activeBrand: Brand;
   setActiveBrand: (brand: Brand) => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 const navigation = [
@@ -41,112 +50,162 @@ const brandFilters: { id: Brand; label: string; arabicLabel: string; icon: React
   { id: 'sasso', label: 'SASSO', arabicLabel: 'ساسو', icon: UtensilsCrossed },
 ];
 
-export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand }: SidebarProps) {
+function SidebarContent({ 
+  activeView, 
+  setActiveView, 
+  activeBrand, 
+  setActiveBrand,
+  onNavClick 
+}: SidebarProps & { onNavClick?: () => void }) {
   const { admin, signOut } = useAdminAuthContext();
   const isSuperAdmin = admin?.role === 'super_admin';
 
+  const handleNavClick = (id: string) => {
+    setActiveView(id);
+    onNavClick?.();
+  };
+
+  const handleBrandClick = (id: Brand) => {
+    setActiveBrand(id);
+    onNavClick?.();
+  };
+
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar border-r border-sidebar-border">
-      <div className="flex h-full flex-col">
-        {/* Logo */}
-        <div className="flex h-20 items-center justify-center border-b border-sidebar-border">
-          <div className="text-center">
-            <h1 className="font-display text-2xl font-semibold text-gradient-gold">RISE</h1>
-            <p className="text-[10px] tracking-[0.3em] text-muted-foreground uppercase">Holding</p>
-          </div>
-        </div>
-
-        {/* Brand Filter */}
-        <div className="p-4 border-b border-sidebar-border">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
-            Brand View
-          </p>
-          <div className="space-y-1">
-            {brandFilters.map((brand) => (
-              <button
-                key={brand.id}
-                onClick={() => setActiveBrand(brand.id)}
-                className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
-                  activeBrand === brand.id
-                    ? 'bg-primary/10 text-primary border border-primary/20'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                )}
-              >
-                <brand.icon className="h-4 w-4" />
-                <span className="font-medium">{brand.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
-            Navigation
-          </p>
-          <div className="space-y-1">
-            {navigation.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveView(item.id)}
-                className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
-                  activeView === item.id
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
-                )}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Super Admin Navigation */}
-          {isSuperAdmin && (
-            <>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 mt-6">
-                Administration
-              </p>
-              <div className="space-y-1">
-                {superAdminNavigation.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveView(item.id)}
-                    className={cn(
-                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
-                      activeView === item.id
-                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-        </nav>
-
-        {/* User Info & Logout */}
-        <div className="p-4 border-t border-sidebar-border space-y-3">
-          {admin && (
-            <div className="px-2">
-              <p className="text-sm font-medium text-foreground truncate">{admin.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{admin.email}</p>
-            </div>
-          )}
-          <button
-            onClick={signOut}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all duration-200"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Sign Out</span>
-          </button>
+    <div className="flex h-full flex-col">
+      {/* Logo */}
+      <div className="flex h-20 items-center justify-center border-b border-sidebar-border">
+        <div className="text-center">
+          <h1 className="font-display text-2xl font-semibold text-gradient-gold">RISE</h1>
+          <p className="text-[10px] tracking-[0.3em] text-muted-foreground uppercase">Holding</p>
         </div>
       </div>
+
+      {/* Brand Filter */}
+      <div className="p-4 border-b border-sidebar-border">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
+          Brand View
+        </p>
+        <div className="space-y-1">
+          {brandFilters.map((brand) => (
+            <button
+              key={brand.id}
+              onClick={() => handleBrandClick(brand.id)}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+                activeBrand === brand.id
+                  ? 'bg-primary/10 text-primary border border-primary/20'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+              )}
+            >
+              <brand.icon className="h-4 w-4" />
+              <span className="font-medium">{brand.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 overflow-y-auto">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
+          Navigation
+        </p>
+        <div className="space-y-1">
+          {navigation.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleNavClick(item.id)}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+                activeView === item.id
+                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+              )}
+            >
+              <item.icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Super Admin Navigation */}
+        {isSuperAdmin && (
+          <>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 mt-6">
+              Administration
+            </p>
+            <div className="space-y-1">
+              {superAdminNavigation.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+                    activeView === item.id
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </nav>
+
+      {/* User Info & Logout */}
+      <div className="p-4 border-t border-sidebar-border space-y-3">
+        {admin && (
+          <div className="px-2">
+            <p className="text-sm font-medium text-foreground truncate">{admin.name}</p>
+            <p className="text-xs text-muted-foreground truncate">{admin.email}</p>
+          </div>
+        )}
+        <button
+          onClick={signOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all duration-200"
+        >
+          <LogOut className="h-4 w-4" />
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand, mobileOpen, onMobileClose }: SidebarProps) {
+  const isMobile = useIsMobile();
+
+  // Mobile: Sheet drawer
+  if (isMobile) {
+    return (
+      <Sheet open={mobileOpen} onOpenChange={(open) => !open && onMobileClose?.()}>
+        <SheetContent side="left" className="w-72 p-0 bg-sidebar border-sidebar-border">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation Menu</SheetTitle>
+          </SheetHeader>
+          <SidebarContent 
+            activeView={activeView}
+            setActiveView={setActiveView}
+            activeBrand={activeBrand}
+            setActiveBrand={setActiveBrand}
+            onNavClick={onMobileClose}
+          />
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop: Fixed sidebar
+  return (
+    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar border-r border-sidebar-border">
+      <SidebarContent 
+        activeView={activeView}
+        setActiveView={setActiveView}
+        activeBrand={activeBrand}
+        setActiveBrand={setActiveBrand}
+      />
     </aside>
   );
 }
