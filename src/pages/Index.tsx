@@ -7,15 +7,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-6 relative">
-      {/* Admin Dashboard Button - Top Left */}
+      {/* Admin Login Button - Top Left */}
       <Button 
         variant="luxury" 
         size="lg"
-        onClick={() => navigate('/dashboard')}
+        onClick={() => navigate('/admin/login')}
         className="absolute top-6 left-6 gap-2"
       >
         <Users className="h-5 w-5" />
-        Admin Dashboard
+        Admin Login
         <ArrowRight className="h-4 w-4" />
       </Button>
 
