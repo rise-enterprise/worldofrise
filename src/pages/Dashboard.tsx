@@ -74,7 +74,6 @@ export default function Dashboard() {
 
         {activeView === 'guests' && (
           <GuestsList 
-            guests={guests}
             activeBrand={activeBrand}
             onSelectGuest={handleSelectGuest}
           />
