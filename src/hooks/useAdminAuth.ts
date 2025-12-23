@@ -15,7 +15,7 @@ interface UseAdminAuthReturn {
   admin: AdminInfo | null;
   isLoading: boolean;
   isAdmin: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  sendMagicLink: (email: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -82,22 +82,30 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
     return () => subscription.unsubscribe();
   }, [fetchAdminInfo]);
 
-  const signIn = async (email: string, password: string): Promise<{ error: Error | null }> => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+  const sendMagicLink = async (email: string): Promise<{ error: Error | null }> => {
+    // First check if the email belongs to an active admin
+    const { data: adminData, error: adminError } = await supabase
+      .from('admins')
+      .select('id, email')
+      .eq('email', email)
+      .eq('is_active', true)
+      .single();
+
+    if (adminError || !adminData) {
+      return { error: new Error('This email is not registered as an admin. Please contact your administrator.') };
+    }
+
+    const redirectUrl = `${window.location.origin}/dashboard`;
+    
+    const { error } = await supabase.auth.signInWithOtp({
       email,
-      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
     });
 
     if (error) {
       return { error };
-    }
-
-    if (data.user) {
-      const adminInfo = await fetchAdminInfo(data.user.id);
-      if (!adminInfo) {
-        await supabase.auth.signOut();
-        return { error: new Error('You do not have admin access. Please contact your administrator.') };
-      }
     }
 
     return { error: null };
@@ -116,7 +124,7 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
     admin,
     isLoading,
     isAdmin: !!admin,
-    signIn,
+    sendMagicLink,
     signOut,
   };
 };
