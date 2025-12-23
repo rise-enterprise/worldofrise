@@ -3,19 +3,27 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Mail, Sparkles, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Loader2, Mail, Sparkles, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const emailSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
 });
 
+const passwordSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
 type EmailFormData = z.infer<typeof emailSchema>;
+type PasswordFormData = z.infer<typeof passwordSchema>;
 
 const AdminLogin = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,11 +33,20 @@ const AdminLogin = () => {
   const { toast } = useToast();
   const { sendMagicLink, isAdmin, isLoading } = useAdminAuthContext();
 
-  const form = useForm<EmailFormData>({
+  const magicLinkForm = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
     mode: 'onChange',
     defaultValues: {
       email: '',
+    },
+  });
+
+  const passwordForm = useForm<PasswordFormData>({
+    resolver: zodResolver(passwordSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
     },
   });
 
@@ -40,7 +57,7 @@ const AdminLogin = () => {
     }
   }, [isAdmin, isLoading, navigate]);
 
-  const onSubmit = async (data: EmailFormData) => {
+  const onMagicLinkSubmit = async (data: EmailFormData) => {
     setIsSubmitting(true);
     
     const { error } = await sendMagicLink(data.email);
@@ -60,6 +77,50 @@ const AdminLogin = () => {
     toast({
       title: 'Magic link sent!',
       description: 'Check your email for the login link.',
+    });
+    setIsSubmitting(false);
+  };
+
+  const onPasswordSubmit = async (data: PasswordFormData) => {
+    setIsSubmitting(true);
+    
+    // First check if email belongs to an active admin
+    const { data: adminData, error: adminError } = await supabase
+      .from('admins')
+      .select('id, is_active')
+      .eq('email', data.email.toLowerCase())
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (adminError || !adminData) {
+      toast({
+        title: 'Access denied',
+        description: 'This email is not registered as an active admin.',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Sign in with password
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
+      toast({
+        title: 'Login failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    toast({
+      title: 'Login successful',
+      description: 'Redirecting to dashboard...',
     });
     setIsSubmitting(false);
   };
@@ -128,7 +189,7 @@ const AdminLogin = () => {
                 variant="ghost" 
                 onClick={() => {
                   setMagicLinkSent(false);
-                  form.reset();
+                  magicLinkForm.reset();
                 }}
                 className="w-full"
               >
@@ -150,62 +211,148 @@ const AdminLogin = () => {
           </div>
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>
-            Enter your email to receive a magic link
+            Sign in to access the admin dashboard
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          placeholder="admin@example.com" 
-                          className="pl-10"
-                          type="email"
-                          autoComplete="email"
-                          {...field} 
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sending magic link...
-                  </>
-                ) : (
-                  <>
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Magic Link
-                  </>
-                )}
-              </Button>
-              <Button 
-                type="button"
-                variant="ghost" 
-                className="w-full" 
-                onClick={() => navigate('/')}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-              </Button>
-            </form>
-          </Form>
+          <Tabs defaultValue="password" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="password">Password</TabsTrigger>
+              <TabsTrigger value="magic-link">Magic Link</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="password">
+              <Form {...passwordForm}>
+                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+                  <FormField
+                    control={passwordForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                              placeholder="admin@example.com" 
+                              className="pl-10"
+                              type="email"
+                              autoComplete="email"
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={passwordForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                              placeholder="Enter your password" 
+                              className="pl-10"
+                              type="password"
+                              autoComplete="current-password"
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="mr-2 h-4 w-4" />
+                        Sign In
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    className="w-full" 
+                    onClick={() => navigate('/')}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Home
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+            
+            <TabsContent value="magic-link">
+              <Form {...magicLinkForm}>
+                <form onSubmit={magicLinkForm.handleSubmit(onMagicLinkSubmit)} className="space-y-4">
+                  <FormField
+                    control={magicLinkForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                              placeholder="admin@example.com" 
+                              className="pl-10"
+                              type="email"
+                              autoComplete="email"
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending magic link...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Send Magic Link
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="ghost" 
+                    className="w-full" 
+                    onClick={() => navigate('/')}
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Home
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
