@@ -33,7 +33,7 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
 
 export const useAdminAuthContext = (): AdminAuthContextType => {
   const context = useContext(AdminAuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAdminAuthContext must be used within an AdminAuthProvider');
   }
   return context;
