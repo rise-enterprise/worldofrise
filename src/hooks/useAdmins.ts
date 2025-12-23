@@ -1,0 +1,156 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+
+export interface Admin {
+  id: string;
+  user_id: string;
+  email: string;
+  name: string;
+  role: 'super_admin' | 'admin' | 'manager' | 'viewer';
+  is_active: boolean;
+  created_at: string | null;
+  last_login_at: string | null;
+}
+
+export interface CreateAdminInput {
+  email: string;
+  password: string;
+  name: string;
+  role: 'super_admin' | 'admin' | 'manager' | 'viewer';
+}
+
+export interface UpdateAdminInput {
+  id: string;
+  name?: string;
+  role?: 'super_admin' | 'admin' | 'manager' | 'viewer';
+  is_active?: boolean;
+}
+
+export function useAdmins() {
+  return useQuery({
+    queryKey: ['admins'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as Admin[];
+    },
+  });
+}
+
+export function useCreateAdmin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: CreateAdminInput) => {
+      // First create the auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: input.email,
+        password: input.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin/login`,
+        },
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error('Failed to create user account');
+
+      // Then create the admin record
+      const { data, error } = await supabase
+        .from('admins')
+        .insert({
+          user_id: authData.user.id,
+          email: input.email,
+          name: input.name,
+          role: input.role,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast({
+        title: 'Admin Created',
+        description: 'New admin user has been created successfully.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+export function useUpdateAdmin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: UpdateAdminInput) => {
+      const { id, ...updates } = input;
+      const { data, error } = await supabase
+        .from('admins')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast({
+        title: 'Admin Updated',
+        description: 'Admin user has been updated successfully.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+export function useDeleteAdmin() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      // Soft delete by setting is_active to false
+      const { error } = await supabase
+        .from('admins')
+        .update({ is_active: false })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast({
+        title: 'Admin Deactivated',
+        description: 'Admin user has been deactivated successfully.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}
