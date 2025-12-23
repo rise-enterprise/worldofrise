@@ -16,6 +16,7 @@ interface UseAdminAuthReturn {
   isLoading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   checkAdminsExist: () => Promise<boolean>;
@@ -118,6 +119,21 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
     return { error: null };
   };
 
+  const signInWithMagicLink = async (email: string): Promise<{ error: Error | null }> => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+
+    if (error) {
+      return { error };
+    }
+
+    return { error: null };
+  };
+
   const signUp = async (email: string, password: string, name: string): Promise<{ error: Error | null }> => {
     // First check if any admins exist - only allow signup if none exist
     const adminsExist = await checkAdminsExist();
@@ -180,6 +196,7 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
     isLoading,
     isAdmin: !!admin,
     signIn,
+    signInWithMagicLink,
     signUp,
     signOut,
     checkAdminsExist,
