@@ -40,6 +40,7 @@ const AdminLogin = () => {
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    mode: 'onChange',
     defaultValues: {
       email: '',
       password: '',
@@ -48,6 +49,7 @@ const AdminLogin = () => {
 
   const signupForm = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
+    mode: 'onChange',
     defaultValues: {
       name: '',
       email: '',
