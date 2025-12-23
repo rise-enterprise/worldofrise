@@ -7,18 +7,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-6 relative">
-      {/* Admin Login Button - Top Left */}
-      <Button 
-        variant="luxury" 
-        size="lg"
-        onClick={() => navigate('/admin/login')}
-        className="absolute top-6 left-6 gap-2"
-      >
-        <Users className="h-5 w-5" />
-        Admin Login
-        <ArrowRight className="h-4 w-4" />
-      </Button>
-
       <div className="w-full max-w-2xl text-center space-y-12 animate-fade-in">
         {/* Logo Subtitle */}
         <p className="text-sm tracking-[0.4em] text-muted-foreground uppercase">Holding</p>
@@ -47,7 +35,7 @@ const Index = () => {
         </div>
 
         {/* CTAs */}
-        <div className="flex justify-center items-center gap-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
+        <div className="flex justify-center items-center gap-4 animate-slide-up flex-wrap" style={{ animationDelay: '400ms' }}>
           <h1 
             className="font-display text-4xl font-semibold text-gradient-gold cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('/')}
@@ -62,6 +50,16 @@ const Index = () => {
           >
             <Crown className="h-5 w-5" />
             Member Portal
+          </Button>
+          <Button 
+            variant="luxury" 
+            size="lg"
+            onClick={() => navigate('/admin/login')}
+            className="gap-2"
+          >
+            <Users className="h-5 w-5" />
+            Admin Login
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
 
