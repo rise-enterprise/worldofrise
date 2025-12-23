@@ -33,6 +33,7 @@ const AdminLogin = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFirstTimeSetup, setIsFirstTimeSetup] = useState(false);
   const [isCheckingAdmins, setIsCheckingAdmins] = useState(true);
+  const [showSignup, setShowSignup] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { signIn, signUp, isAdmin, isLoading, checkAdminsExist } = useAdminAuthContext();
@@ -126,29 +127,33 @@ const AdminLogin = () => {
     );
   }
 
+  const isSignupMode = isFirstTimeSetup || showSignup;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
       <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            {isFirstTimeSetup ? (
+            {isSignupMode ? (
               <UserPlus className="h-6 w-6 text-primary" />
             ) : (
               <Lock className="h-6 w-6 text-primary" />
             )}
           </div>
           <CardTitle className="text-2xl font-bold">
-            {isFirstTimeSetup ? 'First-Time Setup' : 'Admin Login'}
+            {isFirstTimeSetup ? 'First-Time Setup' : isSignupMode ? 'Admin Sign Up' : 'Admin Login'}
           </CardTitle>
           <CardDescription>
             {isFirstTimeSetup 
               ? 'Create the first admin account to get started'
-              : 'Enter your credentials to access the dashboard'
+              : isSignupMode
+                ? 'Create a new admin account'
+                : 'Enter your credentials to access the dashboard'
             }
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          {isFirstTimeSetup ? (
+        <CardContent className="space-y-4">
+          {isSignupMode ? (
             <Form {...signupForm}>
               <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
                 <FormField
@@ -309,6 +314,35 @@ const AdminLogin = () => {
                 </Button>
               </form>
             </Form>
+          )}
+
+          {/* Toggle between Login and Sign Up - only show if not first-time setup */}
+          {!isFirstTimeSetup && (
+            <div className="text-center text-sm text-muted-foreground">
+              {showSignup ? (
+                <>
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSignup(false)}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    Log in
+                  </button>
+                </>
+              ) : (
+                <>
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSignup(true)}
+                    className="text-primary hover:underline font-medium"
+                  >
+                    Sign up
+                  </button>
+                </>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
