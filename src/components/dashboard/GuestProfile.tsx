@@ -130,9 +130,9 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
               </div>
               <div className="p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
                 <p className="flex items-center justify-center gap-1 text-lg">
-                  {guest.country === 'qatar' ? '🇶🇦' : '🇸🇦'}
+                  {guest.country === 'doha' ? '🇶🇦' : '🇸🇦'}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">{guest.country === 'qatar' ? 'Qatar' : 'Saudi Arabia'}</p>
+                <p className="text-xs text-muted-foreground mt-1">{guest.country === 'doha' ? 'Qatar' : 'Saudi Arabia'}</p>
               </div>
             </div>
           </div>

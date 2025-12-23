@@ -1,14 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { mockGuests } from '@/data/mockData';
+import { useMembers } from '@/hooks/useMembers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Calendar, Coffee, UtensilsCrossed, MapPin, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function MemberHistory() {
   const navigate = useNavigate();
-  const member = mockGuests[0]; // Demo member
+  const { data: guests = [], isLoading } = useMembers();
+  const member = guests[0]; // Demo member - first guest
   
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', { 
@@ -18,6 +20,31 @@ export default function MemberHistory() {
       year: 'numeric'
     }).format(date);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-luxury p-4">
+        <Skeleton className="h-12 w-full mb-4" />
+        <Skeleton className="h-32 w-full mb-4" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
+  if (!member) {
+    return (
+      <div className="min-h-screen bg-gradient-luxury flex items-center justify-center">
+        <Card className="bg-card/50 border-border/50">
+          <CardContent className="p-8 text-center">
+            <p className="text-muted-foreground">No member data available</p>
+            <Button variant="outline" className="mt-4" onClick={() => navigate('/member')}>
+              Back to Portal
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Group visits by month
   const groupedVisits = member.visits.reduce((acc, visit) => {
@@ -120,7 +147,7 @@ export default function MemberHistory() {
                         <div className="text-right">
                           <p className="text-sm text-foreground">{formatDate(visit.date)}</p>
                           <Badge variant="outline" className="text-xs mt-1">
-                            {visit.country === 'qatar' ? '🇶🇦 Qatar' : '🇸🇦 Riyadh'}
+                            {visit.country === 'doha' ? '🇶🇦 Qatar' : '🇸🇦 Riyadh'}
                           </Badge>
                         </div>
                       </div>
@@ -131,6 +158,15 @@ export default function MemberHistory() {
             </div>
           ))}
         </div>
+
+        {member.visits.length === 0 && (
+          <Card className="bg-card/50 border-border/50">
+            <CardContent className="p-8 text-center">
+              <Calendar className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+              <p className="text-muted-foreground">No visits recorded yet</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

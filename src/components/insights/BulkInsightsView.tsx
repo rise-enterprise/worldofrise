@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Guest } from '@/types/loyalty';
-import { mockGuests } from '@/data/mockData';
+import { useMembers } from '@/hooks/useMembers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +16,10 @@ interface BulkInsightsViewProps {
 
 export function BulkInsightsView({ onSelectGuest }: BulkInsightsViewProps) {
   const [selectedGuest, setSelectedGuest] = useState<Guest | null>(null);
+  const { data: guests = [] } = useMembers();
 
   // Calculate at-risk guests based on days since last visit
-  const guestsWithRisk = mockGuests.map(guest => {
+  const guestsWithRisk = guests.map(guest => {
     const daysSinceLastVisit = Math.floor(
       (Date.now() - guest.lastVisit.getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -206,6 +207,16 @@ export function BulkInsightsView({ onSelectGuest }: BulkInsightsViewProps) {
                 </div>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Empty state */}
+      {guests.length === 0 && (
+        <Card variant="luxury">
+          <CardContent className="pt-6 text-center py-12">
+            <Users className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+            <p className="text-muted-foreground">No guests to analyze yet. Import members to get started.</p>
           </CardContent>
         </Card>
       )}

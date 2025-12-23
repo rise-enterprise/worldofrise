@@ -152,7 +152,7 @@ export function GuestsList({ guests, activeBrand, onSelectGuest }: GuestsListPro
                       </span>
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        {guest.country === 'qatar' ? 'Qatar' : 'Saudi Arabia'}
+                        {guest.country === 'doha' ? 'Qatar' : 'Saudi Arabia'}
                       </span>
                     </div>
                   </div>
