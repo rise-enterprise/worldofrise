@@ -2,6 +2,8 @@ import React, { createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
+// Context for admin authentication
+
 interface AdminInfo {
   id: string;
   name: string;
