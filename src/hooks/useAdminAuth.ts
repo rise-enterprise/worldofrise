@@ -83,15 +83,11 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
   }, [fetchAdminInfo]);
 
   const sendMagicLink = async (email: string): Promise<{ error: Error | null }> => {
-    // First check if the email belongs to an active admin
-    const { data: adminData, error: adminError } = await supabase
-      .from('admins')
-      .select('id, email')
-      .eq('email', email)
-      .eq('is_active', true)
-      .single();
+    // First check if the email belongs to an active admin using RPC (bypasses RLS)
+    const { data: isAdmin, error: checkError } = await supabase
+      .rpc('check_admin_email', { admin_email: email });
 
-    if (adminError || !adminData) {
+    if (checkError || !isAdmin) {
       return { error: new Error('This email is not registered as an admin. Please contact your administrator.') };
     }
 
