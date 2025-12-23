@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Loader2, Mail, Sparkles, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -194,6 +194,15 @@ const AdminLogin = () => {
                     Send Magic Link
                   </>
                 )}
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost" 
+                className="w-full" 
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Home
               </Button>
             </form>
           </Form>
