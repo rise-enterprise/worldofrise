@@ -22,7 +22,12 @@ const Index = () => {
       <div className="w-full max-w-2xl text-center space-y-12 animate-fade-in">
         {/* Logo */}
         <div className="space-y-2">
-          <h1 className="font-display text-6xl font-semibold text-gradient-gold">RISE</h1>
+          <h1 
+            className="font-display text-6xl font-semibold text-gradient-gold cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+          >
+            RISE
+          </h1>
           <p className="text-sm tracking-[0.4em] text-muted-foreground uppercase">Holding</p>
         </div>
 
