@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Brand } from '@/types/loyalty';
+import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import {
   LayoutDashboard,
   Users,
@@ -10,6 +11,8 @@ import {
   Coffee,
   UtensilsCrossed,
   Sparkles,
+  ShieldCheck,
+  LogOut,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -28,6 +31,10 @@ const navigation = [
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
+const superAdminNavigation = [
+  { id: 'admins', label: 'Admin Users', icon: ShieldCheck },
+];
+
 const brandFilters: { id: Brand; label: string; arabicLabel: string; icon: React.ElementType }[] = [
   { id: 'all', label: 'All Brands', arabicLabel: 'جميع العلامات', icon: Crown },
   { id: 'noir', label: 'NOIR Café', arabicLabel: 'نوار كافيه', icon: Coffee },
@@ -35,6 +42,9 @@ const brandFilters: { id: Brand; label: string; arabicLabel: string; icon: React
 ];
 
 export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand }: SidebarProps) {
+  const { admin, signOut } = useAdminAuthContext();
+  const isSuperAdmin = admin?.role === 'super_admin';
+
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar border-r border-sidebar-border">
       <div className="flex h-full flex-col">
@@ -71,7 +81,7 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
             Navigation
           </p>
@@ -92,15 +102,49 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
               </button>
             ))}
           </div>
+
+          {/* Super Admin Navigation */}
+          {isSuperAdmin && (
+            <>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 mt-6">
+                Administration
+              </p>
+              <div className="space-y-1">
+                {superAdminNavigation.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveView(item.id)}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+                      activeView === item.id
+                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-sidebar-border">
-          <div className="bg-gradient-card rounded-lg p-4 border border-border/50">
-            <p className="text-xs text-muted-foreground mb-1">Active Members</p>
-            <p className="font-display text-2xl text-foreground">892</p>
-            <p className="text-[10px] text-primary mt-1">+12% this month</p>
-          </div>
+        {/* User Info & Logout */}
+        <div className="p-4 border-t border-sidebar-border space-y-3">
+          {admin && (
+            <div className="px-2">
+              <p className="text-sm font-medium text-foreground truncate">{admin.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{admin.email}</p>
+            </div>
+          )}
+          <button
+            onClick={signOut}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all duration-200"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </div>
     </aside>
