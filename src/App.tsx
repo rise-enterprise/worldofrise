@@ -8,6 +8,7 @@ import { MemberAuthProvider } from "@/contexts/MemberAuthContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AdminLogin from "./pages/AdminLogin";
+import AdminResetPassword from "./pages/AdminResetPassword";
 import MemberLogin from "./pages/MemberLogin";
 import MemberPortal from "./pages/MemberPortal";
 import MemberHistory from "./pages/MemberHistory";
@@ -29,6 +30,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/reset-password" element={<AdminResetPassword />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
