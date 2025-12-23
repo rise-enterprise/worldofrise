@@ -23,7 +23,8 @@ import {
 import { Calendar, MapPin, Users, Clock, Plus, Coffee, UtensilsCrossed, X, Edit, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { mockGuests } from '@/data/mockData';
+import { useMembers } from '@/hooks/useMembers';
+import { Guest, Country } from '@/types/loyalty';
 
 interface Event {
   id: string;
@@ -32,7 +33,7 @@ interface Event {
   date: Date;
   time: string;
   location: string;
-  country: 'qatar' | 'riyadh';
+  country: Country;
   brand: 'noir' | 'sasso';
   tier: string;
   capacity: number;
@@ -50,7 +51,7 @@ const initialEvents: Event[] = [
     date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     time: '7:00 PM',
     location: 'NOIR Café, The Pearl',
-    country: 'qatar',
+    country: 'doha',
     brand: 'noir',
     tier: 'Élite+',
     capacity: 30,
@@ -82,7 +83,7 @@ const initialEvents: Event[] = [
     date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
     time: '10:00 AM',
     location: 'NOIR Café, Lusail',
-    country: 'qatar',
+    country: 'doha',
     brand: 'noir',
     tier: 'Connoisseur+',
     capacity: 20,
@@ -98,7 +99,7 @@ const initialEvents: Event[] = [
     date: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
     time: '7:30 PM',
     location: 'SASSO, The Pearl',
-    country: 'qatar',
+    country: 'doha',
     brand: 'sasso',
     tier: 'RISE Black',
     capacity: 16,
@@ -114,7 +115,7 @@ const initialEvents: Event[] = [
     date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000),
     time: '3:00 PM',
     location: 'NOIR Café, The Pearl',
-    country: 'qatar',
+    country: 'doha',
     brand: 'noir',
     tier: 'All Members',
     capacity: 15,
@@ -130,7 +131,7 @@ const initialEvents: Event[] = [
     date: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
     time: '6:00 PM',
     location: 'TBD',
-    country: 'qatar',
+    country: 'doha',
     brand: 'sasso',
     tier: 'Inner Circle+',
     capacity: 50,
@@ -149,13 +150,15 @@ export function EventsView() {
   const [guestListOpen, setGuestListOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   
+  const { data: guests = [] } = useMembers();
+  
   const [newEvent, setNewEvent] = useState({
     title: '',
     titleArabic: '',
     date: '',
     time: '',
     location: '',
-    country: 'qatar' as 'qatar' | 'riyadh',
+    country: 'doha' as Country,
     brand: 'noir' as 'noir' | 'sasso',
     tier: 'All Members',
     capacity: 20,
@@ -198,7 +201,7 @@ export function EventsView() {
       date: '',
       time: '',
       location: '',
-      country: 'qatar',
+      country: 'doha',
       brand: 'noir',
       tier: 'All Members',
       capacity: 20,
@@ -499,7 +502,7 @@ export function EventsView() {
             <Card variant="luxury">
               <CardContent className="pt-6 text-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                <p className="text-muted-foreground">No draft events</p>
+                <p className="text-muted-foreground">No drafts saved</p>
               </CardContent>
             </Card>
           )}
@@ -512,28 +515,28 @@ export function EventsView() {
           <DialogHeader>
             <DialogTitle className="font-display">Create New Event</DialogTitle>
             <DialogDescription>
-              Create an exclusive experience for RISE members
+              Schedule an exclusive experience for RISE members
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4 max-h-[60vh] overflow-y-auto">
+            <div className="space-y-2">
+              <Label>Event Title (English) *</Label>
+              <Input 
+                value={newEvent.title}
+                onChange={(e) => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="e.g., Chef's Table Experience"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Event Title (Arabic)</Label>
+              <Input 
+                value={newEvent.titleArabic}
+                onChange={(e) => setNewEvent(prev => ({ ...prev, titleArabic: e.target.value }))}
+                placeholder="e.g., تجربة طاولة الشيف"
+                dir="rtl"
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2 space-y-2">
-                <Label>Event Title *</Label>
-                <Input 
-                  placeholder="e.g., Coffee Tasting Experience"
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
-                />
-              </div>
-              <div className="col-span-2 space-y-2">
-                <Label>Arabic Title</Label>
-                <Input 
-                  placeholder="العنوان بالعربية"
-                  dir="rtl"
-                  value={newEvent.titleArabic}
-                  onChange={(e) => setNewEvent(prev => ({ ...prev, titleArabic: e.target.value }))}
-                />
-              </div>
               <div className="space-y-2">
                 <Label>Date *</Label>
                 <Input 
@@ -545,10 +548,35 @@ export function EventsView() {
               <div className="space-y-2">
                 <Label>Time *</Label>
                 <Input 
-                  placeholder="e.g., 7:00 PM"
+                  type="time"
                   value={newEvent.time}
                   onChange={(e) => setNewEvent(prev => ({ ...prev, time: e.target.value }))}
                 />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Location *</Label>
+              <Input 
+                value={newEvent.location}
+                onChange={(e) => setNewEvent(prev => ({ ...prev, location: e.target.value }))}
+                placeholder="e.g., SASSO, The Pearl"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Country</Label>
+                <Select 
+                  value={newEvent.country} 
+                  onValueChange={(value: Country) => setNewEvent(prev => ({ ...prev, country: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="doha">Qatar (Doha)</SelectItem>
+                    <SelectItem value="riyadh">Saudi Arabia (Riyadh)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label>Brand</Label>
@@ -565,29 +593,8 @@ export function EventsView() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Country</Label>
-                <Select 
-                  value={newEvent.country} 
-                  onValueChange={(value: 'qatar' | 'riyadh') => setNewEvent(prev => ({ ...prev, country: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="qatar">Qatar</SelectItem>
-                    <SelectItem value="riyadh">Saudi Arabia</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="col-span-2 space-y-2">
-                <Label>Location *</Label>
-                <Input 
-                  placeholder="e.g., NOIR Café, The Pearl"
-                  value={newEvent.location}
-                  onChange={(e) => setNewEvent(prev => ({ ...prev, location: e.target.value }))}
-                />
-              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Tier Requirement</Label>
                 <Select 
@@ -610,19 +617,20 @@ export function EventsView() {
                 <Label>Capacity</Label>
                 <Input 
                   type="number"
-                  min={1}
                   value={newEvent.capacity}
                   onChange={(e) => setNewEvent(prev => ({ ...prev, capacity: parseInt(e.target.value) || 20 }))}
+                  min={1}
                 />
               </div>
-              <div className="col-span-2 space-y-2">
-                <Label>Description</Label>
-                <Textarea 
-                  placeholder="Describe the event experience..."
-                  value={newEvent.description}
-                  onChange={(e) => setNewEvent(prev => ({ ...prev, description: e.target.value }))}
-                />
-              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea 
+                value={newEvent.description}
+                onChange={(e) => setNewEvent(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Describe the event experience..."
+                rows={3}
+              />
             </div>
             <div className="flex gap-3 pt-2">
               <Button variant="outline" className="flex-1" onClick={() => setCreateOpen(false)}>
@@ -638,151 +646,123 @@ export function EventsView() {
 
       {/* Event Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-display">{selectedEvent?.title}</DialogTitle>
+            <DialogDescription>{selectedEvent?.titleArabic}</DialogDescription>
+          </DialogHeader>
           {selectedEvent && (
-            <>
-              <DialogHeader>
+            <div className="space-y-4 pt-4">
+              <p className="text-sm text-muted-foreground">{selectedEvent.description}</p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  {selectedEvent.brand === 'noir' ? (
-                    <Coffee className="h-5 w-5" />
-                  ) : (
-                    <UtensilsCrossed className="h-5 w-5 text-sasso-accent" />
-                  )}
-                  <DialogTitle className="font-display">{selectedEvent.title}</DialogTitle>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  {formatDate(selectedEvent.date)}
                 </div>
-                <DialogDescription>{selectedEvent.titleArabic}</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <p className="text-sm text-muted-foreground">{selectedEvent.description}</p>
-                
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    {formatDate(selectedEvent.date)}
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    {selectedEvent.time}
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    {selectedEvent.location}
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users className="h-4 w-4" />
-                    {selectedEvent.registered}/{selectedEvent.capacity}
-                  </div>
-                </div>
-
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline">{selectedEvent.tier}</Badge>
-                  <Badge variant={selectedEvent.status === 'upcoming' ? 'default' : 'secondary'}>
-                    {selectedEvent.status}
-                  </Badge>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  {selectedEvent.time}
                 </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => handleDeleteEvent(selectedEvent.id)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => {
-                      setDetailsOpen(false);
-                      handleManageGuestList(selectedEvent);
-                    }}
-                  >
-                    Manage Guest List
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  {selectedEvent.location}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  {selectedEvent.registered}/{selectedEvent.capacity}
                 </div>
               </div>
-            </>
+              <div className="flex gap-3 pt-2">
+                <Button 
+                  variant="destructive" 
+                  className="flex-1"
+                  onClick={() => handleDeleteEvent(selectedEvent.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Event
+                </Button>
+                <Button 
+                  className="flex-1"
+                  onClick={() => {
+                    setDetailsOpen(false);
+                    handleManageGuestList(selectedEvent);
+                  }}
+                >
+                  Manage Guests
+                </Button>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
 
       {/* Guest List Dialog */}
       <Dialog open={guestListOpen} onOpenChange={setGuestListOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display">Guest List: {selectedEvent?.title}</DialogTitle>
+            <DialogDescription>
+              {selectedEvent?.registered}/{selectedEvent?.capacity} registered
+            </DialogDescription>
+          </DialogHeader>
           {selectedEvent && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="font-display">Guest List</DialogTitle>
-                <DialogDescription>
-                  {selectedEvent.title} - {selectedEvent.registered}/{selectedEvent.capacity} registered
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                {/* Current Attendees */}
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Registered Guests</h4>
-                  {selectedEvent.attendees.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No guests registered yet</p>
-                  ) : (
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
-                      {selectedEvent.attendees.map(guestId => {
-                        const guest = mockGuests.find(g => g.id === guestId);
-                        if (!guest) return null;
-                        return (
-                          <div 
-                            key={guestId}
-                            className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
-                          >
-                            <div>
-                              <p className="text-sm font-medium">{guest.name}</p>
-                              <p className="text-xs text-muted-foreground">{guest.email}</p>
-                            </div>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleRemoveAttendee(guestId)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Add Guests */}
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Add Guests</h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {mockGuests
-                      .filter(g => !selectedEvent.attendees.includes(g.id))
-                      .map(guest => (
-                        <div 
-                          key={guest.id}
-                          className="flex items-center justify-between p-2 rounded-lg border border-border hover:bg-muted/50 transition-colors"
-                        >
+            <div className="space-y-4 pt-4 max-h-[60vh] overflow-y-auto">
+              {/* Current Attendees */}
+              <div>
+                <h4 className="font-medium text-sm mb-3">Current Attendees</h4>
+                {selectedEvent.attendees.length > 0 ? (
+                  <div className="space-y-2">
+                    {selectedEvent.attendees.map(attendeeId => {
+                      const guest = guests.find(g => g.id === attendeeId);
+                      if (!guest) return null;
+                      return (
+                        <div key={attendeeId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                           <div>
-                            <p className="text-sm font-medium">{guest.name}</p>
-                            <p className="text-xs text-muted-foreground">{guest.tier}</p>
+                            <p className="font-medium text-sm">{guest.name}</p>
+                            <p className="text-xs text-muted-foreground">{guest.email}</p>
                           </div>
                           <Button 
-                            variant="outline" 
+                            variant="ghost" 
                             size="sm"
-                            onClick={() => handleAddAttendee(guest.id)}
-                            disabled={selectedEvent.registered >= selectedEvent.capacity}
+                            onClick={() => handleRemoveAttendee(attendeeId)}
                           >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Add
+                            <X className="h-4 w-4" />
                           </Button>
                         </div>
-                      ))}
+                      );
+                    })}
                   </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No attendees yet</p>
+                )}
+              </div>
+
+              {/* Add Attendees */}
+              <div>
+                <h4 className="font-medium text-sm mb-3">Add Guests</h4>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {guests
+                    .filter(g => !selectedEvent.attendees.includes(g.id))
+                    .map(guest => (
+                      <div key={guest.id} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:bg-muted/50 transition-colors">
+                        <div>
+                          <p className="font-medium text-sm">{guest.name}</p>
+                          <p className="text-xs text-muted-foreground">{guest.email}</p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleAddAttendee(guest.id)}
+                          disabled={selectedEvent.attendees.length >= selectedEvent.capacity}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add
+                        </Button>
+                      </div>
+                    ))}
                 </div>
               </div>
-            </>
+            </div>
           )}
         </DialogContent>
       </Dialog>

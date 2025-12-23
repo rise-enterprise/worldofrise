@@ -87,12 +87,12 @@ export default function Dashboard() {
         )}
 
         {activeView === 'insights' && (
-          <BulkInsightsView guests={guests} onSelectGuest={handleSelectGuest} />
+          <BulkInsightsView onSelectGuest={handleSelectGuest} />
         )}
 
         {activeView === 'privileges' && <PrivilegesView />}
 
-        {activeView === 'events' && <EventsView guests={guests} />}
+        {activeView === 'events' && <EventsView />}
 
         {activeView === 'settings' && <SettingsView />}
       </main>

@@ -62,7 +62,7 @@ export function VIPGuestCard({ guest, onClick, delay = 0 }: VIPGuestCardProps) {
               </span>
               <span className="flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
-                {guest.country === 'qatar' ? 'Qatar' : 'Riyadh'}
+                {guest.country === 'doha' ? 'Qatar' : 'Riyadh'}
               </span>
             </div>
 

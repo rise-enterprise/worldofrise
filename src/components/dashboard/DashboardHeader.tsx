@@ -23,8 +23,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Guest } from '@/types/loyalty';
-import { mockGuests } from '@/data/mockData';
+import { Guest, Country } from '@/types/loyalty';
+import { useMembers, useCreateMember } from '@/hooks/useMembers';
 
 interface DashboardHeaderProps {
   onSearch?: (query: string) => void;
@@ -42,12 +42,15 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
     { id: 3, message: 'Upcoming event: Chef\'s Table Experience', time: '3 hours ago', read: false },
   ]);
 
+  const { data: guests = [] } = useMembers();
+  const createMember = useCreateMember();
+
   // New guest form state
   const [newGuest, setNewGuest] = useState({
     name: '',
     email: '',
     phone: '',
-    country: 'qatar' as 'qatar' | 'riyadh',
+    country: 'doha' as Country,
   });
 
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -60,7 +63,7 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.trim().length > 0) {
-      const results = mockGuests.filter(guest => 
+      const results = guests.filter(guest => 
         guest.name.toLowerCase().includes(query.toLowerCase()) ||
         guest.email.toLowerCase().includes(query.toLowerCase()) ||
         (guest.phone && guest.phone.includes(query))
@@ -74,7 +77,7 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
     }
   };
 
-  const handleNewGuest = () => {
+  const handleNewGuest = async () => {
     if (!newGuest.name.trim()) {
       toast.error('Please enter guest name');
       return;
@@ -84,32 +87,23 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
       return;
     }
 
-    const guest: Partial<Guest> = {
-      id: Date.now().toString(),
-      name: newGuest.name,
-      email: newGuest.email,
-      phone: newGuest.phone || undefined,
-      country: newGuest.country,
-      tier: 'initiation',
-      totalVisits: 0,
-      lifetimeVisits: 0,
-      lastVisit: new Date(),
-      joinedAt: new Date(),
-      favoriteBrand: 'noir',
-      visits: [],
-      tags: ['New Member'],
-    };
+    try {
+      await createMember.mutateAsync({
+        full_name: newGuest.name,
+        email: newGuest.email,
+        phone: newGuest.phone || '',
+        city: newGuest.country,
+      });
 
-    if (onGuestAdded) {
-      onGuestAdded(guest);
+      toast.success(`${newGuest.name} has been registered!`, {
+        description: 'Welcome to RISE loyalty program',
+      });
+      
+      setNewGuestOpen(false);
+      setNewGuest({ name: '', email: '', phone: '', country: 'doha' });
+    } catch (error) {
+      toast.error('Failed to register guest');
     }
-
-    toast.success(`${newGuest.name} has been registered!`, {
-      description: 'Welcome to RISE loyalty program',
-    });
-    
-    setNewGuestOpen(false);
-    setNewGuest({ name: '', email: '', phone: '', country: 'qatar' });
   };
 
   const markAllRead = () => {
@@ -272,7 +266,7 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
                 <Label>Country</Label>
                 <Select 
                   value={newGuest.country} 
-                  onValueChange={(value: 'qatar' | 'riyadh') => 
+                  onValueChange={(value: Country) => 
                     setNewGuest(prev => ({ ...prev, country: value }))
                   }
                 >
@@ -280,8 +274,8 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="qatar">🇶🇦 Qatar</SelectItem>
-                    <SelectItem value="riyadh">🇸🇦 Saudi Arabia</SelectItem>
+                    <SelectItem value="doha">🇶🇦 Qatar (Doha)</SelectItem>
+                    <SelectItem value="riyadh">🇸🇦 Saudi Arabia (Riyadh)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -289,8 +283,13 @@ export function DashboardHeader({ onSearch, onGuestAdded }: DashboardHeaderProps
                 <Button variant="outline" className="flex-1" onClick={() => setNewGuestOpen(false)}>
                   Cancel
                 </Button>
-                <Button variant="luxury" className="flex-1" onClick={handleNewGuest}>
-                  Register Guest
+                <Button 
+                  variant="luxury" 
+                  className="flex-1" 
+                  onClick={handleNewGuest}
+                  disabled={createMember.isPending}
+                >
+                  {createMember.isPending ? 'Registering...' : 'Register Guest'}
                 </Button>
               </div>
             </div>
