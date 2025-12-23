@@ -2,10 +2,8 @@ import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Upload, FileSpreadsheet, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload, FileSpreadsheet, AlertCircle, CheckCircle, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,18 +14,36 @@ interface DataImportProps {
 }
 
 interface ParsedMember {
+  salutation?: string;
+  last_name: string;
+  first_name: string;
   full_name: string;
+  visits_count: number;
   phone: string;
-  email?: string;
-  city?: 'doha' | 'riyadh';
-  brand_affinity?: 'noir' | 'sasso' | 'both';
-  notes?: string;
+  birthday?: string;
+  city: 'doha' | 'riyadh';
+  last_location?: string;
+  last_visit?: string;
   isValid: boolean;
   error?: string;
 }
 
-const REQUIRED_COLUMNS = ['full_name', 'phone'];
-const OPTIONAL_COLUMNS = ['email', 'city', 'brand_affinity', 'notes'];
+const EXPECTED_COLUMNS = [
+  'salutation',
+  'client last name',
+  'client first name',
+  'visits',
+  'mobile number',
+  'birthday',
+  'country',
+  'last location',
+  'last visit'
+];
+
+const TEMPLATE_CSV = `Salutation,Client Last Name,Client First Name,Visits,Mobile Number,Birthday,Country,Last Location,Last Visit
+Mr.,Smith,John,5,+974 5555 1234,1985-03-15,Qatar,Noir Doha,2024-01-15
+Mrs.,Al-Rahman,Sarah,12,+966 55 123 4567,1990-07-22,Saudi Arabia,Sasso Riyadh,2024-01-10
+Dr.,Johnson,Emily,3,+974 6666 7890,1988-11-30,Doha,Noir West Bay,2024-01-08`;
 
 export function DataImport({ open, onOpenChange }: DataImportProps) {
   const [step, setStep] = useState<'upload' | 'preview' | 'importing' | 'done'>('upload');
@@ -37,6 +53,18 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const downloadTemplate = () => {
+    const blob = new Blob([TEMPLATE_CSV], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'members_import_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -66,12 +94,15 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
 
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
       
-      // Check for required columns
-      const missingColumns = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
-      if (missingColumns.length > 0) {
+      // Check for required columns (mobile number is required)
+      const hasPhoneColumn = headers.some(h => 
+        h.includes('mobile') || h.includes('phone') || h === 'mobile number'
+      );
+      
+      if (!hasPhoneColumn) {
         toast({
-          title: 'Missing required columns',
-          description: `CSV must include: ${missingColumns.join(', ')}`,
+          title: 'Missing required column',
+          description: 'CSV must include a "Mobile Number" column',
           variant: 'destructive',
         });
         return;
@@ -87,26 +118,42 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
           row[header] = values[idx]?.trim().replace(/['"]/g, '') || '';
         });
 
+        // Map columns (case-insensitive)
+        const salutation = row['salutation'] || '';
+        const lastName = row['client last name'] || '';
+        const firstName = row['client first name'] || '';
+        const visitsStr = row['visits'] || '0';
+        const phone = row['mobile number'] || row['phone'] || row['mobile'] || '';
+        const birthday = row['birthday'] || '';
+        const country = row['country'] || '';
+        const lastLocation = row['last location'] || '';
+        const lastVisit = row['last visit'] || '';
+
+        // Build full name
+        const nameParts = [salutation, firstName, lastName].filter(Boolean);
+        const fullName = nameParts.join(' ').trim();
+
         const member: ParsedMember = {
-          full_name: row.full_name || '',
-          phone: row.phone || '',
-          email: row.email || undefined,
-          city: validateCity(row.city),
-          brand_affinity: validateBrand(row.brand_affinity),
-          notes: row.notes || undefined,
+          salutation,
+          last_name: lastName,
+          first_name: firstName,
+          full_name: fullName,
+          visits_count: parseInt(visitsStr, 10) || 0,
+          phone: normalizePhone(phone),
+          birthday: birthday || undefined,
+          city: validateCountry(country),
+          last_location: lastLocation || undefined,
+          last_visit: lastVisit || undefined,
           isValid: true,
         };
 
         // Validate
-        if (!member.full_name) {
+        if (!member.full_name || (!member.first_name && !member.last_name)) {
           member.isValid = false;
           member.error = 'Missing name';
         } else if (!member.phone) {
           member.isValid = false;
           member.error = 'Missing phone';
-        } else if (member.email && !isValidEmail(member.email)) {
-          member.isValid = false;
-          member.error = 'Invalid email';
         }
 
         parsed.push(member);
@@ -142,25 +189,32 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
     return result;
   };
 
-  const validateCity = (city?: string): 'doha' | 'riyadh' | undefined => {
-    if (!city) return undefined;
-    const normalized = city.toLowerCase();
-    if (normalized === 'doha' || normalized === 'qatar') return 'doha';
-    if (normalized === 'riyadh' || normalized === 'ksa' || normalized === 'saudi') return 'riyadh';
-    return undefined;
+  const normalizePhone = (phone: string): string => {
+    // Remove spaces and keep + prefix if present
+    return phone.replace(/\s+/g, ' ').trim();
   };
 
-  const validateBrand = (brand?: string): 'noir' | 'sasso' | 'both' | undefined => {
-    if (!brand) return undefined;
-    const normalized = brand.toLowerCase();
-    if (normalized === 'noir') return 'noir';
-    if (normalized === 'sasso') return 'sasso';
-    if (normalized === 'both') return 'both';
-    return undefined;
-  };
-
-  const isValidEmail = (email: string): boolean => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateCountry = (country: string): 'doha' | 'riyadh' => {
+    if (!country) return 'doha';
+    const normalized = country.toLowerCase().trim();
+    
+    // Qatar/Doha variations
+    if (normalized === 'doha' || normalized === 'qatar' || normalized === 'qa') {
+      return 'doha';
+    }
+    
+    // Saudi Arabia/Riyadh variations
+    if (
+      normalized === 'riyadh' || 
+      normalized === 'ksa' || 
+      normalized === 'saudi' || 
+      normalized === 'saudi arabia' ||
+      normalized === 'sa'
+    ) {
+      return 'riyadh';
+    }
+    
+    return 'doha'; // Default
   };
 
   const handleImport = async () => {
@@ -171,13 +225,22 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
 
     for (const member of validMembers) {
       try {
+        // Build notes with additional info
+        const notesParts: string[] = [];
+        if (member.salutation) notesParts.push(`Salutation: ${member.salutation}`);
+        if (member.birthday) notesParts.push(`Birthday: ${member.birthday}`);
+        if (member.last_location) notesParts.push(`Last Location: ${member.last_location}`);
+        if (member.last_visit) notesParts.push(`Last Visit: ${member.last_visit}`);
+        
+        const notes = notesParts.length > 0 ? notesParts.join(' | ') : null;
+
         const { error } = await supabase.from('members').insert({
           full_name: member.full_name,
           phone: member.phone,
-          email: member.email || null,
-          city: member.city || 'doha',
-          brand_affinity: member.brand_affinity || 'both',
-          notes: member.notes || null,
+          city: member.city,
+          brand_affinity: 'both',
+          total_visits: member.visits_count,
+          notes: notes,
         });
 
         if (error) {
@@ -211,7 +274,7 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5" />
@@ -245,12 +308,29 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
             </div>
 
             <div className="bg-muted/50 rounded-lg p-4">
-              <h4 className="font-medium mb-2">CSV Format</h4>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium">CSV Format</h4>
+                <Button variant="ghost" size="sm" onClick={downloadTemplate} className="gap-1">
+                  <Download className="h-4 w-4" />
+                  Download Template
+                </Button>
+              </div>
               <p className="text-sm text-muted-foreground mb-2">
-                Required columns: <code className="bg-muted px-1 rounded">full_name</code>, <code className="bg-muted px-1 rounded">phone</code>
+                Expected columns (in order):
               </p>
-              <p className="text-sm text-muted-foreground">
-                Optional columns: <code className="bg-muted px-1 rounded">email</code>, <code className="bg-muted px-1 rounded">city</code> (doha/riyadh), <code className="bg-muted px-1 rounded">brand_affinity</code> (noir/sasso/both), <code className="bg-muted px-1 rounded">notes</code>
+              <div className="flex flex-wrap gap-1.5 text-xs">
+                <code className="bg-muted px-2 py-0.5 rounded">Salutation</code>
+                <code className="bg-muted px-2 py-0.5 rounded">Client Last Name</code>
+                <code className="bg-muted px-2 py-0.5 rounded">Client First Name</code>
+                <code className="bg-muted px-2 py-0.5 rounded">Visits</code>
+                <code className="bg-primary/20 text-primary px-2 py-0.5 rounded font-semibold">Mobile Number*</code>
+                <code className="bg-muted px-2 py-0.5 rounded">Birthday</code>
+                <code className="bg-muted px-2 py-0.5 rounded">Country</code>
+                <code className="bg-muted px-2 py-0.5 rounded">Last Location</code>
+                <code className="bg-muted px-2 py-0.5 rounded">Last Visit</code>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                * Required field. Country accepts: Qatar, Doha, Saudi Arabia, Riyadh, KSA
               </p>
             </div>
           </div>
@@ -275,12 +355,14 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[60px]">Status</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Phone</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>City</TableHead>
-                    <TableHead>Brand</TableHead>
+                    <TableHead>Visits</TableHead>
+                    <TableHead>Birthday</TableHead>
+                    <TableHead>Country</TableHead>
+                    <TableHead>Last Location</TableHead>
+                    <TableHead>Last Visit</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -293,11 +375,13 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
                           <span className="text-red-500 text-xs">{member.error}</span>
                         )}
                       </TableCell>
-                      <TableCell>{member.full_name}</TableCell>
+                      <TableCell className="font-medium">{member.full_name}</TableCell>
                       <TableCell>{member.phone}</TableCell>
-                      <TableCell>{member.email || '-'}</TableCell>
-                      <TableCell>{member.city || 'doha'}</TableCell>
-                      <TableCell>{member.brand_affinity || 'both'}</TableCell>
+                      <TableCell>{member.visits_count}</TableCell>
+                      <TableCell>{member.birthday || '-'}</TableCell>
+                      <TableCell className="capitalize">{member.city}</TableCell>
+                      <TableCell>{member.last_location || '-'}</TableCell>
+                      <TableCell>{member.last_visit || '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
