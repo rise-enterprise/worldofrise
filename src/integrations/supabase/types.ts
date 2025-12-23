@@ -803,6 +803,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_admin_email: { Args: { admin_email: string }; Returns: boolean }
       get_admin_id: { Args: { _user_id: string }; Returns: string }
       get_admin_role: {
         Args: { _user_id: string }
