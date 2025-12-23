@@ -25,24 +25,21 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
   const [admin, setAdmin] = useState<AdminInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchAdminInfo = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from('admins')
-      .select('id, name, email, role')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .single();
+  const fetchAdminInfo = useCallback(async () => {
+    // Use RPC function to bypass RLS and fetch admin info for authenticated user
+    const { data, error } = await supabase.rpc('get_my_admin_info');
 
-    if (error || !data) {
+    if (error || !data || data.length === 0) {
       setAdmin(null);
       return null;
     }
 
+    const adminData = data[0];
     const adminInfo: AdminInfo = {
-      id: data.id,
-      name: data.name,
-      email: data.email,
-      role: data.role,
+      id: adminData.id,
+      name: adminData.name,
+      email: adminData.email,
+      role: adminData.role as 'super_admin' | 'admin' | 'manager' | 'viewer',
     };
     setAdmin(adminInfo);
     return adminInfo;
@@ -58,7 +55,7 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
         // Defer admin fetch with setTimeout to avoid deadlock
         if (session?.user) {
           setTimeout(() => {
-            fetchAdminInfo(session.user.id);
+            fetchAdminInfo();
           }, 0);
         } else {
           setAdmin(null);
@@ -73,7 +70,7 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchAdminInfo(session.user.id).finally(() => setIsLoading(false));
+        fetchAdminInfo().finally(() => setIsLoading(false));
       } else {
         setIsLoading(false);
       }
