@@ -3,32 +3,47 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Mail } from 'lucide-react';
+import { Loader2, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 
-const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+const phoneSchema = z.object({
+  phone: z.string().min(10, 'Please enter a valid phone number'),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+const otpSchema = z.object({
+  otp: z.string().length(6, 'Please enter the 6-digit code'),
+});
+
+type PhoneFormData = z.infer<typeof phoneSchema>;
+type OtpFormData = z.infer<typeof otpSchema>;
 
 const AdminLogin = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { signInWithMagicLink, isAdmin, isLoading } = useAdminAuthContext();
+  const { signInWithPhone, verifyPhoneOtp, isAdmin, isLoading } = useAdminAuthContext();
 
-  const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  const phoneForm = useForm<PhoneFormData>({
+    resolver: zodResolver(phoneSchema),
     mode: 'onChange',
     defaultValues: {
-      email: '',
+      phone: '',
+    },
+  });
+
+  const otpForm = useForm<OtpFormData>({
+    resolver: zodResolver(otpSchema),
+    mode: 'onChange',
+    defaultValues: {
+      otp: '',
     },
   });
 
@@ -39,14 +54,20 @@ const AdminLogin = () => {
     }
   }, [isAdmin, isLoading, navigate]);
 
-  const onLoginSubmit = async (data: LoginFormData) => {
+  const onPhoneSubmit = async (data: PhoneFormData) => {
     setIsSubmitting(true);
     
-    const { error } = await signInWithMagicLink(data.email);
+    // Format phone number with country code if not present
+    let formattedPhone = data.phone.trim();
+    if (!formattedPhone.startsWith('+')) {
+      formattedPhone = '+' + formattedPhone;
+    }
+    
+    const { error } = await signInWithPhone(formattedPhone);
     
     if (error) {
       toast({
-        title: 'Login Failed',
+        title: 'Failed to send OTP',
         description: error.message,
         variant: 'destructive',
       });
@@ -54,12 +75,35 @@ const AdminLogin = () => {
       return;
     }
 
-    setEmailSent(true);
+    setPhoneNumber(formattedPhone);
+    setOtpSent(true);
     toast({
-      title: 'Check your email!',
-      description: 'We sent you a magic link to sign in.',
+      title: 'OTP Sent!',
+      description: 'Check your phone for the verification code.',
     });
     setIsSubmitting(false);
+  };
+
+  const onOtpSubmit = async (data: OtpFormData) => {
+    setIsSubmitting(true);
+    
+    const { error } = await verifyPhoneOtp(phoneNumber, data.otp);
+    
+    if (error) {
+      toast({
+        title: 'Verification Failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    toast({
+      title: 'Welcome!',
+      description: 'You have been signed in successfully.',
+    });
+    navigate('/dashboard');
   };
 
   if (isLoading) {
@@ -75,47 +119,87 @@ const AdminLogin = () => {
       <Card className="w-full max-w-md shadow-xl border-border/50">
         <CardHeader className="space-y-1 text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Mail className="h-6 w-6 text-primary" />
+            <Phone className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            {emailSent ? 'Check Your Email' : 'Admin Login'}
+            {otpSent ? 'Enter Verification Code' : 'Admin Login'}
           </CardTitle>
           <CardDescription>
-            {emailSent 
-              ? 'We sent you a magic link. Click it to sign in.'
-              : 'Enter your email to receive a magic link'
+            {otpSent 
+              ? `We sent a code to ${phoneNumber}`
+              : 'Enter your phone number to receive a verification code'
             }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {emailSent ? (
-            <div className="text-center space-y-4">
-              <p className="text-muted-foreground text-sm">
-                Didn't receive the email? Check your spam folder or try again.
-              </p>
-              <Button 
-                variant="outline" 
-                onClick={() => setEmailSent(false)}
-                className="w-full"
-              >
-                Try Again
-              </Button>
-            </div>
-          ) : (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+          {otpSent ? (
+            <Form {...otpForm}>
+              <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-4">
                 <FormField
-                  control={loginForm.control}
-                  name="email"
+                  control={otpForm.control}
+                  name="otp"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col items-center">
+                      <FormLabel>Verification Code</FormLabel>
+                      <FormControl>
+                        <InputOTP maxLength={6} {...field}>
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    'Verify & Sign In'
+                  )}
+                </Button>
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => {
+                    setOtpSent(false);
+                    otpForm.reset();
+                  }}
+                  className="w-full"
+                >
+                  Use Different Number
+                </Button>
+              </form>
+            </Form>
+          ) : (
+            <Form {...phoneForm}>
+              <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
+                <FormField
+                  control={phoneForm.control}
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input 
-                            placeholder="admin@example.com" 
+                            placeholder="+974XXXXXXXX" 
                             className="pl-10"
+                            type="tel"
                             {...field} 
                           />
                         </div>
@@ -132,10 +216,10 @@ const AdminLogin = () => {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Sending Magic Link...
+                      Sending Code...
                     </>
                   ) : (
-                    'Send Magic Link'
+                    'Send Verification Code'
                   )}
                 </Button>
               </form>

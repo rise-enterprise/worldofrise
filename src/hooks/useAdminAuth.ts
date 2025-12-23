@@ -16,7 +16,8 @@ interface UseAdminAuthReturn {
   isLoading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signInWithMagicLink: (email: string) => Promise<{ error: Error | null }>;
+  signInWithPhone: (phone: string) => Promise<{ error: Error | null }>;
+  verifyPhoneOtp: (phone: string, token: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   checkAdminsExist: () => Promise<boolean>;
@@ -119,16 +120,35 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
     return { error: null };
   };
 
-  const signInWithMagicLink = async (email: string): Promise<{ error: Error | null }> => {
+  const signInWithPhone = async (phone: string): Promise<{ error: Error | null }> => {
     const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
+      phone,
     });
 
     if (error) {
       return { error };
+    }
+
+    return { error: null };
+  };
+
+  const verifyPhoneOtp = async (phone: string, token: string): Promise<{ error: Error | null }> => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms',
+    });
+
+    if (error) {
+      return { error };
+    }
+
+    if (data.user) {
+      const adminInfo = await fetchAdminInfo(data.user.id);
+      if (!adminInfo) {
+        await supabase.auth.signOut();
+        return { error: new Error('You do not have admin access. Please contact your administrator.') };
+      }
     }
 
     return { error: null };
@@ -196,7 +216,8 @@ export const useAdminAuth = (): UseAdminAuthReturn => {
     isLoading,
     isAdmin: !!admin,
     signIn,
-    signInWithMagicLink,
+    signInWithPhone,
+    verifyPhoneOtp,
     signUp,
     signOut,
     checkAdminsExist,
