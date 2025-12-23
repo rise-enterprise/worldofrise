@@ -20,16 +20,8 @@ const Index = () => {
       </Button>
 
       <div className="w-full max-w-2xl text-center space-y-12 animate-fade-in">
-        {/* Logo */}
-        <div className="space-y-2">
-          <h1 
-            className="font-display text-6xl font-semibold text-gradient-gold cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => navigate('/')}
-          >
-            RISE
-          </h1>
-          <p className="text-sm tracking-[0.4em] text-muted-foreground uppercase">Holding</p>
-        </div>
+        {/* Logo Subtitle */}
+        <p className="text-sm tracking-[0.4em] text-muted-foreground uppercase">Holding</p>
 
         {/* Tagline */}
         <div className="space-y-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
@@ -55,8 +47,13 @@ const Index = () => {
         </div>
 
         {/* CTAs */}
-        <div className="flex justify-center animate-slide-up" style={{ animationDelay: '400ms' }}>
-          
+        <div className="flex justify-center items-center gap-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
+          <h1 
+            className="font-display text-4xl font-semibold text-gradient-gold cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+          >
+            RISE
+          </h1>
           <Button 
             variant="outline" 
             size="xl"
