@@ -28,10 +28,65 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 const AdminLogin = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { sendMagicLink, isAdmin, isLoading } = useAdminAuthContext();
+
+  const handleForgotPassword = async () => {
+    const email = passwordForm.getValues('email');
+    if (!email || !z.string().email().safeParse(email).success) {
+      toast({
+        title: 'Enter your email first',
+        description: 'Please enter a valid email address in the email field.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Check if email belongs to an active admin
+    const { data: adminData } = await supabase
+      .from('admins')
+      .select('id')
+      .eq('email', email.toLowerCase())
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (!adminData) {
+      toast({
+        title: 'Email not found',
+        description: 'This email is not registered as an active admin.',
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/admin/reset-password`,
+    });
+
+    if (error) {
+      toast({
+        title: 'Failed to send reset email',
+        description: error.message,
+        variant: 'destructive',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    setSentEmail(email);
+    setResetEmailSent(true);
+    toast({
+      title: 'Password reset email sent!',
+      description: 'Check your email for the reset link.',
+    });
+    setIsSubmitting(false);
+  };
 
   const magicLinkForm = useForm<EmailFormData>({
     resolver: zodResolver(emailSchema),
@@ -202,6 +257,41 @@ const AdminLogin = () => {
     );
   }
 
+  if (resetEmailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
+        <Card className="w-full max-w-md shadow-xl border-border/50">
+          <CardHeader className="space-y-1 text-center">
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+            <CardDescription className="text-base">
+              We sent a password reset link to <span className="font-medium text-foreground">{sentEmail}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground text-center">
+              Click the link in the email to set your password.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  setResetEmailSent(false);
+                  passwordForm.reset();
+                }}
+                className="w-full"
+              >
+                Back to login
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
       <Card className="w-full max-w-md shadow-xl border-border/50">
@@ -284,6 +374,15 @@ const AdminLogin = () => {
                         Sign In
                       </>
                     )}
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="link" 
+                    className="w-full text-sm" 
+                    onClick={handleForgotPassword}
+                    disabled={isSubmitting}
+                  >
+                    Forgot password?
                   </Button>
                   <Button 
                     type="button"
