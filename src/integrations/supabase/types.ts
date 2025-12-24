@@ -310,6 +310,7 @@ export type Database = {
       }
       members: {
         Row: {
+          birthday: string | null
           brand_affinity: Database["public"]["Enums"]["brand_type"] | null
           city: Database["public"]["Enums"]["location_city"]
           created_at: string | null
@@ -317,17 +318,23 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_vip: boolean | null
+          last_location_id: string | null
+          last_visit_date: string | null
           notes: string | null
           phone: string
           preferred_language:
             | Database["public"]["Enums"]["language_pref"]
             | null
+          salutation: string | null
           status: Database["public"]["Enums"]["member_status"] | null
+          tags: string | null
           total_points: number | null
           total_visits: number | null
           updated_at: string | null
         }
         Insert: {
+          birthday?: string | null
           brand_affinity?: Database["public"]["Enums"]["brand_type"] | null
           city?: Database["public"]["Enums"]["location_city"]
           created_at?: string | null
@@ -335,17 +342,23 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          is_vip?: boolean | null
+          last_location_id?: string | null
+          last_visit_date?: string | null
           notes?: string | null
           phone: string
           preferred_language?:
             | Database["public"]["Enums"]["language_pref"]
             | null
+          salutation?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
+          tags?: string | null
           total_points?: number | null
           total_visits?: number | null
           updated_at?: string | null
         }
         Update: {
+          birthday?: string | null
           brand_affinity?: Database["public"]["Enums"]["brand_type"] | null
           city?: Database["public"]["Enums"]["location_city"]
           created_at?: string | null
@@ -353,12 +366,17 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_vip?: boolean | null
+          last_location_id?: string | null
+          last_visit_date?: string | null
           notes?: string | null
           phone?: string
           preferred_language?:
             | Database["public"]["Enums"]["language_pref"]
             | null
+          salutation?: string | null
           status?: Database["public"]["Enums"]["member_status"] | null
+          tags?: string | null
           total_points?: number | null
           total_visits?: number | null
           updated_at?: string | null
@@ -369,6 +387,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "members_last_location_id_fkey"
+            columns: ["last_location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
             referencedColumns: ["id"]
           },
         ]

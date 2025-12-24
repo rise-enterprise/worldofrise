@@ -51,26 +51,34 @@ type Step = 'upload' | 'mapping' | 'options' | 'preview' | 'importing' | 'done';
 
 // Rise Loyalty fields that can be mapped
 const RISE_FIELDS = [
-  { key: 'full_name', label: 'Full Name', required: true },
-  { key: 'first_name', label: 'First Name (combines with Last)', required: false },
-  { key: 'last_name', label: 'Last Name', required: false },
-  { key: 'phone', label: 'Phone Number', required: true },
+  { key: 'salutation', label: 'Salutation', required: false },
+  { key: 'first_name', label: 'First Name', required: true },
+  { key: 'last_name', label: 'Last Name', required: true },
+  { key: 'is_vip', label: 'VIP', required: false },
+  { key: 'total_visits', label: 'Number of Visits', required: false },
+  { key: 'birthday', label: 'Birthday', required: false },
+  { key: 'phone', label: 'Phone', required: true },
   { key: 'email', label: 'Email', required: false },
-  { key: 'total_visits', label: 'Total Visits', required: false },
-  { key: 'notes', label: 'Notes/Tags', required: false },
-  { key: 'city', label: 'City (Doha/Riyadh)', required: false },
+  { key: 'notes', label: 'Notes', required: false },
+  { key: 'tags', label: 'Tags', required: false },
+  { key: 'last_location', label: 'Last Location', required: false },
+  { key: 'last_visit_date', label: 'Last Visit', required: false },
 ] as const;
 
 // Known SevenRooms column patterns for auto-detection
 const SEVENROOMS_PATTERNS: Record<string, string[]> = {
-  full_name: ['guest name', 'name', 'full name', 'client name'],
-  first_name: ['first name', 'firstname', 'first'],
-  last_name: ['last name', 'lastname', 'last', 'surname'],
+  salutation: ['salutation', 'title', 'prefix', 'mr', 'mrs', 'ms'],
+  first_name: ['first name', 'firstname', 'first', 'client first name'],
+  last_name: ['last name', 'lastname', 'last', 'surname', 'client last name'],
+  is_vip: ['vip', 'is vip', 'vip status', 'vip guest'],
+  total_visits: ['visits', 'total visits', 'visit count', 'number of visits', 'reservation count'],
+  birthday: ['birthday', 'birth date', 'dob', 'date of birth'],
   phone: ['phone', 'phone number', 'mobile', 'cell', 'tel', 'telephone'],
   email: ['email', 'e-mail', 'email address'],
-  total_visits: ['visits', 'total visits', 'visit count', 'number of visits', 'reservation count'],
-  notes: ['notes', 'tags', 'guest notes', 'client notes', 'comments'],
-  city: ['city', 'venue', 'location', 'venue name'],
+  notes: ['notes', 'guest notes', 'client notes', 'comments'],
+  tags: ['tags', 'guest tags', 'labels'],
+  last_location: ['last location', 'venue', 'location', 'venue name', 'last venue'],
+  last_visit_date: ['last visit', 'last visit date', 'last reservation', 'last booking'],
 };
 
 interface ParsedRow {
@@ -83,10 +91,10 @@ interface ParsedRow {
 
 type DuplicateHandling = 'skip' | 'update' | 'create';
 
-const TEMPLATE_CSV = `First Name,Last Name,Email,Phone Number,Total Visits,Tags,Notes,City
-John,Smith,john@email.com,+974 5555 1234,5,VIP;Regular,Prefers window seat,Doha
-Sarah,Johnson,sarah@email.com,+966 5555 5678,12,,Allergic to nuts,Riyadh
-Ahmed,Al Rashid,ahmed@email.com,+974 5555 9012,3,New Guest,,Doha`;
+const TEMPLATE_CSV = `Salutation,First Name,Last Name,VIP,Number of Visits,Birthday,Phone,Email,Notes,Tags,Last Location,Last Visit
+Mr.,John,Smith,Yes,5,1990-05-15,+974 5555 1234,john@email.com,Prefers window seat,VIP;Regular,Noir Doha,2024-12-20
+Mrs.,Sarah,Johnson,No,12,1985-08-22,+966 5555 5678,sarah@email.com,Allergic to nuts,,Sasso Riyadh,2024-12-18
+Mr.,Ahmed,Al Rashid,Yes,3,1992-03-10,+974 5555 9012,ahmed@email.com,New member,New Guest,Noir Doha,2024-12-15`;
 
 export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImportProps) {
   const [step, setStep] = useState<Step>('upload');
@@ -213,12 +221,31 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
     return phone.replace(/[^\d+]/g, '').trim();
   };
 
-  const validateCity = (city: string): 'doha' | 'riyadh' => {
-    const normalized = city.toLowerCase().trim();
+  const validateCity = (location: string): 'doha' | 'riyadh' => {
+    const normalized = location.toLowerCase().trim();
     if (normalized.includes('riyadh') || normalized.includes('saudi') || normalized.includes('ksa')) {
       return 'riyadh';
     }
     return 'doha';
+  };
+
+  const parseVipStatus = (value: string): boolean => {
+    const normalized = value.toLowerCase().trim();
+    return ['yes', 'true', '1', 'vip', 'y'].includes(normalized);
+  };
+
+  const parseBirthday = (value: string): string | null => {
+    if (!value || !value.trim()) return null;
+    const parsed = new Date(value.trim());
+    if (isNaN(parsed.getTime())) return null;
+    return parsed.toISOString().split('T')[0]; // YYYY-MM-DD format
+  };
+
+  const parseLastVisitDate = (value: string): string | null => {
+    if (!value || !value.trim()) return null;
+    const parsed = new Date(value.trim());
+    if (isNaN(parsed.getTime())) return null;
+    return parsed.toISOString();
   };
 
   const processRowsForPreview = async () => {
@@ -228,11 +255,11 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
     const phoneColumn = columnMapping.phone;
     const emailColumn = columnMapping.email;
 
-    if (!phoneColumn && !columnMapping.full_name && !columnMapping.first_name) {
+    if (!phoneColumn || (!columnMapping.first_name && !columnMapping.last_name)) {
       toast({
         variant: 'destructive',
         title: 'Missing required mapping',
-        description: 'Please map at least Phone Number and a name field.',
+        description: 'Please map Phone, First Name, and Last Name fields.',
       });
       setIsProcessing(false);
       return;
@@ -260,17 +287,19 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
       let isDuplicate = false;
       let existingMemberId: string | undefined;
 
-      // Build full name
+      // Build full name from salutation + first + last
+      const salutation = columnMapping.salutation ? data[columnMapping.salutation]?.trim() || '' : '';
+      const first = columnMapping.first_name ? data[columnMapping.first_name]?.trim() || '' : '';
+      const last = columnMapping.last_name ? data[columnMapping.last_name]?.trim() || '' : '';
+      
       let fullName = '';
-      if (columnMapping.full_name && data[columnMapping.full_name]) {
-        fullName = data[columnMapping.full_name].trim();
-      } else if (columnMapping.first_name || columnMapping.last_name) {
-        const first = columnMapping.first_name ? data[columnMapping.first_name]?.trim() || '' : '';
-        const last = columnMapping.last_name ? data[columnMapping.last_name]?.trim() || '' : '';
+      if (salutation) {
+        fullName = `${salutation} ${first} ${last}`.trim();
+      } else {
         fullName = `${first} ${last}`.trim();
       }
 
-      if (!fullName) {
+      if (!first && !last) {
         errors.push('Missing name');
       }
 
@@ -342,13 +371,15 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
       setProgress(Math.round(((i + 1) / rowsToProcess.length) * 100));
 
       try {
-        // Build member data
+        // Build member data from mapped columns
+        const salutation = columnMapping.salutation ? row.data[columnMapping.salutation]?.trim() || null : null;
+        const first = columnMapping.first_name ? row.data[columnMapping.first_name]?.trim() || '' : '';
+        const last = columnMapping.last_name ? row.data[columnMapping.last_name]?.trim() || '' : '';
+        
         let fullName = '';
-        if (columnMapping.full_name && row.data[columnMapping.full_name]) {
-          fullName = row.data[columnMapping.full_name].trim();
+        if (salutation) {
+          fullName = `${salutation} ${first} ${last}`.trim();
         } else {
-          const first = columnMapping.first_name ? row.data[columnMapping.first_name]?.trim() || '' : '';
-          const last = columnMapping.last_name ? row.data[columnMapping.last_name]?.trim() || '' : '';
           fullName = `${first} ${last}`.trim();
         }
 
@@ -358,7 +389,31 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
           ? parseInt(row.data[columnMapping.total_visits]) || 0
           : 0;
         const notes = columnMapping.notes ? row.data[columnMapping.notes]?.trim() || null : null;
-        const city = columnMapping.city ? validateCity(row.data[columnMapping.city] || '') : 'doha';
+        const tags = columnMapping.tags ? row.data[columnMapping.tags]?.trim() || null : null;
+        const isVip = columnMapping.is_vip ? parseVipStatus(row.data[columnMapping.is_vip] || '') : false;
+        const birthday = columnMapping.birthday ? parseBirthday(row.data[columnMapping.birthday] || '') : null;
+        const lastVisitDate = columnMapping.last_visit_date ? parseLastVisitDate(row.data[columnMapping.last_visit_date] || '') : null;
+        
+        // Determine city from last location field
+        const lastLocationValue = columnMapping.last_location ? row.data[columnMapping.last_location]?.trim() || '' : '';
+        const city = lastLocationValue ? validateCity(lastLocationValue) : 'doha';
+
+        // Try to find matching location by name
+        let lastLocationId: string | null = null;
+        if (lastLocationValue) {
+          const { data: locations } = await supabase
+            .from('locations')
+            .select('id, name')
+            .eq('is_active', true);
+          
+          const matchedLocation = locations?.find(loc => 
+            loc.name.toLowerCase().includes(lastLocationValue.toLowerCase()) ||
+            lastLocationValue.toLowerCase().includes(loc.name.toLowerCase())
+          );
+          if (matchedLocation) {
+            lastLocationId = matchedLocation.id;
+          }
+        }
 
         if (row.isDuplicate && row.existingMemberId) {
           // Update existing member (only when duplicateHandling === 'update')
@@ -367,9 +422,15 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
               .from('members')
               .update({
                 full_name: fullName,
+                salutation: salutation || undefined,
                 email: email || undefined,
                 total_visits: totalVisits,
                 notes: notes ? (notes.length > 500 ? notes.substring(0, 500) : notes) : undefined,
+                tags: tags || undefined,
+                is_vip: isVip,
+                birthday: birthday || undefined,
+                last_visit_date: lastVisitDate || undefined,
+                last_location_id: lastLocationId || undefined,
                 city,
               })
               .eq('id', row.existingMemberId);
@@ -382,10 +443,16 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
           // Create new member only if NOT a duplicate
           const { error } = await supabase.from('members').insert({
             full_name: fullName,
+            salutation,
             phone,
             email,
             total_visits: totalVisits,
             notes: notes ? (notes.length > 500 ? notes.substring(0, 500) : notes) : null,
+            tags,
+            is_vip: isVip,
+            birthday,
+            last_visit_date: lastVisitDate,
+            last_location_id: lastLocationId,
             city,
             brand_affinity: 'both',
             status: 'active',
