@@ -139,3 +139,39 @@ export function useDeleteAdmin() {
     },
   });
 }
+
+export function useResendInvitation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: { email: string; name: string; role: 'super_admin' | 'admin' | 'manager' | 'viewer' }) => {
+      const { data, error } = await supabase.functions.invoke('invite-admin', {
+        body: {
+          email: input.email,
+          name: input.name,
+          role: input.role,
+          resend: true,
+        },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast({
+        title: 'Invitation Resent',
+        description: 'A new invitation email has been sent.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}

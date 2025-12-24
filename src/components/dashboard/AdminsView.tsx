@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAdmins, useCreateAdmin, useUpdateAdmin, useDeleteAdmin, Admin, CreateAdminInput } from '@/hooks/useAdmins';
+import { useAdmins, useCreateAdmin, useUpdateAdmin, useDeleteAdmin, useResendInvitation, Admin, CreateAdminInput } from '@/hooks/useAdmins';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Pencil, Trash2, Shield, ShieldCheck, UserCog, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2, Shield, ShieldCheck, UserCog, Eye, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -52,6 +52,7 @@ export function AdminsView() {
   const createAdmin = useCreateAdmin();
   const updateAdmin = useUpdateAdmin();
   const deleteAdmin = useDeleteAdmin();
+  const resendInvitation = useResendInvitation();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
@@ -91,6 +92,14 @@ export function AdminsView() {
 
   const handleDelete = async (id: string) => {
     await deleteAdmin.mutateAsync(id);
+  };
+
+  const handleResendInvitation = async (admin: Admin) => {
+    await resendInvitation.mutateAsync({
+      email: admin.email,
+      name: admin.name,
+      role: admin.role,
+    });
   };
 
   const openEditDialog = (admin: Admin) => {
@@ -256,6 +265,20 @@ export function AdminsView() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {/* Resend invitation button - only for inactive admins who never logged in */}
+                        {!admin.is_active && !admin.last_login_at && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleResendInvitation(admin)}
+                            disabled={resendInvitation.isPending}
+                            title="Resend invitation"
+                            className="text-primary hover:text-primary"
+                          >
+                            <RefreshCw className={`h-4 w-4 ${resendInvitation.isPending ? 'animate-spin' : ''}`} />
+                          </Button>
+                        )}
+                        
                         <Button
                           variant="ghost"
                           size="icon"
