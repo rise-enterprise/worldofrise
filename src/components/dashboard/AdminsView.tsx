@@ -10,7 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Pencil, Trash2, Shield, ShieldCheck, UserCog, Eye, RefreshCw, Copy, Check, Link } from 'lucide-react';
+import { Plus, Pencil, Trash2, Shield, ShieldCheck, UserCog, Eye, RefreshCw, Copy, Check, Link, Mail } from 'lucide-react';
 import { format } from 'date-fns';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -137,6 +137,20 @@ export function AdminsView() {
     setActivationLink(null);
     setInvitedEmail('');
     setCopied(false);
+  };
+
+  const handleSendViaEmail = () => {
+    if (!activationLink || !invitedEmail) return;
+    const subject = encodeURIComponent("You've been invited as an Admin - Rise Loyalty");
+    const body = encodeURIComponent(
+      `Hello,\n\n` +
+      `You've been invited to join as an administrator for Rise Loyalty.\n\n` +
+      `Please click the link below to set your password and activate your account:\n\n` +
+      `${activationLink}\n\n` +
+      `This link expires in 24 hours.\n\n` +
+      `Best regards,\nRise Loyalty Team`
+    );
+    window.open(`mailto:${invitedEmail}?subject=${subject}&body=${body}`, '_blank');
   };
 
   // Only super_admins can access this view
@@ -508,7 +522,11 @@ export function AdminsView() {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={handleSendViaEmail} className="gap-2">
+              <Mail className="h-4 w-4" />
+              Send via Email
+            </Button>
             <Button onClick={closeActivationDialog}>Done</Button>
           </DialogFooter>
         </DialogContent>
