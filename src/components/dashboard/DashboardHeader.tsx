@@ -4,6 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Bell, Search, Plus, Upload, Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +30,7 @@ import { toast } from 'sonner';
 import { Guest, Country } from '@/types/loyalty';
 import { useMembers, useCreateMember } from '@/hooks/useMembers';
 import { DataImport } from './DataImport';
+import { cn } from '@/lib/utils';
 
 interface DashboardHeaderProps {
   onSearch?: (query: string) => void;
@@ -36,15 +40,17 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: DashboardHeaderProps) {
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
+  const { language, isRTL } = useLanguage();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Guest[]>([]);
   const [newGuestOpen, setNewGuestOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [notifications, setNotifications] = useState([
-    { id: 1, message: 'New VIP guest registered', time: '2 mins ago', read: false },
-    { id: 2, message: 'Ahmed Al-Rashid reached Inner Circle', time: '1 hour ago', read: false },
-    { id: 3, message: 'Upcoming event: Chef\'s Table Experience', time: '3 hours ago', read: false },
+    { id: 1, message: t('notifications.newVipGuest'), time: '2 mins ago', read: false },
+    { id: 2, message: `Ahmed Al-Rashid ${t('notifications.tierReached')} Inner Circle`, time: '1 hour ago', read: false },
+    { id: 3, message: `${t('notifications.upcomingEvent')}: Chef's Table Experience`, time: '3 hours ago', read: false },
   ]);
 
   const { data: guests = [] } = useMembers();
@@ -58,7 +64,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
     country: 'doha' as Country,
   });
 
-  const currentDate = new Date().toLocaleDateString('en-US', {
+  const currentDate = new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
     weekday: isMobile ? 'short' : 'long',
     year: 'numeric',
     month: isMobile ? 'short' : 'long',
@@ -84,11 +90,11 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
 
   const handleNewGuest = async () => {
     if (!newGuest.name.trim()) {
-      toast.error('Please enter guest name');
+      toast.error(t('notifications.pleaseEnterName'));
       return;
     }
     if (!newGuest.email.trim() || !newGuest.email.includes('@')) {
-      toast.error('Please enter a valid email');
+      toast.error(t('notifications.pleaseEnterEmail'));
       return;
     }
 
@@ -100,27 +106,30 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         city: newGuest.country,
       });
 
-      toast.success(`${newGuest.name} has been registered!`, {
-        description: 'Welcome to RISE loyalty program',
+      toast.success(`${newGuest.name} ${t('notifications.guestRegistered')}`, {
+        description: t('notifications.welcomeToRise'),
       });
       
       setNewGuestOpen(false);
       setNewGuest({ name: '', email: '', phone: '', country: 'doha' });
     } catch (error) {
-      toast.error('Failed to register guest');
+      toast.error(t('notifications.registrationFailed'));
     }
   };
 
   const markAllRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    toast.success('All notifications marked as read');
+    toast.success(t('notifications.allMarkedRead'));
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <header className="flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30 gap-4">
-      <div className="flex items-center gap-3 animate-fade-in min-w-0">
+    <header className={cn(
+      "flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30 gap-4",
+      isRTL && "flex-row-reverse"
+    )}>
+      <div className={cn("flex items-center gap-3 animate-fade-in min-w-0", isRTL && "flex-row-reverse")}>
         {/* Mobile Menu Button */}
         {isMobile && (
           <Button variant="ghost" size="icon" onClick={onMenuClick} className="shrink-0">
@@ -128,15 +137,18 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
           </Button>
         )}
         
-        <div className="min-w-0">
+        <div className={cn("min-w-0", isRTL && "text-right")}>
           <h1 className="font-display text-lg md:text-2xl font-medium text-foreground truncate">
-            Welcome back
+            {t('common.welcome')}
           </h1>
           <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1 truncate">{currentDate}</p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 md:gap-3 animate-fade-in shrink-0" style={{ animationDelay: '100ms' }}>
+      <div className={cn("flex items-center gap-2 md:gap-3 animate-fade-in shrink-0", isRTL && "flex-row-reverse")} style={{ animationDelay: '100ms' }}>
+        {/* Language Switcher */}
+        <LanguageSwitcher />
+
         {/* Search Button */}
         <Popover open={searchOpen} onOpenChange={setSearchOpen}>
           <PopoverTrigger asChild>
@@ -146,12 +158,13 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
           </PopoverTrigger>
           <PopoverContent className="w-[calc(100vw-2rem)] md:w-80" align="end">
             <div className="space-y-3">
-              <h4 className="font-medium text-sm">Search Guests</h4>
+              <h4 className="font-medium text-sm">{t('header.searchGuests')}</h4>
               <Input 
-                placeholder="Search by name, email, or phone..."
+                placeholder={t('header.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 autoFocus
+                dir={isRTL ? 'rtl' : 'ltr'}
               />
               {searchResults.length > 0 && (
                 <div className="max-h-64 overflow-y-auto space-y-2">
@@ -174,7 +187,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
               )}
               {searchQuery && searchResults.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  No guests found
+                  {t('header.noGuestsFound')}
                 </p>
               )}
             </div>
@@ -193,15 +206,15 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
           </PopoverTrigger>
           <PopoverContent className="w-[calc(100vw-2rem)] md:w-80" align="end">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium text-sm">Notifications</h4>
+              <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+                <h4 className="font-medium text-sm">{t('header.notifications')}</h4>
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   className="text-xs text-muted-foreground"
                   onClick={markAllRead}
                 >
-                  Mark all read
+                  {t('header.markAllRead')}
                 </Button>
               </div>
               <div className="space-y-2">
@@ -217,11 +230,11 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                       );
                     }}
                   >
-                    <div className="flex items-start gap-2">
+                    <div className={cn("flex items-start gap-2", isRTL && "flex-row-reverse")}>
                       {!notif.read && (
                         <span className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />
                       )}
-                      <div>
+                      <div className={isRTL ? "text-right" : ""}>
                         <p className="text-sm text-foreground">{notif.message}</p>
                         <p className="text-xs text-muted-foreground mt-1">{notif.time}</p>
                       </div>
@@ -236,62 +249,62 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         {/* Import CSV Button - Icon only on mobile */}
         <Button 
           variant="outline" 
-          className="gap-2 h-9 md:h-10 px-3 md:px-4" 
+          className={cn("gap-2 h-9 md:h-10 px-3 md:px-4", isRTL && "flex-row-reverse")}
           onClick={() => setImportOpen(true)}
         >
           <Upload className="h-4 w-4" />
-          <span className="hidden md:inline">Import CSV</span>
+          <span className="hidden md:inline">{t('header.importCsv')}</span>
         </Button>
 
         {/* New Guest Button - Icon only on mobile */}
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
           <Button 
             variant="luxury" 
-            className="gap-2 h-9 md:h-10 px-3 md:px-4" 
+            className={cn("gap-2 h-9 md:h-10 px-3 md:px-4", isRTL && "flex-row-reverse")}
             onClick={() => setNewGuestOpen(true)}
           >
             <Plus className="h-4 w-4" />
-            <span className="hidden md:inline">New Guest</span>
+            <span className="hidden md:inline">{t('header.newGuest')}</span>
           </Button>
           <DialogContent className="max-w-[calc(100vw-2rem)] md:max-w-lg">
             <DialogHeader>
-              <DialogTitle className="font-display">Register New Guest</DialogTitle>
+              <DialogTitle className="font-display">{t('header.registerNewGuest')}</DialogTitle>
               <DialogDescription>
-                Add a new member to the RISE loyalty program
+                {t('header.addMemberDescription')}
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 pt-4">
+            <div className="space-y-4 pt-4" dir={isRTL ? 'rtl' : 'ltr'}>
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name *</Label>
+                <Label htmlFor="name">{t('header.fullName')} *</Label>
                 <Input 
                   id="name"
-                  placeholder="Enter full name"
+                  placeholder={t('header.fullName')}
                   value={newGuest.name}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, name: e.target.value }))}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">{t('header.email')} *</Label>
                 <Input 
                   id="email"
-                  placeholder="Enter email address"
+                  placeholder={t('header.email')}
                   type="email"
                   value={newGuest.email}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, email: e.target.value }))}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone (optional)</Label>
+                <Label htmlFor="phone">{t('header.phoneOptional')}</Label>
                 <Input 
                   id="phone"
-                  placeholder="Enter phone number"
+                  placeholder={t('header.phone')}
                   type="tel"
                   value={newGuest.phone}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, phone: e.target.value }))}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Country</Label>
+                <Label>{t('header.country')}</Label>
                 <Select 
                   value={newGuest.country} 
                   onValueChange={(value: Country) => 
@@ -302,14 +315,14 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="doha">🇶🇦 Qatar (Doha)</SelectItem>
-                    <SelectItem value="riyadh">🇸🇦 Saudi Arabia (Riyadh)</SelectItem>
+                    <SelectItem value="doha">🇶🇦 {t('header.qatar')}</SelectItem>
+                    <SelectItem value="riyadh">🇸🇦 {t('header.saudiArabia')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex gap-3 pt-2">
+              <div className={cn("flex gap-3 pt-2", isRTL && "flex-row-reverse")}>
                 <Button variant="outline" className="flex-1" onClick={() => setNewGuestOpen(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button 
                   variant="luxury" 
@@ -317,7 +330,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                   onClick={handleNewGuest}
                   disabled={createMember.isPending}
                 >
-                  {createMember.isPending ? 'Registering...' : 'Register Guest'}
+                  {createMember.isPending ? t('header.registering') : t('header.registerGuest')}
                 </Button>
               </div>
             </div>

@@ -3,6 +3,7 @@ import { Brand, Guest, DashboardMetrics } from '@/types/loyalty';
 import { useMembers } from '@/hooks/useMembers';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { Overview } from '@/components/dashboard/Overview';
@@ -14,6 +15,7 @@ import { EventsView } from '@/components/dashboard/EventsView';
 import { SettingsView } from '@/components/dashboard/SettingsView';
 import { AdminsView } from '@/components/dashboard/AdminsView';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 const emptyMetrics: DashboardMetrics = {
   totalMembers: 0,
@@ -33,6 +35,7 @@ export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isMobile = useIsMobile();
+  const { isRTL } = useLanguage();
   const { data: guests = [], isLoading: guestsLoading } = useMembers();
   const { data: metrics = emptyMetrics, isLoading: metricsLoading } = useDashboardMetrics();
 
@@ -59,7 +62,9 @@ export default function Dashboard() {
         onMobileClose={() => setMobileMenuOpen(false)}
       />
 
-      <main className={isMobile ? '' : 'ml-64'}>
+      <main className={cn(
+        isMobile ? '' : (isRTL ? 'mr-64' : 'ml-64')
+      )}>
         <DashboardHeader 
           onMenuClick={() => setMobileMenuOpen(true)}
         />

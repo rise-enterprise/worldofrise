@@ -2,6 +2,8 @@ import { cn } from '@/lib/utils';
 import { Brand } from '@/types/loyalty';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Sheet,
   SheetContent,
@@ -31,23 +33,10 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
-const navigation = [
-  { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
-  { id: 'guests', label: 'Guests', icon: Users },
-  { id: 'insights', label: 'AI Insights', icon: Sparkles },
-  { id: 'privileges', label: 'Privileges', icon: Gift },
-  { id: 'events', label: 'Events', icon: Calendar },
-  { id: 'settings', label: 'Settings', icon: Settings },
-];
-
-const superAdminNavigation = [
-  { id: 'admins', label: 'Admin Users', icon: ShieldCheck },
-];
-
-const brandFilters: { id: Brand; label: string; arabicLabel: string; icon: React.ElementType }[] = [
-  { id: 'all', label: 'All Brands', arabicLabel: 'جميع العلامات', icon: Crown },
-  { id: 'noir', label: 'NOIR Café', arabicLabel: 'نوار كافيه', icon: Coffee },
-  { id: 'sasso', label: 'SASSO', arabicLabel: 'ساسو', icon: UtensilsCrossed },
+const brandFilters: { id: Brand; labelKey: string; icon: React.ElementType }[] = [
+  { id: 'all', labelKey: 'brands.allBrands', icon: Crown },
+  { id: 'noir', labelKey: 'brands.noir', icon: Coffee },
+  { id: 'sasso', labelKey: 'brands.sasso', icon: UtensilsCrossed },
 ];
 
 function SidebarContent({ 
@@ -58,7 +47,22 @@ function SidebarContent({
   onNavClick 
 }: SidebarProps & { onNavClick?: () => void }) {
   const { admin, signOut } = useAdminAuthContext();
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
   const isSuperAdmin = admin?.role === 'super_admin';
+
+  const navigation = [
+    { id: 'dashboard', labelKey: 'nav.overview', icon: LayoutDashboard },
+    { id: 'guests', labelKey: 'nav.guests', icon: Users },
+    { id: 'insights', labelKey: 'nav.aiInsights', icon: Sparkles },
+    { id: 'privileges', labelKey: 'nav.privileges', icon: Gift },
+    { id: 'events', labelKey: 'nav.events', icon: Calendar },
+    { id: 'settings', labelKey: 'nav.settings', icon: Settings },
+  ];
+
+  const superAdminNavigation = [
+    { id: 'admins', labelKey: 'nav.adminUsers', icon: ShieldCheck },
+  ];
 
   const handleNavClick = (id: string) => {
     setActiveView(id);
@@ -83,7 +87,7 @@ function SidebarContent({
       {/* Brand Filter */}
       <div className="p-4 border-b border-sidebar-border">
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
-          Brand View
+          {t('brands.brandView')}
         </p>
         <div className="space-y-1">
           {brandFilters.map((brand) => (
@@ -92,13 +96,14 @@ function SidebarContent({
               onClick={() => handleBrandClick(brand.id)}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+                isRTL && 'flex-row-reverse',
                 activeBrand === brand.id
                   ? 'bg-primary/10 text-primary border border-primary/20'
                   : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
               )}
             >
               <brand.icon className="h-4 w-4" />
-              <span className="font-medium">{brand.label}</span>
+              <span className="font-medium">{t(brand.labelKey)}</span>
             </button>
           ))}
         </div>
@@ -107,7 +112,7 @@ function SidebarContent({
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
         <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
-          Navigation
+          {t('nav.navigation')}
         </p>
         <div className="space-y-1">
           {navigation.map((item) => (
@@ -116,13 +121,14 @@ function SidebarContent({
               onClick={() => handleNavClick(item.id)}
               className={cn(
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+                isRTL && 'flex-row-reverse',
                 activeView === item.id
                   ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                   : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
               )}
             >
               <item.icon className="h-4 w-4" />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </button>
           ))}
         </div>
@@ -131,7 +137,7 @@ function SidebarContent({
         {isSuperAdmin && (
           <>
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 mt-6">
-              Administration
+              {t('nav.administration')}
             </p>
             <div className="space-y-1">
               {superAdminNavigation.map((item) => (
@@ -140,13 +146,14 @@ function SidebarContent({
                   onClick={() => handleNavClick(item.id)}
                   className={cn(
                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+                    isRTL && 'flex-row-reverse',
                     activeView === item.id
                       ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                       : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
                   )}
                 >
                   <item.icon className="h-4 w-4" />
-                  <span>{item.label}</span>
+                  <span>{t(item.labelKey)}</span>
                 </button>
               ))}
             </div>
@@ -164,10 +171,13 @@ function SidebarContent({
         )}
         <button
           onClick={signOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all duration-200"
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-all duration-200',
+            isRTL && 'flex-row-reverse'
+          )}
         >
           <LogOut className="h-4 w-4" />
-          <span>Sign Out</span>
+          <span>{t('common.signOut')}</span>
         </button>
       </div>
     </div>
@@ -176,12 +186,13 @@ function SidebarContent({
 
 export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand, mobileOpen, onMobileClose }: SidebarProps) {
   const isMobile = useIsMobile();
+  const { isRTL } = useLanguage();
 
   // Mobile: Sheet drawer
   if (isMobile) {
     return (
       <Sheet open={mobileOpen} onOpenChange={(open) => !open && onMobileClose?.()}>
-        <SheetContent side="left" className="w-72 p-0 bg-sidebar border-sidebar-border">
+        <SheetContent side={isRTL ? "right" : "left"} className="w-72 p-0 bg-sidebar border-sidebar-border">
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>
@@ -199,7 +210,10 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
 
   // Desktop: Fixed sidebar
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar border-r border-sidebar-border">
+    <aside className={cn(
+      "fixed top-0 z-40 h-screen w-64 bg-sidebar border-sidebar-border",
+      isRTL ? "right-0 border-l" : "left-0 border-r"
+    )}>
       <SidebarContent 
         activeView={activeView}
         setActiveView={setActiveView}
