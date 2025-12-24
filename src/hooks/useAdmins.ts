@@ -26,6 +26,12 @@ export interface UpdateAdminInput {
   is_active?: boolean;
 }
 
+export interface InviteResult {
+  success: boolean;
+  message: string;
+  activationLink?: string;
+}
+
 export function useAdmins() {
   return useQuery({
     queryKey: ['admins'],
@@ -45,7 +51,7 @@ export function useCreateAdmin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: CreateAdminInput) => {
+    mutationFn: async (input: CreateAdminInput): Promise<InviteResult> => {
       // Call the invite-admin edge function
       const { data, error } = await supabase.functions.invoke('invite-admin', {
         body: {
@@ -58,14 +64,10 @@ export function useCreateAdmin() {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
       
-      return data;
+      return data as InviteResult;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
-      toast({
-        title: 'Invitation Sent',
-        description: 'An invitation email has been sent to the new admin.',
-      });
     },
     onError: (error: Error) => {
       toast({
@@ -144,7 +146,7 @@ export function useResendInvitation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: { email: string; name: string; role: 'super_admin' | 'admin' | 'manager' | 'viewer' }) => {
+    mutationFn: async (input: { email: string; name: string; role: 'super_admin' | 'admin' | 'manager' | 'viewer' }): Promise<InviteResult> => {
       const { data, error } = await supabase.functions.invoke('invite-admin', {
         body: {
           email: input.email,
@@ -157,14 +159,10 @@ export function useResendInvitation() {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
       
-      return data;
+      return data as InviteResult;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
-      toast({
-        title: 'Invitation Resent',
-        description: 'A new invitation email has been sent.',
-      });
     },
     onError: (error: Error) => {
       toast({

@@ -1,8 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
-import { Resend } from "https://esm.sh/resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -158,83 +155,12 @@ serve(async (req) => {
 
     console.log(`Activation link generated for ${email}`);
 
-    // Send invitation email
-    const emailSubject = isResend 
-      ? "Your Admin Dashboard Invitation (Resent)"
-      : "You've been invited to join the Admin Dashboard";
-
-    const { error: emailError } = await resend.emails.send({
-      from: "NOIR & SASSO <noreply@resend.dev>",
-      to: [email],
-      subject: emailSubject,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0a0a0a;">
-            <tr>
-              <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #171717; border-radius: 12px; border: 1px solid #262626;">
-                  <tr>
-                    <td style="padding: 40px;">
-                      <!-- Header -->
-                      <div style="text-align: center; margin-bottom: 32px;">
-                        <h1 style="color: #fafafa; font-size: 24px; font-weight: 600; margin: 0;">${isResend ? 'Invitation Reminder' : 'Welcome to the Team!'}</h1>
-                      </div>
-                      
-                      <!-- Content -->
-                      <div style="color: #a1a1aa; font-size: 16px; line-height: 1.6;">
-                        <p style="margin: 0 0 16px;">Hello <strong style="color: #fafafa;">${name}</strong>,</p>
-                        
-                        <p style="margin: 0 0 16px;">${isResend ? 'This is a reminder that you' : 'You'}'ve been invited to join the NOIR & SASSO Admin Dashboard as a <strong style="color: #fafafa;">${role.replace("_", " ")}</strong>.</p>
-                        
-                        <p style="margin: 0 0 24px;">Click the button below to activate your account and set up your password:</p>
-                        
-                        <!-- Button -->
-                        <div style="text-align: center; margin: 32px 0;">
-                          <a href="${activationLink}" style="display: inline-block; background-color: #fafafa; color: #0a0a0a; padding: 14px 32px; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 8px;">
-                            Activate Your Account
-                          </a>
-                        </div>
-                        
-                        <p style="margin: 0 0 16px; font-size: 14px; color: #71717a;">If the button doesn't work, copy and paste this link into your browser:</p>
-                        <p style="margin: 0 0 24px; font-size: 14px; word-break: break-all; color: #71717a;">${activationLink}</p>
-                        
-                        <p style="margin: 0 0 8px;">This link will expire in 24 hours.</p>
-                        
-                        <p style="margin: 24px 0 0; color: #71717a; font-size: 14px;">If you didn't expect this invitation, you can safely ignore this email.</p>
-                      </div>
-                      
-                      <!-- Footer -->
-                      <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #262626; text-align: center;">
-                        <p style="color: #71717a; font-size: 14px; margin: 0;">NOIR & SASSO Loyalty Platform</p>
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </body>
-        </html>
-      `,
-    });
-
-    if (emailError) {
-      console.error("Error sending email:", emailError);
-      throw new Error("Failed to send invitation email. Please check your Resend configuration.");
-    }
-
-    console.log(`${isResend ? 'Resend' : ''} Invitation email sent to ${email}`);
-
+    // Return the activation link directly (no email sending)
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Invitation ${isResend ? 'resent' : 'sent'} to ${email}`,
+        message: `Invitation ${isResend ? 'regenerated' : 'created'} for ${email}`,
+        activationLink: activationLink,
       }),
       {
         status: 200,
