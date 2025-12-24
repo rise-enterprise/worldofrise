@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { 
   Settings, 
   Bell, 
@@ -15,9 +16,20 @@ import {
   Database,
   Save,
   Coffee,
-  UtensilsCrossed
+  UtensilsCrossed,
+  Upload,
+  FileSpreadsheet,
+  CheckCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import SevenRoomsImport from './SevenRoomsImport';
+
+interface LastImportInfo {
+  date: Date;
+  recordsCreated: number;
+  recordsUpdated: number;
+}
 
 export function SettingsView() {
   const { toast } = useToast();
@@ -31,6 +43,32 @@ export function SettingsView() {
     language: 'en',
     timezone: 'AST',
   });
+  const [sevenRoomsImportOpen, setSevenRoomsImportOpen] = useState(false);
+  const [lastImport, setLastImport] = useState<LastImportInfo | null>(null);
+
+  useEffect(() => {
+    // Fetch last SevenRooms import info
+    const fetchLastImport = async () => {
+      const { data } = await supabase
+        .from('sevenrooms_sync_logs')
+        .select('completed_at, records_created, records_updated')
+        .eq('sync_type', 'manual_csv')
+        .eq('status', 'completed')
+        .order('completed_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (data && data.completed_at) {
+        setLastImport({
+          date: new Date(data.completed_at),
+          recordsCreated: data.records_created || 0,
+          recordsUpdated: data.records_updated || 0,
+        });
+      }
+    };
+
+    fetchLastImport();
+  }, [sevenRoomsImportOpen]);
 
   const handleSave = () => {
     toast({
@@ -218,14 +256,52 @@ export function SettingsView() {
         </TabsContent>
 
         <TabsContent value="integrations" className="mt-6 space-y-6">
+          {/* SevenRooms Integration Card */}
+          <Card variant="luxury">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <FileSpreadsheet className="h-5 w-5 text-primary" />
+                SevenRooms Data Import
+              </CardTitle>
+              <CardDescription>
+                Import guest data from SevenRooms via CSV export
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/30">
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">Import Guests from CSV</p>
+                  <p className="text-sm text-muted-foreground">
+                    Export guest data from SevenRooms and import it here with flexible column mapping
+                  </p>
+                  {lastImport && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="secondary" className="gap-1">
+                        <CheckCircle className="h-3 w-3" />
+                        Last import: {lastImport.date.toLocaleDateString()} at {lastImport.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        ({lastImport.recordsCreated} created, {lastImport.recordsUpdated} updated)
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <Button onClick={() => setSevenRoomsImportOpen(true)}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import from CSV
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card variant="luxury">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
-                Connected Systems
+                Other Integrations
               </CardTitle>
               <CardDescription>
-                Manage integrations with external systems
+                Manage other external system connections
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -233,13 +309,6 @@ export function SettingsView() {
                 <div>
                   <p className="font-medium text-foreground">POS System</p>
                   <p className="text-sm text-muted-foreground">Square POS Integration</p>
-                </div>
-                <Button variant="outline" size="sm">Configure</Button>
-              </div>
-              <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-muted/30">
-                <div>
-                  <p className="font-medium text-foreground">Reservation System</p>
-                  <p className="text-sm text-muted-foreground">SevenRooms Integration</p>
                 </div>
                 <Button variant="outline" size="sm">Configure</Button>
               </div>
@@ -259,6 +328,8 @@ export function SettingsView() {
               </div>
             </CardContent>
           </Card>
+
+          <SevenRoomsImport open={sevenRoomsImportOpen} onOpenChange={setSevenRoomsImportOpen} />
         </TabsContent>
 
         <TabsContent value="security" className="mt-6 space-y-6">
