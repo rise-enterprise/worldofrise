@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n/config';
 
 type Language = 'en' | 'ar';
 
@@ -12,7 +12,6 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const { i18n } = useTranslation();
   const [language, setLanguageState] = useState<Language>(
     (localStorage.getItem('language') as Language) || 'en'
   );
