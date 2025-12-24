@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useAdmins, useCreateAdmin, useUpdateAdmin, useDeleteAdmin, useResendInvitation, useDeleteAdminPermanently, Admin, CreateAdminInput } from '@/hooks/useAdmins';
+import { useAdmins, useCreateAdmin, useUpdateAdmin, useDeleteAdmin, useResendInvitation, useDeleteAdminPermanently, Admin, CreateAdminInput, InviteResult } from '@/hooks/useAdmins';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -11,12 +10,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Pencil, Trash2, Shield, ShieldCheck, UserCog, Eye, RefreshCw } from 'lucide-react';
+import { Plus, Pencil, Trash2, Shield, ShieldCheck, UserCog, Eye, RefreshCw, Copy, Check, Link } from 'lucide-react';
 import { format } from 'date-fns';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { toast } from '@/hooks/use-toast';
 
 const createAdminSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -57,6 +57,9 @@ export function AdminsView() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
+  const [activationLink, setActivationLink] = useState<string | null>(null);
+  const [invitedEmail, setInvitedEmail] = useState<string>('');
+  const [copied, setCopied] = useState(false);
 
   const createForm = useForm<CreateAdminFormData>({
     resolver: zodResolver(createAdminSchema),
@@ -76,7 +79,11 @@ export function AdminsView() {
   });
 
   const handleCreate = async (data: CreateAdminFormData) => {
-    await createAdmin.mutateAsync(data as CreateAdminInput);
+    const result = await createAdmin.mutateAsync(data as CreateAdminInput);
+    if (result.activationLink) {
+      setActivationLink(result.activationLink);
+      setInvitedEmail(data.email);
+    }
     createForm.reset();
     setIsCreateOpen(false);
   };
@@ -96,11 +103,15 @@ export function AdminsView() {
   };
 
   const handleResendInvitation = async (admin: Admin) => {
-    await resendInvitation.mutateAsync({
+    const result = await resendInvitation.mutateAsync({
       email: admin.email,
       name: admin.name,
       role: admin.role,
     });
+    if (result.activationLink) {
+      setActivationLink(result.activationLink);
+      setInvitedEmail(admin.email);
+    }
   };
 
   const openEditDialog = (admin: Admin) => {
@@ -109,6 +120,23 @@ export function AdminsView() {
       role: admin.role,
     });
     setEditingAdmin(admin);
+  };
+
+  const copyToClipboard = async () => {
+    if (!activationLink) return;
+    await navigator.clipboard.writeText(activationLink);
+    setCopied(true);
+    toast({
+      title: 'Copied!',
+      description: 'Activation link copied to clipboard.',
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const closeActivationDialog = () => {
+    setActivationLink(null);
+    setInvitedEmail('');
+    setCopied(false);
   };
 
   // Only super_admins can access this view
@@ -157,7 +185,7 @@ export function AdminsView() {
             <DialogHeader>
               <DialogTitle>Invite New Admin</DialogTitle>
               <DialogDescription>
-                Send an invitation email to add a new administrator.
+                Create an invitation for a new administrator.
               </DialogDescription>
             </DialogHeader>
             <Form {...createForm}>
@@ -216,7 +244,7 @@ export function AdminsView() {
                     Cancel
                   </Button>
                   <Button type="submit" disabled={createAdmin.isPending}>
-                    {createAdmin.isPending ? 'Sending...' : 'Send Invitation'}
+                    {createAdmin.isPending ? 'Creating...' : 'Create Invitation'}
                   </Button>
                 </DialogFooter>
               </form>
@@ -273,7 +301,7 @@ export function AdminsView() {
                             size="icon"
                             onClick={() => handleResendInvitation(admin)}
                             disabled={resendInvitation.isPending}
-                            title="Resend invitation"
+                            title="Regenerate activation link"
                             className="text-primary hover:text-primary"
                           >
                             <RefreshCw className={`h-4 w-4 ${resendInvitation.isPending ? 'animate-spin' : ''}`} />
@@ -431,6 +459,58 @@ export function AdminsView() {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Activation Link Dialog */}
+      <Dialog open={!!activationLink} onOpenChange={(open) => !open && closeActivationDialog()}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Link className="h-5 w-5 text-primary" />
+              Activation Link Generated
+            </DialogTitle>
+            <DialogDescription>
+              Share this link with <strong>{invitedEmail}</strong> to complete their account setup.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-muted/50 border border-border rounded-lg p-4">
+              <p className="text-xs text-muted-foreground mb-2">Activation Link:</p>
+              <div className="flex items-center gap-2">
+                <Input 
+                  readOnly 
+                  value={activationLink || ''} 
+                  className="font-mono text-xs bg-background"
+                />
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={copyToClipboard}
+                  className="shrink-0"
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+            
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p><strong>Instructions:</strong></p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>Copy the link above</li>
+                <li>Send it to the new admin via WhatsApp, SMS, or other secure channel</li>
+                <li>They will use the link to set their password and activate their account</li>
+              </ol>
+              <p className="text-amber-500 text-xs mt-3">
+                ⚠️ This link expires in 24 hours.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button onClick={closeActivationDialog}>Done</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
