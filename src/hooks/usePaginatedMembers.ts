@@ -124,10 +124,13 @@ async function fetchPaginatedMembers({
         joinedAt: new Date(member.created_at || Date.now()),
         favoriteBrand: mapDbBrandToBrand(member.brand_affinity),
         visits: [], // Don't load all visits for list view
-        tags: [],
+        tags: member.tags ? member.tags.split(',').map((t: string) => t.trim()) : [],
         notes: member.notes || undefined,
         totalPoints: member.total_points || 0,
         status: member.status || 'active',
+        isVip: member.is_vip || false,
+        birthday: member.birthday || undefined,
+        salutation: member.salutation || undefined,
       };
     });
 

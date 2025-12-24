@@ -103,10 +103,13 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
               
               <div className="text-center md:text-left">
                 <h2 className="font-display text-xl md:text-2xl font-medium text-foreground">{guest.name}</h2>
-                <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
+                <div className="flex items-center justify-center md:justify-start gap-2 mt-2 flex-wrap">
                   <Badge variant={guest.tier as any} className="text-xs md:text-sm px-3 md:px-4 py-1">
                     {tierConfig.displayName}
                   </Badge>
+                  {guest.isVip && (
+                    <Badge variant="gold" className="text-xs md:text-sm px-3 md:px-4 py-1">VIP</Badge>
+                  )}
                   <span className="text-xs md:text-sm text-muted-foreground hidden sm:inline">{tierConfig.arabicName}</span>
                 </div>
               </div>
