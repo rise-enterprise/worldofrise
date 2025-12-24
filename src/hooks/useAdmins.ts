@@ -175,3 +175,34 @@ export function useResendInvitation() {
     },
   });
 }
+
+export function useDeleteAdminPermanently() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (adminId: string) => {
+      const { data, error } = await supabase.functions.invoke('delete-admin', {
+        body: { adminId },
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admins'] });
+      toast({
+        title: 'Admin Deleted',
+        description: 'The admin record has been permanently deleted.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+}
