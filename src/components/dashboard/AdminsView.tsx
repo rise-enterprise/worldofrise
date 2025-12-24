@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAdmins, useCreateAdmin, useUpdateAdmin, useDeleteAdmin, useResendInvitation, Admin, CreateAdminInput } from '@/hooks/useAdmins';
+import { useAdmins, useCreateAdmin, useUpdateAdmin, useDeleteAdmin, useResendInvitation, useDeleteAdminPermanently, Admin, CreateAdminInput } from '@/hooks/useAdmins';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,6 +53,7 @@ export function AdminsView() {
   const updateAdmin = useUpdateAdmin();
   const deleteAdmin = useDeleteAdmin();
   const resendInvitation = useResendInvitation();
+  const deleteAdminPermanently = useDeleteAdminPermanently();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
@@ -289,36 +290,73 @@ export function AdminsView() {
                           <Pencil className="h-4 w-4" />
                         </Button>
                         
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive hover:text-destructive"
-                              disabled={isSelf || !admin.is_active}
-                              title={isSelf ? "Can't deactivate yourself" : 'Deactivate admin'}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Deactivate Admin?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will deactivate {admin.name}'s admin access. They will no longer be able to log in to the dashboard.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDelete(admin.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        {/* Deactivate button - only for active admins */}
+                        {admin.is_active && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                disabled={isSelf}
+                                title={isSelf ? "Can't deactivate yourself" : 'Deactivate admin'}
                               >
-                                Deactivate
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Deactivate Admin?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will deactivate {admin.name}'s admin access. They will no longer be able to log in to the dashboard.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(admin.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Deactivate
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                        
+                        {/* Permanent delete button - only for inactive admins who never logged in */}
+                        {!admin.is_active && !admin.last_login_at && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive"
+                                disabled={deleteAdminPermanently.isPending}
+                                title="Permanently delete orphaned admin"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Permanently Delete Admin?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will permanently delete {admin.name}'s admin record and auth account. This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deleteAdminPermanently.mutateAsync(admin.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Delete Permanently
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
