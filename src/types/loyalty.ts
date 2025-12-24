@@ -39,6 +39,9 @@ export interface Guest {
   avatarUrl?: string;
   totalPoints?: number;
   status?: 'active' | 'blocked';
+  isVip?: boolean;
+  birthday?: string;
+  salutation?: string;
 }
 
 export interface TierConfig {

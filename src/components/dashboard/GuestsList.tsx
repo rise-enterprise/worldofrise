@@ -194,7 +194,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                             <Badge variant={guest.tier as any} className="text-[10px] md:text-xs shrink-0">
                               {isMobile ? tierConfig.displayName.split(' ')[0] : tierConfig.displayName}
                             </Badge>
-                            {guest.tags.includes('VIP') && (
+                            {guest.isVip && (
                               <Badge variant="gold" className="text-[10px] md:text-xs shrink-0">VIP</Badge>
                             )}
                           </div>
