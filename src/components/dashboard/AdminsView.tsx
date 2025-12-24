@@ -20,7 +20,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 const createAdminSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   role: z.enum(['super_admin', 'admin', 'manager', 'viewer']),
 });
@@ -61,7 +60,6 @@ export function AdminsView() {
     resolver: zodResolver(createAdminSchema),
     defaultValues: {
       email: '',
-      password: '',
       name: '',
       role: 'viewer',
     },
@@ -142,14 +140,14 @@ export function AdminsView() {
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
-              Add Admin
+              Invite Admin
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Create New Admin</DialogTitle>
+              <DialogTitle>Invite New Admin</DialogTitle>
               <DialogDescription>
-                Add a new administrator to the system.
+                Send an invitation email to add a new administrator.
               </DialogDescription>
             </DialogHeader>
             <Form {...createForm}>
@@ -175,19 +173,6 @@ export function AdminsView() {
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="admin@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={createForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -221,7 +206,7 @@ export function AdminsView() {
                     Cancel
                   </Button>
                   <Button type="submit" disabled={createAdmin.isPending}>
-                    {createAdmin.isPending ? 'Creating...' : 'Create Admin'}
+                    {createAdmin.isPending ? 'Sending...' : 'Send Invitation'}
                   </Button>
                 </DialogFooter>
               </form>

@@ -15,7 +15,6 @@ export interface Admin {
 
 export interface CreateAdminInput {
   email: string;
-  password: string;
   name: string;
   role: 'super_admin' | 'admin' | 'manager' | 'viewer';
 }
@@ -47,39 +46,25 @@ export function useCreateAdmin() {
 
   return useMutation({
     mutationFn: async (input: CreateAdminInput) => {
-      // First create the auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: input.email,
-        password: input.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/admin/login`,
-        },
-      });
-
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Failed to create user account');
-
-      // Then create the admin record
-      const { data, error } = await supabase
-        .from('admins')
-        .insert({
-          user_id: authData.user.id,
+      // Call the invite-admin edge function
+      const { data, error } = await supabase.functions.invoke('invite-admin', {
+        body: {
           email: input.email,
           name: input.name,
           role: input.role,
-          is_active: true,
-        })
-        .select()
-        .single();
+        },
+      });
 
       if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admins'] });
       toast({
-        title: 'Admin Created',
-        description: 'New admin user has been created successfully.',
+        title: 'Invitation Sent',
+        description: 'An invitation email has been sent to the new admin.',
       });
     },
     onError: (error: Error) => {
