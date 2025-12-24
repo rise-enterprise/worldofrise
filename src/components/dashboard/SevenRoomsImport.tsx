@@ -93,7 +93,7 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [csvData, setCsvData] = useState<string[][]>([]);
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
-  const [duplicateHandling, setDuplicateHandling] = useState<DuplicateHandling>('skip');
+  const [duplicateHandling, setDuplicateHandling] = useState<DuplicateHandling>('update');
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([]);
   const [importCounts, setImportCounts] = useState({ created: 0, updated: 0, failed: 0 });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -360,23 +360,26 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
         const notes = columnMapping.notes ? row.data[columnMapping.notes]?.trim() || null : null;
         const city = columnMapping.city ? validateCity(row.data[columnMapping.city] || '') : 'doha';
 
-        if (row.isDuplicate && row.existingMemberId && duplicateHandling === 'update') {
-          // Update existing member
-          const { error } = await supabase
-            .from('members')
-            .update({
-              full_name: fullName,
-              email: email || undefined,
-              total_visits: totalVisits,
-              notes: notes ? (notes.length > 500 ? notes.substring(0, 500) : notes) : undefined,
-              city,
-            })
-            .eq('id', row.existingMemberId);
+        if (row.isDuplicate && row.existingMemberId) {
+          // Update existing member (only when duplicateHandling === 'update')
+          if (duplicateHandling === 'update') {
+            const { error } = await supabase
+              .from('members')
+              .update({
+                full_name: fullName,
+                email: email || undefined,
+                total_visits: totalVisits,
+                notes: notes ? (notes.length > 500 ? notes.substring(0, 500) : notes) : undefined,
+                city,
+              })
+              .eq('id', row.existingMemberId);
 
-          if (error) throw error;
-          updated++;
-        } else {
-          // Create new member
+            if (error) throw error;
+            updated++;
+          }
+          // Skip duplicates otherwise (they were already filtered if duplicateHandling === 'skip')
+        } else if (!row.isDuplicate) {
+          // Create new member only if NOT a duplicate
           const { error } = await supabase.from('members').insert({
             full_name: fullName,
             phone,
