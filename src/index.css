@@ -209,3 +209,65 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(42, 65%, 55%);
 }
+
+/* RTL Support */
+html.rtl {
+  direction: rtl;
+}
+
+html.rtl .font-display,
+html.rtl .font-body {
+  font-family: 'Outfit', 'Segoe UI', Tahoma, sans-serif;
+}
+
+/* RTL Layout Adjustments */
+html.rtl .ml-auto { margin-right: auto; margin-left: unset; }
+html.rtl .mr-auto { margin-left: auto; margin-right: unset; }
+html.rtl .text-left { text-align: right; }
+html.rtl .text-right { text-align: left; }
+
+/* RTL Flex Direction */
+html.rtl .flex-row { flex-direction: row-reverse; }
+html.rtl .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+html.rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+html.rtl .space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* RTL Gap adjustments */
+html.rtl .gap-2, html.rtl .gap-3, html.rtl .gap-4 {
+  /* Gap works the same in RTL */
+}
+
+/* RTL Icon rotation for directional icons */
+html.rtl .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* RTL Sidebar positioning */
+html.rtl aside.fixed.left-0 {
+  left: unset;
+  right: 0;
+}
+
+html.rtl aside.fixed {
+  border-right: none;
+  border-left: 1px solid hsl(var(--sidebar-border));
+}
+
+/* RTL Padding adjustments */
+html.rtl .pl-64 { padding-left: 0; padding-right: 16rem; }
+html.rtl .pl-8 { padding-left: 0; padding-right: 2rem; }
+html.rtl .pl-10 { padding-left: 0; padding-right: 2.5rem; }
+html.rtl .pl-12 { padding-left: 0; padding-right: 3rem; }
+html.rtl .pr-4 { padding-right: 0; padding-left: 1rem; }
+
+/* RTL Sheet positioning */
+html.rtl [data-side="left"] {
+  left: unset !important;
+  right: 0 !important;
+}
