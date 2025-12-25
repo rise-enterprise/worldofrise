@@ -22,6 +22,7 @@ import {
   Sparkles,
   ShieldCheck,
   LogOut,
+  Bell,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -57,6 +58,7 @@ function SidebarContent({
     { id: 'insights', labelKey: 'nav.aiInsights', icon: Sparkles },
     { id: 'privileges', labelKey: 'nav.privileges', icon: Gift },
     { id: 'events', labelKey: 'nav.events', icon: Calendar },
+    { id: 'notifications', labelKey: 'nav.notifications', icon: Bell },
     { id: 'settings', labelKey: 'nav.settings', icon: Settings },
   ];
 
