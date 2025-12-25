@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvatarUpload } from '@/components/member/AvatarUpload';
+import { NotificationSettings } from '@/components/member/NotificationSettings';
 import { useMember } from '@/hooks/useMembers';
 import { useMemberAuthContext } from '@/contexts/MemberAuthContext';
 import { useUpdateMemberProfile } from '@/hooks/useUpdateMemberProfile';
@@ -259,6 +260,11 @@ export default function MemberProfileEdit() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Notification Settings */}
+        {memberAuth?.memberId && (
+          <NotificationSettings memberId={memberAuth.memberId} />
+        )}
 
         {/* Submit Button */}
         <Button 
