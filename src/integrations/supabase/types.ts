@@ -310,6 +310,7 @@ export type Database = {
       }
       members: {
         Row: {
+          avatar_url: string | null
           birthday: string | null
           brand_affinity: Database["public"]["Enums"]["brand_type"] | null
           city: Database["public"]["Enums"]["location_city"]
@@ -334,6 +335,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          avatar_url?: string | null
           birthday?: string | null
           brand_affinity?: Database["public"]["Enums"]["brand_type"] | null
           city?: Database["public"]["Enums"]["location_city"]
@@ -358,6 +360,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          avatar_url?: string | null
           birthday?: string | null
           brand_affinity?: Database["public"]["Enums"]["brand_type"] | null
           city?: Database["public"]["Enums"]["location_city"]

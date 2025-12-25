@@ -17,7 +17,7 @@ import {
 import { Guest } from '@/types/loyalty';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ConciergeChat } from './ConciergeChat';
@@ -127,6 +127,7 @@ export function MemberCard({ guest }: MemberCardProps) {
               className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background cursor-pointer", tierStyle.ring)}
               onClick={() => navigate('/member/profile/edit')}
             >
+              <AvatarImage src={guest.avatarUrl} alt={guest.name} />
               <AvatarFallback className={cn(tierStyle.bg, tierStyle.text, "font-semibold")}>
                 {getInitials(guest.name)}
               </AvatarFallback>

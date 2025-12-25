@@ -100,6 +100,7 @@ async function fetchMembers(): Promise<Guest[]> {
       })),
       tags: [], // Tags would need a separate table
       notes: member.notes || undefined,
+      avatarUrl: member.avatar_url || undefined,
       totalPoints: member.total_points || 0,
       status: member.status || 'active',
     };
@@ -171,6 +172,7 @@ async function fetchMember(id: string): Promise<Guest | null> {
     })),
     tags: [],
     notes: member.notes || undefined,
+    avatarUrl: member.avatar_url || undefined,
     totalPoints: member.total_points || 0,
     status: member.status || 'active',
   };
