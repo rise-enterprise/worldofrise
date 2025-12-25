@@ -256,6 +256,44 @@ export type Database = {
           },
         ]
       }
+      member_notification_preferences: {
+        Row: {
+          created_at: string
+          email_events: boolean
+          email_promotions: boolean
+          email_tier_upgrades: boolean
+          id: string
+          member_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email_events?: boolean
+          email_promotions?: boolean
+          email_tier_upgrades?: boolean
+          id?: string
+          member_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email_events?: boolean
+          email_promotions?: boolean
+          email_tier_upgrades?: boolean
+          id?: string
+          member_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_notification_preferences_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: true
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       member_tiers: {
         Row: {
           assigned_at: string | null
@@ -397,6 +435,41 @@ export type Database = {
             columns: ["last_location_id"]
             isOneToOne: false
             referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_history: {
+        Row: {
+          id: string
+          member_id: string
+          notification_type: string
+          sent_at: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          id?: string
+          member_id: string
+          notification_type: string
+          sent_at?: string
+          status?: string
+          subject: string
+        }
+        Update: {
+          id?: string
+          member_id?: string
+          notification_type?: string
+          sent_at?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_history_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
             referencedColumns: ["id"]
           },
         ]

@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.delete-admin]
 verify_jwt = true
+
+[functions.send-notification]
+verify_jwt = true
