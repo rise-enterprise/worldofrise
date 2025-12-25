@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -128,6 +128,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
             </Button>
             <div className="flex items-center gap-3">
               <Avatar className={cn("h-10 w-10 ring-2 ring-offset-2 ring-offset-background", tierColor.replace('bg-', 'ring-'))}>
+                <AvatarImage src={guest.avatarUrl} alt={guest.name} />
                 <AvatarFallback className={cn(tierColor, "text-white font-medium")}>
                   {getInitials(guest.name)}
                 </AvatarFallback>

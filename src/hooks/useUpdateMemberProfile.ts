@@ -8,6 +8,7 @@ interface UpdateMemberProfileInput {
   city?: 'doha' | 'riyadh';
   brand_affinity?: 'noir' | 'sasso' | 'both';
   preferred_language?: 'ar' | 'en';
+  avatar_url?: string;
 }
 
 async function updateMemberProfile(updates: UpdateMemberProfileInput) {
@@ -24,16 +25,18 @@ async function updateMemberProfile(updates: UpdateMemberProfileInput) {
   if (authError) throw authError;
   if (!memberAuth?.member_id) throw new Error('Member not found');
 
+  const updateData: Record<string, any> = {};
+  if (updates.full_name !== undefined) updateData.full_name = updates.full_name;
+  if (updates.email !== undefined) updateData.email = updates.email;
+  if (updates.phone !== undefined) updateData.phone = updates.phone;
+  if (updates.city !== undefined) updateData.city = updates.city;
+  if (updates.brand_affinity !== undefined) updateData.brand_affinity = updates.brand_affinity;
+  if (updates.preferred_language !== undefined) updateData.preferred_language = updates.preferred_language;
+  if (updates.avatar_url !== undefined) updateData.avatar_url = updates.avatar_url;
+
   const { data, error } = await supabase
     .from('members')
-    .update({
-      full_name: updates.full_name,
-      email: updates.email,
-      phone: updates.phone,
-      city: updates.city,
-      brand_affinity: updates.brand_affinity,
-      preferred_language: updates.preferred_language,
-    })
+    .update(updateData)
     .eq('id', memberAuth.member_id)
     .select()
     .single();
@@ -42,11 +45,54 @@ async function updateMemberProfile(updates: UpdateMemberProfileInput) {
   return data;
 }
 
+export async function uploadMemberAvatar(file: File): Promise<string> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Create unique filename
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+  // Upload file
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(fileName);
+
+  return publicUrl;
+}
+
 export function useUpdateMemberProfile() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateMemberProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+      queryClient.invalidateQueries({ queryKey: ['member'] });
+    },
+  });
+}
+
+export function useUploadAvatar() {
+  const queryClient = useQueryClient();
+  const updateProfile = useUpdateMemberProfile();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const avatarUrl = await uploadMemberAvatar(file);
+      await updateProfile.mutateAsync({ avatar_url: avatarUrl });
+      return avatarUrl;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['members'] });
       queryClient.invalidateQueries({ queryKey: ['member'] });

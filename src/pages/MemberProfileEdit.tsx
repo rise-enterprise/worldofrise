@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AvatarUpload } from '@/components/member/AvatarUpload';
 import { useMember } from '@/hooks/useMembers';
 import { useMemberAuthContext } from '@/contexts/MemberAuthContext';
 import { useUpdateMemberProfile } from '@/hooks/useUpdateMemberProfile';
@@ -113,6 +114,16 @@ export default function MemberProfileEdit() {
       </div>
 
       <form onSubmit={handleSubmit} className="p-4 max-w-lg mx-auto space-y-6">
+        {/* Avatar Upload */}
+        <Card>
+          <CardContent className="py-6">
+            <AvatarUpload 
+              currentAvatarUrl={member?.avatarUrl}
+              name={formData.full_name || 'Member'}
+            />
+          </CardContent>
+        </Card>
+
         {/* Personal Info */}
         <Card>
           <CardHeader className="pb-4">
