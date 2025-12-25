@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Coffee, UtensilsCrossed } from 'lucide-react';
+import NoirLogo from '@/assets/NOIR_LOGO.png';
+import SassoLogo from '@/assets/sasso_logo.png';
 
 interface BrandMetricsProps {
   visitsByBrand: {
@@ -25,8 +26,8 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
         <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-noir border border-noir-accent/20">
-                <Coffee className="h-4 w-4 text-foreground" />
+              <div className="p-2 rounded-lg bg-noir border border-noir-accent/20 flex items-center justify-center">
+                <img src={NoirLogo} alt="NOIR" className="h-5 w-auto object-contain" />
               </div>
               <div>
                 <p className="font-display text-sm font-medium text-foreground">NOIR Café</p>
@@ -50,8 +51,8 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
         <div className="animate-slide-up" style={{ animationDelay: '500ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-sasso border border-sasso-accent/20">
-                <UtensilsCrossed className="h-4 w-4 text-foreground" />
+              <div className="p-2 rounded-lg bg-sasso border border-sasso-accent/20 flex items-center justify-center">
+                <img src={SassoLogo} alt="SASSO" className="h-5 w-auto object-contain" />
               </div>
               <div>
                 <p className="font-display text-sm font-medium text-foreground">SASSO</p>
