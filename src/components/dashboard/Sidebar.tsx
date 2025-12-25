@@ -25,6 +25,8 @@ import {
   Bell,
 } from 'lucide-react';
 import RHLogo from '@/assets/RH_logo.png';
+import NoirLogo from '@/assets/NOIR_LOGO.png';
+import SassoLogo from '@/assets/sasso_logo.png';
 
 interface SidebarProps {
   activeView: string;
@@ -35,10 +37,10 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
-const brandFilters: { id: Brand; labelKey: string; icon: React.ElementType }[] = [
+const brandFilters: { id: Brand; labelKey: string; icon?: React.ElementType; logo?: string }[] = [
   { id: 'all', labelKey: 'brands.allBrands', icon: Crown },
-  { id: 'noir', labelKey: 'brands.noir', icon: Coffee },
-  { id: 'sasso', labelKey: 'brands.sasso', icon: UtensilsCrossed },
+  { id: 'noir', labelKey: 'brands.noir', logo: NoirLogo },
+  { id: 'sasso', labelKey: 'brands.sasso', logo: SassoLogo },
 ];
 
 function SidebarContent({ 
@@ -102,7 +104,11 @@ function SidebarContent({
                   : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
               )}
             >
-              <brand.icon className="h-4 w-4" />
+              {brand.logo ? (
+                <img src={brand.logo} alt={brand.id} className="h-4 w-auto object-contain" />
+              ) : brand.icon ? (
+                <brand.icon className="h-4 w-4" />
+              ) : null}
               <span className="font-medium">{t(brand.labelKey)}</span>
             </button>
           ))}
