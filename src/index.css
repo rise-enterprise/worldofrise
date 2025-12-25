@@ -82,6 +82,82 @@
     --sidebar-border: 0 0% 92%;
     --sidebar-ring: 343 77% 34%;
   }
+
+  .dark {
+    /* Qatar Airways Dark Theme */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    /* Qatar Airways Burgundy - slightly lighter for dark mode */
+    --primary: 343 77% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Dark Secondary */
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 90%;
+
+    /* Muted Tones */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+
+    /* Accent - Burgundy Dark */
+    --accent: 343 50% 18%;
+    --accent-foreground: 343 70% 70%;
+
+    /* Status Colors */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
+
+    /* Borders & Inputs */
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 343 77% 45%;
+
+    /* Brand Colors - Dark Mode */
+    --noir: 0 0% 95%;
+    --noir-accent: 343 50% 55%;
+    --sasso: 30 40% 70%;
+    --sasso-accent: 35 55% 60%;
+
+    /* Tier Colors - Dark Mode */
+    --tier-initiation: 0 0% 60%;
+    --tier-connoisseur: 30 25% 55%;
+    --tier-elite: 45 60% 55%;
+    --tier-inner-circle: 343 50% 50%;
+    --tier-black: 45 50% 55%;
+
+    /* Gradients - Dark Mode */
+    --gradient-primary: linear-gradient(135deg, hsl(343, 77%, 45%) 0%, hsl(343, 70%, 35%) 100%);
+    --gradient-light: linear-gradient(180deg, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 8%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0, 0%, 12%) 0%, hsl(0, 0%, 10%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0, 0%, 8%) 0%, hsl(0, 0%, 10%) 50%, hsl(343, 30%, 12%) 100%);
+
+    /* Shadows - Dark Mode */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.2);
+    --shadow-lg: 0 10px 25px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -4px hsl(0 0% 0% / 0.2);
+    --shadow-xl: 0 20px 40px -8px hsl(0 0% 0% / 0.5);
+    --shadow-primary: 0 8px 30px -8px hsl(343 77% 45% / 0.4);
+
+    /* Sidebar - Dark Theme */
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 80%;
+    --sidebar-primary: 343 77% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 343 40% 15%;
+    --sidebar-accent-foreground: 343 70% 70%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 343 77% 45%;
+  }
 }
 
 @layer base {
@@ -202,23 +278,23 @@
   }
 }
 
-/* Custom Scrollbar - Light Theme */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(0, 0%, 96%);
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(0, 0%, 80%);
+  background: hsl(var(--muted-foreground) / 0.3);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(343, 77%, 34%);
+  background: hsl(var(--primary));
 }
 
 /* RTL Support */
@@ -286,5 +362,5 @@ html.rtl [data-side="left"] {
 /* Selection colors */
 ::selection {
   background-color: hsl(343 77% 34% / 0.15);
-  color: hsl(343, 77%, 28%);
+  color: hsl(var(--primary));
 }

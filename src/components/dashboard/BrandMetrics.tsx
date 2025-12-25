@@ -15,7 +15,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
   const sassoPercentage = 100 - noirPercentage;
 
   return (
-    <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
+    <Card variant="elevated" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
       <CardHeader>
         <CardTitle className="text-lg">Brand Performance</CardTitle>
         <p className="text-xs text-muted-foreground">Visits this month by experience</p>

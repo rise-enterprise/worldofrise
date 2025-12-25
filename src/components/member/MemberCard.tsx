@@ -23,6 +23,7 @@ import { ConciergeChat } from './ConciergeChat';
 import { useTiers } from '@/hooks/useTiers';
 import { format, formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface MemberCardProps {
   guest: Guest;
@@ -118,6 +119,7 @@ export function MemberCard({ guest }: MemberCardProps) {
         {/* Header with Avatar and Greeting */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Avatar 
               className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background cursor-pointer shadow-md", tierStyle.ring)}
               onClick={() => navigate('/member/profile/edit')}

@@ -120,7 +120,7 @@ export function BulkInsightsView({ onSelectGuest }: BulkInsightsViewProps) {
 
       {/* At Risk Guests */}
       {atRiskGuests.length > 0 && (
-        <Card variant="luxury">
+        <Card variant="elevated">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-red-500" />
@@ -173,7 +173,7 @@ export function BulkInsightsView({ onSelectGuest }: BulkInsightsViewProps) {
 
       {/* Medium Risk */}
       {mediumRiskGuests.length > 0 && (
-        <Card variant="luxury">
+        <Card variant="elevated">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2 text-amber-500">
               <AlertTriangle className="h-5 w-5" />
@@ -213,7 +213,7 @@ export function BulkInsightsView({ onSelectGuest }: BulkInsightsViewProps) {
 
       {/* Empty state */}
       {guests.length === 0 && (
-        <Card variant="luxury">
+        <Card variant="elevated">
           <CardContent className="pt-6 text-center py-12">
             <Users className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
             <p className="text-muted-foreground">No guests to analyze yet. Import members to get started.</p>
