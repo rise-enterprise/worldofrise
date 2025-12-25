@@ -12,7 +12,6 @@ import {
   MapPin,
   Settings,
   QrCode,
-  X
 } from 'lucide-react';
 import { Guest } from '@/types/loyalty';
 import { Button } from '@/components/ui/button';
@@ -29,13 +28,13 @@ interface MemberCardProps {
   guest: Guest;
 }
 
-const tierColors: Record<string, { bg: string; text: string; ring: string }> = {
-  'Initiation': { bg: 'bg-slate-600', text: 'text-slate-100', ring: 'ring-slate-500' },
-  'Bronze': { bg: 'bg-amber-700', text: 'text-amber-100', ring: 'ring-amber-600' },
-  'Silver': { bg: 'bg-slate-400', text: 'text-slate-900', ring: 'ring-slate-400' },
-  'Gold': { bg: 'bg-yellow-500', text: 'text-yellow-950', ring: 'ring-yellow-500' },
-  'Platinum': { bg: 'bg-purple-600', text: 'text-purple-100', ring: 'ring-purple-500' },
-  'Diamond': { bg: 'bg-cyan-500', text: 'text-cyan-950', ring: 'ring-cyan-400' },
+const tierColors: Record<string, { bg: string; text: string; ring: string; gradient: string }> = {
+  'Initiation': { bg: 'bg-slate-500', text: 'text-white', ring: 'ring-slate-400', gradient: 'from-slate-500 to-slate-600' },
+  'Bronze': { bg: 'bg-amber-600', text: 'text-white', ring: 'ring-amber-500', gradient: 'from-amber-500 to-amber-700' },
+  'Silver': { bg: 'bg-slate-400', text: 'text-slate-900', ring: 'ring-slate-300', gradient: 'from-slate-300 to-slate-500' },
+  'Gold': { bg: 'bg-yellow-500', text: 'text-yellow-950', ring: 'ring-yellow-400', gradient: 'from-yellow-400 to-yellow-600' },
+  'Platinum': { bg: 'bg-primary', text: 'text-white', ring: 'ring-primary/70', gradient: 'from-primary to-primary/80' },
+  'Diamond': { bg: 'bg-cyan-500', text: 'text-cyan-950', ring: 'ring-cyan-400', gradient: 'from-cyan-400 to-cyan-600' },
 };
 
 export function MemberCard({ guest }: MemberCardProps) {
@@ -44,7 +43,6 @@ export function MemberCard({ guest }: MemberCardProps) {
   const [showQR, setShowQR] = useState(false);
   const { data: tiers } = useTiers();
 
-  // Calculate tier progress dynamically from database
   const sortedTiers = tiers?.sort((a, b) => a.minVisits - b.minVisits) || [];
   const currentTierIndex = sortedTiers.findIndex(t => t.displayName === guest.tierName);
   const nextTier = sortedTiers[currentTierIndex + 1];
@@ -74,7 +72,6 @@ export function MemberCard({ guest }: MemberCardProps) {
     return 'Good evening';
   };
 
-  // QR code contains member ID for scanning at venue
   const qrValue = JSON.stringify({
     type: 'RISE_MEMBER',
     id: guest.id,
@@ -85,22 +82,20 @@ export function MemberCard({ guest }: MemberCardProps) {
   const recentVisits = guest.visits.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      {/* Chat Overlay */}
+    <div className="min-h-screen bg-gradient-hero">
       <ConciergeChat 
         open={showChat} 
         onOpenChange={setShowChat}
         memberName={guest.name}
       />
 
-      {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-center">Your Member QR Code</DialogTitle>
+            <DialogTitle className="text-center font-display">Your Member QR Code</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center py-6">
-            <div className="bg-white p-4 rounded-xl shadow-lg">
+            <div className="bg-white p-4 rounded-2xl shadow-lg">
               <QRCodeSVG 
                 value={qrValue}
                 size={200}
@@ -124,7 +119,7 @@ export function MemberCard({ guest }: MemberCardProps) {
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-3">
             <Avatar 
-              className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background cursor-pointer", tierStyle.ring)}
+              className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background cursor-pointer shadow-md", tierStyle.ring)}
               onClick={() => navigate('/member/profile/edit')}
             >
               <AvatarImage src={guest.avatarUrl} alt={guest.name} />
@@ -138,13 +133,13 @@ export function MemberCard({ guest }: MemberCardProps) {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={() => setShowQR(true)}>
+            <Button variant="ghost" size="icon" onClick={() => setShowQR(true)} className="text-foreground">
               <QrCode className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')} className="text-foreground">
               <Settings className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setShowChat(true)}>
+            <Button variant="ghost" size="icon" onClick={() => setShowChat(true)} className="text-foreground">
               <MessageCircle className="h-5 w-5" />
             </Button>
           </div>
@@ -152,18 +147,18 @@ export function MemberCard({ guest }: MemberCardProps) {
 
         {/* Membership Card with QR */}
         <Card className={cn(
-          "relative overflow-hidden border-0",
-          tierStyle.bg
+          "relative overflow-hidden border-0 shadow-xl",
+          `bg-gradient-to-br ${tierStyle.gradient}`
         )}>
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
           <CardContent className="relative p-6">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <p className={cn("text-xs opacity-80", tierStyle.text)}>Membership Tier</p>
-                <h2 className={cn("text-2xl font-bold", tierStyle.text)}>{guest.tierName}</h2>
+                <p className={cn("text-xs opacity-80 font-medium", tierStyle.text)}>Membership Tier</p>
+                <h2 className={cn("text-2xl font-bold font-display", tierStyle.text)}>{guest.tierName}</h2>
               </div>
               <div 
-                className="bg-white p-1.5 rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                className="bg-white p-1.5 rounded-xl cursor-pointer hover:scale-105 transition-transform shadow-md"
                 onClick={() => setShowQR(true)}
               >
                 <QRCodeSVG 
@@ -178,7 +173,7 @@ export function MemberCard({ guest }: MemberCardProps) {
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className={cn("opacity-80", tierStyle.text)}>Progress to {nextTier?.displayName || 'Max'}</span>
-                <span className={cn("font-medium", tierStyle.text)}>
+                <span className={cn("font-semibold", tierStyle.text)}>
                   {nextTier ? `${visitsToNextTier} visits away` : 'Max tier!'}
                 </span>
               </div>
@@ -200,20 +195,20 @@ export function MemberCard({ guest }: MemberCardProps) {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-card/50 border-border/50">
+          <Card variant="elevated" className="border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <Sparkles className="h-4 w-4" />
-                <span className="text-xs">Favorite Brand</span>
+                <span className="text-xs font-medium">Favorite Brand</span>
               </div>
               <p className="font-semibold text-foreground">{guest.favoriteBrand}</p>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 border-border/50">
+          <Card variant="elevated" className="border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <Calendar className="h-4 w-4" />
-                <span className="text-xs">Last Visit</span>
+                <span className="text-xs font-medium">Last Visit</span>
               </div>
               <p className="font-semibold text-foreground text-sm">
                 {formatDistanceToNow(guest.lastVisit, { addSuffix: true })}
@@ -224,10 +219,10 @@ export function MemberCard({ guest }: MemberCardProps) {
 
         {/* Recent Visits */}
         {recentVisits.length > 0 && (
-          <Card className="bg-card/50 border-border/50">
+          <Card variant="elevated" className="border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-foreground">Recent Visits</h3>
+                <h3 className="font-semibold text-foreground">Recent Visits</h3>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -243,25 +238,25 @@ export function MemberCard({ guest }: MemberCardProps) {
                   <div key={visit.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center",
+                        "w-8 h-8 rounded-full flex items-center justify-center shadow-sm",
                         visit.brand === 'noir' ? 'bg-zinc-800' : 'bg-amber-100'
                       )}>
                         <span className={cn(
-                          "text-xs font-medium",
+                          "text-xs font-semibold",
                           visit.brand === 'noir' ? 'text-zinc-100' : 'text-amber-900'
                         )}>
                           {visit.brand[0].toUpperCase()}
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">{visit.brand}</p>
+                        <p className="text-sm font-medium text-foreground capitalize">{visit.brand}</p>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="h-3 w-3" />
                           <span>{visit.location}</span>
                         </div>
                       </div>
                     </div>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground font-medium">
                       {format(visit.date, 'MMM d')}
                     </span>
                   </div>
@@ -275,25 +270,26 @@ export function MemberCard({ guest }: MemberCardProps) {
         <div className="grid grid-cols-2 gap-3 pt-2">
           <Button 
             variant="outline" 
-            className="h-auto py-4 flex-col gap-2"
+            className="h-auto py-4 flex-col gap-2 shadow-sm"
             onClick={() => navigate('/member/history')}
           >
             <History className="h-5 w-5" />
-            <span>Visit History</span>
+            <span className="font-medium">Visit History</span>
           </Button>
           <Button 
             variant="outline" 
-            className="h-auto py-4 flex-col gap-2"
+            className="h-auto py-4 flex-col gap-2 shadow-sm"
             onClick={() => navigate('/member/events')}
           >
             <CalendarCheck className="h-5 w-5" />
-            <span>Events</span>
+            <span className="font-medium">Events</span>
           </Button>
         </div>
 
         {/* Concierge CTA */}
         <Card 
-          className="bg-primary/5 border-primary/20 cursor-pointer hover:bg-primary/10 transition-colors"
+          variant="interactive"
+          className="bg-primary/5 border-primary/20"
           onClick={() => setShowChat(true)}
         >
           <CardContent className="p-4 flex items-center gap-3">
@@ -301,7 +297,7 @@ export function MemberCard({ guest }: MemberCardProps) {
               <MessageCircle className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="font-medium text-foreground">Need assistance?</p>
+              <p className="font-semibold text-foreground">Need assistance?</p>
               <p className="text-sm text-muted-foreground">Chat with our concierge</p>
             </div>
             <ChevronRight className="h-5 w-5 text-muted-foreground" />

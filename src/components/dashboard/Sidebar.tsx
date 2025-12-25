@@ -77,18 +77,18 @@ function SidebarContent({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-sidebar">
       {/* Logo */}
       <div className="flex h-20 items-center justify-center border-b border-sidebar-border">
         <div className="text-center">
-          <h1 className="font-display text-2xl font-semibold text-gradient-gold">RISE</h1>
-          <p className="text-[10px] tracking-[0.3em] text-muted-foreground uppercase">Holding</p>
+          <h1 className="font-display text-2xl font-bold text-gradient-burgundy">RISE</h1>
+          <p className="text-[10px] tracking-[0.3em] text-muted-foreground uppercase font-medium">Holding</p>
         </div>
       </div>
 
       {/* Brand Filter */}
       <div className="p-4 border-b border-sidebar-border">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 font-medium">
           {t('brands.brandView')}
         </p>
         <div className="space-y-1">
@@ -100,7 +100,7 @@ function SidebarContent({
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
                 isRTL && 'flex-row-reverse',
                 activeBrand === brand.id
-                  ? 'bg-primary/10 text-primary border border-primary/20'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
                   : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
               )}
             >
@@ -113,7 +113,7 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 font-medium">
           {t('nav.navigation')}
         </p>
         <div className="space-y-1">
@@ -125,7 +125,7 @@ function SidebarContent({
                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
                 isRTL && 'flex-row-reverse',
                 activeView === item.id
-                  ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                  ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
                   : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
               )}
             >
@@ -138,7 +138,7 @@ function SidebarContent({
         {/* Super Admin Navigation */}
         {isSuperAdmin && (
           <>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 mt-6">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3 px-2 mt-6 font-medium">
               {t('nav.administration')}
             </p>
             <div className="space-y-1">
@@ -150,7 +150,7 @@ function SidebarContent({
                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
                     isRTL && 'flex-row-reverse',
                     activeView === item.id
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
                       : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
                   )}
                 >
@@ -167,7 +167,7 @@ function SidebarContent({
       <div className="p-4 border-t border-sidebar-border space-y-3">
         {admin && (
           <div className="px-2">
-            <p className="text-sm font-medium text-foreground truncate">{admin.name}</p>
+            <p className="text-sm font-semibold text-foreground truncate">{admin.name}</p>
             <p className="text-xs text-muted-foreground truncate">{admin.email}</p>
           </div>
         )}
@@ -179,7 +179,7 @@ function SidebarContent({
           )}
         >
           <LogOut className="h-4 w-4" />
-          <span>{t('common.signOut')}</span>
+          <span className="font-medium">{t('common.signOut')}</span>
         </button>
       </div>
     </div>
@@ -213,7 +213,7 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
   // Desktop: Fixed sidebar
   return (
     <aside className={cn(
-      "fixed top-0 z-40 h-screen w-64 bg-sidebar border-sidebar-border",
+      "fixed top-0 z-40 h-screen w-64 bg-sidebar border-sidebar-border shadow-lg",
       isRTL ? "right-0 border-l" : "left-0 border-r"
     )}>
       <SidebarContent 

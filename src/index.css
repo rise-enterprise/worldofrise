@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,79 +6,81 @@
 
 @layer base {
   :root {
-    /* Luxury Dark Theme - Primary */
-    --background: 20 10% 6%;
-    --foreground: 40 30% 92%;
+    /* Qatar Airways Inspired Light Theme */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 12%;
 
-    --card: 20 10% 9%;
-    --card-foreground: 40 30% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
 
-    --popover: 20 10% 8%;
-    --popover-foreground: 40 30% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
 
-    /* Champagne Gold - Brand Accent */
-    --primary: 42 65% 55%;
-    --primary-foreground: 20 10% 6%;
+    /* Qatar Airways Burgundy */
+    --primary: 343 77% 34%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Warm Ivory */
-    --secondary: 40 20% 15%;
-    --secondary-foreground: 40 30% 92%;
+    /* Warm Grey */
+    --secondary: 30 5% 96%;
+    --secondary-foreground: 0 0% 20%;
 
     /* Muted Tones */
-    --muted: 20 10% 14%;
-    --muted-foreground: 40 10% 55%;
+    --muted: 30 5% 94%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Accent - Soft Gold */
-    --accent: 42 40% 25%;
-    --accent-foreground: 42 65% 75%;
+    /* Accent - Burgundy Light */
+    --accent: 343 60% 95%;
+    --accent-foreground: 343 77% 34%;
 
     /* Status Colors */
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 40 30% 92%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --success: 152 45% 45%;
-    --success-foreground: 40 30% 92%;
+    --success: 152 60% 42%;
+    --success-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 40 10% 18%;
-    --input: 40 10% 18%;
-    --ring: 42 65% 55%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 343 77% 34%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     /* Brand Colors */
-    --noir: 20 10% 8%;
-    --noir-accent: 280 15% 25%;
-    --sasso: 15 40% 18%;
-    --sasso-accent: 25 50% 45%;
+    --noir: 0 0% 12%;
+    --noir-accent: 343 50% 40%;
+    --sasso: 30 40% 25%;
+    --sasso-accent: 35 55% 50%;
 
-    /* Tier Colors */
-    --tier-initiation: 40 10% 40%;
-    --tier-connoisseur: 42 30% 45%;
-    --tier-elite: 42 50% 55%;
-    --tier-inner-circle: 42 65% 60%;
-    --tier-black: 0 0% 10%;
+    /* Tier Colors - Qatar Airways Privilege Club Inspired */
+    --tier-initiation: 0 0% 50%;
+    --tier-connoisseur: 30 25% 45%;
+    --tier-elite: 45 60% 50%;
+    --tier-inner-circle: 343 50% 40%;
+    --tier-black: 0 0% 8%;
 
     /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(42, 65%, 55%) 0%, hsl(35, 70%, 45%) 100%);
-    --gradient-noir: linear-gradient(180deg, hsl(20, 10%, 8%) 0%, hsl(20, 10%, 4%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(20, 10%, 11%) 0%, hsl(20, 10%, 7%) 100%);
-    --gradient-luxury: linear-gradient(135deg, hsl(20, 10%, 12%) 0%, hsl(20, 10%, 6%) 50%, hsl(42, 20%, 10%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(343, 77%, 34%) 0%, hsl(343, 70%, 28%) 100%);
+    --gradient-light: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(30, 10%, 97%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0, 0%, 100%) 0%, hsl(30, 5%, 98%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0, 0%, 98%) 0%, hsl(30, 10%, 96%) 50%, hsl(343, 30%, 97%) 100%);
 
     /* Shadows */
-    --shadow-luxury: 0 25px 50px -12px hsl(0, 0%, 0% / 0.5);
-    --shadow-card: 0 10px 40px -10px hsl(0, 0%, 0% / 0.3);
-    --shadow-gold: 0 0 60px hsl(42, 65%, 55% / 0.15);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.03);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.05), 0 2px 4px -2px hsl(0 0% 0% / 0.03);
+    --shadow-lg: 0 10px 25px -3px hsl(0 0% 0% / 0.08), 0 4px 6px -4px hsl(0 0% 0% / 0.03);
+    --shadow-xl: 0 20px 40px -8px hsl(0 0% 0% / 0.1);
+    --shadow-primary: 0 8px 30px -8px hsl(343 77% 34% / 0.3);
 
-    /* Sidebar */
-    --sidebar-background: 20 10% 5%;
-    --sidebar-foreground: 40 30% 85%;
-    --sidebar-primary: 42 65% 55%;
-    --sidebar-primary-foreground: 20 10% 6%;
-    --sidebar-accent: 40 10% 12%;
-    --sidebar-accent-foreground: 40 30% 92%;
-    --sidebar-border: 40 10% 12%;
-    --sidebar-ring: 42 65% 55%;
+    /* Sidebar - Light Theme */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 30%;
+    --sidebar-primary: 343 77% 34%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 343 60% 96%;
+    --sidebar-accent-foreground: 343 77% 30%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 343 77% 34%;
   }
 }
 
@@ -89,49 +91,49 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Inter', 'Poppins', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
-    @apply font-medium tracking-tight;
+    font-family: 'Poppins', sans-serif;
+    @apply font-semibold tracking-tight;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Poppins', sans-serif;
   }
 
   .font-body {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 
-  .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(42, 65%, 65%) 0%, hsl(35, 70%, 50%) 100%);
+  .text-gradient-burgundy {
+    background: linear-gradient(135deg, hsl(343, 77%, 38%) 0%, hsl(343, 70%, 28%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .bg-gradient-luxury {
-    background: var(--gradient-luxury);
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
   }
 
   .bg-gradient-card {
     background: var(--gradient-card);
   }
 
-  .bg-gradient-gold {
-    background: var(--gradient-gold);
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
   }
 
-  .shadow-luxury {
-    box-shadow: var(--shadow-luxury);
+  .shadow-primary {
+    box-shadow: var(--shadow-primary);
   }
 
-  .shadow-gold {
-    box-shadow: var(--shadow-gold);
+  .shadow-card {
+    box-shadow: var(--shadow-lg);
   }
 
   .animate-fade-in {
@@ -148,6 +150,15 @@
 
   .animate-shimmer {
     animation: shimmer 2s linear infinite;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-lift:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-xl);
   }
 }
 
@@ -191,23 +202,23 @@
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Light Theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(20, 10%, 8%);
+  background: hsl(0, 0%, 96%);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(40, 10%, 20%);
+  background: hsl(0, 0%, 80%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(42, 65%, 55%);
+  background: hsl(343, 77%, 34%);
 }
 
 /* RTL Support */
@@ -217,7 +228,7 @@ html.rtl {
 
 html.rtl .font-display,
 html.rtl .font-body {
-  font-family: 'Outfit', 'Segoe UI', Tahoma, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
 }
 
 /* RTL Layout Adjustments */
@@ -270,4 +281,10 @@ html.rtl .pr-4 { padding-right: 0; padding-left: 1rem; }
 html.rtl [data-side="left"] {
   left: unset !important;
   right: 0 !important;
+}
+
+/* Selection colors */
+::selection {
+  background-color: hsl(343 77% 34% / 0.15);
+  color: hsl(343, 77%, 28%);
 }
