@@ -104,7 +104,7 @@ export function SettingsView() {
         </TabsList>
 
         <TabsContent value="notifications" className="mt-6 space-y-6">
-          <Card variant="elevated">
+          <Card variant="luxury">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Bell className="h-5 w-5 text-primary" />
@@ -159,7 +159,7 @@ export function SettingsView() {
             </CardContent>
           </Card>
 
-          <Card variant="elevated">
+          <Card variant="luxury">
             <CardHeader>
               <CardTitle className="text-lg">Alert Settings</CardTitle>
               <CardDescription>
@@ -205,7 +205,7 @@ export function SettingsView() {
 
         <TabsContent value="brands" className="mt-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card variant="elevated">
+            <Card variant="luxury">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Coffee className="h-5 w-5" />
@@ -229,7 +229,7 @@ export function SettingsView() {
               </CardContent>
             </Card>
 
-            <Card variant="elevated">
+            <Card variant="luxury">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <UtensilsCrossed className="h-5 w-5 text-sasso-accent" />
@@ -257,7 +257,7 @@ export function SettingsView() {
 
         <TabsContent value="integrations" className="mt-6 space-y-6">
           {/* SevenRooms Integration Card */}
-          <Card variant="elevated">
+          <Card variant="luxury">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <FileSpreadsheet className="h-5 w-5 text-primary" />
@@ -294,7 +294,7 @@ export function SettingsView() {
             </CardContent>
           </Card>
 
-          <Card variant="elevated">
+          <Card variant="luxury">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Database className="h-5 w-5 text-primary" />
@@ -333,7 +333,7 @@ export function SettingsView() {
         </TabsContent>
 
         <TabsContent value="security" className="mt-6 space-y-6">
-          <Card variant="elevated">
+          <Card variant="luxury">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
@@ -368,7 +368,7 @@ export function SettingsView() {
             </CardContent>
           </Card>
 
-          <Card variant="elevated">
+          <Card variant="luxury">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Globe className="h-5 w-5 text-primary" />

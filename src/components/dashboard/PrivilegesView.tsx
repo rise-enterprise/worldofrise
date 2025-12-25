@@ -33,7 +33,7 @@ export function PrivilegesView() {
           return (
             <Card 
               key={tier}
-              variant="elevated"
+              variant="luxury"
               className={cn(
                 'animate-slide-up relative overflow-hidden',
                 tier === 'black' && 'border-primary/30 shadow-gold'
@@ -76,7 +76,7 @@ export function PrivilegesView() {
       </div>
 
       {/* Special Privileges Section */}
-      <Card variant="elevated" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
+      <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
         <CardHeader>
           <CardTitle className="font-display text-lg flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />

@@ -11,8 +11,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, User, LogIn } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import RHLogo from '@/assets/RH_logo.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Invalid email address' }).max(255),
@@ -107,22 +105,16 @@ export default function MemberLogin() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-luxury flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative">
-      <div className="absolute top-4 right-4 z-20">
-        <ThemeToggle />
-      </div>
-      <Card className="w-full max-w-md shadow-xl border-border">
-        <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-4">
-            <img src={RHLogo} alt="Rise Holding" className="h-16 w-auto object-contain" />
-          </div>
+    <div className="min-h-screen bg-gradient-luxury flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm border-border/50">
+        <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-foreground">Member Portal</CardTitle>
           <CardDescription className="text-muted-foreground">
             Access your loyalty account
@@ -131,11 +123,11 @@ export default function MemberLogin() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login" className="flex items-center gap-2 font-medium">
+              <TabsTrigger value="login" className="flex items-center gap-2">
                 <LogIn className="h-4 w-4" />
                 Login
               </TabsTrigger>
-              <TabsTrigger value="signup" className="flex items-center gap-2 font-medium">
+              <TabsTrigger value="signup" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Sign Up
               </TabsTrigger>
@@ -149,13 +141,12 @@ export default function MemberLogin() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Email</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input
                             type="email"
                             placeholder="your@email.com"
                             autoComplete="email"
-                            className="h-11"
                             {...field}
                           />
                         </FormControl>
@@ -168,13 +159,12 @@ export default function MemberLogin() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Password</FormLabel>
+                        <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="••••••••"
                             autoComplete="current-password"
-                            className="h-11"
                             {...field}
                           />
                         </FormControl>
@@ -182,7 +172,7 @@ export default function MemberLogin() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" variant="qatar" className="w-full" disabled={isSubmitting}>
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -204,12 +194,11 @@ export default function MemberLogin() {
                     name="fullName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Full Name</FormLabel>
+                        <FormLabel>Full Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="John Doe"
                             autoComplete="name"
-                            className="h-11"
                             {...field}
                           />
                         </FormControl>
@@ -222,13 +211,12 @@ export default function MemberLogin() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Email</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input
                             type="email"
                             placeholder="your@email.com"
                             autoComplete="email"
-                            className="h-11"
                             {...field}
                           />
                         </FormControl>
@@ -241,13 +229,12 @@ export default function MemberLogin() {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Phone Number</FormLabel>
+                        <FormLabel>Phone Number</FormLabel>
                         <FormControl>
                           <Input
                             type="tel"
                             placeholder="+974 1234 5678"
                             autoComplete="tel"
-                            className="h-11"
                             {...field}
                           />
                         </FormControl>
@@ -260,13 +247,12 @@ export default function MemberLogin() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Password</FormLabel>
+                        <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="••••••••"
                             autoComplete="new-password"
-                            className="h-11"
                             {...field}
                           />
                         </FormControl>
@@ -279,13 +265,12 @@ export default function MemberLogin() {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Confirm Password</FormLabel>
+                        <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
                             placeholder="••••••••"
                             autoComplete="new-password"
-                            className="h-11"
                             {...field}
                           />
                         </FormControl>
@@ -293,7 +278,7 @@ export default function MemberLogin() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" variant="qatar" className="w-full" disabled={isSubmitting}>
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

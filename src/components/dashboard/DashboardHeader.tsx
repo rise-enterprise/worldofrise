@@ -7,8 +7,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import RHLogo from '@/assets/RH_logo.png';
 import {
   Dialog,
   DialogContent,
@@ -140,19 +138,14 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         )}
         
         <div className={cn("min-w-0", isRTL && "text-right")}>
-          <img 
-            src={RHLogo} 
-            alt="Rise Holding" 
-            className="h-10 md:h-14 w-auto object-contain"
-          />
+          <h1 className="font-display text-lg md:text-2xl font-medium text-foreground truncate">
+            {t('common.welcome')}
+          </h1>
           <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1 truncate">{currentDate}</p>
         </div>
       </div>
 
       <div className={cn("flex items-center gap-2 md:gap-3 animate-fade-in shrink-0", isRTL && "flex-row-reverse")} style={{ animationDelay: '100ms' }}>
-        {/* Theme Toggle */}
-        <ThemeToggle />
-        
         {/* Language Switcher */}
         <LanguageSwitcher />
 
@@ -266,7 +259,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         {/* New Guest Button - Icon only on mobile */}
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
           <Button 
-            variant="qatar" 
+            variant="luxury" 
             className={cn("gap-2 h-9 md:h-10 px-3 md:px-4", isRTL && "flex-row-reverse")}
             onClick={() => setNewGuestOpen(true)}
           >
@@ -332,7 +325,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                   {t('common.cancel')}
                 </Button>
                 <Button 
-                  variant="qatar" 
+                  variant="luxury" 
                   className="flex-1" 
                   onClick={handleNewGuest}
                   disabled={createMember.isPending}

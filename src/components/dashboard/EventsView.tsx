@@ -294,7 +294,7 @@ export function EventsView() {
   const renderEventCard = (event: Event, index: number) => (
     <Card 
       key={event.id}
-      variant="elevated"
+      variant="luxury"
       className="animate-slide-up overflow-hidden"
       style={{ animationDelay: `${index * 100}ms` }}
     >
@@ -397,7 +397,7 @@ export function EventsView() {
             {upcomingEvents.map((event, index) => renderEventCard(event, index))}
           </div>
           {upcomingEvents.length === 0 && (
-            <Card variant="elevated">
+            <Card variant="luxury">
               <CardContent className="pt-6 text-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                 <p className="text-muted-foreground">No upcoming events</p>
@@ -411,7 +411,7 @@ export function EventsView() {
             {pastEvents.map((event, index) => (
               <Card 
                 key={event.id}
-                variant="elevated"
+                variant="luxury"
                 className="animate-slide-up overflow-hidden opacity-75"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -448,7 +448,7 @@ export function EventsView() {
             ))}
           </div>
           {pastEvents.length === 0 && (
-            <Card variant="elevated">
+            <Card variant="luxury">
               <CardContent className="pt-6 text-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                 <p className="text-muted-foreground">No past events to display</p>
@@ -462,7 +462,7 @@ export function EventsView() {
             {draftEvents.map((event, index) => (
               <Card 
                 key={event.id}
-                variant="elevated"
+                variant="luxury"
                 className="animate-slide-up overflow-hidden border-dashed"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -499,7 +499,7 @@ export function EventsView() {
             ))}
           </div>
           {draftEvents.length === 0 && (
-            <Card variant="elevated">
+            <Card variant="luxury">
               <CardContent className="pt-6 text-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                 <p className="text-muted-foreground">No drafts saved</p>

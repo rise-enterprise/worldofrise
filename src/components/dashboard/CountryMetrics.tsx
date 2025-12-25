@@ -12,7 +12,7 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
   const total = (visitsByCountry.doha || 0) + (visitsByCountry.riyadh || 0) || 1;
 
   return (
-    <Card variant="elevated" className="animate-slide-up" style={{ animationDelay: '400ms' }}>
+    <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '400ms' }}>
       <CardHeader>
         <CardTitle className="text-lg">Regional Presence</CardTitle>
         <p className="text-xs text-muted-foreground">Guest activity by location</p>

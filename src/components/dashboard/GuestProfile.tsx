@@ -14,8 +14,6 @@ import {
   Globe,
   Sparkles
 } from 'lucide-react';
-import NoirLogo from '@/assets/NOIR_LOGO.png';
-import SassoLogo from '@/assets/sasso_logo.png';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -283,30 +281,9 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                 <Sparkles className="h-4 w-4" />
                 <span className="text-xs">Favorite Brand</span>
               </div>
-              <div className={cn(
-                "mt-2 w-16 h-16 rounded-xl flex items-center justify-center p-2",
-                "shadow-lg hover:shadow-xl transition-all duration-300",
-                "hover:scale-105 ring-2 ring-offset-2 ring-offset-background",
-                guest.favoriteBrand === 'noir' 
-                  ? 'bg-noir border border-noir-accent/30 ring-noir-accent/20' 
-                  : guest.favoriteBrand === 'sasso' 
-                  ? 'bg-sasso border border-sasso-accent/30 ring-sasso-accent/20' 
-                  : 'bg-gradient-to-br from-noir via-noir/80 to-sasso border border-border ring-primary/10'
-              )}>
-                {guest.favoriteBrand === 'both' ? (
-                  <div className="flex items-center gap-1.5">
-                    <img src={NoirLogo} alt="NOIR" className="h-6 w-6 object-contain drop-shadow-md" />
-                    <div className="w-px h-6 bg-white/30" />
-                    <img src={SassoLogo} alt="SASSO" className="h-6 w-6 object-contain drop-shadow-md" />
-                  </div>
-                ) : (
-                  <img 
-                    src={guest.favoriteBrand === 'noir' ? NoirLogo : SassoLogo} 
-                    alt={guest.favoriteBrand} 
-                    className="h-10 w-10 object-contain drop-shadow-md" 
-                  />
-                )}
-              </div>
+              <Badge className={cn("mt-1", brandColors[guest.favoriteBrand])}>
+                {guest.favoriteBrand}
+              </Badge>
             </CardContent>
           </Card>
         </div>
@@ -384,17 +361,15 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               <div className={cn(
-                                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 p-2",
-                                "shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200",
-                                visit.brand === 'noir' 
-                                  ? 'bg-noir border border-noir-accent/30' 
-                                  : 'bg-sasso border border-sasso-accent/30'
+                                "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                                visit.brand === 'noir' ? 'bg-zinc-800' : 'bg-amber-100'
                               )}>
-                                <img 
-                                  src={visit.brand === 'noir' ? NoirLogo : SassoLogo} 
-                                  alt={visit.brand} 
-                                  className="h-8 w-8 object-contain drop-shadow-sm" 
-                                />
+                                <span className={cn(
+                                  "text-xs font-medium",
+                                  visit.brand === 'noir' ? 'text-zinc-100' : 'text-amber-900'
+                                )}>
+                                  {visit.brand[0].toUpperCase()}
+                                </span>
                               </div>
                               <div>
                                 <p className="font-medium text-foreground">{visit.brand}</p>

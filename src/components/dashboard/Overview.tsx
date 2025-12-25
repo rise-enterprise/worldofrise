@@ -71,7 +71,7 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
 
         {/* Right Column - VIP Guests */}
         <div className="lg:col-span-1">
-          <Card variant="elevated" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
+          <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
             <CardHeader className="pb-3 md:pb-6">
               <div className="flex items-center justify-between">
                 <div>

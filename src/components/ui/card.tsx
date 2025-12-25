@@ -8,12 +8,11 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-card border-border shadow-sm",
-        elevated: "bg-card border-border/50 shadow-lg hover:shadow-xl",
-        glass: "bg-card/80 backdrop-blur-xl border-border/30 shadow-lg",
-        metric: "bg-card border-border/50 shadow-md hover:shadow-lg hover:border-primary/20",
-        premium: "bg-gradient-to-br from-card to-secondary/50 border-border/50 shadow-lg",
-        interactive: "bg-card border-border shadow-md hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 cursor-pointer",
+        default: "bg-card border-border",
+        luxury: "bg-gradient-to-br from-card to-card/80 border-border/50 shadow-xl hover:border-primary/30",
+        glass: "bg-card/50 backdrop-blur-xl border-border/30",
+        metric: "bg-gradient-to-br from-card to-card/80 border-border/50 hover:shadow-xl hover:border-primary/40",
+        elevated: "bg-card border-border shadow-lg hover:shadow-xl",
       },
     },
     defaultVariants: {
@@ -46,7 +45,7 @@ CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("font-display text-xl font-semibold leading-none tracking-tight", className)} {...props} />
+    <h3 ref={ref} className={cn("font-display text-xl font-medium leading-none tracking-tight", className)} {...props} />
   ),
 );
 CardTitle.displayName = "CardTitle";

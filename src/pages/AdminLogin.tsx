@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Mail, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
+import { Loader2, Mail, Sparkles, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,8 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import RHLogo from '@/assets/RH_logo.png';
 
 const emailSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -49,6 +47,7 @@ const AdminLogin = () => {
 
     setIsSubmitting(true);
     
+    // Check if email belongs to an active admin using RPC (bypasses RLS)
     const { data: isAdmin } = await supabase
       .rpc('check_admin_email', { admin_email: email });
 
@@ -102,6 +101,7 @@ const AdminLogin = () => {
     },
   });
 
+  // Redirect if already authenticated as admin
   useEffect(() => {
     if (!isLoading && isAdmin) {
       navigate('/dashboard');
@@ -135,6 +135,7 @@ const AdminLogin = () => {
   const onPasswordSubmit = async (data: PasswordFormData) => {
     setIsSubmitting(true);
     
+    // First check if email belongs to an active admin using RPC (bypasses RLS)
     const { data: isAdmin, error: adminError } = await supabase
       .rpc('check_admin_email', { admin_email: data.email });
 
@@ -148,6 +149,7 @@ const AdminLogin = () => {
       return;
     }
 
+    // Sign in with password
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
@@ -191,7 +193,7 @@ const AdminLogin = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -199,15 +201,15 @@ const AdminLogin = () => {
 
   if (magicLinkSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
-        <Card className="w-full max-w-md shadow-xl border-border">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
+        <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="space-y-1 text-center">
-            <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-success/10 flex items-center justify-center">
-              <CheckCircle2 className="h-7 w-7 text-success" />
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
             </div>
             <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
             <CardDescription className="text-base">
-              We sent a magic link to <span className="font-semibold text-foreground">{sentEmail}</span>
+              We sent a magic link to <span className="font-medium text-foreground">{sentEmail}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -249,15 +251,15 @@ const AdminLogin = () => {
 
   if (resetEmailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
-        <Card className="w-full max-w-md shadow-xl border-border">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
+        <Card className="w-full max-w-md shadow-xl border-border/50">
           <CardHeader className="space-y-1 text-center">
-            <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-success/10 flex items-center justify-center">
-              <CheckCircle2 className="h-7 w-7 text-success" />
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
+              <CheckCircle2 className="h-6 w-6 text-green-500" />
             </div>
             <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
             <CardDescription className="text-base">
-              We sent a password reset link to <span className="font-semibold text-foreground">{sentEmail}</span>
+              We sent a password reset link to <span className="font-medium text-foreground">{sentEmail}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -283,14 +285,11 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4 relative">
-      <div className="absolute top-4 right-4 z-20">
-        <ThemeToggle />
-      </div>
-      <Card className="w-full max-w-md shadow-xl border-border">
-        <CardHeader className="space-y-1 text-center pb-2">
-          <div className="mx-auto mb-4">
-            <img src={RHLogo} alt="Rise Holding" className="h-16 w-auto object-contain" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
+      <Card className="w-full max-w-md shadow-xl border-border/50">
+        <CardHeader className="space-y-1 text-center">
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Sparkles className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>
@@ -299,9 +298,9 @@ const AdminLogin = () => {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="password" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="password" className="font-medium">Password</TabsTrigger>
-              <TabsTrigger value="magic-link" className="font-medium">Magic Link</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="password">Password</TabsTrigger>
+              <TabsTrigger value="magic-link">Magic Link</TabsTrigger>
             </TabsList>
             
             <TabsContent value="password">
@@ -312,13 +311,13 @@ const AdminLogin = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Email</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input 
                               placeholder="admin@example.com" 
-                              className="pl-10 h-11"
+                              className="pl-10"
                               type="email"
                               autoComplete="email"
                               {...field} 
@@ -334,13 +333,13 @@ const AdminLogin = () => {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Password</FormLabel>
+                        <FormLabel>Password</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input 
                               placeholder="Enter your password" 
-                              className="pl-10 h-11"
+                              className="pl-10"
                               type="password"
                               autoComplete="current-password"
                               {...field} 
@@ -353,7 +352,6 @@ const AdminLogin = () => {
                   />
                   <Button 
                     type="submit" 
-                    variant="qatar"
                     className="w-full" 
                     disabled={isSubmitting}
                   >
@@ -372,7 +370,7 @@ const AdminLogin = () => {
                   <Button 
                     type="button"
                     variant="link" 
-                    className="w-full text-sm text-primary" 
+                    className="w-full text-sm" 
                     onClick={handleForgotPassword}
                     disabled={isSubmitting}
                   >
@@ -399,13 +397,13 @@ const AdminLogin = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-medium">Email</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input 
                               placeholder="admin@example.com" 
-                              className="pl-10 h-11"
+                              className="pl-10"
                               type="email"
                               autoComplete="email"
                               {...field} 
@@ -418,7 +416,6 @@ const AdminLogin = () => {
                   />
                   <Button 
                     type="submit" 
-                    variant="qatar"
                     className="w-full" 
                     disabled={isSubmitting}
                   >

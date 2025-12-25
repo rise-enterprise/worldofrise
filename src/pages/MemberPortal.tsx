@@ -10,18 +10,18 @@ export default function MemberPortal() {
   
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-hero p-4">
-        <Skeleton className="h-64 w-full mb-4 rounded-xl" />
-        <Skeleton className="h-32 w-full mb-4 rounded-xl" />
-        <Skeleton className="h-32 w-full rounded-xl" />
+      <div className="min-h-screen bg-gradient-luxury p-4">
+        <Skeleton className="h-64 w-full mb-4" />
+        <Skeleton className="h-32 w-full mb-4" />
+        <Skeleton className="h-32 w-full" />
       </div>
     );
   }
 
   if (!member) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <Card className="border-border shadow-lg">
+      <div className="min-h-screen bg-gradient-luxury flex items-center justify-center">
+        <Card className="bg-card/50 border-border/50">
           <CardContent className="p-8 text-center">
             <p className="text-muted-foreground">No member data available</p>
           </CardContent>

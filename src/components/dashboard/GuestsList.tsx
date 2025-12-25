@@ -89,7 +89,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
             {totalCount.toLocaleString()} members in your circle
           </p>
         </div>
-        <Button variant="qatar" className="gap-2 w-full sm:w-auto">
+        <Button variant="luxury" className="gap-2 w-full sm:w-auto">
           <Crown className="h-4 w-4" />
           <span className="hidden sm:inline">Export VIP List</span>
           <span className="sm:hidden">Export VIPs</span>

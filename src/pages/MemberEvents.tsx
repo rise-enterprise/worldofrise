@@ -236,7 +236,7 @@ export default function MemberEvents() {
                     </div>
                   </div>
                   <Button 
-                    variant="qatar" 
+                    variant="luxury" 
                     size="sm" 
                     className="w-full mt-4"
                     onClick={() => handleRegister(event.id)}
