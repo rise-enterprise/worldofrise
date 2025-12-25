@@ -24,6 +24,7 @@ import {
   LogOut,
   Bell,
 } from 'lucide-react';
+import RHLogo from '@/assets/RH_logo.png';
 
 interface SidebarProps {
   activeView: string;
@@ -79,11 +80,8 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col bg-sidebar">
       {/* Logo */}
-      <div className="flex h-20 items-center justify-center border-b border-sidebar-border">
-        <div className="text-center">
-          <h1 className="font-display text-2xl font-bold text-gradient-burgundy">RISE</h1>
-          <p className="text-[10px] tracking-[0.3em] text-muted-foreground uppercase font-medium">Holding</p>
-        </div>
+      <div className="flex h-20 items-center justify-center border-b border-sidebar-border px-4">
+        <img src={RHLogo} alt="Rise Holding" className="h-12 w-auto object-contain" />
       </div>
 
       {/* Brand Filter */}
