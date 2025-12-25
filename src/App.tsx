@@ -15,6 +15,7 @@ import MemberLogin from "./pages/MemberLogin";
 import MemberPortal from "./pages/MemberPortal";
 import MemberHistory from "./pages/MemberHistory";
 import MemberEvents from "./pages/MemberEvents";
+import MemberProfileEdit from "./pages/MemberProfileEdit";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedMemberRoute from "./components/ProtectedMemberRoute";
@@ -54,6 +55,11 @@ const App = () => (
                 <Route path="/member/events" element={
                   <ProtectedMemberRoute>
                     <MemberEvents />
+                  </ProtectedMemberRoute>
+                } />
+                <Route path="/member/profile/edit" element={
+                  <ProtectedMemberRoute>
+                    <MemberProfileEdit />
                   </ProtectedMemberRoute>
                 } />
                 <Route path="*" element={<NotFound />} />

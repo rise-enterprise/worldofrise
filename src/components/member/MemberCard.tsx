@@ -8,8 +8,8 @@ import {
   History,
   CalendarCheck,
   Sparkles,
-  X,
-  MapPin
+  MapPin,
+  Settings
 } from 'lucide-react';
 import { Guest } from '@/types/loyalty';
 import { Button } from '@/components/ui/button';
@@ -85,7 +85,10 @@ export function MemberCard({ guest }: MemberCardProps) {
         {/* Header with Avatar and Greeting */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-3">
-            <Avatar className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background", tierStyle.ring)}>
+            <Avatar 
+              className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background cursor-pointer", tierStyle.ring)}
+              onClick={() => navigate('/member/profile/edit')}
+            >
               <AvatarFallback className={cn(tierStyle.bg, tierStyle.text, "font-semibold")}>
                 {getInitials(guest.name)}
               </AvatarFallback>
@@ -95,9 +98,14 @@ export function MemberCard({ guest }: MemberCardProps) {
               <h1 className="text-lg font-semibold text-foreground">{guest.name.split(' ')[0]}</h1>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setShowChat(true)}>
-            <MessageCircle className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')}>
+              <Settings className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => setShowChat(true)}>
+              <MessageCircle className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Membership Card */}
