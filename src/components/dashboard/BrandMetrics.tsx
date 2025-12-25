@@ -25,14 +25,8 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
         {/* NOIR */}
         <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-noir border border-noir-accent/20 flex items-center justify-center">
-                <img src={NoirLogo} alt="NOIR" className="h-5 w-auto object-contain" />
-              </div>
-              <div>
-                <p className="font-display text-sm font-medium text-foreground">NOIR Café</p>
-                <p className="text-xs text-muted-foreground">نوار كافيه</p>
-              </div>
+            <div className="p-2 rounded-lg bg-noir border border-noir-accent/20 flex items-center justify-center">
+              <img src={NoirLogo} alt="NOIR" className="h-8 w-8 object-contain" />
             </div>
             <div className="text-right">
               <p className="font-display text-2xl font-medium text-foreground">{visitsByBrand.noir.toLocaleString()}</p>
@@ -50,14 +44,8 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
         {/* SASSO */}
         <div className="animate-slide-up" style={{ animationDelay: '500ms' }}>
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-sasso border border-sasso-accent/20 flex items-center justify-center">
-                <img src={SassoLogo} alt="SASSO" className="h-5 w-auto object-contain" />
-              </div>
-              <div>
-                <p className="font-display text-sm font-medium text-foreground">SASSO</p>
-                <p className="text-xs text-muted-foreground">Italian Fine Dining</p>
-              </div>
+            <div className="p-2 rounded-lg bg-sasso border border-sasso-accent/20 flex items-center justify-center">
+              <img src={SassoLogo} alt="SASSO" className="h-8 w-8 object-contain" />
             </div>
             <div className="text-right">
               <p className="font-display text-2xl font-medium text-foreground">{visitsByBrand.sasso.toLocaleString()}</p>
