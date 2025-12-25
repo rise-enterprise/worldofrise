@@ -1,330 +1,435 @@
 import { useState } from 'react';
-import { Guest, TIER_CONFIG } from '@/types/loyalty';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
 import { 
   ArrowLeft, 
-  Coffee, 
-  UtensilsCrossed, 
-  MapPin,
-  Calendar,
-  Gift,
+  Calendar, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Star, 
   MessageSquare,
-  Phone,
-  Mail,
-  Star,
   Plus,
-  ChevronDown,
-  ChevronUp
+  Clock,
+  TrendingUp,
+  CalendarDays,
+  Globe,
+  Sparkles
 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Guest } from '@/types/loyalty';
+import { useUpdateMember } from '@/hooks/useMembers';
+import { useCreateVisit } from '@/hooks/useVisits';
+import { useLocations } from '@/hooks/useLocations';
 import { GuestInsightsPanel } from '@/components/insights/GuestInsightsPanel';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { toast } from 'sonner';
+import { format, formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface GuestProfileProps {
   guest: Guest;
   onBack: () => void;
 }
 
+const tierColors: Record<string, string> = {
+  'Initiation': 'bg-slate-500',
+  'Bronze': 'bg-amber-600',
+  'Silver': 'bg-slate-400',
+  'Gold': 'bg-yellow-500',
+  'Platinum': 'bg-purple-500',
+  'Diamond': 'bg-cyan-400',
+};
+
+const brandColors: Record<string, string> = {
+  'Noir': 'bg-zinc-800 text-zinc-100',
+  'Sasso': 'bg-amber-100 text-amber-900',
+  'Both': 'bg-gradient-to-r from-zinc-800 to-amber-600 text-white',
+};
+
 export function GuestProfile({ guest, onBack }: GuestProfileProps) {
   const isMobile = useIsMobile();
-  const [noteOpen, setNoteOpen] = useState(false);
-  const [newNote, setNewNote] = useState('');
-  const [notes, setNotes] = useState<string[]>(guest.notes ? [guest.notes] : []);
-  const [privilegesOpen, setPrivilegesOpen] = useState(!isMobile);
-  const [notesOpen, setNotesOpen] = useState(!isMobile);
-  const tierConfig = TIER_CONFIG[guest.tier];
-  const initials = guest.name.split(' ').map(n => n[0]).join('');
+  const [noteText, setNoteText] = useState('');
+  const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
+  const [isAddVisitOpen, setIsAddVisitOpen] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<'noir' | 'sasso'>('noir');
   
-  const handleAddNote = () => {
-    if (!newNote.trim()) return;
-    setNotes(prev => [newNote, ...prev]);
-    toast.success('Note added');
-    setNewNote('');
-    setNoteOpen(false);
-  };
-  
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', { 
-      month: isMobile ? 'short' : 'long', 
-      day: 'numeric',
-      year: 'numeric'
-    }).format(date);
+  const updateMember = useUpdateMember();
+  const createVisit = useCreateVisit();
+  const { data: locations } = useLocations();
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('');
+
+  const handleSaveNote = () => {
+    if (!noteText.trim()) return;
+    
+    const existingNotes = guest.notes || '';
+    const timestamp = format(new Date(), 'MMM d, yyyy HH:mm');
+    const newNote = `[${timestamp}] ${noteText.trim()}`;
+    const updatedNotes = existingNotes ? `${newNote}\n\n${existingNotes}` : newNote;
+    
+    updateMember.mutate(
+      { id: guest.id, updates: { notes: updatedNotes } },
+      {
+        onSuccess: () => {
+          toast.success('Note saved');
+          setNoteText('');
+          setIsNoteDialogOpen(false);
+        },
+        onError: () => toast.error('Failed to save note'),
+      }
+    );
   };
 
-  const recentVisits = guest.visits.slice(0, isMobile ? 5 : 8);
+  const handleAddVisit = () => {
+    createVisit.mutate(
+      {
+        member_id: guest.id,
+        brand: selectedBrand,
+        location_id: selectedLocationId || undefined,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Visit logged successfully');
+          setIsAddVisitOpen(false);
+        },
+        onError: () => toast.error('Failed to log visit'),
+      }
+    );
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const tierColor = tierColors[guest.tierName] || tierColors['Initiation'];
+
+  // Parse notes into array for display
+  const notesList = guest.notes?.split('\n\n').filter(Boolean) || [];
 
   return (
-    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
-      {/* Back Button */}
-      <Button 
-        variant="ghost" 
-        onClick={onBack}
-        className="gap-2 animate-fade-in h-9"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="hidden sm:inline">Back to Guests</span>
-        <span className="sm:hidden">Back</span>
-      </Button>
-
-      {/* Profile Header */}
-      <Card 
-        variant="luxury" 
-        className={cn(
-          'animate-slide-up',
-          guest.tier === 'black' && 'border-primary/30 shadow-gold'
-        )}
-      >
-        <CardContent className="p-4 md:p-8">
-          <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-            {/* Avatar & Basic Info */}
-            <div className="flex flex-col items-center md:items-start gap-3 md:gap-4">
-              <Avatar className="h-20 w-20 md:h-28 md:w-28 border-4 border-border shadow-luxury">
-                <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-                <AvatarFallback className="bg-muted text-muted-foreground font-display text-2xl md:text-3xl">
-                  {initials}
+    <div className="min-h-screen bg-background">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={onBack}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-3">
+              <Avatar className={cn("h-10 w-10 ring-2 ring-offset-2 ring-offset-background", tierColor.replace('bg-', 'ring-'))}>
+                <AvatarFallback className={cn(tierColor, "text-white font-medium")}>
+                  {getInitials(guest.name)}
                 </AvatarFallback>
               </Avatar>
-              
-              <div className="text-center md:text-left">
-                <h2 className="font-display text-xl md:text-2xl font-medium text-foreground">{guest.name}</h2>
-                <div className="flex items-center justify-center md:justify-start gap-2 mt-2 flex-wrap">
-                  <Badge variant={guest.tier as any} className="text-xs md:text-sm px-3 md:px-4 py-1">
-                    {tierConfig.displayName}
+              <div>
+                <h1 className="font-semibold text-foreground">{guest.name}</h1>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className={cn("text-xs", tierColor, "text-white")}>
+                    {guest.tierName}
                   </Badge>
-                  {guest.isVip && (
-                    <Badge variant="gold" className="text-xs md:text-sm px-3 md:px-4 py-1">VIP</Badge>
-                  )}
-                  <span className="text-xs md:text-sm text-muted-foreground hidden sm:inline">{tierConfig.arabicName}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2 flex-wrap justify-center md:justify-start">
-                {guest.tags.map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            {/* Stats Grid - 2x2 on mobile, 4 cols on desktop */}
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
-                <p className="font-display text-2xl md:text-3xl font-medium text-foreground">{guest.totalVisits}</p>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Total Visits</p>
-              </div>
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
-                <p className="font-display text-2xl md:text-3xl font-medium text-foreground">{guest.lifetimeVisits}</p>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Lifetime</p>
-              </div>
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
-                <div className="flex items-center justify-center gap-2">
-                  {guest.favoriteBrand === 'noir' ? (
-                    <Coffee className="h-5 w-5 text-foreground" />
-                  ) : (
-                    <UtensilsCrossed className="h-5 w-5 text-sasso-accent" />
+                  {guest.status === 'blocked' && (
+                    <Badge variant="destructive" className="text-xs">Blocked</Badge>
                   )}
                 </div>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">Favorite</p>
-              </div>
-              <div className="p-3 md:p-4 rounded-xl bg-muted/50 border border-border/50 text-center">
-                <p className="flex items-center justify-center gap-1 text-lg">
-                  {guest.country === 'doha' ? '🇶🇦' : '🇸🇦'}
-                </p>
-                <p className="text-[10px] md:text-xs text-muted-foreground mt-1">{guest.country === 'doha' ? 'Qatar' : 'Saudi'}</p>
               </div>
             </div>
           </div>
-
-          {/* Contact Info */}
-          <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 mt-6 md:mt-8 pt-4 md:pt-6 border-t border-border">
-            <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-              <Mail className="h-4 w-4 shrink-0" />
-              <span className="truncate">{guest.email}</span>
-            </div>
-            {guest.phone && (
-              <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-                <Phone className="h-4 w-4 shrink-0" />
-                {guest.phone}
-              </div>
-            )}
-            <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4 shrink-0" />
-              <span className="hidden sm:inline">Member since</span> {formatDate(guest.joinedAt)}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* AI Insights Panel */}
-      <div className="animate-slide-up" style={{ animationDelay: '100ms' }}>
-        <GuestInsightsPanel guest={guest} />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-        {/* Privileges - Collapsible on mobile */}
-        <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
-          <Collapsible open={privilegesOpen} onOpenChange={setPrivilegesOpen}>
-            <CardHeader className="pb-3 md:pb-6">
-              <CollapsibleTrigger className="w-full">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base md:text-lg flex items-center gap-2">
-                    <Gift className="h-5 w-5 text-primary" />
-                    Active Privileges
-                  </CardTitle>
-                  <div className="md:hidden">
-                    {privilegesOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </div>
-                </div>
-              </CollapsibleTrigger>
-            </CardHeader>
-            <CollapsibleContent>
-              <CardContent className="pt-0 space-y-2 md:space-y-3">
-                {tierConfig.privileges.map((privilege, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-center gap-3 p-2.5 md:p-3 rounded-lg bg-muted/50 border border-border/50"
-                  >
-                    <Star className="h-4 w-4 text-primary shrink-0" />
-                    <p className="text-xs md:text-sm text-foreground">{privilege}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </Card>
-
-        {/* Notes - Collapsible on mobile */}
-        <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
-          <Collapsible open={notesOpen} onOpenChange={setNotesOpen}>
-            <CardHeader className="pb-3 md:pb-6">
-              <CollapsibleTrigger className="w-full">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base md:text-lg flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-primary" />
-                    Guest Notes
-                  </CardTitle>
-                  <div className="md:hidden">
-                    {notesOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </div>
-                </div>
-              </CollapsibleTrigger>
-            </CardHeader>
-            <CollapsibleContent>
-              <CardContent className="pt-0">
-                {notes.length > 0 ? (
-                  <div className="space-y-2 md:space-y-3">
-                    {notes.map((note, index) => (
-                      <div key={index} className="p-2.5 md:p-3 rounded-lg bg-muted/50 border border-border/50">
-                        <p className="text-xs md:text-sm text-foreground leading-relaxed">{note}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs md:text-sm text-muted-foreground italic">No notes added for this guest.</p>
-                )}
-                <Button variant="outline" className="mt-4 w-full h-9 md:h-10" onClick={() => setNoteOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Note
+          
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2">
+            <Dialog open={isAddVisitOpen} onOpenChange={setIsAddVisitOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1.5">
+                  <Plus className="h-4 w-4" />
+                  {!isMobile && 'Log Visit'}
                 </Button>
-              </CardContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </Card>
-      </div>
-
-      {/* Add Note Dialog */}
-      <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
-        <DialogContent className="max-w-[calc(100vw-2rem)] md:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="font-display">Add Note for {guest.name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <Textarea 
-              placeholder="Enter your note..."
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              rows={4}
-            />
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={() => setNoteOpen(false)}>
-                Cancel
-              </Button>
-              <Button className="flex-1" onClick={handleAddNote}>
-                Save Note
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Visit History - Compact on mobile */}
-      <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '400ms' }}>
-        <CardHeader className="pb-3 md:pb-6">
-          <CardTitle className="text-base md:text-lg">Visit Timeline</CardTitle>
-          <p className="text-xs text-muted-foreground">Recent experiences across RISE brands</p>
-        </CardHeader>
-        <CardContent>
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-4 md:left-6 top-0 bottom-0 w-px bg-border" />
-            
-            <div className="space-y-3 md:space-y-4">
-              {recentVisits.map((visit, index) => (
-                <div 
-                  key={visit.id}
-                  className="relative flex items-start gap-3 md:gap-4 pl-8 md:pl-12 animate-slide-up"
-                  style={{ animationDelay: `${400 + index * 50}ms` }}
-                >
-                  {/* Timeline dot */}
-                  <div className={cn(
-                    'absolute left-2 md:left-4 w-3 h-3 md:w-4 md:h-4 rounded-full border-2 border-background',
-                    visit.brand === 'noir' ? 'bg-foreground' : 'bg-sasso-accent'
-                  )} />
-                  
-                  <div className="flex-1 p-3 md:p-4 rounded-lg bg-muted/50 border border-border/50">
-                    <div className="flex items-center justify-between mb-1 md:mb-2 gap-2">
-                      <div className="flex items-center gap-2">
-                        {visit.brand === 'noir' ? (
-                          <Coffee className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                        ) : (
-                          <UtensilsCrossed className="h-3.5 w-3.5 md:h-4 md:w-4 text-sasso-accent" />
-                        )}
-                        <span className="font-medium text-xs md:text-sm text-foreground">
-                          {visit.brand === 'noir' ? 'NOIR' : 'SASSO'}
-                        </span>
-                      </div>
-                      <span className="text-[10px] md:text-xs text-muted-foreground shrink-0">
-                        {formatDate(visit.date)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{visit.location}</span>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Log New Visit</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Brand</label>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={selectedBrand === 'noir' ? 'default' : 'outline'}
+                        onClick={() => setSelectedBrand('noir')}
+                        className="flex-1"
+                      >
+                        Noir
+                      </Button>
+                      <Button
+                        variant={selectedBrand === 'sasso' ? 'default' : 'outline'}
+                        onClick={() => setSelectedBrand('sasso')}
+                        className="flex-1"
+                      >
+                        Sasso
+                      </Button>
                     </div>
                   </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Location (optional)</label>
+                    <select 
+                      className="w-full p-2 border rounded-md bg-background"
+                      value={selectedLocationId}
+                      onChange={(e) => setSelectedLocationId(e.target.value)}
+                    >
+                      <option value="">Select location...</option>
+                      {locations?.filter(l => l.brand === selectedBrand || l.brand === 'both').map(loc => (
+                        <option key={loc.id} value={loc.id}>{loc.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <Button 
+                    onClick={handleAddVisit} 
+                    className="w-full"
+                    disabled={createVisit.isPending}
+                  >
+                    {createVisit.isPending ? 'Logging...' : 'Log Visit'}
+                  </Button>
                 </div>
-              ))}
-            </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={isNoteDialogOpen} onOpenChange={setIsNoteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="gap-1.5">
+                  <MessageSquare className="h-4 w-4" />
+                  {!isMobile && 'Add Note'}
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add Note</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <Textarea
+                    placeholder="Write a note about this guest..."
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                    className="min-h-[120px]"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="outline" onClick={() => setIsNoteDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleSaveNote}
+                      disabled={!noteText.trim() || updateMember.isPending}
+                    >
+                      {updateMember.isPending ? 'Saving...' : 'Save Note'}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4 max-w-4xl mx-auto">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="bg-card/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <TrendingUp className="h-4 w-4" />
+                <span className="text-xs">Total Visits</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground">{guest.totalVisits}</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Star className="h-4 w-4" />
+                <span className="text-xs">Points</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground">{guest.totalPoints?.toLocaleString() || 0}</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Clock className="h-4 w-4" />
+                <span className="text-xs">Last Visit</span>
+              </div>
+              <p className="text-sm font-medium text-foreground">
+                {formatDistanceToNow(guest.lastVisit, { addSuffix: true })}
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Sparkles className="h-4 w-4" />
+                <span className="text-xs">Favorite Brand</span>
+              </div>
+              <Badge className={cn("mt-1", brandColors[guest.favoriteBrand])}>
+                {guest.favoriteBrand}
+              </Badge>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Contact Info */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-4">
+              {guest.phone && (
+                <a 
+                  href={`tel:${guest.phone}`}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Phone className="h-4 w-4" />
+                  <span>{guest.phone}</span>
+                </a>
+              )}
+              {guest.email && (
+                <a 
+                  href={`mailto:${guest.email}`}
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Mail className="h-4 w-4" />
+                  <span>{guest.email}</span>
+                </a>
+              )}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Globe className="h-4 w-4" />
+                <span>{guest.country}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CalendarDays className="h-4 w-4" />
+                <span>Joined {format(guest.joinedAt, 'MMM d, yyyy')}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Insights */}
+        <GuestInsightsPanel guest={guest} />
+
+        {/* Tabbed Content */}
+        <Tabs defaultValue="visits" className="w-full">
+          <TabsList className="w-full grid grid-cols-2">
+            <TabsTrigger value="visits" className="gap-2">
+              <Calendar className="h-4 w-4" />
+              Visits ({guest.visits.length})
+            </TabsTrigger>
+            <TabsTrigger value="notes" className="gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Notes ({notesList.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="visits" className="mt-4">
+            <Card>
+              <CardContent className="p-0">
+                {guest.visits.length === 0 ? (
+                  <EmptyState
+                    icon={Calendar}
+                    title="No visits yet"
+                    description="This guest hasn't made any visits. Log their first visit to start tracking."
+                    action={
+                      <Button size="sm" onClick={() => setIsAddVisitOpen(true)}>
+                        <Plus className="h-4 w-4 mr-1" />
+                        Log First Visit
+                      </Button>
+                    }
+                  />
+                ) : (
+                  <ScrollArea className="h-[400px]">
+                    <div className="divide-y divide-border">
+                      {guest.visits.map((visit) => (
+                        <div key={visit.id} className="p-4 hover:bg-muted/50 transition-colors">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3">
+                              <div className={cn(
+                                "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
+                                visit.brand === 'noir' ? 'bg-zinc-800' : 'bg-amber-100'
+                              )}>
+                                <span className={cn(
+                                  "text-xs font-medium",
+                                  visit.brand === 'noir' ? 'text-zinc-100' : 'text-amber-900'
+                                )}>
+                                  {visit.brand[0].toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-foreground">{visit.brand}</p>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <MapPin className="h-3 w-3" />
+                                  <span>{visit.location}</span>
+                                </div>
+                                {visit.notes && (
+                                  <p className="text-sm text-muted-foreground mt-1">{visit.notes}</p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium text-foreground">
+                                {format(visit.date, 'MMM d, yyyy')}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {format(visit.date, 'h:mm a')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="notes" className="mt-4">
+            <Card>
+              <CardContent className="p-0">
+                {notesList.length === 0 ? (
+                  <EmptyState
+                    icon={MessageSquare}
+                    title="No notes yet"
+                    description="Add notes to remember important details about this guest."
+                    action={
+                      <Button size="sm" onClick={() => setIsNoteDialogOpen(true)}>
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add First Note
+                      </Button>
+                    }
+                  />
+                ) : (
+                  <ScrollArea className="h-[400px]">
+                    <div className="divide-y divide-border">
+                      {notesList.map((note, index) => (
+                        <div key={index} className="p-4">
+                          <p className="text-sm text-foreground whitespace-pre-wrap">{note}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

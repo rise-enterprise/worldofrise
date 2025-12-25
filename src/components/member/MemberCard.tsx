@@ -1,232 +1,253 @@
 import { useState } from 'react';
-import { Guest, TIER_CONFIG } from '@/types/loyalty';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Crown, Coffee, UtensilsCrossed, Sparkles, ArrowLeft, LayoutDashboard, History, Calendar, MessageCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Award, 
+  Calendar, 
+  ChevronRight,
+  MessageCircle,
+  History,
+  CalendarCheck,
+  Sparkles,
+  X,
+  MapPin
+} from 'lucide-react';
+import { Guest } from '@/types/loyalty';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import { ConciergeChat } from './ConciergeChat';
+import { useTiers } from '@/hooks/useTiers';
+import { format, formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface MemberCardProps {
   guest: Guest;
 }
 
+const tierColors: Record<string, { bg: string; text: string; ring: string }> = {
+  'Initiation': { bg: 'bg-slate-600', text: 'text-slate-100', ring: 'ring-slate-500' },
+  'Bronze': { bg: 'bg-amber-700', text: 'text-amber-100', ring: 'ring-amber-600' },
+  'Silver': { bg: 'bg-slate-400', text: 'text-slate-900', ring: 'ring-slate-400' },
+  'Gold': { bg: 'bg-yellow-500', text: 'text-yellow-950', ring: 'ring-yellow-500' },
+  'Platinum': { bg: 'bg-purple-600', text: 'text-purple-100', ring: 'ring-purple-500' },
+  'Diamond': { bg: 'bg-cyan-500', text: 'text-cyan-950', ring: 'ring-cyan-400' },
+};
+
 export function MemberCard({ guest }: MemberCardProps) {
   const navigate = useNavigate();
-  const [conciergeOpen, setConciergeOpen] = useState(false);
-  const tierConfig = TIER_CONFIG[guest.tier];
-  const nextTierVisits = 
-    guest.tier === 'initiation' ? 5 - guest.totalVisits :
-    guest.tier === 'connoisseur' ? 15 - guest.totalVisits :
-    guest.tier === 'elite' ? 30 - guest.totalVisits :
-    guest.tier === 'inner-circle' ? 50 - guest.totalVisits : 0;
+  const [showChat, setShowChat] = useState(false);
+  const { data: tiers } = useTiers();
 
-  const progressPercentage = 
-    guest.tier === 'initiation' ? (guest.totalVisits / 5) * 100 :
-    guest.tier === 'connoisseur' ? ((guest.totalVisits - 5) / 10) * 100 :
-    guest.tier === 'elite' ? ((guest.totalVisits - 15) / 15) * 100 :
-    guest.tier === 'inner-circle' ? ((guest.totalVisits - 30) / 20) * 100 : 100;
+  // Calculate tier progress dynamically from database
+  const sortedTiers = tiers?.sort((a, b) => a.minVisits - b.minVisits) || [];
+  const currentTierIndex = sortedTiers.findIndex(t => t.displayName === guest.tierName);
+  const nextTier = sortedTiers[currentTierIndex + 1];
+  const currentTierMinVisits = sortedTiers[currentTierIndex]?.minVisits || 0;
+  const nextTierMinVisits = nextTier?.minVisits;
+  
+  const visitsToNextTier = nextTierMinVisits ? nextTierMinVisits - guest.totalVisits : 0;
+  const progressPercentage = nextTierMinVisits 
+    ? Math.min(100, ((guest.totalVisits - currentTierMinVisits) / (nextTierMinVisits - currentTierMinVisits)) * 100)
+    : 100;
+
+  const tierStyle = tierColors[guest.tierName] || tierColors['Initiation'];
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const recentVisits = guest.visits.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gradient-luxury flex flex-col">
-      {/* Top Navigation Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/30">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Home
-          </Button>
-          <h1 
-            className="font-display text-lg font-semibold text-gradient-gold cursor-pointer"
-            onClick={() => navigate('/')}
-          >
-            RISE
-          </h1>
-          <div className="w-16" /> {/* Spacer for centering */}
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-start p-6 pt-4">
-        <div className="w-full max-w-md space-y-6 animate-fade-in">
-        {/* Card */}
-        <div 
-          className={cn(
-            'relative overflow-hidden rounded-3xl p-8 shadow-luxury',
-            'bg-gradient-to-br from-card via-card to-noir',
-            'border border-border/50',
-            guest.tier === 'black' && 'border-primary/30 shadow-gold'
-          )}
-        >
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary rounded-full blur-3xl" />
-          </div>
-
-          {/* Content */}
-          <div className="relative z-10">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="font-display text-2xl font-semibold text-gradient-gold">RISE</h1>
-                <p className="text-[10px] tracking-[0.3em] text-muted-foreground uppercase">Holding</p>
-              </div>
-              <Crown className="h-8 w-8 text-primary" />
-            </div>
-
-            {/* Member Info */}
-            <div className="space-y-6">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Member</p>
-                <h2 className="font-display text-2xl font-medium text-foreground">{guest.name}</h2>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Badge variant={guest.tier as any} className="text-sm px-4 py-1.5">
-                  {tierConfig.displayName}
-                </Badge>
-                <span className="text-sm text-muted-foreground font-display">{tierConfig.arabicName}</span>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-muted/30 border border-border/30">
-                  <p className="font-display text-4xl font-medium text-foreground">{guest.totalVisits}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Total Visits</p>
-                </div>
-                <div className="p-4 rounded-xl bg-muted/30 border border-border/30">
-                  <div className="flex items-center gap-2 mb-1">
-                    {guest.favoriteBrand === 'noir' ? (
-                      <Coffee className="h-5 w-5 text-foreground" />
-                    ) : (
-                      <UtensilsCrossed className="h-5 w-5 text-sasso-accent" />
-                    )}
-                    <span className="text-sm text-foreground">
-                      {guest.favoriteBrand === 'noir' ? 'NOIR' : 'SASSO'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Preferred</p>
-                </div>
-              </div>
-
-              {/* Progress to next tier */}
-              {guest.tier !== 'black' && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Journey to next tier</span>
-                    <span className="text-primary font-medium">{nextTierVisits} visits away</span>
-                  </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-gold rounded-full transition-all duration-1000"
-                      style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Active Privileges */}
-        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '200ms' }}>
-          <h3 className="font-display text-lg font-medium text-foreground flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            Your Privileges
-          </h3>
-          
-          <div className="space-y-2">
-            {tierConfig.privileges.map((privilege, index) => (
-              <div 
-                key={index}
-                className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50 animate-slide-up"
-                style={{ animationDelay: `${300 + index * 50}ms` }}
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                <p className="text-sm text-foreground">{privilege}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Brands */}
-        <div className="flex gap-4 justify-center animate-slide-up" style={{ animationDelay: '500ms' }}>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border/50">
-            <Coffee className="h-4 w-4" />
-            <span className="text-xs text-muted-foreground">NOIR Café</span>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border/50">
-            <UtensilsCrossed className="h-4 w-4 text-sasso-accent" />
-            <span className="text-xs text-muted-foreground">SASSO</span>
-          </div>
-        </div>
-
-        {/* Navigation Actions */}
-        <div className="space-y-3 animate-slide-up pt-2" style={{ animationDelay: '600ms' }}>
-          <div className="grid grid-cols-2 gap-3">
-            <Button 
-              variant="luxury" 
-              className="w-full"
-              onClick={() => navigate('/dashboard')}
-            >
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/')}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Home
-            </Button>
-          </div>
-          
-          {/* Quick Actions */}
-          <div className="grid grid-cols-3 gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
-              onClick={() => navigate('/member/history')}
-            >
-              <History className="h-5 w-5 mb-1" />
-              <span className="text-xs">History</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
-              onClick={() => navigate('/member/events')}
-            >
-              <Calendar className="h-5 w-5 mb-1" />
-              <span className="text-xs">Events</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="flex-col h-auto py-3 text-muted-foreground hover:text-foreground"
-              onClick={() => setConciergeOpen(true)}
-            >
-              <MessageCircle className="h-5 w-5 mb-1" />
-              <span className="text-xs">Concierge</span>
-            </Button>
-          </div>
-        </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      {/* Chat Overlay */}
       <ConciergeChat 
-        open={conciergeOpen} 
-        onOpenChange={setConciergeOpen}
+        open={showChat} 
+        onOpenChange={setShowChat}
         memberName={guest.name}
       />
+
+      <div className="p-4 space-y-4 max-w-lg mx-auto">
+        {/* Header with Avatar and Greeting */}
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-3">
+            <Avatar className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background", tierStyle.ring)}>
+              <AvatarFallback className={cn(tierStyle.bg, tierStyle.text, "font-semibold")}>
+                {getInitials(guest.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm text-muted-foreground">{getGreeting()},</p>
+              <h1 className="text-lg font-semibold text-foreground">{guest.name.split(' ')[0]}</h1>
+            </div>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => setShowChat(true)}>
+            <MessageCircle className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Membership Card */}
+        <Card className={cn(
+          "relative overflow-hidden border-0",
+          tierStyle.bg
+        )}>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+          <CardContent className="relative p-6">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <p className={cn("text-xs opacity-80", tierStyle.text)}>Membership Tier</p>
+                <h2 className={cn("text-2xl font-bold", tierStyle.text)}>{guest.tierName}</h2>
+              </div>
+              <Award className={cn("h-8 w-8 opacity-80", tierStyle.text)} />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className={cn("opacity-80", tierStyle.text)}>Progress to {nextTier?.displayName || 'Max'}</span>
+                <span className={cn("font-medium", tierStyle.text)}>
+                  {nextTier ? `${visitsToNextTier} visits away` : 'Max tier!'}
+                </span>
+              </div>
+              <Progress value={progressPercentage} className="h-2 bg-white/20" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-white/20">
+              <div>
+                <p className={cn("text-xs opacity-80", tierStyle.text)}>Total Visits</p>
+                <p className={cn("text-xl font-bold", tierStyle.text)}>{guest.totalVisits}</p>
+              </div>
+              <div>
+                <p className={cn("text-xs opacity-80", tierStyle.text)}>Points</p>
+                <p className={cn("text-xl font-bold", tierStyle.text)}>{guest.totalPoints?.toLocaleString() || 0}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-3">
+          <Card className="bg-card/50 border-border/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Sparkles className="h-4 w-4" />
+                <span className="text-xs">Favorite Brand</span>
+              </div>
+              <p className="font-semibold text-foreground">{guest.favoriteBrand}</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-card/50 border-border/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <Calendar className="h-4 w-4" />
+                <span className="text-xs">Last Visit</span>
+              </div>
+              <p className="font-semibold text-foreground text-sm">
+                {formatDistanceToNow(guest.lastVisit, { addSuffix: true })}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Visits */}
+        {recentVisits.length > 0 && (
+          <Card className="bg-card/50 border-border/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-foreground">Recent Visits</h3>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-muted-foreground h-auto py-1 px-2"
+                  onClick={() => navigate('/member/history')}
+                >
+                  View all
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {recentVisits.map((visit) => (
+                  <div key={visit.id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center",
+                        visit.brand === 'noir' ? 'bg-zinc-800' : 'bg-amber-100'
+                      )}>
+                        <span className={cn(
+                          "text-xs font-medium",
+                          visit.brand === 'noir' ? 'text-zinc-100' : 'text-amber-900'
+                        )}>
+                          {visit.brand[0].toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{visit.brand}</p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3 w-3" />
+                          <span>{visit.location}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {format(visit.date, 'MMM d')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Navigation */}
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <Button 
+            variant="outline" 
+            className="h-auto py-4 flex-col gap-2"
+            onClick={() => navigate('/member/history')}
+          >
+            <History className="h-5 w-5" />
+            <span>Visit History</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            className="h-auto py-4 flex-col gap-2"
+            onClick={() => navigate('/member/events')}
+          >
+            <CalendarCheck className="h-5 w-5" />
+            <span>Events</span>
+          </Button>
+        </div>
+
+        {/* Concierge CTA */}
+        <Card 
+          className="bg-primary/5 border-primary/20 cursor-pointer hover:bg-primary/10 transition-colors"
+          onClick={() => setShowChat(true)}
+        >
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <MessageCircle className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-foreground">Need assistance?</p>
+              <p className="text-sm text-muted-foreground">Chat with our concierge</p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
