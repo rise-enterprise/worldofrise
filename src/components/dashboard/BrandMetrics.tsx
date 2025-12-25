@@ -73,9 +73,9 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
               style={{ width: `${sassoPercentage}%` }}
             />
           </div>
-          <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-            <span>NOIR</span>
-            <span>SASSO</span>
+          <div className="flex justify-between mt-2">
+            <img src={NoirLogo} alt="NOIR" className="h-4 w-4 object-contain" />
+            <img src={SassoLogo} alt="SASSO" className="h-4 w-4 object-contain" />
           </div>
         </div>
       </CardContent>
