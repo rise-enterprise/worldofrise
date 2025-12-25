@@ -12,6 +12,7 @@ import { GuestProfile } from '@/components/dashboard/GuestProfile';
 import { BulkInsightsView } from '@/components/insights/BulkInsightsView';
 import { PrivilegesView } from '@/components/dashboard/PrivilegesView';
 import { EventsView } from '@/components/dashboard/EventsView';
+import { NotificationsView } from '@/components/dashboard/NotificationsView';
 import { SettingsView } from '@/components/dashboard/SettingsView';
 import { AdminsView } from '@/components/dashboard/AdminsView';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -105,6 +106,8 @@ export default function Dashboard() {
         {activeView === 'privileges' && <PrivilegesView />}
 
         {activeView === 'events' && <EventsView />}
+
+        {activeView === 'notifications' && <NotificationsView />}
 
         {activeView === 'settings' && <SettingsView />}
 
