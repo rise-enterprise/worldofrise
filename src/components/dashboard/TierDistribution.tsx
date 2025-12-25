@@ -13,7 +13,7 @@ export function TierDistribution({ distribution }: TierDistributionProps) {
   const total = Object.values(distribution).reduce((a, b) => a + b, 0);
 
   return (
-    <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+    <Card variant="elevated" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
       <CardHeader>
         <CardTitle className="text-lg">Tier Distribution</CardTitle>
         <p className="text-xs text-muted-foreground">Member journey across privilege levels</p>

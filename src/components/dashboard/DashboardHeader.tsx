@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   Dialog,
   DialogContent,
@@ -146,6 +147,9 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
       </div>
 
       <div className={cn("flex items-center gap-2 md:gap-3 animate-fade-in shrink-0", isRTL && "flex-row-reverse")} style={{ animationDelay: '100ms' }}>
+        {/* Theme Toggle */}
+        <ThemeToggle />
+        
         {/* Language Switcher */}
         <LanguageSwitcher />
 
@@ -259,7 +263,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         {/* New Guest Button - Icon only on mobile */}
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
           <Button 
-            variant="luxury" 
+            variant="qatar" 
             className={cn("gap-2 h-9 md:h-10 px-3 md:px-4", isRTL && "flex-row-reverse")}
             onClick={() => setNewGuestOpen(true)}
           >
@@ -325,7 +329,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                   {t('common.cancel')}
                 </Button>
                 <Button 
-                  variant="luxury" 
+                  variant="qatar" 
                   className="flex-1" 
                   onClick={handleNewGuest}
                   disabled={createMember.isPending}
