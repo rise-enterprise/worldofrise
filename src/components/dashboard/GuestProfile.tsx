@@ -14,6 +14,8 @@ import {
   Globe,
   Sparkles
 } from 'lucide-react';
+import NoirLogo from '@/assets/NOIR_LOGO.png';
+import SassoLogo from '@/assets/sasso_logo.png';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -361,15 +363,14 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               <div className={cn(
-                                "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
-                                visit.brand === 'noir' ? 'bg-zinc-800' : 'bg-amber-100'
+                                "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 p-1.5",
+                                visit.brand === 'noir' ? 'bg-noir border border-noir-accent/20' : 'bg-sasso border border-sasso-accent/20'
                               )}>
-                                <span className={cn(
-                                  "text-xs font-medium",
-                                  visit.brand === 'noir' ? 'text-zinc-100' : 'text-amber-900'
-                                )}>
-                                  {visit.brand[0].toUpperCase()}
-                                </span>
+                                <img 
+                                  src={visit.brand === 'noir' ? NoirLogo : SassoLogo} 
+                                  alt={visit.brand} 
+                                  className="h-6 w-6 object-contain" 
+                                />
                               </div>
                               <div>
                                 <p className="font-medium text-foreground">{visit.brand}</p>
