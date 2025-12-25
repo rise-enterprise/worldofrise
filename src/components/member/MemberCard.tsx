@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import { 
   Award, 
   Calendar, 
@@ -9,14 +10,16 @@ import {
   CalendarCheck,
   Sparkles,
   MapPin,
-  Settings
+  Settings,
+  QrCode,
+  X
 } from 'lucide-react';
 import { Guest } from '@/types/loyalty';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ConciergeChat } from './ConciergeChat';
 import { useTiers } from '@/hooks/useTiers';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -38,6 +41,7 @@ const tierColors: Record<string, { bg: string; text: string; ring: string }> = {
 export function MemberCard({ guest }: MemberCardProps) {
   const navigate = useNavigate();
   const [showChat, setShowChat] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   const { data: tiers } = useTiers();
 
   // Calculate tier progress dynamically from database
@@ -70,6 +74,14 @@ export function MemberCard({ guest }: MemberCardProps) {
     return 'Good evening';
   };
 
+  // QR code contains member ID for scanning at venue
+  const qrValue = JSON.stringify({
+    type: 'RISE_MEMBER',
+    id: guest.id,
+    name: guest.name,
+    tier: guest.tierName,
+  });
+
   const recentVisits = guest.visits.slice(0, 3);
 
   return (
@@ -80,6 +92,32 @@ export function MemberCard({ guest }: MemberCardProps) {
         onOpenChange={setShowChat}
         memberName={guest.name}
       />
+
+      {/* QR Code Dialog */}
+      <Dialog open={showQR} onOpenChange={setShowQR}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-center">Your Member QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center py-6">
+            <div className="bg-white p-4 rounded-xl shadow-lg">
+              <QRCodeSVG 
+                value={qrValue}
+                size={200}
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground text-center">
+              Show this code at the venue for quick check-in
+            </p>
+            <div className="mt-4 text-center">
+              <p className="font-semibold text-foreground">{guest.name}</p>
+              <p className="text-sm text-muted-foreground">{guest.tierName} Member</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="p-4 space-y-4 max-w-lg mx-auto">
         {/* Header with Avatar and Greeting */}
@@ -99,6 +137,9 @@ export function MemberCard({ guest }: MemberCardProps) {
             </div>
           </div>
           <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => setShowQR(true)}>
+              <QrCode className="h-5 w-5" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')}>
               <Settings className="h-5 w-5" />
             </Button>
@@ -108,7 +149,7 @@ export function MemberCard({ guest }: MemberCardProps) {
           </div>
         </div>
 
-        {/* Membership Card */}
+        {/* Membership Card with QR */}
         <Card className={cn(
           "relative overflow-hidden border-0",
           tierStyle.bg
@@ -120,7 +161,17 @@ export function MemberCard({ guest }: MemberCardProps) {
                 <p className={cn("text-xs opacity-80", tierStyle.text)}>Membership Tier</p>
                 <h2 className={cn("text-2xl font-bold", tierStyle.text)}>{guest.tierName}</h2>
               </div>
-              <Award className={cn("h-8 w-8 opacity-80", tierStyle.text)} />
+              <div 
+                className="bg-white p-1.5 rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => setShowQR(true)}
+              >
+                <QRCodeSVG 
+                  value={qrValue}
+                  size={48}
+                  level="L"
+                  includeMargin={false}
+                />
+              </div>
             </div>
 
             <div className="space-y-3">
