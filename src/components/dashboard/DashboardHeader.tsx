@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import RHLogo from '@/assets/RH_logo.png';
 import {
   Dialog,
   DialogContent,
@@ -139,9 +140,11 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         )}
         
         <div className={cn("min-w-0", isRTL && "text-right")}>
-          <h1 className="font-display text-lg md:text-2xl font-medium text-foreground truncate">
-            {t('common.welcome')}
-          </h1>
+          <img 
+            src={RHLogo} 
+            alt="Rise Holding" 
+            className="h-10 md:h-14 w-auto object-contain"
+          />
           <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1 truncate">{currentDate}</p>
         </div>
       </div>
