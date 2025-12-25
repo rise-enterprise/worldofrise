@@ -111,6 +111,8 @@ export function useDashboardMetrics() {
   return useQuery({
     queryKey: ['dashboard-metrics'],
     queryFn: fetchDashboardMetrics,
-    staleTime: 30000, // Refresh every 30 seconds
+    staleTime: 5000, // Data considered fresh for 5 seconds
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchInterval: 30000, // Background refresh every 30 seconds
   });
 }
