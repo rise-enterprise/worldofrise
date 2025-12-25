@@ -284,21 +284,26 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                 <span className="text-xs">Favorite Brand</span>
               </div>
               <div className={cn(
-                "mt-1 w-10 h-10 rounded-lg flex items-center justify-center p-1.5",
-                guest.favoriteBrand === 'noir' ? 'bg-noir border border-noir-accent/20' : 
-                guest.favoriteBrand === 'sasso' ? 'bg-sasso border border-sasso-accent/20' : 
-                'bg-gradient-to-r from-noir to-sasso border border-border'
+                "mt-2 w-16 h-16 rounded-xl flex items-center justify-center p-2",
+                "shadow-lg hover:shadow-xl transition-all duration-300",
+                "hover:scale-105 ring-2 ring-offset-2 ring-offset-background",
+                guest.favoriteBrand === 'noir' 
+                  ? 'bg-noir border border-noir-accent/30 ring-noir-accent/20' 
+                  : guest.favoriteBrand === 'sasso' 
+                  ? 'bg-sasso border border-sasso-accent/30 ring-sasso-accent/20' 
+                  : 'bg-gradient-to-br from-noir via-noir/80 to-sasso border border-border ring-primary/10'
               )}>
                 {guest.favoriteBrand === 'both' ? (
-                  <div className="flex items-center gap-0.5">
-                    <img src={NoirLogo} alt="NOIR" className="h-4 w-4 object-contain" />
-                    <img src={SassoLogo} alt="SASSO" className="h-4 w-4 object-contain" />
+                  <div className="flex items-center gap-1.5">
+                    <img src={NoirLogo} alt="NOIR" className="h-6 w-6 object-contain drop-shadow-md" />
+                    <div className="w-px h-6 bg-white/30" />
+                    <img src={SassoLogo} alt="SASSO" className="h-6 w-6 object-contain drop-shadow-md" />
                   </div>
                 ) : (
                   <img 
                     src={guest.favoriteBrand === 'noir' ? NoirLogo : SassoLogo} 
                     alt={guest.favoriteBrand} 
-                    className="h-6 w-6 object-contain" 
+                    className="h-10 w-10 object-contain drop-shadow-md" 
                   />
                 )}
               </div>
@@ -379,13 +384,16 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               <div className={cn(
-                                "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 p-1.5",
-                                visit.brand === 'noir' ? 'bg-noir border border-noir-accent/20' : 'bg-sasso border border-sasso-accent/20'
+                                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 p-2",
+                                "shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200",
+                                visit.brand === 'noir' 
+                                  ? 'bg-noir border border-noir-accent/30' 
+                                  : 'bg-sasso border border-sasso-accent/30'
                               )}>
                                 <img 
                                   src={visit.brand === 'noir' ? NoirLogo : SassoLogo} 
                                   alt={visit.brand} 
-                                  className="h-6 w-6 object-contain" 
+                                  className="h-8 w-8 object-contain drop-shadow-sm" 
                                 />
                               </div>
                               <div>
