@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Mail, CheckCircle2, ArrowLeft, Lock, Shield } from 'lucide-react';
+import { Loader2, Mail, CheckCircle2, ArrowLeft, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import RHLogo from '@/assets/RH_logo.png';
 
 const emailSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -288,8 +289,8 @@ const AdminLogin = () => {
       </div>
       <Card className="w-full max-w-md shadow-xl border-border">
         <CardHeader className="space-y-1 text-center pb-2">
-          <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <Shield className="h-7 w-7 text-primary" />
+          <div className="mx-auto mb-4">
+            <img src={RHLogo} alt="Rise Holding" className="h-16 w-auto object-contain" />
           </div>
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>

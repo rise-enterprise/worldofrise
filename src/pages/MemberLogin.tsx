@@ -10,8 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, User, LogIn, Crown } from 'lucide-react';
+import { Loader2, User, LogIn } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import RHLogo from '@/assets/RH_logo.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Invalid email address' }).max(255),
@@ -119,8 +120,8 @@ export default function MemberLogin() {
       </div>
       <Card className="w-full max-w-md shadow-xl border-border">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <Crown className="h-7 w-7 text-primary" />
+          <div className="mx-auto mb-4">
+            <img src={RHLogo} alt="Rise Holding" className="h-16 w-auto object-contain" />
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">Member Portal</CardTitle>
           <CardDescription className="text-muted-foreground">
