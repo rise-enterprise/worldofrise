@@ -73,9 +73,13 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
               style={{ width: `${sassoPercentage}%` }}
             />
           </div>
-          <div className="flex justify-between mt-2">
-            <img src={NoirLogo} alt="NOIR" className="h-4 w-4 object-contain" />
-            <img src={SassoLogo} alt="SASSO" className="h-4 w-4 object-contain" />
+          <div className="flex justify-between mt-3">
+            <div className="w-8 h-8 rounded-lg bg-noir border border-noir-accent/20 flex items-center justify-center shadow-sm hover:shadow-md hover:scale-110 transition-all duration-200">
+              <img src={NoirLogo} alt="NOIR" className="h-5 w-5 object-contain" />
+            </div>
+            <div className="w-8 h-8 rounded-lg bg-sasso border border-sasso-accent/20 flex items-center justify-center shadow-sm hover:shadow-md hover:scale-110 transition-all duration-200">
+              <img src={SassoLogo} alt="SASSO" className="h-5 w-5 object-contain" />
+            </div>
           </div>
         </div>
       </CardContent>
