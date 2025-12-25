@@ -283,9 +283,25 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                 <Sparkles className="h-4 w-4" />
                 <span className="text-xs">Favorite Brand</span>
               </div>
-              <Badge className={cn("mt-1", brandColors[guest.favoriteBrand])}>
-                {guest.favoriteBrand}
-              </Badge>
+              <div className={cn(
+                "mt-1 w-10 h-10 rounded-lg flex items-center justify-center p-1.5",
+                guest.favoriteBrand === 'noir' ? 'bg-noir border border-noir-accent/20' : 
+                guest.favoriteBrand === 'sasso' ? 'bg-sasso border border-sasso-accent/20' : 
+                'bg-gradient-to-r from-noir to-sasso border border-border'
+              )}>
+                {guest.favoriteBrand === 'both' ? (
+                  <div className="flex items-center gap-0.5">
+                    <img src={NoirLogo} alt="NOIR" className="h-4 w-4 object-contain" />
+                    <img src={SassoLogo} alt="SASSO" className="h-4 w-4 object-contain" />
+                  </div>
+                ) : (
+                  <img 
+                    src={guest.favoriteBrand === 'noir' ? NoirLogo : SassoLogo} 
+                    alt={guest.favoriteBrand} 
+                    className="h-6 w-6 object-contain" 
+                  />
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
