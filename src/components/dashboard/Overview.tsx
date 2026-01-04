@@ -21,9 +21,9 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
   ).slice(0, 4);
 
   return (
-    <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+    <div className="p-4 md:p-8 space-y-8 md:space-y-10">
       {/* Top Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <MetricCard
           title="Total Members"
           value={metrics.totalMembers.toLocaleString()}
@@ -57,28 +57,28 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
         {/* Left Column - Tier Distribution */}
         <div className="lg:col-span-1">
           <TierDistribution distribution={metrics.tierDistribution} />
         </div>
 
         {/* Middle Column - Brand & Country */}
-        <div className="lg:col-span-1 space-y-4 md:space-y-6">
+        <div className="lg:col-span-1 space-y-5 md:space-y-6">
           <BrandMetrics visitsByBrand={metrics.visitsByBrand} />
           <CountryMetrics visitsByCountry={metrics.visitsByCountry} />
         </div>
 
         {/* Right Column - VIP Guests */}
         <div className="lg:col-span-1">
-          <Card variant="luxury" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
-            <CardHeader className="pb-3 md:pb-6">
+          <Card variant="crystal" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
+            <CardHeader className="pb-4 md:pb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base md:text-lg">Distinguished Guests</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-1">Your most valued members</p>
+                  <CardTitle className="text-base md:text-lg tracking-crystal">Distinguished Guests</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1 tracking-refined">Your most valued members</p>
                 </div>
-                <span className="text-xs text-primary font-medium cursor-pointer hover:underline">
+                <span className="text-xs text-primary font-medium cursor-pointer hover:text-primary/70 transition-colors duration-500 tracking-refined">
                   View all
                 </span>
               </div>
@@ -87,12 +87,12 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
               {/* Mobile: Horizontal scroll */}
               <div className="block md:hidden">
                 <ScrollArea className="w-full whitespace-nowrap">
-                  <div className="flex gap-3 pb-2">
+                  <div className="flex gap-4 pb-2">
                     {vipGuests.map((guest, index) => (
                       <div key={guest.id} className="w-[200px] shrink-0">
                         <VIPGuestCard 
                           guest={guest} 
-                          delay={600 + index * 100}
+                          delay={600 + index * 150}
                           compact
                         />
                       </div>
@@ -102,12 +102,12 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
                 </ScrollArea>
               </div>
               {/* Desktop: Vertical list */}
-              <div className="hidden md:block space-y-3">
+              <div className="hidden md:block space-y-4">
                 {vipGuests.map((guest, index) => (
                   <VIPGuestCard 
                     key={guest.id} 
                     guest={guest} 
-                    delay={600 + index * 100}
+                    delay={600 + index * 150}
                   />
                 ))}
               </div>

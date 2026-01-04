@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,79 +6,155 @@
 
 @layer base {
   :root {
-    /* Luxury Dark Theme - Primary */
-    --background: 20 10% 6%;
-    --foreground: 40 30% 92%;
+    /* Crystal Day Mode - "Tiffany Daylight" */
+    --background: 140 4% 96%;
+    --foreground: 200 5% 30%;
 
-    --card: 20 10% 9%;
-    --card-foreground: 40 30% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 200 5% 30%;
 
-    --popover: 20 10% 8%;
-    --popover-foreground: 40 30% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 5% 30%;
 
-    /* Champagne Gold - Brand Accent */
-    --primary: 42 65% 55%;
-    --primary-foreground: 20 10% 6%;
+    /* Platinum Silver - Refined Accent */
+    --primary: 200 5% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Warm Ivory */
-    --secondary: 40 20% 15%;
-    --secondary-foreground: 40 30% 92%;
+    /* Frosted Crystal Gray */
+    --secondary: 160 4% 90%;
+    --secondary-foreground: 200 5% 35%;
 
-    /* Muted Tones */
-    --muted: 20 10% 14%;
-    --muted-foreground: 40 10% 55%;
+    /* Muted Tones - Ice */
+    --muted: 160 4% 93%;
+    --muted-foreground: 200 5% 55%;
 
-    /* Accent - Soft Gold */
-    --accent: 42 40% 25%;
-    --accent-foreground: 42 65% 75%;
+    /* Accent - Soft Ice */
+    --accent: 165 8% 92%;
+    --accent-foreground: 200 5% 35%;
 
     /* Status Colors */
     --destructive: 0 62% 50%;
-    --destructive-foreground: 40 30% 92%;
+    --destructive-foreground: 0 0% 100%;
 
     --success: 152 45% 45%;
-    --success-foreground: 40 30% 92%;
+    --success-foreground: 0 0% 100%;
 
-    /* Borders & Inputs */
-    --border: 40 10% 18%;
-    --input: 40 10% 18%;
-    --ring: 42 65% 55%;
+    /* Borders & Inputs - Platinum */
+    --border: 200 5% 85%;
+    --input: 200 5% 90%;
+    --ring: 200 5% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     /* Brand Colors */
-    --noir: 20 10% 8%;
-    --noir-accent: 280 15% 25%;
-    --sasso: 15 40% 18%;
-    --sasso-accent: 25 50% 45%;
+    --noir: 200 10% 12%;
+    --noir-accent: 200 8% 25%;
+    --sasso: 25 20% 35%;
+    --sasso-accent: 25 30% 45%;
 
-    /* Tier Colors */
-    --tier-initiation: 40 10% 40%;
-    --tier-connoisseur: 42 30% 45%;
-    --tier-elite: 42 50% 55%;
-    --tier-inner-circle: 42 65% 60%;
-    --tier-black: 0 0% 10%;
+    /* Tier Colors - Refined */
+    --tier-initiation: 200 5% 65%;
+    --tier-connoisseur: 200 10% 50%;
+    --tier-elite: 200 15% 40%;
+    --tier-inner-circle: 200 20% 30%;
+    --tier-black: 200 10% 12%;
 
-    /* Gradients */
-    --gradient-gold: linear-gradient(135deg, hsl(42, 65%, 55%) 0%, hsl(35, 70%, 45%) 100%);
-    --gradient-noir: linear-gradient(180deg, hsl(20, 10%, 8%) 0%, hsl(20, 10%, 4%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(20, 10%, 11%) 0%, hsl(20, 10%, 7%) 100%);
-    --gradient-luxury: linear-gradient(135deg, hsl(20, 10%, 12%) 0%, hsl(20, 10%, 6%) 50%, hsl(42, 20%, 10%) 100%);
+    /* Crystal Gradients */
+    --gradient-crystal: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(160, 4%, 96%) 100%);
+    --gradient-glass: linear-gradient(145deg, hsl(0, 0%, 100% / 0.95) 0%, hsl(160, 4%, 98% / 0.9) 100%);
+    --gradient-platinum: linear-gradient(135deg, hsl(200, 5%, 70%) 0%, hsl(200, 5%, 50%) 100%);
 
-    /* Shadows */
-    --shadow-luxury: 0 25px 50px -12px hsl(0, 0%, 0% / 0.5);
-    --shadow-card: 0 10px 40px -10px hsl(0, 0%, 0% / 0.3);
-    --shadow-gold: 0 0 60px hsl(42, 65%, 55% / 0.15);
+    /* Crystal Shadows */
+    --shadow-crystal: 0 8px 32px -8px hsl(200, 10%, 50% / 0.08);
+    --shadow-glass: 0 4px 24px -4px hsl(200, 10%, 50% / 0.06);
+    --shadow-elevated: 0 24px 48px -12px hsl(200, 10%, 50% / 0.12);
 
-    /* Sidebar */
-    --sidebar-background: 20 10% 5%;
-    --sidebar-foreground: 40 30% 85%;
-    --sidebar-primary: 42 65% 55%;
-    --sidebar-primary-foreground: 20 10% 6%;
-    --sidebar-accent: 40 10% 12%;
-    --sidebar-accent-foreground: 40 30% 92%;
-    --sidebar-border: 40 10% 12%;
-    --sidebar-ring: 42 65% 55%;
+    /* Sidebar - Crystal */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 200 5% 35%;
+    --sidebar-primary: 200 5% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 160 4% 96%;
+    --sidebar-accent-foreground: 200 5% 30%;
+    --sidebar-border: 200 5% 90%;
+    --sidebar-ring: 200 5% 55%;
+
+    /* Design Tokens */
+    --blur-glass: 16px;
+    --blur-heavy: 24px;
+    --transition-crystal: 700ms;
+    --easing-crystal: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .dark {
+    /* Crystal Dark Mode - "Private Viewing Room" */
+    --background: 210 10% 7%;
+    --foreground: 200 10% 85%;
+
+    --card: 210 8% 11%;
+    --card-foreground: 200 10% 85%;
+
+    --popover: 210 8% 9%;
+    --popover-foreground: 200 10% 85%;
+
+    /* Platinum Silver - Dark */
+    --primary: 200 10% 70%;
+    --primary-foreground: 210 10% 7%;
+
+    /* Graphite */
+    --secondary: 210 6% 15%;
+    --secondary-foreground: 200 10% 80%;
+
+    /* Muted Tones - Charcoal */
+    --muted: 210 6% 14%;
+    --muted-foreground: 200 8% 55%;
+
+    /* Accent - Dark Crystal */
+    --accent: 210 6% 16%;
+    --accent-foreground: 200 10% 80%;
+
+    /* Status Colors */
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 200 10% 90%;
+
+    --success: 152 45% 45%;
+    --success-foreground: 200 10% 90%;
+
+    /* Borders & Inputs */
+    --border: 210 6% 18%;
+    --input: 210 6% 16%;
+    --ring: 200 10% 70%;
+
+    /* Brand Colors - Dark */
+    --noir: 210 10% 8%;
+    --noir-accent: 200 8% 30%;
+
+    /* Tier Colors - Dark */
+    --tier-initiation: 200 5% 45%;
+    --tier-connoisseur: 200 8% 50%;
+    --tier-elite: 200 12% 55%;
+    --tier-inner-circle: 200 15% 65%;
+    --tier-black: 0 0% 95%;
+
+    /* Crystal Gradients - Dark */
+    --gradient-crystal: linear-gradient(180deg, hsl(210, 8%, 12%) 0%, hsl(210, 10%, 7%) 100%);
+    --gradient-glass: linear-gradient(145deg, hsl(210, 8%, 14% / 0.95) 0%, hsl(210, 8%, 10% / 0.9) 100%);
+    --gradient-platinum: linear-gradient(135deg, hsl(200, 10%, 60%) 0%, hsl(200, 10%, 75%) 100%);
+
+    /* Crystal Shadows - Dark */
+    --shadow-crystal: 0 8px 32px -8px hsl(0, 0%, 0% / 0.4);
+    --shadow-glass: 0 4px 24px -4px hsl(0, 0%, 0% / 0.3);
+    --shadow-elevated: 0 24px 48px -12px hsl(0, 0%, 0% / 0.5);
+
+    /* Sidebar - Dark */
+    --sidebar-background: 210 10% 5%;
+    --sidebar-foreground: 200 10% 80%;
+    --sidebar-primary: 200 10% 70%;
+    --sidebar-primary-foreground: 210 10% 7%;
+    --sidebar-accent: 210 6% 12%;
+    --sidebar-accent-foreground: 200 10% 85%;
+    --sidebar-border: 210 6% 15%;
+    --sidebar-ring: 200 10% 70%;
   }
 }
 
@@ -87,71 +163,152 @@
     @apply border-border;
   }
 
+  html {
+    transition: background-color var(--transition-crystal) var(--easing-crystal),
+                color var(--transition-crystal) var(--easing-crystal);
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
-    @apply font-medium tracking-tight;
+    font-family: 'Cormorant Garamond', serif;
+    @apply font-medium tracking-wide;
+    letter-spacing: 0.04em;
   }
 }
 
 @layer utilities {
   .font-display {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Cormorant Garamond', serif;
+    letter-spacing: 0.04em;
   }
 
   .font-body {
     font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.01em;
   }
 
+  /* Crystal Glass Utilities */
+  .glass-panel {
+    background-color: hsl(var(--card) / 0.95);
+    @apply backdrop-blur-xl border border-border/50;
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-panel-heavy {
+    background-color: hsl(var(--card) / 0.98);
+    @apply backdrop-blur-2xl border border-border/30;
+    box-shadow: var(--shadow-crystal);
+  }
+
+  .crystal-border {
+    @apply border border-border/40;
+    border-image: linear-gradient(
+      to bottom,
+      hsl(var(--border) / 0.6),
+      hsl(var(--border) / 0.2)
+    ) 1;
+  }
+
+  .crystal-accent {
+    @apply relative;
+  }
+
+  .crystal-accent::before {
+    content: '';
+    @apply absolute left-0 top-1/4 bottom-1/4 w-px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      hsl(var(--primary) / 0.4),
+      transparent
+    );
+  }
+
+  /* Light Shift Effect */
+  .light-shift {
+    @apply transition-all duration-700;
+    transition-timing-function: var(--easing-crystal);
+  }
+
+  .light-shift:hover {
+    @apply border-primary/30;
+    box-shadow: 
+      var(--shadow-glass),
+      inset 0 1px 0 0 hsl(var(--primary) / 0.05);
+  }
+
+  /* Crystal Text */
+  .text-crystal {
+    @apply text-foreground;
+    text-shadow: 0 1px 2px hsl(var(--foreground) / 0.05);
+  }
+
+  .text-platinum {
+    background: var(--gradient-platinum);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Legacy gradient support */
   .text-gradient-gold {
-    background: linear-gradient(135deg, hsl(42, 65%, 65%) 0%, hsl(35, 70%, 50%) 100%);
+    background: var(--gradient-platinum);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .bg-gradient-luxury {
-    background: var(--gradient-luxury);
+    background: var(--gradient-crystal);
   }
 
   .bg-gradient-card {
-    background: var(--gradient-card);
+    background: var(--gradient-glass);
   }
 
   .bg-gradient-gold {
-    background: var(--gradient-gold);
+    background: var(--gradient-platinum);
   }
 
+  /* Crystal Shadows */
   .shadow-luxury {
-    box-shadow: var(--shadow-luxury);
+    box-shadow: var(--shadow-elevated);
   }
 
-  .shadow-gold {
-    box-shadow: var(--shadow-gold);
+  .shadow-crystal {
+    box-shadow: var(--shadow-crystal);
   }
 
+  .shadow-glass {
+    box-shadow: var(--shadow-glass);
+  }
+
+  /* Animations - Slow, Cinematic */
   .animate-fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
+    animation: crystalFadeIn 800ms var(--easing-crystal) forwards;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.5s ease-out forwards;
+    animation: crystalSlideUp 900ms var(--easing-crystal) forwards;
   }
 
   .animate-scale-in {
-    animation: scaleIn 0.4s ease-out forwards;
+    animation: crystalScaleIn 700ms var(--easing-crystal) forwards;
   }
 
-  .animate-shimmer {
-    animation: shimmer 2s linear infinite;
+  .animate-crystal-reveal {
+    animation: crystalReveal 1000ms var(--easing-crystal) forwards;
   }
 }
 
-@keyframes fadeIn {
+/* Crystal Keyframes - Slow, Museum-grade */
+@keyframes crystalFadeIn {
   from {
     opacity: 0;
   }
@@ -160,10 +317,10 @@
   }
 }
 
-@keyframes slideUp {
+@keyframes crystalSlideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -171,10 +328,10 @@
   }
 }
 
-@keyframes scaleIn {
+@keyframes crystalScaleIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.98);
   }
   to {
     opacity: 1;
@@ -182,32 +339,36 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+@keyframes crystalReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(4px);
   }
-  100% {
-    background-position: 200% 0;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Crystal */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(20, 10%, 8%);
+  background: hsl(var(--muted));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(40, 10%, 20%);
+  background: hsl(var(--border));
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(42, 65%, 55%);
+  background: hsl(var(--primary) / 0.5);
 }
 
 /* RTL Support */
@@ -270,4 +431,20 @@ html.rtl .pr-4 { padding-right: 0; padding-left: 1rem; }
 html.rtl [data-side="left"] {
   left: unset !important;
   right: 0 !important;
+}
+
+/* Crystal accent line */
+.crystal-line {
+  @apply relative;
+}
+
+.crystal-line::after {
+  content: '';
+  @apply absolute right-0 top-0 bottom-0 w-px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    hsl(var(--primary) / 0.3),
+    transparent
+  );
 }

@@ -4,15 +4,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "rounded-xl border text-card-foreground transition-all duration-300",
+  "rounded-xl text-card-foreground transition-all duration-700 ease-crystal",
   {
     variants: {
       variant: {
-        default: "bg-card border-border",
-        luxury: "bg-gradient-to-br from-card to-card/80 border-border/50 shadow-xl hover:border-primary/30",
-        glass: "bg-card/50 backdrop-blur-xl border-border/30",
-        metric: "bg-gradient-to-br from-card to-card/80 border-border/50 hover:shadow-xl hover:border-primary/40",
-        elevated: "bg-card border-border shadow-lg hover:shadow-xl",
+        default: "bg-card border border-border/50 shadow-glass",
+        luxury: "glass-panel-heavy light-shift",
+        glass: "bg-card/95 backdrop-blur-xl border border-border/40 shadow-glass",
+        metric: "glass-panel light-shift",
+        elevated: "bg-card border border-border/40 shadow-crystal",
+        crystal: "bg-card/98 backdrop-blur-2xl border border-border/30 shadow-crystal light-shift",
       },
     },
     defaultVariants: {
@@ -45,14 +46,14 @@ CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("font-display text-xl font-medium leading-none tracking-tight", className)} {...props} />
+    <h3 ref={ref} className={cn("font-display text-xl font-medium leading-none tracking-crystal", className)} {...props} />
   ),
 );
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-muted-foreground font-body", className)} {...props} />
+    <p ref={ref} className={cn("text-sm text-muted-foreground font-body tracking-refined", className)} {...props} />
   ),
 );
 CardDescription.displayName = "CardDescription";

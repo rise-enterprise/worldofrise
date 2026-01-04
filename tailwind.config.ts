@@ -78,13 +78,32 @@ export default {
         },
       },
       fontFamily: {
-        display: ["'Playfair Display'", "serif"],
+        display: ["'Cormorant Garamond'", "serif"],
         body: ["'Outfit'", "sans-serif"],
+      },
+      letterSpacing: {
+        crystal: "0.04em",
+        refined: "0.02em",
+        wide: "0.08em",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
+      },
+      backdropBlur: {
+        glass: "var(--blur-glass)",
+        heavy: "var(--blur-heavy)",
+      },
+      transitionDuration: {
+        crystal: "700ms",
+        slow: "900ms",
+      },
+      transitionTimingFunction: {
+        crystal: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        cinematic: "cubic-bezier(0.33, 1, 0.68, 1)",
       },
       keyframes: {
         "accordion-down": {
@@ -100,15 +119,25 @@ export default {
           to: { opacity: "1" },
         },
         "slide-up": {
-          from: { opacity: "0", transform: "translateY(20px)" },
+          from: { opacity: "0", transform: "translateY(16px)" },
           to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "crystal-reveal": {
+          from: { opacity: "0", transform: "translateY(24px)", filter: "blur(4px)" },
+          to: { opacity: "1", transform: "translateY(0)", filter: "blur(0)" },
+        },
+        "light-shift": {
+          "0%, 100%": { opacity: "0.5" },
+          "50%": { opacity: "0.8" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.6s ease-out forwards",
-        "slide-up": "slide-up 0.5s ease-out forwards",
+        "accordion-down": "accordion-down 0.3s ease-out",
+        "accordion-up": "accordion-up 0.3s ease-out",
+        "fade-in": "fade-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
+        "slide-up": "slide-up 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
+        "crystal-reveal": "crystal-reveal 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
+        "light-shift": "light-shift 3s ease-in-out infinite",
       },
     },
   },
