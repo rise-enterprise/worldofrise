@@ -26,32 +26,32 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
   if (compact) {
     return (
       <Card 
-        variant="elevated"
+        variant="glass"
         className={cn(
-          'cursor-pointer hover:scale-[1.02] transition-all duration-300 animate-slide-up h-full',
-          guest.tier === 'black' && 'border-primary/30 shadow-gold'
+          'cursor-pointer transition-all duration-500 ease-crystal animate-slide-up h-full light-shift',
+          guest.tier === 'black' && 'border-primary/30'
         )}
         style={{ animationDelay: `${delay}ms` }}
         onClick={onClick}
       >
-        <CardContent className="p-3">
-          <div className="flex items-center gap-3 mb-2">
-            <Avatar className="h-10 w-10 border-2 border-border shrink-0">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar className="h-10 w-10 border border-border/50 shrink-0">
               <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-              <AvatarFallback className="bg-muted text-muted-foreground font-display text-sm">
+              <AvatarFallback className="bg-accent text-foreground font-display text-sm">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <h4 className="font-display text-sm font-medium text-foreground truncate">
+              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-crystal">
                 {guest.name}
               </h4>
-              <Badge variant={guest.tier as any} className="text-[10px]">
+              <Badge variant={guest.tier as any} className="text-[10px] mt-1">
                 {tierConfig.displayName.split(' ')[0]}
               </Badge>
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center justify-between text-xs text-muted-foreground tracking-refined">
             <span>{guest.totalVisits} visits</span>
             <span>{formatDate(guest.lastVisit)}</span>
           </div>
@@ -62,26 +62,26 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
 
   return (
     <Card 
-      variant="elevated"
+      variant="glass"
       className={cn(
-        'cursor-pointer hover:scale-[1.02] transition-all duration-300 animate-slide-up',
-        guest.tier === 'black' && 'border-primary/30 shadow-gold'
+        'cursor-pointer transition-all duration-500 ease-crystal animate-slide-up light-shift',
+        guest.tier === 'black' && 'border-primary/30'
       )}
       style={{ animationDelay: `${delay}ms` }}
       onClick={onClick}
     >
-      <CardContent className="p-4">
+      <CardContent className="p-5">
         <div className="flex items-start gap-4">
-          <Avatar className="h-12 w-12 border-2 border-border">
+          <Avatar className="h-12 w-12 border border-border/50">
             <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-            <AvatarFallback className="bg-muted text-muted-foreground font-display">
+            <AvatarFallback className="bg-accent text-foreground font-display">
               {initials}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-display text-sm font-medium text-foreground truncate">
+            <div className="flex items-center gap-2 mb-1.5">
+              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-crystal">
                 {guest.name}
               </h4>
               <Badge variant={guest.tier as any} className="text-[10px] shrink-0">
@@ -89,8 +89,8 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
               </Badge>
             </div>
             
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground tracking-refined">
+              <span className="flex items-center gap-1.5">
                 {guest.favoriteBrand === 'noir' ? (
                   <Coffee className="h-3 w-3" />
                 ) : (
@@ -98,29 +98,29 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
                 )}
                 {guest.favoriteBrand === 'noir' ? 'NOIR' : 'SASSO'}
               </span>
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1.5">
                 <MapPin className="h-3 w-3" />
                 {guest.country === 'doha' ? 'Qatar' : 'Riyadh'}
               </span>
             </div>
 
-            <div className="flex items-center justify-between mt-3">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Visits</p>
-                  <p className="font-display text-lg font-medium text-foreground">{guest.totalVisits}</p>
+                  <p className="text-xs text-muted-foreground tracking-widest uppercase">Visits</p>
+                  <p className="font-display text-lg font-medium text-foreground tracking-crystal">{guest.totalVisits}</p>
                 </div>
-                <div className="w-px h-8 bg-border" />
+                <div className="w-px h-8 bg-border/30" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Last visit</p>
-                  <p className="text-sm text-foreground">{formatDate(guest.lastVisit)}</p>
+                  <p className="text-xs text-muted-foreground tracking-widest uppercase">Last visit</p>
+                  <p className="text-sm text-foreground tracking-refined">{formatDate(guest.lastVisit)}</p>
                 </div>
               </div>
               
               {guest.tags.length > 0 && (
-                <div className="flex gap-1">
+                <div className="flex gap-1.5">
                   {guest.tags.slice(0, 2).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-[10px]">
+                    <Badge key={tag} variant="outline" className="text-[10px] tracking-refined">
                       {tag}
                     </Badge>
                   ))}

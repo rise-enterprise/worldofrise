@@ -29,13 +29,13 @@ interface MemberCardProps {
   guest: Guest;
 }
 
-const tierColors: Record<string, { bg: string; text: string; ring: string }> = {
-  'Initiation': { bg: 'bg-slate-600', text: 'text-slate-100', ring: 'ring-slate-500' },
-  'Bronze': { bg: 'bg-amber-700', text: 'text-amber-100', ring: 'ring-amber-600' },
-  'Silver': { bg: 'bg-slate-400', text: 'text-slate-900', ring: 'ring-slate-400' },
-  'Gold': { bg: 'bg-yellow-500', text: 'text-yellow-950', ring: 'ring-yellow-500' },
-  'Platinum': { bg: 'bg-purple-600', text: 'text-purple-100', ring: 'ring-purple-500' },
-  'Diamond': { bg: 'bg-cyan-500', text: 'text-cyan-950', ring: 'ring-cyan-400' },
+const tierColors: Record<string, { bg: string; text: string; accent: string }> = {
+  'Initiation': { bg: 'bg-muted', text: 'text-foreground', accent: 'bg-tier-initiation' },
+  'Bronze': { bg: 'bg-muted', text: 'text-foreground', accent: 'bg-tier-connoisseur' },
+  'Silver': { bg: 'bg-secondary', text: 'text-foreground', accent: 'bg-tier-elite' },
+  'Gold': { bg: 'bg-accent', text: 'text-foreground', accent: 'bg-tier-inner-circle' },
+  'Platinum': { bg: 'bg-primary/10', text: 'text-foreground', accent: 'bg-tier-inner-circle' },
+  'Diamond': { bg: 'bg-noir', text: 'text-foreground', accent: 'bg-tier-black' },
 };
 
 export function MemberCard({ guest }: MemberCardProps) {
@@ -85,7 +85,7 @@ export function MemberCard({ guest }: MemberCardProps) {
   const recentVisits = guest.visits.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+    <div className="min-h-screen bg-background">
       {/* Chat Overlay */}
       <ConciergeChat 
         open={showChat} 
@@ -95,75 +95,80 @@ export function MemberCard({ guest }: MemberCardProps) {
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm glass-panel-heavy">
           <DialogHeader>
-            <DialogTitle className="text-center">Your Member QR Code</DialogTitle>
+            <DialogTitle className="text-center font-display tracking-crystal">Your Member QR Code</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col items-center py-6">
-            <div className="bg-white p-4 rounded-xl shadow-lg">
+          <div className="flex flex-col items-center py-8">
+            <div className="bg-card p-6 rounded-2xl shadow-crystal border border-border/30">
               <QRCodeSVG 
                 value={qrValue}
-                size={200}
+                size={180}
                 level="H"
                 includeMargin={false}
+                fgColor="hsl(var(--foreground))"
+                bgColor="transparent"
               />
             </div>
-            <p className="mt-4 text-sm text-muted-foreground text-center">
+            <p className="mt-6 text-sm text-muted-foreground text-center tracking-refined">
               Show this code at the venue for quick check-in
             </p>
             <div className="mt-4 text-center">
-              <p className="font-semibold text-foreground">{guest.name}</p>
-              <p className="text-sm text-muted-foreground">{guest.tierName} Member</p>
+              <p className="font-display text-lg text-foreground tracking-crystal">{guest.name}</p>
+              <p className="text-sm text-muted-foreground tracking-refined">{guest.tierName} Member</p>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      <div className="p-4 space-y-4 max-w-lg mx-auto">
+      <div className="p-4 space-y-5 max-w-lg mx-auto">
         {/* Header with Avatar and Greeting */}
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between pt-4 animate-fade-in">
+          <div className="flex items-center gap-4">
             <Avatar 
-              className={cn("h-12 w-12 ring-2 ring-offset-2 ring-offset-background cursor-pointer", tierStyle.ring)}
+              className="h-14 w-14 ring-1 ring-border ring-offset-2 ring-offset-background cursor-pointer transition-all duration-500 hover:ring-primary/50"
               onClick={() => navigate('/member/profile/edit')}
             >
               <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-              <AvatarFallback className={cn(tierStyle.bg, tierStyle.text, "font-semibold")}>
+              <AvatarFallback className="bg-accent text-foreground font-display text-lg">
                 {getInitials(guest.name)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm text-muted-foreground">{getGreeting()},</p>
-              <h1 className="text-lg font-semibold text-foreground">{guest.name.split(' ')[0]}</h1>
+              <p className="text-sm text-muted-foreground tracking-refined">{getGreeting()},</p>
+              <h1 className="text-xl font-display font-medium text-foreground tracking-crystal">{guest.name.split(' ')[0]}</h1>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={() => setShowQR(true)}>
+            <Button variant="ghost" size="icon" onClick={() => setShowQR(true)} className="text-muted-foreground hover:text-foreground">
               <QrCode className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')} className="text-muted-foreground hover:text-foreground">
               <Settings className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setShowChat(true)}>
+            <Button variant="ghost" size="icon" onClick={() => setShowChat(true)} className="text-muted-foreground hover:text-foreground">
               <MessageCircle className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
         {/* Membership Card with QR */}
-        <Card className={cn(
-          "relative overflow-hidden border-0",
-          tierStyle.bg
-        )}>
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+        <Card 
+          variant="crystal" 
+          className="relative overflow-hidden animate-slide-up"
+          style={{ animationDelay: '100ms' }}
+        >
+          {/* Crystal accent line */}
+          <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
+          
           <CardContent className="relative p-6">
-            <div className="flex justify-between items-start mb-6">
+            <div className="flex justify-between items-start mb-8">
               <div>
-                <p className={cn("text-xs opacity-80", tierStyle.text)}>Membership Tier</p>
-                <h2 className={cn("text-2xl font-bold", tierStyle.text)}>{guest.tierName}</h2>
+                <p className="text-xs text-muted-foreground tracking-widest uppercase font-body">Membership Status</p>
+                <h2 className="text-2xl font-display font-medium text-foreground mt-2 tracking-crystal">{guest.tierName}</h2>
               </div>
               <div 
-                className="bg-white p-1.5 rounded-lg cursor-pointer hover:scale-105 transition-transform"
+                className="glass-panel p-2 rounded-xl cursor-pointer hover:border-primary/30 transition-all duration-500"
                 onClick={() => setShowQR(true)}
               >
                 <QRCodeSVG 
@@ -171,51 +176,61 @@ export function MemberCard({ guest }: MemberCardProps) {
                   size={48}
                   level="L"
                   includeMargin={false}
+                  fgColor="hsl(var(--foreground))"
+                  bgColor="transparent"
                 />
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className={cn("opacity-80", tierStyle.text)}>Progress to {nextTier?.displayName || 'Max'}</span>
-                <span className={cn("font-medium", tierStyle.text)}>
-                  {nextTier ? `${visitsToNextTier} visits away` : 'Max tier!'}
+                <span className="text-muted-foreground tracking-refined">Progress to {nextTier?.displayName || 'Max'}</span>
+                <span className="font-medium text-foreground tracking-refined">
+                  {nextTier ? `${visitsToNextTier} visits away` : 'Max tier achieved'}
                 </span>
               </div>
-              <Progress value={progressPercentage} className="h-2 bg-white/20" />
+              <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary/60 rounded-full transition-all duration-1000 ease-crystal"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-white/20">
+            <div className="grid grid-cols-2 gap-6 mt-8 pt-6 border-t border-border/30">
               <div>
-                <p className={cn("text-xs opacity-80", tierStyle.text)}>Total Visits</p>
-                <p className={cn("text-xl font-bold", tierStyle.text)}>{guest.totalVisits}</p>
+                <p className="text-xs text-muted-foreground tracking-widest uppercase font-body">Total Visits</p>
+                <p className="text-2xl font-display font-medium text-foreground mt-1 tracking-crystal">{guest.totalVisits}</p>
               </div>
               <div>
-                <p className={cn("text-xs opacity-80", tierStyle.text)}>Points</p>
-                <p className={cn("text-xl font-bold", tierStyle.text)}>{guest.totalPoints?.toLocaleString() || 0}</p>
+                <p className="text-xs text-muted-foreground tracking-widest uppercase font-body">Points</p>
+                <p className="text-2xl font-display font-medium text-foreground mt-1 tracking-crystal">{guest.totalPoints?.toLocaleString() || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="bg-card/50 border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+        <div 
+          className="grid grid-cols-2 gap-4 animate-slide-up"
+          style={{ animationDelay: '200ms' }}
+        >
+          <Card variant="glass" className="light-shift">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-muted-foreground mb-2">
                 <Sparkles className="h-4 w-4" />
-                <span className="text-xs">Favorite Brand</span>
+                <span className="text-xs tracking-widest uppercase">Favorite</span>
               </div>
-              <p className="font-semibold text-foreground">{guest.favoriteBrand}</p>
+              <p className="font-display text-lg font-medium text-foreground tracking-crystal">{guest.favoriteBrand}</p>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1">
+          <Card variant="glass" className="light-shift">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-muted-foreground mb-2">
                 <Calendar className="h-4 w-4" />
-                <span className="text-xs">Last Visit</span>
+                <span className="text-xs tracking-widest uppercase">Last Visit</span>
               </div>
-              <p className="font-semibold text-foreground text-sm">
+              <p className="font-display text-lg font-medium text-foreground tracking-crystal">
                 {formatDistanceToNow(guest.lastVisit, { addSuffix: true })}
               </p>
             </CardContent>
@@ -224,44 +239,42 @@ export function MemberCard({ guest }: MemberCardProps) {
 
         {/* Recent Visits */}
         {recentVisits.length > 0 && (
-          <Card className="bg-card/50 border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-foreground">Recent Visits</h3>
+          <Card 
+            variant="glass" 
+            className="animate-slide-up"
+            style={{ animationDelay: '300ms' }}
+          >
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-display font-medium text-foreground tracking-crystal">Recent Visits</h3>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-muted-foreground h-auto py-1 px-2"
+                  className="text-muted-foreground h-auto py-1 px-2 hover:text-foreground"
                   onClick={() => navigate('/member/history')}
                 >
                   View all
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {recentVisits.map((visit) => (
                   <div key={visit.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center",
-                        visit.brand === 'noir' ? 'bg-zinc-800' : 'bg-amber-100'
-                      )}>
-                        <span className={cn(
-                          "text-xs font-medium",
-                          visit.brand === 'noir' ? 'text-zinc-100' : 'text-amber-900'
-                        )}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center">
+                        <span className="text-xs font-display font-medium text-foreground tracking-wide">
                           {visit.brand[0].toUpperCase()}
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">{visit.brand}</p>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <p className="text-sm font-medium text-foreground tracking-refined capitalize">{visit.brand}</p>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <MapPin className="h-3 w-3" />
-                          <span>{visit.location}</span>
+                          <span className="tracking-refined">{visit.location}</span>
                         </div>
                       </div>
                     </div>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground tracking-refined">
                       {format(visit.date, 'MMM d')}
                     </span>
                   </div>
@@ -272,37 +285,42 @@ export function MemberCard({ guest }: MemberCardProps) {
         )}
 
         {/* Navigation */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
+        <div 
+          className="grid grid-cols-2 gap-4 pt-2 animate-slide-up"
+          style={{ animationDelay: '400ms' }}
+        >
           <Button 
-            variant="outline" 
-            className="h-auto py-4 flex-col gap-2"
+            variant="crystal" 
+            className="h-auto py-5 flex-col gap-3"
             onClick={() => navigate('/member/history')}
           >
             <History className="h-5 w-5" />
-            <span>Visit History</span>
+            <span className="tracking-refined">Visit History</span>
           </Button>
           <Button 
-            variant="outline" 
-            className="h-auto py-4 flex-col gap-2"
+            variant="crystal" 
+            className="h-auto py-5 flex-col gap-3"
             onClick={() => navigate('/member/events')}
           >
             <CalendarCheck className="h-5 w-5" />
-            <span>Events</span>
+            <span className="tracking-refined">Events</span>
           </Button>
         </div>
 
         {/* Concierge CTA */}
         <Card 
-          className="bg-primary/5 border-primary/20 cursor-pointer hover:bg-primary/10 transition-colors"
+          variant="glass"
+          className="cursor-pointer light-shift animate-slide-up"
+          style={{ animationDelay: '500ms' }}
           onClick={() => setShowChat(true)}
         >
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <MessageCircle className="h-5 w-5 text-primary" />
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+              <MessageCircle className="h-5 w-5 text-primary/70" />
             </div>
             <div className="flex-1">
-              <p className="font-medium text-foreground">Need assistance?</p>
-              <p className="text-sm text-muted-foreground">Chat with our concierge</p>
+              <p className="font-display font-medium text-foreground tracking-crystal">Need assistance?</p>
+              <p className="text-sm text-muted-foreground tracking-refined">Chat with our concierge</p>
             </div>
             <ChevronRight className="h-5 w-5 text-muted-foreground" />
           </CardContent>
