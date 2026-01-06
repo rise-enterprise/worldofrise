@@ -53,7 +53,23 @@ export default function Dashboard() {
   const isLoading = guestsLoading || metricsLoading;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      {/* Ambient background effect */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div 
+          className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full crystal-ambient-1"
+          style={{
+            background: 'radial-gradient(circle, hsl(var(--primary) / 0.02) 0%, transparent 70%)',
+          }}
+        />
+        <div 
+          className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full crystal-ambient-2"
+          style={{
+            background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)',
+          }}
+        />
+      </div>
+
       <Sidebar 
         activeView={activeView}
         setActiveView={setActiveView}
@@ -64,6 +80,7 @@ export default function Dashboard() {
       />
 
       <main className={cn(
+        'relative z-10',
         isMobile ? '' : (isRTL ? 'mr-64' : 'ml-64')
       )}>
         <DashboardHeader 

@@ -352,6 +352,125 @@
   }
 }
 
+/* Crystal Background Animations - Ultra-slow, Museum-grade */
+@keyframes crystalShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes crystalAmbient1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.04;
+  }
+  50% {
+    transform: translate(5%, 5%) scale(1.05);
+    opacity: 0.06;
+  }
+}
+
+@keyframes crystalAmbient2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.05;
+  }
+  50% {
+    transform: translate(-3%, -3%) scale(1.03);
+    opacity: 0.03;
+  }
+}
+
+@keyframes crystalAmbient3 {
+  0%, 100% {
+    transform: translate(-50%, 0);
+    opacity: 0.02;
+  }
+  50% {
+    transform: translate(-50%, 5%);
+    opacity: 0.04;
+  }
+}
+
+@keyframes crystalRefract {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes crystalLinePulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Crystal Background Utilities */
+.crystal-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(var(--primary) / 0.08) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: crystalShimmer 25s linear infinite;
+  will-change: transform;
+}
+
+.crystal-ambient-1 {
+  animation: crystalAmbient1 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.crystal-ambient-2 {
+  animation: crystalAmbient2 22s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.crystal-ambient-3 {
+  animation: crystalAmbient3 30s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.crystal-refract {
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    hsl(165 8% 92% / 0.05) 25%,
+    transparent 50%,
+    hsl(200 5% 90% / 0.04) 75%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: crystalRefract 30s ease-in-out infinite;
+  will-change: background-position;
+}
+
+.dark .crystal-refract {
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    hsl(200 10% 70% / 0.03) 25%,
+    transparent 50%,
+    hsl(200 10% 60% / 0.02) 75%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+}
+
+.crystal-line-pulse {
+  animation: crystalLinePulse 8s ease-in-out infinite;
+}
+
 /* Custom Scrollbar - Crystal */
 ::-webkit-scrollbar {
   width: 6px;
