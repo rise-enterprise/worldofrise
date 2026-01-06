@@ -1,19 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Crown, Users, ArrowRight } from 'lucide-react';
+import { CrystalBackground } from '@/components/effects/CrystalBackground';
 
 const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Subtle crystal background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-accent/20" />
-      
-      {/* Vertical crystal accent lines */}
-      <div className="absolute left-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-border/30 to-transparent" />
-      <div className="absolute right-1/4 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-border/30 to-transparent" />
-
+    <CrystalBackground variant="full" className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-2xl text-center space-y-16 relative z-10">
         {/* Logo */}
         <div 
@@ -129,7 +123,7 @@ const Index = () => {
           Qatar · Saudi Arabia
         </p>
       </div>
-    </div>
+    </CrystalBackground>
   );
 };
 
