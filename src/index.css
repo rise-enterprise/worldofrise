@@ -355,20 +355,20 @@
 /* Crystal Background Animations - Ultra-slow, Museum-grade */
 @keyframes crystalShimmer {
   0% {
-    transform: translateX(-100%);
+    background-position: -200% 0;
   }
   100% {
-    transform: translateX(100%);
+    background-position: 200% 0;
   }
 }
 
 @keyframes crystalAmbient1 {
   0%, 100% {
     transform: translate(0, 0) scale(1);
-    opacity: 0.04;
+    opacity: 0.03;
   }
   50% {
-    transform: translate(5%, 5%) scale(1.05);
+    transform: translate(10px, -10px) scale(1.05);
     opacity: 0.06;
   }
 }
@@ -376,40 +376,95 @@
 @keyframes crystalAmbient2 {
   0%, 100% {
     transform: translate(0, 0) scale(1);
-    opacity: 0.05;
+    opacity: 0.02;
   }
   50% {
-    transform: translate(-3%, -3%) scale(1.03);
-    opacity: 0.03;
+    transform: translate(-15px, 10px) scale(1.08);
+    opacity: 0.05;
   }
 }
 
 @keyframes crystalAmbient3 {
   0%, 100% {
-    transform: translate(-50%, 0);
+    transform: translate(0, 0);
     opacity: 0.02;
   }
   50% {
-    transform: translate(-50%, 5%);
+    transform: translate(5px, -5px);
     opacity: 0.04;
   }
 }
 
 @keyframes crystalRefract {
   0%, 100% {
-    background-position: 0% 50%;
+    opacity: 0.02;
+    filter: hue-rotate(0deg);
   }
   50% {
-    background-position: 100% 50%;
+    opacity: 0.05;
+    filter: hue-rotate(10deg);
   }
 }
 
 @keyframes crystalLinePulse {
   0%, 100% {
-    opacity: 0.3;
+    opacity: 0.15;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.35;
+  }
+}
+
+/* Crystal Strand Animations */
+@keyframes crystalStrandGlow {
+  0%, 100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes crystalStrandGlowSlow {
+  0%, 100% {
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* Crystal Sparkle/Twinkle Animation */
+@keyframes crystalTwinkle {
+  0%, 100% {
+    opacity: 0.1;
+    transform: rotate(45deg) scale(0.8);
+  }
+  50% {
+    opacity: 0.7;
+    transform: rotate(45deg) scale(1.1);
+  }
+}
+
+/* Crystal Light Glint Flash */
+@keyframes crystalGlint {
+  0%, 85%, 100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  90%, 95% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Crystal Float Animation */
+@keyframes crystalFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
 
@@ -418,12 +473,12 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    hsl(var(--primary) / 0.08) 50%,
+    hsl(var(--primary) / 0.1) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
   animation: crystalShimmer 25s linear infinite;
-  will-change: transform;
+  will-change: background-position;
 }
 
 .crystal-ambient-1 {
@@ -442,33 +497,37 @@
 }
 
 .crystal-refract {
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    hsl(165 8% 92% / 0.05) 25%,
-    transparent 50%,
-    hsl(200 5% 90% / 0.04) 75%,
-    transparent 100%
-  );
-  background-size: 200% 200%;
   animation: crystalRefract 30s ease-in-out infinite;
-  will-change: background-position;
-}
-
-.dark .crystal-refract {
-  background: linear-gradient(
-    120deg,
-    transparent 0%,
-    hsl(200 10% 70% / 0.03) 25%,
-    transparent 50%,
-    hsl(200 10% 60% / 0.02) 75%,
-    transparent 100%
-  );
-  background-size: 200% 200%;
+  will-change: opacity, filter;
 }
 
 .crystal-line-pulse {
   animation: crystalLinePulse 8s ease-in-out infinite;
+}
+
+.crystal-strand-glow {
+  animation: crystalStrandGlow 10s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.crystal-strand-glow-slow {
+  animation: crystalStrandGlowSlow 14s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.crystal-twinkle {
+  animation: crystalTwinkle 4s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+.crystal-glint {
+  animation: crystalGlint 3s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+.crystal-float {
+  animation: crystalFloat 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Custom Scrollbar - Crystal */
