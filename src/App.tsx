@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { MemberAuthProvider } from "@/contexts/MemberAuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import Gate from "./pages/Gate";
+import RequestInvitation from "./pages/RequestInvitation";
+import VerificationPending from "./pages/VerificationPending";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AdminLogin from "./pages/AdminLogin";
@@ -32,7 +35,13 @@ const App = () => (
           <AdminAuthProvider>
             <MemberAuthProvider>
               <Routes>
-                <Route path="/" element={<Index />} />
+                {/* Entry Experience */}
+                <Route path="/" element={<Gate />} />
+                <Route path="/request-invitation" element={<RequestInvitation />} />
+                <Route path="/verification-pending" element={<VerificationPending />} />
+                <Route path="/welcome" element={<Index />} />
+                
+                {/* Admin Routes */}
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/reset-password" element={<AdminResetPassword />} />
                 <Route path="/admin/setup-password" element={<AdminSetupPassword />} />
