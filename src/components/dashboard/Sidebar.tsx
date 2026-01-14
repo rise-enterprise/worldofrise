@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils';
 import { Brand } from '@/types/loyalty';
-import { useAdminAuthContext } from '@/contexts/AdminAuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,8 +20,9 @@ import {
   UtensilsCrossed,
   Sparkles,
   ShieldCheck,
-  LogOut,
   Bell,
+  BarChart3,
+  FileEdit,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -40,6 +40,13 @@ const brandFilters: { id: Brand; labelKey: string; icon: React.ElementType }[] =
   { id: 'sasso', labelKey: 'brands.sasso', icon: UtensilsCrossed },
 ];
 
+// Demo admin for open-access mode
+const demoAdmin = {
+  name: 'Administrator',
+  email: 'admin@rise.com',
+  role: 'super_admin' as const,
+};
+
 function SidebarContent({ 
   activeView, 
   setActiveView, 
@@ -47,23 +54,25 @@ function SidebarContent({
   setActiveBrand,
   onNavClick 
 }: SidebarProps & { onNavClick?: () => void }) {
-  const { admin, signOut } = useAdminAuthContext();
   const { t } = useTranslation();
   const { isRTL } = useLanguage();
-  const isSuperAdmin = admin?.role === 'super_admin';
+  const isSuperAdmin = demoAdmin.role === 'super_admin';
 
   const navigation = [
     { id: 'dashboard', labelKey: 'nav.overview', icon: LayoutDashboard },
     { id: 'guests', labelKey: 'nav.guests', icon: Users },
     { id: 'insights', labelKey: 'nav.aiInsights', icon: Sparkles },
     { id: 'privileges', labelKey: 'nav.privileges', icon: Gift },
+    { id: 'rewards', labelKey: 'nav.rewards', icon: Gift },
     { id: 'events', labelKey: 'nav.events', icon: Calendar },
+    { id: 'analytics', labelKey: 'nav.analytics', icon: BarChart3 },
     { id: 'notifications', labelKey: 'nav.notifications', icon: Bell },
     { id: 'settings', labelKey: 'nav.settings', icon: Settings },
   ];
 
   const superAdminNavigation = [
     { id: 'admins', labelKey: 'nav.adminUsers', icon: ShieldCheck },
+    { id: 'cms', labelKey: 'nav.cms', icon: FileEdit },
   ];
 
   const handleNavClick = (id: string) => {
@@ -164,24 +173,12 @@ function SidebarContent({
         )}
       </nav>
 
-      {/* User Info & Logout */}
+      {/* User Info */}
       <div className="p-5 border-t border-[rgba(217,222,231,0.08)] space-y-4">
-        {admin && (
-          <div className="px-2 py-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
-            <p className="text-sm font-medium text-foreground truncate tracking-refined">{admin.name}</p>
-            <p className="text-xs text-muted-foreground/60 truncate">{admin.email}</p>
-          </div>
-        )}
-        <button
-          onClick={signOut}
-          className={cn(
-            'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-300',
-            isRTL && 'flex-row-reverse'
-          )}
-        >
-          <LogOut className="h-4 w-4" />
-          <span className="tracking-refined">{t('common.signOut')}</span>
-        </button>
+        <div className="px-2 py-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+          <p className="text-sm font-medium text-foreground truncate tracking-refined">{demoAdmin.name}</p>
+          <p className="text-xs text-muted-foreground/60 truncate">{demoAdmin.email}</p>
+        </div>
       </div>
     </div>
   );

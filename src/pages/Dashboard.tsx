@@ -15,6 +15,9 @@ import { EventsView } from '@/components/dashboard/EventsView';
 import { NotificationsView } from '@/components/dashboard/NotificationsView';
 import { SettingsView } from '@/components/dashboard/SettingsView';
 import { AdminsView } from '@/components/dashboard/AdminsView';
+import { AnalyticsView } from '@/components/dashboard/AnalyticsView';
+import { RewardsManagement } from '@/components/dashboard/RewardsManagement';
+import { CMSView } from '@/components/dashboard/CMSView';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -54,18 +57,26 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Ambient background effect */}
-      <div className="fixed inset-0 pointer-events-none">
+      {/* Enhanced ambient background effect */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div 
-          className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full crystal-ambient-1"
+          className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full animate-pulse"
           style={{
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.02) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, hsl(var(--primary) / 0.03) 0%, transparent 70%)',
+            animationDuration: '8s',
           }}
         />
         <div 
-          className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full crystal-ambient-2"
+          className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full animate-pulse"
           style={{
-            background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, hsl(var(--burgundy) / 0.02) 0%, transparent 70%)',
+            animationDuration: '12s',
+          }}
+        />
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full"
+          style={{
+            background: 'radial-gradient(ellipse at center, hsl(var(--sapphire) / 0.01) 0%, transparent 50%)',
           }}
         />
       </div>
@@ -90,8 +101,16 @@ export default function Dashboard() {
         {activeView === 'dashboard' && (
           isLoading ? (
             <div className="p-4 md:p-8 space-y-4">
-              <Skeleton className="h-32 w-full" />
-              <Skeleton className="h-64 w-full" />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} className="h-32 bg-[#0E1116]" />
+                ))}
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} className="h-64 bg-[#0E1116]" />
+                ))}
+              </div>
             </div>
           ) : (
             <Overview 
@@ -122,13 +141,19 @@ export default function Dashboard() {
 
         {activeView === 'privileges' && <PrivilegesView />}
 
+        {activeView === 'rewards' && <RewardsManagement />}
+
         {activeView === 'events' && <EventsView />}
+
+        {activeView === 'analytics' && <AnalyticsView />}
 
         {activeView === 'notifications' && <NotificationsView />}
 
         {activeView === 'settings' && <SettingsView />}
 
         {activeView === 'admins' && <AdminsView />}
+
+        {activeView === 'cms' && <CMSView />}
       </main>
     </div>
   );
