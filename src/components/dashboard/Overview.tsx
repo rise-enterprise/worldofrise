@@ -15,10 +15,8 @@ interface OverviewProps {
 }
 
 export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
-  // Filter VIP guests (top tiers)
-  const vipGuests = guests.filter(g => 
-    g.tier === 'black' || g.tier === 'inner-circle' || g.tier === 'elite'
-  ).slice(0, 4);
+  // Guests are pre-filtered VIP members from useVIPGuests hook
+  const vipGuests = guests.slice(0, 4);
 
   return (
     <div className="p-4 md:p-8 space-y-8 md:space-y-10">

@@ -298,6 +298,91 @@ async function fetchDemoMember(): Promise<Guest | null> {
   };
 }
 
+// Fetch VIP guests (Black, Platinum, Gold tiers) with limit for Overview
+async function fetchVIPGuests(): Promise<Guest[]> {
+  // Get tier IDs for VIP tiers (DB names: Black, Platinum, Gold)
+  const { data: vipTiers, error: tiersError } = await supabase
+    .from('tiers')
+    .select('id, name')
+    .in('name', ['Black', 'Platinum', 'Gold']);
+
+  if (tiersError) throw tiersError;
+  
+  const vipTierIds = vipTiers?.map(t => t.id) || [];
+  
+  if (vipTierIds.length === 0) {
+    return [];
+  }
+
+  // Fetch member_tiers for VIP members
+  const { data: memberTiers, error: memberTiersError } = await supabase
+    .from('member_tiers')
+    .select('member_id')
+    .in('tier_id', vipTierIds)
+    .limit(10);
+
+  if (memberTiersError) throw memberTiersError;
+  
+  const memberIds = memberTiers?.map(mt => mt.member_id) || [];
+  
+  if (memberIds.length === 0) {
+    return [];
+  }
+
+  // Fetch those specific members with their tiers
+  const { data: members, error: membersError } = await supabase
+    .from('members')
+    .select(`
+      *,
+      member_tiers (
+        tier_id,
+        tiers (
+          name,
+          color
+        )
+      )
+    `)
+    .in('id', memberIds)
+    .limit(10);
+
+  if (membersError) throw membersError;
+
+  // Transform to Guest format (no need to fetch visits for VIP cards)
+  return (members || []).map((member: any) => {
+    const tierInfo = member.member_tiers?.[0]?.tiers;
+    const tierName = tierInfo?.name || 'Initiation';
+
+    return {
+      id: member.id,
+      name: member.full_name,
+      email: member.email,
+      phone: member.phone,
+      country: mapDbCityToCountry(member.city),
+      tier: mapDbTierToTier(tierName),
+      tierName: tierName,
+      totalVisits: member.total_visits || 0,
+      lifetimeVisits: member.total_visits || 0,
+      lastVisit: new Date(member.created_at || Date.now()),
+      joinedAt: new Date(member.created_at || Date.now()),
+      favoriteBrand: mapDbBrandToBrand(member.brand_affinity),
+      visits: [],
+      tags: [],
+      notes: member.notes || undefined,
+      avatarUrl: member.avatar_url || undefined,
+      totalPoints: member.total_points || 0,
+      status: member.status || 'active',
+    };
+  });
+}
+
+export function useVIPGuests() {
+  return useQuery({
+    queryKey: ['vip-guests'],
+    queryFn: fetchVIPGuests,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
 export function useDemoMember() {
   return useQuery({
     queryKey: ['demo-member'],
