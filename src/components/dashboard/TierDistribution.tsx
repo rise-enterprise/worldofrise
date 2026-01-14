@@ -13,16 +13,17 @@ export function TierDistribution({ distribution }: TierDistributionProps) {
   const total = Object.values(distribution).reduce((a, b) => a + b, 0);
 
   return (
-    <Card variant="crystal" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+    <Card variant="obsidian" className="animate-slide-up" style={{ animationDelay: '200ms' }}>
       <CardHeader>
-        <CardTitle className="text-lg tracking-crystal">Tier Distribution</CardTitle>
-        <p className="text-xs text-muted-foreground tracking-refined">Member journey across privilege levels</p>
+        <CardTitle className="text-lg tracking-wide font-display">Privilege Hierarchy</CardTitle>
+        <p className="text-xs text-muted-foreground/60 tracking-refined">Member journey across privilege levels</p>
       </CardHeader>
       <CardContent className="space-y-5">
         {tierOrder.map((tier, index) => {
           const config = TIER_CONFIG[tier];
           const count = distribution[tier];
           const percentage = Math.round((count / total) * 100);
+          const isTopTier = tier === 'black' || tier === 'inner-circle';
 
           return (
             <div 
@@ -35,20 +36,23 @@ export function TierDistribution({ distribution }: TierDistributionProps) {
                   <Badge variant={tier as any} className="text-xs tracking-refined">
                     {config.displayName}
                   </Badge>
-                  <span className="text-xs text-muted-foreground hidden sm:inline font-body">
+                  <span className="text-xs text-muted-foreground/50 hidden sm:inline font-body">
                     {config.arabicName}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-foreground font-body">{count}</span>
-                  <span className="text-xs text-muted-foreground font-body">({percentage}%)</span>
+                  <span className={cn(
+                    "text-sm font-medium font-display",
+                    isTopTier ? "text-primary" : "text-foreground"
+                  )}>{count}</span>
+                  <span className="text-xs text-muted-foreground/50 font-body">({percentage}%)</span>
                 </div>
               </div>
-              <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden">
                 <div
                   className={cn(
-                    'h-full rounded-full transition-all duration-1000 ease-crystal',
-                    tier === 'black' ? 'bg-tier-black' :
+                    'h-full rounded-full transition-all duration-1000 ease-out',
+                    tier === 'black' ? 'bg-gradient-to-r from-primary to-primary/60' :
                     tier === 'inner-circle' ? 'bg-tier-inner-circle' :
                     tier === 'elite' ? 'bg-tier-elite' :
                     tier === 'connoisseur' ? 'bg-tier-connoisseur' :
