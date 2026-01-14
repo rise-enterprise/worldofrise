@@ -110,7 +110,7 @@ function SidebarContent({
             <Sparkles className="h-4 w-4 text-primary animate-pulse" style={{ animationDuration: '3s', animationDelay: '1.5s' }} />
           </div>
           <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-          <p className="text-[10px] tracking-[0.4em] text-muted-foreground/60 uppercase font-body mt-2">Administration</p>
+          <p className="text-[10px] tracking-[0.4em] text-muted-foreground/60 uppercase font-body mt-2">Holding</p>
         </div>
       </div>
 
