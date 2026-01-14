@@ -5,60 +5,84 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium font-body tracking-refined transition-all duration-220 ease-luxury focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium font-body tracking-refined transition-all duration-280 ease-luxury focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // Default — Subtle noir
-        default: "bg-secondary text-foreground border border-border/50 hover:border-primary/30 hover:bg-secondary/80",
+        // Default — Crystal noir
+        default: [
+          "bg-secondary text-foreground",
+          "border border-border/50",
+          "shadow-[inset_0_1px_0_0_hsl(var(--crystal-silver)/0.05)]",
+          "hover:border-primary/30 hover:bg-secondary/80",
+          "hover:shadow-[inset_0_1px_0_0_hsl(var(--gold)/0.08)]",
+        ].join(" "),
         
-        // VIP Gold Primary — Metallic gradient with bevel
+        // VIP Gold Primary — Metallic gold with bevel and prestige
         "vip-gold": [
-          "bg-gradient-to-b from-primary via-primary/90 to-primary/80",
+          "bg-gradient-to-b from-primary via-primary/95 to-primary/85",
           "text-primary-foreground font-semibold tracking-ceremonial",
-          "border border-primary/40",
-          "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_4px_12px_rgba(200,162,74,0.3)]",
-          "hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_6px_20px_rgba(200,162,74,0.4)]",
-          "hover:from-primary/95 hover:to-primary/85",
+          "border border-primary/50",
+          "shadow-[inset_0_1px_0_0_hsl(var(--gold-light)/0.3),inset_0_-1px_0_0_hsl(var(--gold-shadow)/0.3),0_4px_16px_-4px_hsl(var(--gold)/0.4)]",
+          "hover:shadow-[inset_0_1px_0_0_hsl(var(--gold-light)/0.4),inset_0_-1px_0_0_hsl(var(--gold-shadow)/0.3),0_8px_24px_-4px_hsl(var(--gold)/0.5)]",
+          "hover:from-primary hover:to-primary/90",
+          "active:shadow-[inset_0_2px_4px_0_hsl(var(--gold-shadow)/0.4)]",
         ].join(" "),
         
         // Luxury (legacy) — Same as vip-gold
         luxury: [
-          "bg-gradient-to-b from-primary via-primary/90 to-primary/80",
+          "bg-gradient-to-b from-primary via-primary/95 to-primary/85",
           "text-primary-foreground font-semibold tracking-ceremonial",
-          "border border-primary/40",
-          "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15),0_4px_12px_rgba(200,162,74,0.3)]",
-          "hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_6px_20px_rgba(200,162,74,0.4)]",
-          "hover:from-primary/95 hover:to-primary/85",
+          "border border-primary/50",
+          "shadow-[inset_0_1px_0_0_hsl(var(--gold-light)/0.3),0_4px_16px_-4px_hsl(var(--gold)/0.4)]",
+          "hover:shadow-[inset_0_1px_0_0_hsl(var(--gold-light)/0.4),0_8px_24px_-4px_hsl(var(--gold)/0.5)]",
         ].join(" "),
         
-        // Crystal (legacy) — Same as noir
+        // Crystal — Glass button with refraction
         crystal: [
-          "bg-card text-foreground",
+          "bg-card/80 backdrop-blur-xl text-foreground",
           "border border-border/60",
+          "shadow-[inset_0_1px_0_0_hsl(var(--crystal-silver)/0.08)]",
           "hover:border-primary/40",
-          "hover:shadow-[inset_0_0_30px_rgba(200,162,74,0.03)]",
+          "hover:bg-card/90",
+          "hover:shadow-[inset_0_1px_0_0_hsl(var(--gold)/0.1),inset_0_0_30px_-10px_hsl(var(--gold)/0.03)]",
         ].join(" "),
         
-        // Noir Secondary — Crystal border with inner glow
+        // Noir — Deep obsidian with subtle gold on hover
         noir: [
           "bg-card text-foreground",
           "border border-border/60",
+          "shadow-[inset_0_1px_0_0_hsl(var(--crystal-silver)/0.05)]",
           "hover:border-primary/40",
-          "hover:shadow-[inset_0_0_30px_rgba(200,162,74,0.03)]",
+          "hover:shadow-[inset_0_0_30px_-10px_hsl(var(--gold)/0.03)]",
         ].join(" "),
         
         // Destructive
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        destructive: [
+          "bg-destructive text-destructive-foreground",
+          "hover:bg-destructive/90",
+          "shadow-[0_4px_12px_-4px_hsl(0_62%_30%/0.4)]",
+        ].join(" "),
         
         // Outline — Crystal silver border
-        outline: "border border-border/60 bg-transparent text-foreground hover:bg-card hover:border-primary/30",
+        outline: [
+          "border border-border/60 bg-transparent text-foreground",
+          "hover:bg-card/50 hover:border-primary/30",
+          "hover:shadow-[inset_0_0_20px_-10px_hsl(var(--gold)/0.02)]",
+        ].join(" "),
         
         // Secondary
-        secondary: "bg-secondary text-secondary-foreground border border-border/30 hover:bg-secondary/80",
+        secondary: [
+          "bg-secondary text-secondary-foreground",
+          "border border-border/30",
+          "hover:bg-secondary/80",
+        ].join(" "),
         
         // Ghost — Subtle hover
-        ghost: "text-muted-foreground hover:bg-card hover:text-foreground",
+        ghost: [
+          "text-muted-foreground",
+          "hover:bg-card/50 hover:text-foreground",
+        ].join(" "),
         
         // Link — Gold underline on hover
         link: "text-primary underline-offset-4 hover:underline",
@@ -77,15 +101,26 @@ const buttonVariants = cva(
         
         // Burgundy — Velvet accent
         burgundy: [
-          "bg-burgundy text-foreground",
+          "bg-gradient-to-b from-burgundy to-burgundy/80",
+          "text-foreground",
           "border border-burgundy/60",
-          "hover:bg-burgundy/80",
+          "shadow-[inset_0_1px_0_0_hsl(var(--burgundy-light)/0.2)]",
+          "hover:from-burgundy/90 hover:to-burgundy/70",
+        ].join(" "),
+        
+        // Sapphire — Deep blue
+        sapphire: [
+          "bg-gradient-to-b from-sapphire to-sapphire/80",
+          "text-foreground",
+          "border border-sapphire/60",
+          "shadow-[inset_0_1px_0_0_hsl(var(--sapphire-light)/0.2)]",
+          "hover:from-sapphire/90 hover:to-sapphire/70",
         ].join(" "),
       },
       size: {
         default: "h-10 px-5 py-2",
         sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-12 rounded-lg px-8 text-base",
+        lg: "h-12 rounded-xl px-8 text-base",
         xl: "h-14 rounded-xl px-10 text-lg tracking-ceremonial",
         icon: "h-9 w-9",
       },
