@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { DashboardMetrics } from '@/types/loyalty';
+import { DashboardMetrics, mapDbTierToTier } from '@/types/loyalty';
 
 async function fetchDashboardMetrics(): Promise<DashboardMetrics> {
   // Fetch total members count
@@ -65,12 +65,9 @@ async function fetchDashboardMetrics(): Promise<DashboardMetrics> {
   };
 
   tierData?.forEach(mt => {
-    const tierName = (mt.tiers as any)?.name?.toLowerCase().replace(/\s+/g, '-') || 'initiation';
-    if (tierName === 'rise-black') {
-      tierDistribution['black'] = (tierDistribution['black'] || 0) + 1;
-    } else if (tierDistribution[tierName] !== undefined) {
-      tierDistribution[tierName]++;
-    }
+    const tierName = (mt.tiers as any)?.name || '';
+    const mappedTier = mapDbTierToTier(tierName);
+    tierDistribution[mappedTier]++;
   });
 
   // Members without tier assignment are in initiation
