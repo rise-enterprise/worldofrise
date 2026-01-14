@@ -4,16 +4,39 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const cardVariants = cva(
-  "rounded-xl text-card-foreground transition-all duration-700 ease-crystal",
+  "rounded-xl text-card-foreground transition-all duration-300 ease-luxury",
   {
     variants: {
       variant: {
+        // Default — Obsidian surface
         default: "bg-card border border-border/50 shadow-glass",
-        luxury: "glass-panel-heavy light-shift",
+        
+        // Luxury (legacy) — same as obsidian
+        luxury: "bg-gradient-to-b from-card to-background border border-border/30 shadow-obsidian hover:border-primary/25 hover:shadow-obsidian-lg",
+        
+        // Glass — Subtle transparency
         glass: "bg-card/95 backdrop-blur-xl border border-border/40 shadow-glass",
+        
+        // Metric — For dashboard metrics
         metric: "glass-panel light-shift",
+        
+        // Elevated — Higher prominence
         elevated: "bg-card border border-border/40 shadow-crystal",
+        
+        // Crystal (legacy) — Same as obsidian
         crystal: "bg-card/98 backdrop-blur-2xl border border-border/30 shadow-crystal light-shift",
+        
+        // Obsidian — Deep noir with inner light on hover
+        obsidian: "bg-gradient-to-b from-card to-background border border-border/30 shadow-obsidian hover:border-primary/25 hover:shadow-obsidian-lg",
+        
+        // VIP — Gold border glow
+        vip: "bg-card border border-primary/30 shadow-[0_4px_24px_-4px_rgba(200,162,74,0.15)] hover:border-primary/50 hover:shadow-gold-glow",
+        
+        // Medallion — Baroque inspired
+        medallion: "bg-gradient-to-b from-card via-card to-muted border border-primary/40 shadow-medallion relative overflow-hidden",
+        
+        // Burgundy — Velvet accent
+        burgundy: "bg-gradient-to-b from-burgundy/20 to-card border border-burgundy/30",
       },
     },
     defaultVariants: {
@@ -46,7 +69,7 @@ CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("font-display text-xl font-medium leading-none tracking-crystal", className)} {...props} />
+    <h3 ref={ref} className={cn("font-display text-xl font-medium leading-none tracking-refined", className)} {...props} />
   ),
 );
 CardTitle.displayName = "CardTitle";
