@@ -16,6 +16,8 @@ import MemberPortal from "./pages/MemberPortal";
 import MemberHistory from "./pages/MemberHistory";
 import MemberEvents from "./pages/MemberEvents";
 import MemberProfileEdit from "./pages/MemberProfileEdit";
+import MemberRewards from "./pages/MemberRewards";
+import MemberExperiences from "./pages/MemberExperiences";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +47,8 @@ const App = () => (
             <Route path="/member/history" element={<MemberHistory />} />
             <Route path="/member/events" element={<MemberEvents />} />
             <Route path="/member/profile/edit" element={<MemberProfileEdit />} />
+            <Route path="/member/rewards" element={<MemberRewards />} />
+            <Route path="/member/experiences" element={<MemberExperiences />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
