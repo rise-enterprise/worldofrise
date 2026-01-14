@@ -1,76 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Calendar, MapPin, Clock, Users, Coffee, UtensilsCrossed, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-
-interface MemberEvent {
-  id: string;
-  title: string;
-  titleArabic: string;
-  date: Date;
-  time: string;
-  location: string;
-  brand: 'noir' | 'sasso';
-  tier: string;
-  capacity: number;
-  registered: number;
-  description: string;
-  isRegistered: boolean;
-}
-
-const memberEvents: MemberEvent[] = [
-  {
-    id: '1',
-    title: 'Literary Evening with Local Authors',
-    titleArabic: 'أمسية أدبية مع كتاب محليين',
-    date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    time: '7:00 PM',
-    location: 'NOIR Café, The Pearl',
-    brand: 'noir',
-    tier: 'Élite+',
-    capacity: 30,
-    registered: 24,
-    description: 'An intimate evening of poetry and prose with celebrated Qatari authors.',
-    isRegistered: true,
-  },
-  {
-    id: '2',
-    title: 'SASSO Chef Table Experience',
-    titleArabic: 'تجربة طاولة الشيف في ساسو',
-    date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-    time: '8:00 PM',
-    location: 'SASSO, Riyadh',
-    brand: 'sasso',
-    tier: 'Inner Circle+',
-    capacity: 12,
-    registered: 10,
-    description: 'Exclusive 8-course tasting menu crafted by our Executive Chef.',
-    isRegistered: false,
-  },
-  {
-    id: '3',
-    title: 'Coffee Origins: Ethiopia',
-    titleArabic: 'أصول القهوة: إثيوبيا',
-    date: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
-    time: '10:00 AM',
-    location: 'NOIR Café, Lusail',
-    brand: 'noir',
-    tier: 'Connoisseur+',
-    capacity: 20,
-    registered: 8,
-    description: 'A curated tasting journey through Ethiopian coffee varieties.',
-    isRegistered: false,
-  },
-];
+import { useMemberEvents, MemberEvent } from '@/hooks/useExperiences';
 
 export default function MemberEvents() {
   const navigate = useNavigate();
-  const [events, setEvents] = useState(memberEvents);
+  const { data: dbEvents = [], isLoading } = useMemberEvents();
+  const [events, setEvents] = useState<MemberEvent[]>([]);
+
+  // Sync database events with local state for registration tracking
+  useEffect(() => {
+    if (dbEvents.length > 0) {
+      setEvents(dbEvents);
+    }
+  }, [dbEvents]);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', { 
@@ -101,6 +51,25 @@ export default function MemberEvents() {
 
   const registeredEvents = events.filter(e => e.isRegistered);
   const availableEvents = events.filter(e => !e.isRegistered);
+
+  if (isLoading) {
+    return (
+      <CrystalPageWrapper variant="subtle" sparkleCount={15}>
+        <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-primary/10">
+          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-6 w-24" />
+            <div className="w-16" />
+          </div>
+        </header>
+        <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-48 w-full" />
+          ))}
+        </div>
+      </CrystalPageWrapper>
+    );
+  }
 
   return (
     <CrystalPageWrapper variant="subtle" sparkleCount={15}>
@@ -193,6 +162,14 @@ export default function MemberEvents() {
             <Calendar className="h-5 w-5 text-primary" />
             Upcoming Events
           </h2>
+          {availableEvents.length === 0 && events.length === 0 && (
+            <Card className="crystal-panel">
+              <CardContent className="p-8 text-center">
+                <Calendar className="h-12 w-12 mx-auto text-primary/40 mb-4" />
+                <p className="text-muted-foreground">No upcoming events at the moment</p>
+              </CardContent>
+            </Card>
+          )}
           <div className="space-y-4">
             {availableEvents.map((event, index) => (
               <Card 

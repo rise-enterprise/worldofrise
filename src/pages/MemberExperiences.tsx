@@ -6,77 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Calendar, MapPin, Users, Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface Experience {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  capacity: number;
-  spotsLeft: number;
-  tier: 'crystal' | 'onyx' | 'obsidian' | 'royal';
-  brand: 'noir' | 'sasso' | 'both';
-  category: 'dinner' | 'tasting' | 'chefs_table' | 'gala';
-}
-
-const mockExperiences: Experience[] = [
-  {
-    id: '1',
-    title: 'Midnight Tasting Ritual',
-    description: 'An exclusive after-hours tasting experience featuring rare vintages and secret menu items, hosted by our Master Sommelier.',
-    date: '2026-02-15',
-    time: '22:00',
-    location: 'NOIR Private Cellar',
-    capacity: 12,
-    spotsLeft: 4,
-    tier: 'obsidian',
-    brand: 'noir',
-    category: 'tasting',
-  },
-  {
-    id: '2',
-    title: 'Chef\'s Table: Italian Odyssey',
-    description: 'A seven-course journey through the regions of Italy, prepared tableside by Chef Marco Bellini.',
-    date: '2026-02-20',
-    time: '19:30',
-    location: 'SASSO Private Dining',
-    capacity: 8,
-    spotsLeft: 2,
-    tier: 'royal',
-    brand: 'sasso',
-    category: 'chefs_table',
-  },
-  {
-    id: '3',
-    title: 'Members\' Evening Soirée',
-    description: 'An intimate gathering for our distinguished members, featuring live jazz, fine spirits, and culinary delights.',
-    date: '2026-02-28',
-    time: '20:00',
-    location: 'RISE Private Lounge',
-    capacity: 30,
-    spotsLeft: 12,
-    tier: 'onyx',
-    brand: 'both',
-    category: 'dinner',
-  },
-  {
-    id: '4',
-    title: 'Spring Gala 2026',
-    description: 'Our annual celebration of excellence, featuring a black-tie dinner, world-renowned entertainment, and exclusive announcements.',
-    date: '2026-03-21',
-    time: '18:00',
-    location: 'The Grand Ballroom',
-    capacity: 150,
-    spotsLeft: 45,
-    tier: 'crystal',
-    brand: 'both',
-    category: 'gala',
-  },
-];
+import { useExperiences, Experience } from '@/hooks/useExperiences';
 
 const tierColors = {
   crystal: 'border-gray-400/30 bg-gray-500/10',
@@ -93,6 +26,7 @@ const categoryLabels = {
 };
 
 export default function MemberExperiences() {
+  const { data: experiences = [], isLoading } = useExperiences();
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
   const [isRsvpDialogOpen, setIsRsvpDialogOpen] = useState(false);
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
@@ -121,6 +55,22 @@ export default function MemberExperiences() {
     });
   };
 
+  if (isLoading) {
+    return (
+      <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <Skeleton className="h-10 w-32 mb-8" />
+          <Skeleton className="h-24 w-full max-w-xl mx-auto mb-12" />
+          <div className="space-y-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-40 w-full" />
+            ))}
+          </div>
+        </div>
+      </CrystalPageWrapper>
+    );
+  }
+
   return (
     <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -145,81 +95,90 @@ export default function MemberExperiences() {
         </div>
 
         {/* Experiences List */}
-        <div className="space-y-6">
-          {mockExperiences.map((experience, index) => (
-            <motion.div
-              key={experience.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-            >
-              <Card 
-                className={cn(
-                  "crystal-panel overflow-hidden hover:border-primary/30 transition-all duration-300 cursor-pointer group",
-                  tierColors[experience.tier]
-                )}
-                onClick={() => handleRsvp(experience)}
+        {experiences.length === 0 ? (
+          <Card className="crystal-panel max-w-md mx-auto">
+            <CardContent className="p-8 text-center">
+              <Calendar className="h-12 w-12 mx-auto text-primary/40 mb-4" />
+              <p className="text-muted-foreground">No upcoming experiences at the moment</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-6">
+            {experiences.map((experience, index) => (
+              <motion.div
+                key={experience.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
               >
-                <CardContent className="p-0">
-                  <div className="flex flex-col md:flex-row">
-                    {/* Date Section */}
-                    <div className="md:w-48 p-6 bg-background/50 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-primary/10">
-                      <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
-                        {new Date(experience.date).toLocaleDateString('en-US', { month: 'short' })}
-                      </p>
-                      <p className="font-display text-4xl text-primary mt-1">
-                        {new Date(experience.date).getDate()}
-                      </p>
-                      <p className="text-sm text-muted-foreground/60 mt-1">
-                        {experience.time}
-                      </p>
-                    </div>
+                <Card 
+                  className={cn(
+                    "crystal-panel overflow-hidden hover:border-primary/30 transition-all duration-300 cursor-pointer group",
+                    tierColors[experience.tier]
+                  )}
+                  onClick={() => handleRsvp(experience)}
+                >
+                  <CardContent className="p-0">
+                    <div className="flex flex-col md:flex-row">
+                      {/* Date Section */}
+                      <div className="md:w-48 p-6 bg-background/50 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-primary/10">
+                        <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
+                          {new Date(experience.date).toLocaleDateString('en-US', { month: 'short' })}
+                        </p>
+                        <p className="font-display text-4xl text-primary mt-1">
+                          {new Date(experience.date).getDate()}
+                        </p>
+                        <p className="text-sm text-muted-foreground/60 mt-1">
+                          {experience.time}
+                        </p>
+                      </div>
 
-                    {/* Content Section */}
-                    <div className="flex-1 p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="outline" className="text-xs border-primary/30">
-                              {categoryLabels[experience.category]}
-                            </Badge>
-                            <Badge variant="outline" className="text-xs capitalize border-primary/30">
-                              {experience.tier}+
-                            </Badge>
-                            {experience.brand !== 'both' && (
-                              <Badge variant="outline" className="text-xs uppercase border-primary/30">
-                                {experience.brand}
+                      {/* Content Section */}
+                      <div className="flex-1 p-6">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="outline" className="text-xs border-primary/30">
+                                {categoryLabels[experience.category]}
                               </Badge>
-                            )}
+                              <Badge variant="outline" className="text-xs capitalize border-primary/30">
+                                {experience.tier}+
+                              </Badge>
+                              {experience.brand !== 'both' && (
+                                <Badge variant="outline" className="text-xs uppercase border-primary/30">
+                                  {experience.brand}
+                                </Badge>
+                              )}
+                            </div>
+                            <h3 className="font-display text-xl text-foreground group-hover:text-primary transition-colors tracking-crystal">
+                              {experience.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground/60 mt-2 line-clamp-2">
+                              {experience.description}
+                            </p>
                           </div>
-                          <h3 className="font-display text-xl text-foreground group-hover:text-primary transition-colors tracking-crystal">
-                            {experience.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground/60 mt-2 line-clamp-2">
-                            {experience.description}
-                          </p>
+                          <ChevronRight className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
                         </div>
-                        <ChevronRight className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
-                      </div>
 
-                      {/* Meta Info */}
-                      <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground/60">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4 text-primary" />
-                          {experience.location}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4 text-primary" />
-                          {experience.spotsLeft} of {experience.capacity} spots left
+                        {/* Meta Info */}
+                        <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground/60">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4 text-primary" />
+                            {experience.location}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users className="h-4 w-4 text-primary" />
+                            {experience.spotsLeft} of {experience.capacity} spots left
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* RSVP Dialog */}
