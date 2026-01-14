@@ -3,7 +3,6 @@ import { useMemberAuthContext } from '@/contexts/MemberAuthContext';
 import { MemberCard } from '@/components/member/MemberCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
-import { CrystalBackground } from '@/components/effects/CrystalBackground';
 
 export default function MemberPortal() {
   const { member: memberAuth } = useMemberAuthContext();
@@ -11,25 +10,39 @@ export default function MemberPortal() {
   
   if (isLoading) {
     return (
-      <CrystalBackground variant="subtle" className="min-h-screen p-4">
-        <Skeleton className="h-64 w-full mb-4" />
-        <Skeleton className="h-32 w-full mb-4" />
-        <Skeleton className="h-32 w-full" />
-      </CrystalBackground>
+      <div className="min-h-screen bg-noir-black p-4">
+        <div className="max-w-md mx-auto space-y-4 pt-8">
+          <Skeleton className="h-64 w-full bg-noir-surface" />
+          <Skeleton className="h-32 w-full bg-noir-surface" />
+          <Skeleton className="h-32 w-full bg-noir-surface" />
+        </div>
+      </div>
     );
   }
 
   if (!member) {
     return (
-      <CrystalBackground variant="subtle" className="min-h-screen flex items-center justify-center">
-        <Card className="bg-card/50 border-border/50">
+      <div className="min-h-screen bg-noir-black flex items-center justify-center p-4">
+        <Card variant="obsidian" className="max-w-md w-full">
           <CardContent className="p-8 text-center">
-            <p className="text-muted-foreground">No member data available</p>
+            <p className="text-muted-foreground tracking-wide">No member data available</p>
           </CardContent>
         </Card>
-      </CrystalBackground>
+      </div>
     );
   }
 
-  return <MemberCard guest={member} />;
+  return (
+    <div className="min-h-screen bg-noir-black relative overflow-hidden">
+      {/* Ambient Background */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gold/5 blur-[120px] rounded-full" />
+        <div className="absolute bottom-1/4 right-0 w-[400px] h-[300px] bg-burgundy/5 blur-[100px] rounded-full" />
+      </div>
+
+      <div className="relative z-10">
+        <MemberCard guest={member} />
+      </div>
+    </div>
+  );
 }
