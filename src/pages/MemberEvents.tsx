@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Calendar, MapPin, Clock, Users, Coffee, UtensilsCrossed, Check } from 'lucide-react';
@@ -102,20 +103,20 @@ export default function MemberEvents() {
   const availableEvents = events.filter(e => !e.isRegistered);
 
   return (
-    <div className="min-h-screen bg-gradient-luxury">
+    <CrystalPageWrapper variant="subtle" sparkleCount={15}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/30">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-primary/10">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => navigate('/member')}
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-primary"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="font-display text-lg font-semibold text-foreground">Events</h1>
+          <h1 className="font-display text-lg font-semibold text-foreground tracking-crystal">Events</h1>
           <div className="w-16" />
         </div>
       </header>
@@ -132,22 +133,24 @@ export default function MemberEvents() {
               {registeredEvents.map((event) => (
                 <Card 
                   key={event.id}
-                  className="bg-card border-primary/30 overflow-hidden"
+                  className="crystal-panel-gold overflow-hidden"
                 >
                   <div className={cn(
                     'h-1',
-                    event.brand === 'noir' ? 'bg-foreground' : 'bg-sasso-accent'
+                    event.brand === 'noir' ? 'bg-foreground' : 'bg-primary'
                   )} />
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className={cn(
-                        'w-12 h-12 rounded-xl flex items-center justify-center shrink-0',
-                        event.brand === 'noir' ? 'bg-foreground/10' : 'bg-sasso-accent/10'
+                        'w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border',
+                        event.brand === 'noir' 
+                          ? 'bg-foreground/10 border-foreground/20' 
+                          : 'bg-primary/10 border-primary/20'
                       )}>
                         {event.brand === 'noir' ? (
                           <Coffee className="h-6 w-6 text-foreground" />
                         ) : (
-                          <UtensilsCrossed className="h-6 w-6 text-sasso-accent" />
+                          <UtensilsCrossed className="h-6 w-6 text-primary" />
                         )}
                       </div>
                       <div className="flex-1">
@@ -155,15 +158,15 @@ export default function MemberEvents() {
                         <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
                         <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
+                            <Calendar className="h-3 w-3 text-primary" />
                             {formatDate(event.date)}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
+                            <Clock className="h-3 w-3 text-primary" />
                             {event.time}
                           </span>
                           <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
+                            <MapPin className="h-3 w-3 text-primary" />
                             {event.location}
                           </span>
                         </div>
@@ -172,7 +175,7 @@ export default function MemberEvents() {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="w-full mt-4"
+                      className="w-full mt-4 border-primary/30"
                       onClick={() => handleRegister(event.id)}
                     >
                       Cancel Registration
@@ -194,49 +197,51 @@ export default function MemberEvents() {
             {availableEvents.map((event, index) => (
               <Card 
                 key={event.id}
-                className="bg-card/50 border-border/50 overflow-hidden animate-slide-up"
+                className="crystal-panel overflow-hidden animate-slide-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className={cn(
                   'h-1',
-                  event.brand === 'noir' ? 'bg-foreground' : 'bg-sasso-accent'
+                  event.brand === 'noir' ? 'bg-foreground' : 'bg-primary'
                 )} />
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className={cn(
-                      'w-12 h-12 rounded-xl flex items-center justify-center shrink-0',
-                      event.brand === 'noir' ? 'bg-foreground/10' : 'bg-sasso-accent/10'
+                      'w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border',
+                      event.brand === 'noir' 
+                        ? 'bg-foreground/10 border-foreground/20' 
+                        : 'bg-primary/10 border-primary/20'
                     )}>
                       {event.brand === 'noir' ? (
                         <Coffee className="h-6 w-6 text-foreground" />
                       ) : (
-                        <UtensilsCrossed className="h-6 w-6 text-sasso-accent" />
+                        <UtensilsCrossed className="h-6 w-6 text-primary" />
                       )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <h3 className="font-medium text-foreground">{event.title}</h3>
-                        <Badge variant="outline" className="text-xs shrink-0">{event.tier}</Badge>
+                        <Badge variant="outline" className="text-xs shrink-0 border-primary/30">{event.tier}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">{event.description}</p>
                       <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
+                          <Calendar className="h-3 w-3 text-primary" />
                           {formatDate(event.date)}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
+                          <Clock className="h-3 w-3 text-primary" />
                           {event.time}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
+                          <Users className="h-3 w-3 text-primary" />
                           {event.registered}/{event.capacity}
                         </span>
                       </div>
                     </div>
                   </div>
                   <Button 
-                    variant="luxury" 
+                    variant="vip-gold" 
                     size="sm" 
                     className="w-full mt-4"
                     onClick={() => handleRegister(event.id)}
@@ -250,6 +255,6 @@ export default function MemberEvents() {
           </div>
         </div>
       </div>
-    </div>
+    </CrystalPageWrapper>
   );
 }

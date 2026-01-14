@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { CrystalMedallion } from '@/components/ui/crystal-medallion';
+import { CrystalEmblem } from '@/components/effects/CrystalEmblem';
 import { Button } from '@/components/ui/button';
 import { useMembers } from '@/hooks/useMembers';
 import { Sparkles } from 'lucide-react';
@@ -14,7 +16,6 @@ export default function MemberWelcome() {
   const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
-    // Stagger the reveal animation
     const contentTimer = setTimeout(() => setShowContent(true), 500);
     const buttonTimer = setTimeout(() => setShowButton(true), 1500);
     
@@ -33,85 +34,33 @@ export default function MemberWelcome() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground tracking-refined">Preparing your experience...</p>
-        </motion.div>
-      </div>
+      <CrystalPageWrapper variant="tiffany" sparkleCount={25}>
+        <div className="flex items-center justify-center min-h-screen">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center"
+          >
+            <div className="w-16 h-16 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground tracking-refined">Preparing your experience...</p>
+          </motion.div>
+        </div>
+      </CrystalPageWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Ambient background effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Top gold glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 blur-[150px] rounded-full" />
-        
-        {/* Crystal vertical lines */}
-        {[...Array(5)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute top-0 w-px h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent"
-            style={{ left: `${20 + i * 15}%` }}
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 0.5, scaleY: 1 }}
-            transition={{ delay: 0.3 + i * 0.1, duration: 1.5 }}
-          />
-        ))}
-        
-        {/* Floating particles */}
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-primary/40"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.2, 0.6, 0.2],
-            }}
-            transition={{
-              duration: 4 + Math.random() * 2,
-              delay: Math.random() * 2,
-              repeat: Infinity,
-            }}
-          />
-        ))}
-      </div>
-
+    <CrystalPageWrapper variant="tiffany" sparkleCount={30}>
       {/* Main content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12">
-        {/* RISE Logo / Emblem */}
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
+        {/* RISE Crystal Emblem */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
           className="mb-8"
         >
-          <div className="relative">
-            {/* Outer glow ring */}
-            <div className="absolute inset-0 w-32 h-32 rounded-full bg-primary/20 blur-2xl animate-gentle-pulse" />
-            
-            {/* Crystal emblem */}
-            <div className="relative w-32 h-32 rounded-full border-2 border-primary/30 flex items-center justify-center bg-card/50 backdrop-blur-xl">
-              <span className="font-display text-4xl text-primary tracking-widest">R</span>
-              
-              {/* Rotating ring effect */}
-              <motion.div
-                className="absolute inset-0 rounded-full border border-primary/20"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              />
-            </div>
-          </div>
+          <CrystalEmblem size="lg" />
         </motion.div>
 
         <AnimatePresence>
@@ -181,6 +130,6 @@ export default function MemberWelcome() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </CrystalPageWrapper>
   );
 }

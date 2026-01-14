@@ -4,6 +4,7 @@ import { useMembers } from '@/hooks/useMembers';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { Overview } from '@/components/dashboard/Overview';
@@ -56,31 +57,7 @@ export default function Dashboard() {
   const isLoading = guestsLoading || metricsLoading;
 
   return (
-    <div className="min-h-screen bg-background relative">
-      {/* Enhanced ambient background effect */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div 
-          className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full animate-pulse"
-          style={{
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.03) 0%, transparent 70%)',
-            animationDuration: '8s',
-          }}
-        />
-        <div 
-          className="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 rounded-full animate-pulse"
-          style={{
-            background: 'radial-gradient(circle, hsl(var(--burgundy) / 0.02) 0%, transparent 70%)',
-            animationDuration: '12s',
-          }}
-        />
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full"
-          style={{
-            background: 'radial-gradient(ellipse at center, hsl(var(--sapphire) / 0.01) 0%, transparent 50%)',
-          }}
-        />
-      </div>
-
+    <CrystalPageWrapper variant="subtle" sparkleCount={10} showSparkles={!isMobile}>
       <Sidebar 
         activeView={activeView}
         setActiveView={setActiveView}
@@ -103,12 +80,12 @@ export default function Dashboard() {
             <div className="p-4 md:p-8 space-y-4">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="h-32 bg-[#0E1116]" />
+                  <Skeleton key={i} className="h-32 bg-card" />
                 ))}
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="h-64 bg-[#0E1116]" />
+                  <Skeleton key={i} className="h-64 bg-card" />
                 ))}
               </div>
             </div>
@@ -155,6 +132,6 @@ export default function Dashboard() {
 
         {activeView === 'cms' && <CMSView />}
       </main>
-    </div>
+    </CrystalPageWrapper>
   );
 }

@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useMembers } from '@/hooks/useMembers';
 import { useTiers } from '@/hooks/useTiers';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { CrystalMedallion } from '@/components/ui/crystal-medallion';
 import { PointsCounter } from '@/components/ui/points-counter';
-import { ProgressArc } from '@/components/ui/progress-arc';
 import { LuxuryTimeline } from '@/components/ui/luxury-timeline';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ConciergeChat } from '@/components/member/ConciergeChat';
@@ -27,7 +27,7 @@ import {
   MapPin,
   Gift
 } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 export default function MemberPortal() {
@@ -42,25 +42,27 @@ export default function MemberPortal() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-lg mx-auto space-y-6 pt-8">
+      <CrystalPageWrapper variant="subtle" sparkleCount={10}>
+        <div className="p-4 max-w-lg mx-auto space-y-6 pt-8">
           <Skeleton className="h-20 w-full rounded-2xl" />
           <Skeleton className="h-64 w-full rounded-2xl" />
           <Skeleton className="h-40 w-full rounded-2xl" />
         </div>
-      </div>
+      </CrystalPageWrapper>
     );
   }
 
   if (!member) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card variant="obsidian" className="max-w-md w-full">
-          <CardContent className="p-8 text-center">
-            <p className="text-muted-foreground tracking-wide">No member data available</p>
-          </CardContent>
-        </Card>
-      </div>
+      <CrystalPageWrapper variant="subtle" sparkleCount={10}>
+        <div className="flex items-center justify-center min-h-screen p-4">
+          <Card variant="obsidian" className="max-w-md w-full crystal-panel-gold">
+            <CardContent className="p-8 text-center">
+              <p className="text-muted-foreground tracking-wide">No member data available</p>
+            </CardContent>
+          </Card>
+        </div>
+      </CrystalPageWrapper>
     );
   }
 
@@ -102,13 +104,7 @@ export default function MemberPortal() {
   }));
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Ambient Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-1/4 right-0 w-[400px] h-[300px] bg-burgundy/5 blur-[100px] rounded-full" />
-      </div>
-
+    <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
       {/* Chat Overlay */}
       <ConciergeChat 
         open={showChat} 
@@ -118,7 +114,7 @@ export default function MemberPortal() {
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-sm glass-panel-heavy">
+        <DialogContent className="sm:max-w-sm crystal-panel-gold">
           <DialogHeader>
             <DialogTitle className="text-center font-display tracking-crystal">Your Member QR Code</DialogTitle>
           </DialogHeader>
@@ -155,7 +151,7 @@ export default function MemberPortal() {
       </Dialog>
 
       {/* Main Content */}
-      <div className="relative z-10 p-4 max-w-lg mx-auto space-y-6 pb-24">
+      <div className="p-4 max-w-lg mx-auto space-y-6 pb-24">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -164,7 +160,7 @@ export default function MemberPortal() {
         >
           <div className="flex items-center gap-4">
             <Avatar 
-              className="h-14 w-14 ring-1 ring-border ring-offset-2 ring-offset-background cursor-pointer transition-all duration-500 hover:ring-primary/50"
+              className="h-14 w-14 ring-2 ring-primary/30 ring-offset-2 ring-offset-background cursor-pointer transition-all duration-500 hover:ring-primary/50"
               onClick={() => navigate('/member/profile/edit')}
             >
               <AvatarImage src={member.avatarUrl} alt={member.name} />
@@ -181,13 +177,13 @@ export default function MemberPortal() {
           </div>
           <div className="flex items-center gap-1">
             <ThemeToggle />
-            <Button variant="ghost" size="icon" onClick={() => setShowQR(true)} className="text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon" onClick={() => setShowQR(true)} className="text-muted-foreground hover:text-primary">
               <QrCode className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')} className="text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/member/profile/edit')} className="text-muted-foreground hover:text-primary">
               <Settings className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => setShowChat(true)} className="text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon" onClick={() => setShowChat(true)} className="text-muted-foreground hover:text-primary">
               <MessageCircle className="h-5 w-5" />
             </Button>
           </div>
@@ -199,9 +195,12 @@ export default function MemberPortal() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card variant="obsidian" className="relative overflow-hidden">
-            {/* Crystal accent line */}
-            <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
+          <Card variant="obsidian" className="relative overflow-hidden crystal-panel-gold">
+            {/* Crystal corner accents */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary/40 rounded-tl-xl" />
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary/40 rounded-tr-xl" />
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary/40 rounded-bl-xl" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary/40 rounded-br-xl" />
             
             <CardContent className="p-6">
               <div className="flex items-start gap-6">
@@ -217,7 +216,7 @@ export default function MemberPortal() {
                   <p className="text-xs text-muted-foreground tracking-widest uppercase mb-1">
                     Membership Status
                   </p>
-                  <h2 className="text-2xl font-display font-medium text-foreground tracking-crystal mb-4">
+                  <h2 className="text-2xl font-display font-medium text-primary tracking-crystal mb-4">
                     {member.tierName}
                   </h2>
                   
@@ -234,7 +233,7 @@ export default function MemberPortal() {
                       </div>
                       <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
                         <motion.div 
-                          className="h-full bg-primary/60 rounded-full"
+                          className="h-full bg-gradient-to-r from-primary/60 to-primary rounded-full"
                           initial={{ width: 0 }}
                           animate={{ width: `${progressPercentage}%` }}
                           transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
@@ -246,7 +245,7 @@ export default function MemberPortal() {
               </div>
               
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-6 mt-6 pt-6 border-t border-border/30">
+              <div className="grid grid-cols-2 gap-6 mt-6 pt-6 border-t border-primary/20">
                 <div>
                   <p className="text-xs text-muted-foreground tracking-widest uppercase font-body">Total Visits</p>
                   <PointsCounter value={member.totalVisits} showParticles={false} className="!text-2xl" />
@@ -270,12 +269,11 @@ export default function MemberPortal() {
           {['noir', 'sasso'].map((brand) => (
             <Button
               key={brand}
-              variant={activeTab === brand ? 'default' : 'outline'}
+              variant={activeTab === brand ? 'vip-gold' : 'outline'}
               size="sm"
               onClick={() => setActiveTab(brand as 'noir' | 'sasso')}
               className={cn(
                 'flex-1 capitalize tracking-refined transition-all duration-300',
-                activeTab === brand && 'bg-primary text-primary-foreground'
               )}
             >
               {brand}
@@ -290,10 +288,10 @@ export default function MemberPortal() {
           transition={{ delay: 0.25 }}
           className="grid grid-cols-2 gap-4"
         >
-          <Card variant="glass" className="light-shift">
+          <Card variant="glass" className="light-shift crystal-panel">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-4 w-4 text-primary" />
                 <span className="text-xs tracking-widest uppercase">Favorite</span>
               </div>
               <p className="font-display text-lg font-medium text-foreground tracking-crystal capitalize">
@@ -301,10 +299,10 @@ export default function MemberPortal() {
               </p>
             </CardContent>
           </Card>
-          <Card variant="glass" className="light-shift">
+          <Card variant="glass" className="light-shift crystal-panel">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4 text-primary" />
                 <span className="text-xs tracking-widest uppercase">Last Visit</span>
               </div>
               <p className="font-display text-lg font-medium text-foreground tracking-crystal">
@@ -321,7 +319,7 @@ export default function MemberPortal() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card variant="glass">
+            <Card variant="glass" className="crystal-panel">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-display font-medium text-foreground tracking-crystal">
@@ -330,7 +328,7 @@ export default function MemberPortal() {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="text-muted-foreground h-auto py-1 px-2 hover:text-foreground"
+                    className="text-muted-foreground h-auto py-1 px-2 hover:text-primary"
                     onClick={() => navigate('/member/history')}
                   >
                     View all
@@ -369,7 +367,7 @@ export default function MemberPortal() {
           <Button 
             variant="crystal" 
             className="h-auto py-5 flex-col gap-2 relative"
-            onClick={() => {}}
+            onClick={() => navigate('/member/rewards')}
           >
             <Gift className="h-5 w-5" />
             <span className="text-xs tracking-refined">Rewards</span>
@@ -385,12 +383,12 @@ export default function MemberPortal() {
         >
           <Card 
             variant="glass"
-            className="cursor-pointer light-shift"
+            className="cursor-pointer light-shift crystal-panel"
             onClick={() => setShowChat(true)}
           >
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-burgundy/20 flex items-center justify-center">
-                <MessageCircle className="h-5 w-5 text-primary/70" />
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                <MessageCircle className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
                 <p className="font-display font-medium text-foreground tracking-crystal">
@@ -400,11 +398,11 @@ export default function MemberPortal() {
                   Your personal concierge awaits
                 </p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <ChevronRight className="h-5 w-5 text-primary/50" />
             </CardContent>
           </Card>
         </motion.div>
       </div>
-    </div>
+    </CrystalPageWrapper>
   );
 }

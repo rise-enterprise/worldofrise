@@ -86,18 +86,25 @@ function SidebarContent({
   };
 
   return (
-    <div className="flex h-full flex-col bg-[#0E1116]">
+    <div className="flex h-full flex-col bg-card/95 backdrop-blur-xl">
+      {/* Crystal vertical accent line */}
+      <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
+      
       {/* Logo */}
-      <div className="flex h-24 items-center justify-center border-b border-[rgba(217,222,231,0.08)]">
+      <div className="flex h-24 items-center justify-center border-b border-primary/10">
         <div className="text-center">
-          <h1 className="font-display text-3xl font-medium text-primary tracking-[0.2em]">RISE</h1>
-          <div className="h-px w-12 mx-auto mt-2 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <div className="flex items-center justify-center gap-2 mb-1">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h1 className="font-display text-3xl font-medium text-primary tracking-[0.2em]">RISE</h1>
+            <Sparkles className="h-4 w-4 text-primary" />
+          </div>
+          <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           <p className="text-[10px] tracking-[0.4em] text-muted-foreground/60 uppercase font-body mt-2">Administration</p>
         </div>
       </div>
 
       {/* Brand Filter */}
-      <div className="p-5 border-b border-[rgba(217,222,231,0.08)]">
+      <div className="p-5 border-b border-primary/10">
         <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 font-body">
           {t('brands.brandView')}
         </p>
@@ -110,8 +117,8 @@ function SidebarContent({
                 'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out',
                 isRTL && 'flex-row-reverse',
                 activeBrand === brand.id
-                  ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_20px_rgba(200,162,74,0.05)]'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-[#151921]'
+                  ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_30px_rgba(200,162,74,0.08)]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card'
               )}
             >
               <brand.icon className={cn("h-4 w-4", activeBrand === brand.id && "text-primary")} />
@@ -135,8 +142,8 @@ function SidebarContent({
                 'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out',
                 isRTL && 'flex-row-reverse',
                 activeView === item.id
-                  ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_20px_rgba(200,162,74,0.05)]'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-[#151921]'
+                  ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_30px_rgba(200,162,74,0.08)]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card'
               )}
             >
               <item.icon className={cn("h-4 w-4", activeView === item.id && "text-primary")} />
@@ -148,7 +155,8 @@ function SidebarContent({
         {/* Super Admin Navigation */}
         {isSuperAdmin && (
           <>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 mt-8 font-body">
+            <div className="my-6 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 font-body">
               {t('nav.administration')}
             </p>
             <div className="space-y-1">
@@ -160,8 +168,8 @@ function SidebarContent({
                     'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out',
                     isRTL && 'flex-row-reverse',
                     activeView === item.id
-                      ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_20px_rgba(200,162,74,0.05)]'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-[#151921]'
+                      ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_30px_rgba(200,162,74,0.08)]'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-card'
                   )}
                 >
                   <item.icon className={cn("h-4 w-4", activeView === item.id && "text-primary")} />
@@ -174,8 +182,8 @@ function SidebarContent({
       </nav>
 
       {/* User Info */}
-      <div className="p-5 border-t border-[rgba(217,222,231,0.08)] space-y-4">
-        <div className="px-2 py-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+      <div className="p-5 border-t border-primary/10 space-y-4">
+        <div className="px-4 py-3 rounded-lg bg-background/50 border border-primary/10">
           <p className="text-sm font-medium text-foreground truncate tracking-refined">{demoAdmin.name}</p>
           <p className="text-xs text-muted-foreground/60 truncate">{demoAdmin.email}</p>
         </div>
@@ -192,7 +200,7 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
   if (isMobile) {
     return (
       <Sheet open={mobileOpen} onOpenChange={(open) => !open && onMobileClose?.()}>
-        <SheetContent side={isRTL ? "right" : "left"} className="w-72 p-0 bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+        <SheetContent side={isRTL ? "right" : "left"} className="w-72 p-0 bg-card border-primary/10">
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>
@@ -208,10 +216,10 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
     );
   }
 
-  // Desktop: Fixed sidebar with obsidian styling
+  // Desktop: Fixed sidebar with crystal styling
   return (
     <aside className={cn(
-      "fixed top-0 z-40 h-screen w-64 bg-[#0E1116]/98 backdrop-blur-xl border-[rgba(217,222,231,0.08)]",
+      "fixed top-0 z-40 h-screen w-64 bg-card/98 backdrop-blur-xl border-primary/10",
       isRTL ? "right-0 border-l" : "left-0 border-r"
     )}>
       <SidebarContent 

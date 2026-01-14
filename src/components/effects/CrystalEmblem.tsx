@@ -3,14 +3,22 @@ import { cn } from '@/lib/utils';
 
 interface CrystalEmblemProps {
   className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function CrystalEmblem({ className }: CrystalEmblemProps) {
+const sizeClasses = {
+  sm: { container: 'w-[140px] h-[140px]', outer: 'w-[100px] h-[100px]', inner: 'w-[80px] h-[80px]', svg: 'w-[100px] h-[100px]', text: 'text-xl', glow: 'w-[160px] h-[160px]', sparkle: '-70px' },
+  md: { container: 'w-[200px] h-[200px]', outer: 'w-[140px] h-[140px]', inner: 'w-[110px] h-[110px]', svg: 'w-[140px] h-[140px]', text: 'text-2xl', glow: 'w-[220px] h-[220px]', sparkle: '-80px' },
+  lg: { container: 'w-[280px] h-[280px]', outer: 'w-[200px] h-[200px]', inner: 'w-[160px] h-[160px]', svg: 'w-[200px] h-[200px]', text: 'text-4xl', glow: 'w-[320px] h-[320px]', sparkle: '-100px' },
+};
+
+export function CrystalEmblem({ className, size = 'lg' }: CrystalEmblemProps) {
+  const s = sizeClasses[size];
   return (
     <div className={cn('relative flex items-center justify-center', className)}>
       {/* Outer glow */}
       <motion.div
-        className="absolute w-[320px] h-[320px] rounded-full"
+        className={cn("absolute rounded-full", s.glow)}
         style={{
           background: 'radial-gradient(circle, hsl(var(--gold) / 0.15) 0%, transparent 70%)',
         }}
@@ -26,7 +34,7 @@ export function CrystalEmblem({ className }: CrystalEmblemProps) {
       />
 
       {/* Crystal facets container */}
-      <div className="relative w-[280px] h-[280px]">
+      <div className={cn("relative", s.container)}>
         {/* Diamond shape background */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
@@ -36,7 +44,7 @@ export function CrystalEmblem({ className }: CrystalEmblemProps) {
         >
           {/* Outer diamond border */}
           <div
-            className="absolute w-[200px] h-[200px] rotate-45"
+            className={cn("absolute rotate-45", s.outer)}
             style={{
               background: 'linear-gradient(135deg, hsl(var(--gold) / 0.3) 0%, transparent 50%, hsl(var(--gold) / 0.2) 100%)',
               border: '1px solid hsl(var(--gold) / 0.4)',
@@ -49,7 +57,7 @@ export function CrystalEmblem({ className }: CrystalEmblemProps) {
 
           {/* Inner diamond */}
           <div
-            className="absolute w-[160px] h-[160px] rotate-45"
+            className={cn("absolute rotate-45", s.inner)}
             style={{
               background: 'linear-gradient(135deg, hsl(var(--background) / 0.9) 0%, hsl(var(--noir-obsidian) / 0.8) 100%)',
               border: '1px solid hsl(var(--gold) / 0.3)',
@@ -59,7 +67,7 @@ export function CrystalEmblem({ className }: CrystalEmblemProps) {
 
           {/* Crystal facet lines */}
           <svg
-            className="absolute w-[200px] h-[200px] rotate-45"
+            className={cn("absolute rotate-45", s.svg)}
             viewBox="0 0 200 200"
             fill="none"
           >
@@ -101,7 +109,7 @@ export function CrystalEmblem({ className }: CrystalEmblemProps) {
           transition={{ delay: 0.5, duration: 1 }}
         >
           <span
-            className="text-4xl font-display tracking-[0.5em] font-light"
+            className={cn("font-display tracking-[0.5em] font-light", s.text)}
             style={{
               background: 'linear-gradient(180deg, hsl(var(--gold)) 0%, hsl(var(--gold-muted)) 50%, hsl(var(--gold)) 100%)',
               WebkitBackgroundClip: 'text',
@@ -127,7 +135,7 @@ export function CrystalEmblem({ className }: CrystalEmblemProps) {
             style={{
               top: '50%',
               left: '50%',
-              transform: `rotate(${angle}deg) translateY(-100px)`,
+              transform: `rotate(${angle}deg) translateY(${s.sparkle})`,
             }}
             animate={{
               opacity: [0.3, 1, 0.3],

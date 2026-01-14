@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CrystalBackground } from '@/components/effects/CrystalBackground';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, Calendar, MapPin, Users, Clock, Check, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Users, Check, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Experience {
@@ -21,7 +21,6 @@ interface Experience {
   tier: 'crystal' | 'onyx' | 'obsidian' | 'royal';
   brand: 'noir' | 'sasso' | 'both';
   category: 'dinner' | 'tasting' | 'chefs_table' | 'gala';
-  image?: string;
 }
 
 const mockExperiences: Experience[] = [
@@ -123,14 +122,12 @@ export default function MemberExperiences() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      <CrystalBackground variant="subtle" />
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
+    <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link to="/member">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 hover:text-primary">
               <ArrowLeft className="h-4 w-4" />
               Back to Salon
             </Button>
@@ -139,7 +136,7 @@ export default function MemberExperiences() {
 
         {/* Title */}
         <div className="text-center mb-12">
-          <h1 className="font-display text-4xl md:text-5xl font-medium text-foreground tracking-wide">
+          <h1 className="font-display text-4xl md:text-5xl font-medium text-foreground tracking-crystal">
             Private Gatherings
           </h1>
           <p className="text-muted-foreground/60 mt-4 max-w-xl mx-auto">
@@ -157,9 +154,8 @@ export default function MemberExperiences() {
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
               <Card 
-                variant="obsidian" 
                 className={cn(
-                  "overflow-hidden hover:border-primary/20 transition-all duration-300 cursor-pointer group",
+                  "crystal-panel overflow-hidden hover:border-primary/30 transition-all duration-300 cursor-pointer group",
                   tierColors[experience.tier]
                 )}
                 onClick={() => handleRsvp(experience)}
@@ -167,7 +163,7 @@ export default function MemberExperiences() {
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">
                     {/* Date Section */}
-                    <div className="md:w-48 p-6 bg-[#0B0D11] flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-[rgba(217,222,231,0.08)]">
+                    <div className="md:w-48 p-6 bg-background/50 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-primary/10">
                       <p className="text-xs uppercase tracking-widest text-muted-foreground/60">
                         {new Date(experience.date).toLocaleDateString('en-US', { month: 'short' })}
                       </p>
@@ -184,19 +180,19 @@ export default function MemberExperiences() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs border-primary/30">
                               {categoryLabels[experience.category]}
                             </Badge>
-                            <Badge variant="outline" className="text-xs capitalize">
+                            <Badge variant="outline" className="text-xs capitalize border-primary/30">
                               {experience.tier}+
                             </Badge>
                             {experience.brand !== 'both' && (
-                              <Badge variant="outline" className="text-xs uppercase">
+                              <Badge variant="outline" className="text-xs uppercase border-primary/30">
                                 {experience.brand}
                               </Badge>
                             )}
                           </div>
-                          <h3 className="font-display text-xl text-foreground group-hover:text-primary transition-colors">
+                          <h3 className="font-display text-xl text-foreground group-hover:text-primary transition-colors tracking-crystal">
                             {experience.title}
                           </h3>
                           <p className="text-sm text-muted-foreground/60 mt-2 line-clamp-2">
@@ -209,11 +205,11 @@ export default function MemberExperiences() {
                       {/* Meta Info */}
                       <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground/60">
                         <div className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
+                          <MapPin className="h-4 w-4 text-primary" />
                           {experience.location}
                         </div>
                         <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
+                          <Users className="h-4 w-4 text-primary" />
                           {experience.spotsLeft} of {experience.capacity} spots left
                         </div>
                       </div>
@@ -228,11 +224,11 @@ export default function MemberExperiences() {
 
       {/* RSVP Dialog */}
       <Dialog open={isRsvpDialogOpen} onOpenChange={setIsRsvpDialogOpen}>
-        <DialogContent className="bg-[#0E1116] border-[rgba(217,222,231,0.08)] max-w-lg">
+        <DialogContent className="crystal-panel-gold max-w-lg">
           {!rsvpSuccess ? (
             <>
               <DialogHeader>
-                <DialogTitle className="font-display text-xl text-center">
+                <DialogTitle className="font-display text-xl text-center tracking-crystal">
                   {selectedExperience?.title}
                 </DialogTitle>
               </DialogHeader>
@@ -242,25 +238,25 @@ export default function MemberExperiences() {
                 </p>
 
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-primary/20">
                     <Calendar className="h-5 w-5 text-primary" />
                     <div>
                       <p className="text-sm font-medium">{selectedExperience && formatDate(selectedExperience.date)}</p>
                       <p className="text-xs text-muted-foreground/60">{selectedExperience?.time}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-primary/20">
                     <MapPin className="h-5 w-5 text-primary" />
                     <p className="text-sm">{selectedExperience?.location}</p>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-primary/20">
                     <Users className="h-5 w-5 text-primary" />
                     <p className="text-sm">{selectedExperience?.spotsLeft} spots remaining</p>
                   </div>
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1" onClick={() => setIsRsvpDialogOpen(false)}>
+                  <Button variant="outline" className="flex-1 border-primary/30" onClick={() => setIsRsvpDialogOpen(false)}>
                     Perhaps Later
                   </Button>
                   <Button 
@@ -275,10 +271,10 @@ export default function MemberExperiences() {
             </>
           ) : (
             <div className="py-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
                 <Check className="h-8 w-8 text-emerald-500" />
               </div>
-              <h3 className="font-display text-xl text-foreground">You're Invited</h3>
+              <h3 className="font-display text-xl text-foreground tracking-crystal">You're Invited</h3>
               <p className="text-sm text-muted-foreground/60 mt-2">
                 A confirmation has been sent to your email. We look forward to welcoming you.
               </p>
@@ -286,6 +282,6 @@ export default function MemberExperiences() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </CrystalPageWrapper>
   );
 }

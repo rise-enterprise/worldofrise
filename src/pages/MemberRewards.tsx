@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CrystalBackground } from '@/components/effects/CrystalBackground';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { RewardCard } from '@/components/ui/reward-card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, Filter, Gift, Star, Wine, Crown, Check } from 'lucide-react';
+import { ArrowLeft, Gift, Star, Wine, Crown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const mockRewards = [
@@ -83,8 +83,7 @@ export default function MemberRewards() {
   const [isRedeemDialogOpen, setIsRedeemDialogOpen] = useState(false);
   const [redeemSuccess, setRedeemSuccess] = useState(false);
 
-  const memberPoints = 7500; // Mock member points
-  const memberTier = 'obsidian';
+  const memberPoints = 7500;
 
   const filteredRewards = selectedCategory === 'all' 
     ? mockRewards 
@@ -105,14 +104,12 @@ export default function MemberRewards() {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      <CrystalBackground variant="subtle" />
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-8">
+    <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link to="/member">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 hover:text-primary">
               <ArrowLeft className="h-4 w-4" />
               Back to Salon
             </Button>
@@ -125,7 +122,7 @@ export default function MemberRewards() {
 
         {/* Title */}
         <div className="text-center mb-12">
-          <h1 className="font-display text-4xl md:text-5xl font-medium text-foreground tracking-wide">
+          <h1 className="font-display text-4xl md:text-5xl font-medium text-foreground tracking-crystal">
             Exclusive Privileges
           </h1>
           <p className="text-muted-foreground/60 mt-4 max-w-xl mx-auto">
@@ -138,12 +135,12 @@ export default function MemberRewards() {
           {categories.map((cat) => (
             <Button
               key={cat.id}
-              variant={selectedCategory === cat.id ? 'default' : 'outline'}
+              variant={selectedCategory === cat.id ? 'vip-gold' : 'outline'}
               size="sm"
               onClick={() => setSelectedCategory(cat.id)}
               className={cn(
                 'gap-2',
-                selectedCategory === cat.id && 'bg-primary text-primary-foreground'
+                selectedCategory !== cat.id && 'border-primary/30'
               )}
             >
               <cat.icon className="h-4 w-4" />
@@ -166,7 +163,7 @@ export default function MemberRewards() {
 
         {filteredRewards.length === 0 && (
           <div className="text-center py-16">
-            <Gift className="h-12 w-12 mx-auto text-muted-foreground/40" />
+            <Gift className="h-12 w-12 mx-auto text-primary/40" />
             <p className="text-muted-foreground/60 mt-4">No privileges available in this category</p>
           </div>
         )}
@@ -174,11 +171,11 @@ export default function MemberRewards() {
 
       {/* Redeem Dialog */}
       <Dialog open={isRedeemDialogOpen} onOpenChange={setIsRedeemDialogOpen}>
-        <DialogContent className="bg-[#0E1116] border-[rgba(217,222,231,0.08)] max-w-md">
+        <DialogContent className="crystal-panel-gold max-w-md">
           {!redeemSuccess ? (
             <>
               <DialogHeader>
-                <DialogTitle className="font-display text-xl text-center">
+                <DialogTitle className="font-display text-xl text-center tracking-crystal">
                   Confirm Redemption
                 </DialogTitle>
               </DialogHeader>
@@ -187,18 +184,18 @@ export default function MemberRewards() {
                   <p className="text-lg font-medium text-foreground">{selectedReward?.title}</p>
                   <p className="text-sm text-muted-foreground/60 mt-2">{selectedReward?.description}</p>
                 </div>
-                <div className="flex justify-between items-center p-4 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                <div className="flex justify-between items-center p-4 rounded-lg bg-background/50 border border-primary/20">
                   <span className="text-sm text-muted-foreground/60">Points Required</span>
                   <span className="text-lg font-medium text-primary">{selectedReward?.pointsCost.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between items-center p-4 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                <div className="flex justify-between items-center p-4 rounded-lg bg-background/50 border border-primary/20">
                   <span className="text-sm text-muted-foreground/60">Your Balance After</span>
                   <span className="text-lg font-medium text-foreground">
                     {(memberPoints - (selectedReward?.pointsCost || 0)).toLocaleString()}
                   </span>
                 </div>
                 <div className="flex gap-3">
-                  <Button variant="outline" className="flex-1" onClick={() => setIsRedeemDialogOpen(false)}>
+                  <Button variant="outline" className="flex-1 border-primary/30" onClick={() => setIsRedeemDialogOpen(false)}>
                     Cancel
                   </Button>
                   <Button 
@@ -214,10 +211,10 @@ export default function MemberRewards() {
             </>
           ) : (
             <div className="py-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
                 <Check className="h-8 w-8 text-emerald-500" />
               </div>
-              <h3 className="font-display text-xl text-foreground">Privilege Redeemed</h3>
+              <h3 className="font-display text-xl text-foreground tracking-crystal">Privilege Redeemed</h3>
               <p className="text-sm text-muted-foreground/60 mt-2">
                 Your request has been submitted. We'll be in touch shortly.
               </p>
@@ -225,6 +222,6 @@ export default function MemberRewards() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </CrystalPageWrapper>
   );
 }

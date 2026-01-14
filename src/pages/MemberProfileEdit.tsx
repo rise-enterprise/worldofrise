@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Mail, Phone, Globe, Heart, Save } from 'lucide-react';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,7 +28,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 export default function MemberProfileEdit() {
   const navigate = useNavigate();
   const { data: guests = [], isLoading } = useMembers();
-  const member = guests[0]; // Demo member - first guest
+  const member = guests[0];
 
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: '',
@@ -55,7 +56,6 @@ export default function MemberProfileEdit() {
 
   const handleChange = (field: keyof ProfileFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -64,7 +64,6 @@ export default function MemberProfileEdit() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form data
     const result = profileSchema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -78,7 +77,6 @@ export default function MemberProfileEdit() {
     }
 
     setIsSaving(true);
-    // Demo mode - just show success
     setTimeout(() => {
       toast.success('Profile updated successfully');
       setIsSaving(false);
@@ -88,30 +86,30 @@ export default function MemberProfileEdit() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-lg mx-auto space-y-4">
+      <CrystalPageWrapper variant="subtle" sparkleCount={10}>
+        <div className="p-4 max-w-lg mx-auto space-y-4">
           <Skeleton className="h-10 w-24" />
           <Skeleton className="h-[600px] w-full" />
         </div>
-      </div>
+      </CrystalPageWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <CrystalPageWrapper variant="subtle" sparkleCount={15}>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-primary/10">
         <div className="flex items-center gap-3 p-4 max-w-lg mx-auto">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/member')}>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/member')} className="hover:text-primary">
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-semibold text-foreground">Edit Profile</h1>
+          <h1 className="text-lg font-display font-semibold text-foreground tracking-crystal">Edit Profile</h1>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-4 max-w-lg mx-auto space-y-6">
+      <form onSubmit={handleSubmit} className="p-4 max-w-lg mx-auto space-y-6 pb-8">
         {/* Avatar Upload */}
-        <Card>
+        <Card className="crystal-panel">
           <CardContent className="py-6">
             <AvatarUpload 
               currentAvatarUrl={member?.avatarUrl}
@@ -121,9 +119,9 @@ export default function MemberProfileEdit() {
         </Card>
 
         {/* Personal Info */}
-        <Card>
+        <Card className="crystal-panel">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-base flex items-center gap-2 font-display tracking-crystal">
               <User className="h-4 w-4 text-primary" />
               Personal Information
             </CardTitle>
@@ -136,7 +134,7 @@ export default function MemberProfileEdit() {
                 value={formData.full_name}
                 onChange={(e) => handleChange('full_name', e.target.value)}
                 placeholder="Enter your full name"
-                className={errors.full_name ? 'border-destructive' : ''}
+                className={`bg-background/50 border-primary/20 focus:border-primary/50 ${errors.full_name ? 'border-destructive' : ''}`}
               />
               {errors.full_name && (
                 <p className="text-xs text-destructive">{errors.full_name}</p>
@@ -145,7 +143,7 @@ export default function MemberProfileEdit() {
 
             <div className="space-y-2">
               <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="h-3 w-3" />
+                <Mail className="h-3 w-3 text-primary" />
                 Email
               </Label>
               <Input
@@ -154,7 +152,7 @@ export default function MemberProfileEdit() {
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="your@email.com"
-                className={errors.email ? 'border-destructive' : ''}
+                className={`bg-background/50 border-primary/20 focus:border-primary/50 ${errors.email ? 'border-destructive' : ''}`}
               />
               {errors.email && (
                 <p className="text-xs text-destructive">{errors.email}</p>
@@ -163,7 +161,7 @@ export default function MemberProfileEdit() {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="flex items-center gap-2">
-                <Phone className="h-3 w-3" />
+                <Phone className="h-3 w-3 text-primary" />
                 Phone Number
               </Label>
               <Input
@@ -172,7 +170,7 @@ export default function MemberProfileEdit() {
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 placeholder="+974 XXXX XXXX"
-                className={errors.phone ? 'border-destructive' : ''}
+                className={`bg-background/50 border-primary/20 focus:border-primary/50 ${errors.phone ? 'border-destructive' : ''}`}
               />
               {errors.phone && (
                 <p className="text-xs text-destructive">{errors.phone}</p>
@@ -182,9 +180,9 @@ export default function MemberProfileEdit() {
         </Card>
 
         {/* Location */}
-        <Card>
+        <Card className="crystal-panel">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-base flex items-center gap-2 font-display tracking-crystal">
               <Globe className="h-4 w-4 text-primary" />
               Location
             </CardTitle>
@@ -196,21 +194,21 @@ export default function MemberProfileEdit() {
               className="flex gap-4"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="doha" id="doha" />
-                <Label htmlFor="doha" className="cursor-pointer">🇶🇦 Doha, Qatar</Label>
+                <RadioGroupItem value="doha" id="doha" className="border-primary/30" />
+                <Label htmlFor="doha" className="cursor-pointer">Doha, Qatar</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="riyadh" id="riyadh" />
-                <Label htmlFor="riyadh" className="cursor-pointer">🇸🇦 Riyadh, Saudi Arabia</Label>
+                <RadioGroupItem value="riyadh" id="riyadh" className="border-primary/30" />
+                <Label htmlFor="riyadh" className="cursor-pointer">Riyadh, Saudi Arabia</Label>
               </div>
             </RadioGroup>
           </CardContent>
         </Card>
 
         {/* Preferences */}
-        <Card>
+        <Card className="crystal-panel">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base flex items-center gap-2">
+            <CardTitle className="text-base flex items-center gap-2 font-display tracking-crystal">
               <Heart className="h-4 w-4 text-primary" />
               Preferences
             </CardTitle>
@@ -224,15 +222,15 @@ export default function MemberProfileEdit() {
                 className="flex flex-wrap gap-4"
               >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="noir" id="noir" />
+                  <RadioGroupItem value="noir" id="noir" className="border-primary/30" />
                   <Label htmlFor="noir" className="cursor-pointer">Noir</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="sasso" id="sasso" />
+                  <RadioGroupItem value="sasso" id="sasso" className="border-primary/30" />
                   <Label htmlFor="sasso" className="cursor-pointer">Sasso</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="both" id="both" />
+                  <RadioGroupItem value="both" id="both" className="border-primary/30" />
                   <Label htmlFor="both" className="cursor-pointer">Both</Label>
                 </div>
               </RadioGroup>
@@ -244,10 +242,10 @@ export default function MemberProfileEdit() {
                 value={formData.preferred_language}
                 onValueChange={(value) => handleChange('preferred_language', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-background/50 border-primary/20">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-primary/20">
                   <SelectItem value="en">English</SelectItem>
                   <SelectItem value="ar">العربية (Arabic)</SelectItem>
                 </SelectContent>
@@ -259,6 +257,7 @@ export default function MemberProfileEdit() {
         {/* Submit Button */}
         <Button 
           type="submit" 
+          variant="vip-gold"
           className="w-full gap-2" 
           size="lg"
           disabled={isSaving}
@@ -267,6 +266,6 @@ export default function MemberProfileEdit() {
           {isSaving ? 'Saving...' : 'Save Changes'}
         </Button>
       </form>
-    </div>
+    </CrystalPageWrapper>
   );
 }
