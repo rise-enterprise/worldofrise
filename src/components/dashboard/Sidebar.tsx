@@ -77,18 +77,19 @@ function SidebarContent({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-[#0E1116]">
       {/* Logo */}
-      <div className="flex h-24 items-center justify-center border-b border-sidebar-border">
+      <div className="flex h-24 items-center justify-center border-b border-[rgba(217,222,231,0.08)]">
         <div className="text-center">
-          <h1 className="font-display text-3xl font-medium text-foreground tracking-wide">RISE</h1>
-          <p className="text-[10px] tracking-[0.4em] text-muted-foreground uppercase font-body mt-1">Admin</p>
+          <h1 className="font-display text-3xl font-medium text-primary tracking-[0.2em]">RISE</h1>
+          <div className="h-px w-12 mx-auto mt-2 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+          <p className="text-[10px] tracking-[0.4em] text-muted-foreground/60 uppercase font-body mt-2">Administration</p>
         </div>
       </div>
 
       {/* Brand Filter */}
-      <div className="p-5 border-b border-sidebar-border">
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-4 px-2 font-body">
+      <div className="p-5 border-b border-[rgba(217,222,231,0.08)]">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 font-body">
           {t('brands.brandView')}
         </p>
         <div className="space-y-1">
@@ -97,14 +98,14 @@ function SidebarContent({
               key={brand.id}
               onClick={() => handleBrandClick(brand.id)}
               className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all duration-500 ease-crystal',
+                'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out',
                 isRTL && 'flex-row-reverse',
                 activeBrand === brand.id
-                  ? 'glass-panel border-primary/30 text-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                  ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_20px_rgba(200,162,74,0.05)]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-[#151921]'
               )}
             >
-              <brand.icon className="h-4 w-4" />
+              <brand.icon className={cn("h-4 w-4", activeBrand === brand.id && "text-primary")} />
               <span className="font-medium tracking-refined">{t(brand.labelKey)}</span>
             </button>
           ))}
@@ -113,7 +114,7 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="flex-1 p-5 overflow-y-auto">
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-4 px-2 font-body">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 font-body">
           {t('nav.navigation')}
         </p>
         <div className="space-y-1">
@@ -122,14 +123,14 @@ function SidebarContent({
               key={item.id}
               onClick={() => handleNavClick(item.id)}
               className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all duration-500 ease-crystal',
+                'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out',
                 isRTL && 'flex-row-reverse',
                 activeView === item.id
-                  ? 'glass-panel text-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                  ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_20px_rgba(200,162,74,0.05)]'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-[#151921]'
               )}
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className={cn("h-4 w-4", activeView === item.id && "text-primary")} />
               <span className="tracking-refined">{t(item.labelKey)}</span>
             </button>
           ))}
@@ -138,7 +139,7 @@ function SidebarContent({
         {/* Super Admin Navigation */}
         {isSuperAdmin && (
           <>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-4 px-2 mt-8 font-body">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 mt-8 font-body">
               {t('nav.administration')}
             </p>
             <div className="space-y-1">
@@ -147,14 +148,14 @@ function SidebarContent({
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
                   className={cn(
-                    'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all duration-500 ease-crystal',
+                    'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out',
                     isRTL && 'flex-row-reverse',
                     activeView === item.id
-                      ? 'glass-panel text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      ? 'bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_20px_rgba(200,162,74,0.05)]'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-[#151921]'
                   )}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className={cn("h-4 w-4", activeView === item.id && "text-primary")} />
                   <span className="tracking-refined">{t(item.labelKey)}</span>
                 </button>
               ))}
@@ -164,17 +165,17 @@ function SidebarContent({
       </nav>
 
       {/* User Info & Logout */}
-      <div className="p-5 border-t border-sidebar-border space-y-4">
+      <div className="p-5 border-t border-[rgba(217,222,231,0.08)] space-y-4">
         {admin && (
-          <div className="px-2">
+          <div className="px-2 py-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
             <p className="text-sm font-medium text-foreground truncate tracking-refined">{admin.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{admin.email}</p>
+            <p className="text-xs text-muted-foreground/60 truncate">{admin.email}</p>
           </div>
         )}
         <button
           onClick={signOut}
           className={cn(
-            'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-all duration-500',
+            'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-300',
             isRTL && 'flex-row-reverse'
           )}
         >
@@ -194,7 +195,7 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
   if (isMobile) {
     return (
       <Sheet open={mobileOpen} onOpenChange={(open) => !open && onMobileClose?.()}>
-        <SheetContent side={isRTL ? "right" : "left"} className="w-72 p-0 bg-sidebar border-sidebar-border">
+        <SheetContent side={isRTL ? "right" : "left"} className="w-72 p-0 bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>
@@ -210,10 +211,10 @@ export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand
     );
   }
 
-  // Desktop: Fixed sidebar with glass effect
+  // Desktop: Fixed sidebar with obsidian styling
   return (
     <aside className={cn(
-      "fixed top-0 z-40 h-screen w-64 bg-sidebar/95 backdrop-blur-xl border-sidebar-border",
+      "fixed top-0 z-40 h-screen w-64 bg-[#0E1116]/98 backdrop-blur-xl border-[rgba(217,222,231,0.08)]",
       isRTL ? "right-0 border-l" : "left-0 border-r"
     )}>
       <SidebarContent 

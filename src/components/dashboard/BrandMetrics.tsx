@@ -15,32 +15,32 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
   const sassoPercentage = 100 - noirPercentage;
 
   return (
-    <Card variant="crystal" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
+    <Card variant="obsidian" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
       <CardHeader>
-        <CardTitle className="text-lg tracking-crystal">Brand Performance</CardTitle>
-        <p className="text-xs text-muted-foreground tracking-refined">Visits this month by experience</p>
+        <CardTitle className="text-lg tracking-wide font-display">Brand Performance</CardTitle>
+        <p className="text-xs text-muted-foreground/60 tracking-refined">Visits this month by experience</p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* NOIR */}
         <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-accent/50 border border-border/30">
+              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
                 <Coffee className="h-4 w-4 text-foreground/70" />
               </div>
               <div>
-                <p className="font-display text-sm font-medium text-foreground tracking-crystal">NOIR Café</p>
-                <p className="text-xs text-muted-foreground tracking-refined">نوار كافيه</p>
+                <p className="font-display text-sm font-medium text-foreground tracking-wide">NOIR Café</p>
+                <p className="text-xs text-muted-foreground/50 tracking-refined">نوار كافيه</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-display text-2xl font-medium text-foreground tracking-crystal">{visitsByBrand.noir.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground tracking-refined">{noirPercentage}% of total</p>
+              <p className="font-display text-2xl font-medium text-foreground tracking-wide">{visitsByBrand.noir.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground/50 tracking-refined">{noirPercentage}% of total</p>
             </div>
           </div>
-          <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-foreground/50 rounded-full transition-all duration-1000 ease-crystal"
+              className="h-full bg-foreground/40 rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${noirPercentage}%` }}
             />
           </div>
@@ -50,41 +50,41 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
         <div className="animate-slide-up" style={{ animationDelay: '500ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-accent/50 border border-border/30">
-                <UtensilsCrossed className="h-4 w-4 text-foreground/70" />
+              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                <UtensilsCrossed className="h-4 w-4 text-primary/70" />
               </div>
               <div>
-                <p className="font-display text-sm font-medium text-foreground tracking-crystal">SASSO</p>
-                <p className="text-xs text-muted-foreground tracking-refined">Italian Fine Dining</p>
+                <p className="font-display text-sm font-medium text-foreground tracking-wide">SASSO</p>
+                <p className="text-xs text-muted-foreground/50 tracking-refined">Italian Fine Dining</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-display text-2xl font-medium text-foreground tracking-crystal">{visitsByBrand.sasso.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground tracking-refined">{sassoPercentage}% of total</p>
+              <p className="font-display text-2xl font-medium text-primary tracking-wide">{visitsByBrand.sasso.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground/50 tracking-refined">{sassoPercentage}% of total</p>
             </div>
           </div>
-          <div className="h-1.5 bg-muted/50 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-primary/40 rounded-full transition-all duration-1000 ease-crystal"
+              className="h-full bg-primary/50 rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${sassoPercentage}%` }}
             />
           </div>
         </div>
 
         {/* Combined visualization */}
-        <div className="pt-5 border-t border-border/30 animate-slide-up" style={{ animationDelay: '600ms' }}>
-          <p className="text-xs text-muted-foreground mb-3 tracking-widest uppercase">Distribution</p>
-          <div className="flex h-2 rounded-full overflow-hidden bg-muted/30">
+        <div className="pt-5 border-t border-[rgba(217,222,231,0.08)] animate-slide-up" style={{ animationDelay: '600ms' }}>
+          <p className="text-xs text-muted-foreground/50 mb-3 tracking-[0.2em] uppercase">Distribution</p>
+          <div className="flex h-2 rounded-full overflow-hidden bg-[#0B0D11]">
             <div 
-              className="bg-foreground/50 transition-all duration-1000 ease-crystal"
+              className="bg-foreground/40 transition-all duration-1000 ease-out"
               style={{ width: `${noirPercentage}%` }}
             />
             <div 
-              className="bg-primary/40 transition-all duration-1000 ease-crystal"
+              className="bg-primary/50 transition-all duration-1000 ease-out"
               style={{ width: `${sassoPercentage}%` }}
             />
           </div>
-          <div className="flex justify-between mt-3 text-xs text-muted-foreground tracking-refined">
+          <div className="flex justify-between mt-3 text-xs text-muted-foreground/50 tracking-refined">
             <span>NOIR</span>
             <span>SASSO</span>
           </div>

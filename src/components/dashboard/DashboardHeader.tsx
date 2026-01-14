@@ -126,22 +126,22 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
 
   return (
     <header className={cn(
-      "flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-30 gap-4",
+      "flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-[rgba(217,222,231,0.08)] bg-[#07080A]/90 backdrop-blur-xl sticky top-0 z-30 gap-4",
       isRTL && "flex-row-reverse"
     )}>
       <div className={cn("flex items-center gap-3 animate-fade-in min-w-0", isRTL && "flex-row-reverse")}>
         {/* Mobile Menu Button */}
         {isMobile && (
-          <Button variant="ghost" size="icon" onClick={onMenuClick} className="shrink-0">
+          <Button variant="ghost" size="icon" onClick={onMenuClick} className="shrink-0 text-muted-foreground hover:text-foreground">
             <Menu className="h-5 w-5" />
           </Button>
         )}
         
         <div className={cn("min-w-0", isRTL && "text-right")}>
-          <h1 className="font-display text-lg md:text-2xl font-medium text-foreground truncate">
+          <h1 className="font-display text-lg md:text-2xl font-medium text-foreground truncate tracking-wide">
             {t('common.welcome')}
           </h1>
-          <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1 truncate">{currentDate}</p>
+          <p className="text-xs md:text-sm text-muted-foreground/60 mt-0.5 md:mt-1 truncate tracking-refined">{currentDate}</p>
         </div>
       </div>
 
@@ -152,26 +152,27 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         {/* Search Button */}
         <Popover open={searchOpen} onOpenChange={setSearchOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10 text-muted-foreground hover:text-foreground hover:bg-[#151921]">
               <Search className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80" align="end">
+          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80 bg-[#0E1116] border-[rgba(217,222,231,0.12)]" align="end">
             <div className="space-y-3">
-              <h4 className="font-medium text-sm">{t('header.searchGuests')}</h4>
+              <h4 className="font-medium text-sm text-foreground">{t('header.searchGuests')}</h4>
               <Input 
                 placeholder={t('header.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 autoFocus
                 dir={isRTL ? 'rtl' : 'ltr'}
+                className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50 focus:ring-primary/20"
               />
               {searchResults.length > 0 && (
                 <div className="max-h-64 overflow-y-auto space-y-2">
                   {searchResults.map((guest) => (
                     <div 
                       key={guest.id}
-                      className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                      className="p-3 rounded-lg bg-[#0B0D11] border border-transparent hover:border-primary/20 transition-all duration-200 cursor-pointer"
                       onClick={() => {
                         setSearchOpen(false);
                         setSearchQuery('');
@@ -180,13 +181,13 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                       }}
                     >
                       <p className="text-sm font-medium text-foreground">{guest.name}</p>
-                      <p className="text-xs text-muted-foreground">{guest.email}</p>
+                      <p className="text-xs text-muted-foreground/60">{guest.email}</p>
                     </div>
                   ))}
                 </div>
               )}
               {searchQuery && searchResults.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">
+                <p className="text-sm text-muted-foreground/60 text-center py-4">
                   {t('header.noGuestsFound')}
                 </p>
               )}
@@ -197,21 +198,21 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         {/* Notifications Button */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10 text-muted-foreground hover:text-foreground hover:bg-[#151921]">
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 md:top-1.5 md:right-1.5 w-2 h-2 bg-primary rounded-full" />
+                <span className="absolute top-1 right-1 md:top-1.5 md:right-1.5 w-2 h-2 bg-primary rounded-full animate-pulse" />
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80" align="end">
+          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80 bg-[#0E1116] border-[rgba(217,222,231,0.12)]" align="end">
             <div className="space-y-3">
               <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
-                <h4 className="font-medium text-sm">{t('header.notifications')}</h4>
+                <h4 className="font-medium text-sm text-foreground">{t('header.notifications')}</h4>
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-xs text-muted-foreground"
+                  className="text-xs text-primary hover:text-primary/80"
                   onClick={markAllRead}
                 >
                   {t('header.markAllRead')}
@@ -221,9 +222,12 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                 {notifications.map((notif) => (
                   <div 
                     key={notif.id} 
-                    className={`p-3 rounded-lg transition-colors cursor-pointer ${
-                      notif.read ? 'bg-muted/30' : 'bg-muted/50 hover:bg-muted'
-                    }`}
+                    className={cn(
+                      "p-3 rounded-lg transition-all duration-200 cursor-pointer border",
+                      notif.read 
+                        ? 'bg-[#0B0D11]/50 border-transparent' 
+                        : 'bg-[#0B0D11] border-primary/10 hover:border-primary/20'
+                    )}
                     onClick={() => {
                       setNotifications(prev => 
                         prev.map(n => n.id === notif.id ? { ...n, read: true } : n)
@@ -236,7 +240,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                       )}
                       <div className={isRTL ? "text-right" : ""}>
                         <p className="text-sm text-foreground">{notif.message}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{notif.time}</p>
+                        <p className="text-xs text-muted-foreground/60 mt-1">{notif.time}</p>
                       </div>
                     </div>
                   </div>
@@ -246,87 +250,98 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
           </PopoverContent>
         </Popover>
 
-        {/* Import CSV Button - Icon only on mobile */}
+        {/* Import CSV Button */}
         <Button 
           variant="outline" 
-          className={cn("gap-2 h-9 md:h-10 px-3 md:px-4", isRTL && "flex-row-reverse")}
+          className={cn(
+            "gap-2 h-9 md:h-10 px-3 md:px-4 bg-transparent border-[rgba(217,222,231,0.12)] text-muted-foreground hover:text-foreground hover:bg-[#151921] hover:border-primary/30",
+            isRTL && "flex-row-reverse"
+          )}
           onClick={() => setImportOpen(true)}
         >
           <Upload className="h-4 w-4" />
           <span className="hidden md:inline">{t('header.importCsv')}</span>
         </Button>
 
-        {/* New Guest Button - Icon only on mobile */}
+        {/* New Guest Button */}
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
           <Button 
-            variant="luxury" 
-            className={cn("gap-2 h-9 md:h-10 px-3 md:px-4", isRTL && "flex-row-reverse")}
+            className={cn(
+              "gap-2 h-9 md:h-10 px-3 md:px-4 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-[0_0_20px_rgba(200,162,74,0.15)]",
+              isRTL && "flex-row-reverse"
+            )}
             onClick={() => setNewGuestOpen(true)}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden md:inline">{t('header.newGuest')}</span>
           </Button>
-          <DialogContent className="max-w-[calc(100vw-2rem)] md:max-w-lg">
+          <DialogContent className="max-w-[calc(100vw-2rem)] md:max-w-lg bg-[#0E1116] border-[rgba(217,222,231,0.12)]">
             <DialogHeader>
-              <DialogTitle className="font-display">{t('header.registerNewGuest')}</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="font-display text-foreground">{t('header.registerNewGuest')}</DialogTitle>
+              <DialogDescription className="text-muted-foreground/60">
                 {t('header.addMemberDescription')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-4" dir={isRTL ? 'rtl' : 'ltr'}>
               <div className="space-y-2">
-                <Label htmlFor="name">{t('header.fullName')} *</Label>
+                <Label htmlFor="name" className="text-xs uppercase tracking-widest text-muted-foreground/60">{t('header.fullName')} *</Label>
                 <Input 
                   id="name"
                   placeholder={t('header.fullName')}
                   value={newGuest.name}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, name: e.target.value }))}
+                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">{t('header.email')} *</Label>
+                <Label htmlFor="email" className="text-xs uppercase tracking-widest text-muted-foreground/60">{t('header.email')} *</Label>
                 <Input 
                   id="email"
                   placeholder={t('header.email')}
                   type="email"
                   value={newGuest.email}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, email: e.target.value }))}
+                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">{t('header.phoneOptional')}</Label>
+                <Label htmlFor="phone" className="text-xs uppercase tracking-widest text-muted-foreground/60">{t('header.phoneOptional')}</Label>
                 <Input 
                   id="phone"
                   placeholder={t('header.phone')}
                   type="tel"
                   value={newGuest.phone}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, phone: e.target.value }))}
+                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
-                <Label>{t('header.country')}</Label>
+                <Label className="text-xs uppercase tracking-widest text-muted-foreground/60">{t('header.country')}</Label>
                 <Select 
                   value={newGuest.country} 
                   onValueChange={(value: Country) => 
                     setNewGuest(prev => ({ ...prev, country: value }))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)]">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="doha">🇶🇦 {t('header.qatar')}</SelectItem>
-                    <SelectItem value="riyadh">🇸🇦 {t('header.saudiArabia')}</SelectItem>
+                  <SelectContent className="bg-[#0E1116] border-[rgba(217,222,231,0.12)]">
+                    <SelectItem value="doha">{t('header.qatar')}</SelectItem>
+                    <SelectItem value="riyadh">{t('header.saudiArabia')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className={cn("flex gap-3 pt-2", isRTL && "flex-row-reverse")}>
-                <Button variant="outline" className="flex-1" onClick={() => setNewGuestOpen(false)}>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 bg-transparent border-[rgba(217,222,231,0.12)] hover:bg-[#151921]" 
+                  onClick={() => setNewGuestOpen(false)}
+                >
                   {t('common.cancel')}
                 </Button>
                 <Button 
-                  variant="luxury" 
-                  className="flex-1" 
+                  className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground" 
                   onClick={handleNewGuest}
                   disabled={createMember.isPending}
                 >

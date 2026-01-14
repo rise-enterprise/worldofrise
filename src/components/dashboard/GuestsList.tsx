@@ -84,31 +84,31 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fade-in">
         <div>
-          <h2 className="font-display text-xl md:text-2xl font-medium text-foreground">Guest Directory</h2>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">
+          <h2 className="font-display text-xl md:text-2xl font-medium text-foreground tracking-wide">Guest Directory</h2>
+          <p className="text-xs md:text-sm text-muted-foreground/60 mt-1 tracking-refined">
             {totalCount.toLocaleString()} members in your circle
           </p>
         </div>
-        <Button variant="luxury" className="gap-2 w-full sm:w-auto">
+        <Button className="gap-2 w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-[0_0_20px_rgba(200,162,74,0.15)]">
           <Crown className="h-4 w-4" />
-          <span className="hidden sm:inline">Export VIP List</span>
+          <span className="hidden sm:inline">Export Distinguished</span>
           <span className="sm:hidden">Export VIPs</span>
         </Button>
       </div>
 
       {/* Filters */}
-      <Card variant="glass" className="animate-slide-up">
+      <Card variant="obsidian" className="animate-slide-up">
         <CardContent className="p-3 md:p-4">
           <div className="flex flex-col gap-3 md:gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
               <input
                 type="text"
                 placeholder="Search by name, email, or phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#0B0D11] border border-[rgba(217,222,231,0.12)] rounded-lg text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all"
               />
             </div>
 
@@ -121,7 +121,12 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                     variant={selectedTier === tier.id ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setSelectedTier(tier.id)}
-                    className="whitespace-nowrap h-8 text-xs md:text-sm"
+                    className={cn(
+                      "whitespace-nowrap h-8 text-xs md:text-sm transition-all duration-200",
+                      selectedTier === tier.id 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-transparent border-[rgba(217,222,231,0.12)] text-muted-foreground hover:text-foreground hover:border-primary/30"
+                    )}
                   >
                     {tier.label}
                   </Button>
@@ -137,15 +142,15 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
       {isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Card key={i} variant="elevated">
+            <Card key={i} variant="obsidian">
               <CardContent className="p-3 md:p-4">
                 <div className="flex items-center gap-3 md:gap-4">
-                  <Skeleton className="h-12 w-12 md:h-14 md:w-14 rounded-full shrink-0" />
+                  <Skeleton className="h-12 w-12 md:h-14 md:w-14 rounded-full shrink-0 bg-[#151921]" />
                   <div className="flex-1 space-y-2 min-w-0">
-                    <Skeleton className="h-4 w-32 md:w-48" />
-                    <Skeleton className="h-3 w-24 md:w-32" />
+                    <Skeleton className="h-4 w-32 md:w-48 bg-[#151921]" />
+                    <Skeleton className="h-3 w-24 md:w-32 bg-[#151921]" />
                   </div>
-                  <Skeleton className="h-5 w-5 shrink-0" />
+                  <Skeleton className="h-5 w-5 shrink-0 bg-[#151921]" />
                 </div>
               </CardContent>
             </Card>
@@ -156,39 +161,43 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
           {/* Guest List */}
           <div className={cn("space-y-2 md:space-y-3 transition-opacity", isFetching && "opacity-60")}>
             {guests.length === 0 ? (
-              <Card variant="elevated">
+              <Card variant="obsidian">
                 <CardContent className="p-6 md:p-8 text-center">
-                  <p className="text-muted-foreground">No members found matching your criteria.</p>
+                  <p className="text-muted-foreground/60">No members match your criteria.</p>
                 </CardContent>
               </Card>
             ) : (
               guests.map((guest, index) => {
                 const tierConfig = TIER_CONFIG[guest.tier];
                 const initials = guest.name.split(' ').map(n => n[0]).join('');
+                const isTopTier = guest.tier === 'black' || guest.tier === 'inner-circle';
 
                 return (
                   <Card 
                     key={guest.id}
-                    variant="elevated"
+                    variant="obsidian"
                     className={cn(
-                      'cursor-pointer hover:scale-[1.01] transition-all duration-300 animate-slide-up active:scale-[0.99]',
-                      guest.tier === 'black' && 'border-primary/30'
+                      'cursor-pointer hover:shadow-[inset_0_0_20px_rgba(200,162,74,0.03)] transition-all duration-300 animate-slide-up active:scale-[0.99]',
+                      isTopTier && 'border-primary/20'
                     )}
                     style={{ animationDelay: `${index * 30}ms` }}
                     onClick={() => onSelectGuest(guest)}
                   >
                     <CardContent className="p-3 md:p-4">
                       <div className="flex items-center gap-3 md:gap-4">
-                        <Avatar className="h-12 w-12 md:h-14 md:w-14 border-2 border-border shrink-0">
+                        <Avatar className={cn(
+                          "h-12 w-12 md:h-14 md:w-14 border shrink-0",
+                          isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-[rgba(217,222,231,0.12)]"
+                        )}>
                           <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-                          <AvatarFallback className="bg-muted text-muted-foreground font-display text-base md:text-lg">
+                          <AvatarFallback className="bg-[#0B0D11] text-muted-foreground font-display text-base md:text-lg">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h4 className="font-display text-sm md:text-base font-medium text-foreground truncate">
+                            <h4 className="font-display text-sm md:text-base font-medium text-foreground truncate tracking-wide">
                               {guest.name}
                             </h4>
                             <Badge variant={guest.tier as any} className="text-[10px] md:text-xs shrink-0">
@@ -199,12 +208,12 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                             )}
                           </div>
                           
-                          <p className="text-xs md:text-sm text-muted-foreground truncate">
+                          <p className="text-xs md:text-sm text-muted-foreground/60 truncate">
                             {guest.email || guest.phone || 'No contact info'}
                           </p>
                           
                           {/* Mobile: Show visits inline */}
-                          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground/50">
                             <span className="flex items-center gap-1">
                               {guest.favoriteBrand === 'noir' ? (
                                 <Coffee className="h-3 w-3" />
@@ -226,17 +235,17 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
 
                         {/* Desktop: visits count */}
                         <div className="text-right hidden md:block">
-                          <p className="font-display text-2xl font-medium text-foreground">{guest.totalVisits}</p>
-                          <p className="text-xs text-muted-foreground">total visits</p>
+                          <p className="font-display text-2xl font-medium text-primary">{guest.totalVisits}</p>
+                          <p className="text-xs text-muted-foreground/50">total visits</p>
                         </div>
 
                         {/* Desktop: last visit */}
                         <div className="text-right hidden lg:block">
                           <p className="text-sm text-foreground">{formatDate(guest.lastVisit)}</p>
-                          <p className="text-xs text-muted-foreground">last visit</p>
+                          <p className="text-xs text-muted-foreground/50">last visit</p>
                         </div>
 
-                        <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+                        <ChevronRight className="h-5 w-5 text-muted-foreground/40 shrink-0" />
                       </div>
                     </CardContent>
                   </Card>
@@ -247,13 +256,13 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
 
           {/* Pagination - Simplified for mobile */}
           {totalPages > 1 && (
-            <Card variant="glass" className="animate-fade-in">
+            <Card variant="obsidian" className="animate-fade-in">
               <CardContent className="p-3 md:p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
+                  <p className="text-xs md:text-sm text-muted-foreground/60 hidden sm:block">
                     {((currentPage - 1) * PAGE_SIZE) + 1} - {Math.min(currentPage * PAGE_SIZE, totalCount)} of {totalCount.toLocaleString()}
                   </p>
-                  <p className="text-xs text-muted-foreground sm:hidden">
+                  <p className="text-xs text-muted-foreground/60 sm:hidden">
                     Page {currentPage} of {totalPages}
                   </p>
                   
@@ -263,14 +272,14 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                       size="sm"
                       onClick={() => goToPage(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="h-9 px-3"
+                      className="h-9 px-3 bg-transparent border-[rgba(217,222,231,0.12)] hover:border-primary/30"
                     >
                       <ChevronLeft className="h-4 w-4" />
                       <span className="hidden sm:inline ml-1">Prev</span>
                     </Button>
                     
                     {/* Page indicator for mobile */}
-                    <span className="text-sm font-medium px-2 min-w-[3rem] text-center">
+                    <span className="text-sm font-medium px-2 min-w-[3rem] text-center text-foreground">
                       {currentPage} / {totalPages}
                     </span>
 
@@ -279,7 +288,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                       size="sm"
                       onClick={() => goToPage(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="h-9 px-3"
+                      className="h-9 px-3 bg-transparent border-[rgba(217,222,231,0.12)] hover:border-primary/30"
                     >
                       <span className="hidden sm:inline mr-1">Next</span>
                       <ChevronRight className="h-4 w-4" />

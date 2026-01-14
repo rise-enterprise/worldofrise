@@ -71,15 +71,15 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
 
         {/* Right Column - VIP Guests */}
         <div className="lg:col-span-1">
-          <Card variant="crystal" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
+          <Card variant="obsidian" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
             <CardHeader className="pb-4 md:pb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-base md:text-lg tracking-crystal">Distinguished Guests</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-1 tracking-refined">Your most valued members</p>
+                  <CardTitle className="text-base md:text-lg tracking-wide font-display">Distinguished Guests</CardTitle>
+                  <p className="text-xs text-muted-foreground/60 mt-1 tracking-refined">Your most valued members</p>
                 </div>
-                <span className="text-xs text-primary font-medium cursor-pointer hover:text-primary/70 transition-colors duration-500 tracking-refined">
-                  View all
+                <span className="text-xs text-primary font-medium cursor-pointer hover:text-primary/70 transition-colors duration-300 tracking-refined">
+                  Explore Further
                 </span>
               </div>
             </CardHeader>

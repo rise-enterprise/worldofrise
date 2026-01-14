@@ -23,27 +23,32 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
     }).format(date);
   };
 
+  const isTopTier = guest.tier === 'black' || guest.tier === 'inner-circle';
+
   if (compact) {
     return (
       <Card 
-        variant="glass"
+        variant="obsidian"
         className={cn(
-          'cursor-pointer transition-all duration-500 ease-crystal animate-slide-up h-full light-shift',
-          guest.tier === 'black' && 'border-primary/30'
+          'cursor-pointer transition-all duration-300 ease-out animate-slide-up h-full hover:shadow-[inset_0_0_20px_rgba(200,162,74,0.03)]',
+          isTopTier && 'border-primary/20'
         )}
         style={{ animationDelay: `${delay}ms` }}
         onClick={onClick}
       >
         <CardContent className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            <Avatar className="h-10 w-10 border border-border/50 shrink-0">
+            <Avatar className={cn(
+              "h-10 w-10 border shrink-0",
+              isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-[rgba(217,222,231,0.12)]"
+            )}>
               <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-              <AvatarFallback className="bg-accent text-foreground font-display text-sm">
+              <AvatarFallback className="bg-[#0B0D11] text-foreground font-display text-sm">
                 {initials}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-crystal">
+              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-wide">
                 {guest.name}
               </h4>
               <Badge variant={guest.tier as any} className="text-[10px] mt-1">
@@ -51,7 +56,7 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
               </Badge>
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground tracking-refined">
+          <div className="flex items-center justify-between text-xs text-muted-foreground/60 tracking-refined">
             <span>{guest.totalVisits} visits</span>
             <span>{formatDate(guest.lastVisit)}</span>
           </div>
@@ -62,26 +67,29 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
 
   return (
     <Card 
-      variant="glass"
+      variant="obsidian"
       className={cn(
-        'cursor-pointer transition-all duration-500 ease-crystal animate-slide-up light-shift',
-        guest.tier === 'black' && 'border-primary/30'
+        'cursor-pointer transition-all duration-300 ease-out animate-slide-up hover:shadow-[inset_0_0_20px_rgba(200,162,74,0.03)]',
+        isTopTier && 'border-primary/20'
       )}
       style={{ animationDelay: `${delay}ms` }}
       onClick={onClick}
     >
       <CardContent className="p-5">
         <div className="flex items-start gap-4">
-          <Avatar className="h-12 w-12 border border-border/50">
+          <Avatar className={cn(
+            "h-12 w-12 border",
+            isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-[rgba(217,222,231,0.12)]"
+          )}>
             <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-            <AvatarFallback className="bg-accent text-foreground font-display">
+            <AvatarFallback className="bg-[#0B0D11] text-foreground font-display">
               {initials}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5">
-              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-crystal">
+              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-wide">
                 {guest.name}
               </h4>
               <Badge variant={guest.tier as any} className="text-[10px] shrink-0">
@@ -89,7 +97,7 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
               </Badge>
             </div>
             
-            <div className="flex items-center gap-4 text-xs text-muted-foreground tracking-refined">
+            <div className="flex items-center gap-4 text-xs text-muted-foreground/60 tracking-refined">
               <span className="flex items-center gap-1.5">
                 {guest.favoriteBrand === 'noir' ? (
                   <Coffee className="h-3 w-3" />
@@ -107,12 +115,12 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
             <div className="flex items-center justify-between mt-4">
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground tracking-widest uppercase">Visits</p>
-                  <p className="font-display text-lg font-medium text-foreground tracking-crystal">{guest.totalVisits}</p>
+                  <p className="text-xs text-muted-foreground/50 tracking-[0.2em] uppercase">Visits</p>
+                  <p className="font-display text-lg font-medium text-primary tracking-wide">{guest.totalVisits}</p>
                 </div>
-                <div className="w-px h-8 bg-border/30" />
+                <div className="w-px h-8 bg-[rgba(217,222,231,0.08)]" />
                 <div>
-                  <p className="text-xs text-muted-foreground tracking-widest uppercase">Last visit</p>
+                  <p className="text-xs text-muted-foreground/50 tracking-[0.2em] uppercase">Last visit</p>
                   <p className="text-sm text-foreground tracking-refined">{formatDate(guest.lastVisit)}</p>
                 </div>
               </div>
@@ -120,7 +128,7 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
               {guest.tags.length > 0 && (
                 <div className="flex gap-1.5">
                   {guest.tags.slice(0, 2).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-[10px] tracking-refined">
+                    <Badge key={tag} variant="outline" className="text-[10px] tracking-refined border-[rgba(217,222,231,0.12)] text-muted-foreground/60 hover:border-primary/20 hover:text-primary/70 transition-colors">
                       {tag}
                     </Badge>
                   ))}
