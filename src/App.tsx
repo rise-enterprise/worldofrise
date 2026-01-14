@@ -7,10 +7,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import Gate from "./pages/Gate";
 import RequestInvitation from "./pages/RequestInvitation";
 import VerificationPending from "./pages/VerificationPending";
-import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import AdminResetPassword from "./pages/AdminResetPassword";
-import AdminSetupPassword from "./pages/AdminSetupPassword";
 import MemberWelcome from "./pages/MemberWelcome";
 import MemberPortal from "./pages/MemberPortal";
 import MemberHistory from "./pages/MemberHistory";
@@ -34,11 +31,8 @@ const App = () => (
             <Route path="/" element={<Gate />} />
             <Route path="/request-invitation" element={<RequestInvitation />} />
             <Route path="/verification-pending" element={<VerificationPending />} />
-            <Route path="/welcome" element={<Index />} />
             
             {/* Admin Routes */}
-            <Route path="/admin/reset-password" element={<AdminResetPassword />} />
-            <Route path="/admin/setup-password" element={<AdminSetupPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
             
             {/* Member Routes - Open Access */}
