@@ -67,6 +67,7 @@ export interface VIPEmblemProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof emblemVariants> {
   showMedallion?: boolean;
+  variant?: "gold" | "silver";
 }
 
 const tierIcons = {
@@ -78,7 +79,7 @@ const tierIcons = {
 };
 
 const VIPEmblem = React.forwardRef<HTMLDivElement, VIPEmblemProps>(
-  ({ className, tier = "initiation", size = "md", showMedallion = true, ...props }, ref) => {
+  ({ className, tier = "initiation", size = "md", showMedallion = true, variant, ...props }, ref) => {
     const Icon = tierIcons[tier || "initiation"];
     const iconSizes = {
       sm: 14,
@@ -87,19 +88,38 @@ const VIPEmblem = React.forwardRef<HTMLDivElement, VIPEmblemProps>(
       xl: 40,
     };
     
+    // If variant is specified, use that for coloring instead of tier
+    const variantStyles = variant === "gold" 
+      ? "text-gold [filter:drop-shadow(0_0_12px_rgba(200,162,74,0.5))]"
+      : variant === "silver"
+      ? "text-crystal-silver [filter:drop-shadow(0_0_8px_rgba(233,238,247,0.3))]"
+      : "";
+    
+    const variantMedallion = variant === "gold"
+      ? "border-gold/50 bg-gradient-to-b from-gold/20 to-gold/10 shadow-gold-glow"
+      : variant === "silver"
+      ? "border-crystal-silver/30 bg-gradient-to-b from-crystal-silver/10 to-crystal-silver/5"
+      : "";
+    
     return (
       <div
         ref={ref}
-        className={cn(emblemVariants({ tier, size }), className)}
+        className={cn(
+          emblemVariants({ tier: variant ? undefined : tier, size }), 
+          variant && variantStyles,
+          className
+        )}
         {...props}
       >
         {showMedallion && (
-          <div className={cn(medallionVariants({ tier }))} />
+          <div className={cn(
+            variant ? `absolute inset-0 rounded-full border-2 transition-all duration-400 ${variantMedallion}` : medallionVariants({ tier })
+          )} />
         )}
         <Icon 
           size={iconSizes[size || "md"]} 
           className="relative z-10" 
-          strokeWidth={tier === "black" ? 1.5 : 2}
+          strokeWidth={tier === "black" || variant === "gold" ? 1.5 : 2}
         />
       </div>
     );
