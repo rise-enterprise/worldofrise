@@ -120,6 +120,51 @@ export type Database = {
           },
         ]
       }
+      brand_circles: {
+        Row: {
+          brand: Database["public"]["Enums"]["brand_type"]
+          color: string | null
+          created_at: string | null
+          display_name: string
+          id: string
+          is_invite_only: boolean | null
+          min_visits: number | null
+          name: string
+          name_ar: string | null
+          privileges_ar: string[] | null
+          privileges_en: string[] | null
+          sort_order: number | null
+        }
+        Insert: {
+          brand: Database["public"]["Enums"]["brand_type"]
+          color?: string | null
+          created_at?: string | null
+          display_name: string
+          id?: string
+          is_invite_only?: boolean | null
+          min_visits?: number | null
+          name: string
+          name_ar?: string | null
+          privileges_ar?: string[] | null
+          privileges_en?: string[] | null
+          sort_order?: number | null
+        }
+        Update: {
+          brand?: Database["public"]["Enums"]["brand_type"]
+          color?: string | null
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          is_invite_only?: boolean | null
+          min_visits?: number | null
+          name?: string
+          name_ar?: string | null
+          privileges_ar?: string[] | null
+          privileges_en?: string[] | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       campaigns: {
         Row: {
           bonus_points_rules: Json | null
@@ -179,6 +224,155 @@ export type Database = {
           {
             foreignKeyName: "campaigns_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experience_invitations: {
+        Row: {
+          attended_at: string | null
+          experience_id: string
+          id: string
+          invited_at: string | null
+          member_id: string
+          responded_at: string | null
+          status: string | null
+        }
+        Insert: {
+          attended_at?: string | null
+          experience_id: string
+          id?: string
+          invited_at?: string | null
+          member_id: string
+          responded_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          attended_at?: string | null
+          experience_id?: string
+          id?: string
+          invited_at?: string | null
+          member_id?: string
+          responded_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experience_invitations_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "experience_invitations_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experiences: {
+        Row: {
+          brand: Database["public"]["Enums"]["brand_type"] | null
+          capacity: number | null
+          created_at: string | null
+          description_ar: string | null
+          description_en: string | null
+          experience_date: string | null
+          experience_type: string | null
+          id: string
+          image_url: string | null
+          is_invite_only: boolean | null
+          status: string | null
+          tier_requirement: string[] | null
+          title_ar: string | null
+          title_en: string
+          updated_at: string | null
+        }
+        Insert: {
+          brand?: Database["public"]["Enums"]["brand_type"] | null
+          capacity?: number | null
+          created_at?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          experience_date?: string | null
+          experience_type?: string | null
+          id?: string
+          image_url?: string | null
+          is_invite_only?: boolean | null
+          status?: string | null
+          tier_requirement?: string[] | null
+          title_ar?: string | null
+          title_en: string
+          updated_at?: string | null
+        }
+        Update: {
+          brand?: Database["public"]["Enums"]["brand_type"] | null
+          capacity?: number | null
+          created_at?: string | null
+          description_ar?: string | null
+          description_en?: string | null
+          experience_date?: string | null
+          experience_type?: string | null
+          id?: string
+          image_url?: string | null
+          is_invite_only?: boolean | null
+          status?: string | null
+          tier_requirement?: string[] | null
+          title_ar?: string | null
+          title_en?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      invitation_requests: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string | null
+          preferred_brand: Database["public"]["Enums"]["brand_type"] | null
+          referral_source: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          preferred_brand?: Database["public"]["Enums"]["brand_type"] | null
+          referral_source?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          preferred_brand?: Database["public"]["Enums"]["brand_type"] | null
+          referral_source?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitation_requests_reviewed_by_fkey"
+            columns: ["reviewed_by"]
             isOneToOne: false
             referencedRelation: "admins"
             referencedColumns: ["id"]
@@ -249,6 +443,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "member_auth_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_brand_circles: {
+        Row: {
+          assigned_at: string | null
+          brand_circle_id: string
+          id: string
+          member_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          brand_circle_id: string
+          id?: string
+          member_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          brand_circle_id?: string
+          id?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_brand_circles_brand_circle_id_fkey"
+            columns: ["brand_circle_id"]
+            isOneToOne: false
+            referencedRelation: "brand_circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_brand_circles_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "members"
