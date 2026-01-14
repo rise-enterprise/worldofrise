@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Check } from 'lucide-react';
-import { CrystalBackground } from '@/components/effects/CrystalBackground';
+import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,57 +58,55 @@ export default function RequestInvitation() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-noir-black relative overflow-hidden flex flex-col items-center justify-center">
-        <CrystalBackground variant="subtle" />
-        
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="relative z-10 text-center px-6 max-w-md"
-        >
-          <div className="w-16 h-16 mx-auto mb-8 rounded-full border border-primary/30 flex items-center justify-center">
-            <Check className="w-8 h-8 text-primary/70" />
-          </div>
-          
-          <h1 className="text-2xl md:text-3xl font-display tracking-wider text-foreground mb-4">
-            Request Received
-          </h1>
-          
-          <p className="text-muted-foreground/80 mb-8 leading-relaxed">
-            Your request for invitation has been noted. We review each application with care. 
-            If approved, you will receive an invitation to join our circle.
-          </p>
-          
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="text-muted-foreground/60 hover:text-foreground"
+      <CrystalPageWrapper variant="tiffany" sparkleCount={25}>
+        <div className="flex flex-col items-center justify-center min-h-screen px-6">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center max-w-md"
           >
-            Return to Gate
-          </Button>
-        </motion.div>
-      </div>
+            <div className="w-16 h-16 mx-auto mb-8 rounded-full border-2 border-primary/30 flex items-center justify-center">
+              <Check className="w-8 h-8 text-primary" />
+            </div>
+            
+            <h1 className="text-2xl md:text-3xl font-display tracking-crystal text-foreground mb-4">
+              Request Received
+            </h1>
+            
+            <p className="text-muted-foreground/80 mb-8 leading-relaxed">
+              Your request for invitation has been noted. We review each application with care. 
+              If approved, you will receive an invitation to join our circle.
+            </p>
+            
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="text-muted-foreground/60 hover:text-primary"
+            >
+              Return to Gate
+            </Button>
+          </motion.div>
+        </div>
+      </CrystalPageWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-noir-black relative overflow-hidden">
-      <CrystalBackground variant="subtle" />
-      
+    <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
       {/* Back Button */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
         onClick={() => navigate('/')}
-        className="absolute top-8 left-8 z-20 flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-foreground transition-colors duration-300"
+        className="absolute top-8 left-8 z-20 flex items-center gap-2 text-sm text-muted-foreground/60 hover:text-primary transition-colors duration-300"
       >
         <ArrowLeft className="w-4 h-4" />
         <span className="tracking-wider">Back</span>
       </motion.button>
 
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-16">
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -125,7 +123,7 @@ export default function RequestInvitation() {
               <div className="w-8 h-[1px] bg-gradient-to-l from-transparent to-primary/40" />
             </div>
             
-            <h1 className="text-2xl md:text-3xl font-display tracking-wider text-foreground mb-3">
+            <h1 className="text-2xl md:text-3xl font-display tracking-crystal text-foreground mb-3">
               Request an Invitation
             </h1>
             
@@ -145,7 +143,7 @@ export default function RequestInvitation() {
                   id="fullName"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="mt-2 bg-noir-surface/50 border-crystal/10 focus:border-primary/30 text-foreground"
+                  className="mt-2 bg-background/50 border-primary/20 focus:border-primary/50 text-foreground"
                   placeholder="Your name"
                   required
                 />
@@ -160,7 +158,7 @@ export default function RequestInvitation() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="mt-2 bg-noir-surface/50 border-crystal/10 focus:border-primary/30 text-foreground"
+                  className="mt-2 bg-background/50 border-primary/20 focus:border-primary/50 text-foreground"
                   placeholder="your@email.com"
                   required
                 />
@@ -174,7 +172,7 @@ export default function RequestInvitation() {
                   id="phone"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="mt-2 bg-noir-surface/50 border-crystal/10 focus:border-primary/30 text-foreground"
+                  className="mt-2 bg-background/50 border-primary/20 focus:border-primary/50 text-foreground"
                   placeholder="+974 XXXX XXXX"
                 />
               </div>
@@ -191,10 +189,10 @@ export default function RequestInvitation() {
                       onClick={() => setFormData({ ...formData, preferredBrand: brand })}
                       className={`
                         flex-1 py-3 px-4 text-xs tracking-wider uppercase
-                        border rounded-sm transition-all duration-300
+                        border rounded-lg transition-all duration-300
                         ${formData.preferredBrand === brand
-                          ? 'bg-primary/10 border-primary/30 text-foreground'
-                          : 'bg-noir-surface/30 border-crystal/10 text-muted-foreground/60 hover:border-crystal/20'
+                          ? 'bg-primary/10 border-primary/40 text-foreground'
+                          : 'bg-background/30 border-primary/10 text-muted-foreground/60 hover:border-primary/20'
                         }
                       `}
                     >
@@ -212,7 +210,7 @@ export default function RequestInvitation() {
                   id="referral"
                   value={formData.referralSource}
                   onChange={(e) => setFormData({ ...formData, referralSource: e.target.value })}
-                  className="mt-2 bg-noir-surface/50 border-crystal/10 focus:border-primary/30 text-foreground"
+                  className="mt-2 bg-background/50 border-primary/20 focus:border-primary/50 text-foreground"
                   placeholder="A friend, social media, visit..."
                 />
               </div>
@@ -225,7 +223,7 @@ export default function RequestInvitation() {
                   id="message"
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="mt-2 bg-noir-surface/50 border-crystal/10 focus:border-primary/30 text-foreground min-h-[100px] resize-none"
+                  className="mt-2 bg-background/50 border-primary/20 focus:border-primary/50 text-foreground min-h-[100px] resize-none"
                   placeholder="Tell us about yourself..."
                 />
               </div>
@@ -247,6 +245,6 @@ export default function RequestInvitation() {
           </p>
         </motion.div>
       </div>
-    </div>
+    </CrystalPageWrapper>
   );
 }
