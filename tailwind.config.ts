@@ -77,7 +77,16 @@ export default {
           elite: "hsl(var(--tier-elite))",
           "inner-circle": "hsl(var(--tier-inner-circle))",
           black: "hsl(var(--tier-black))",
+          // New Crystal Tier System
+          crystal: "hsl(var(--tier-crystal))",
+          onyx: "hsl(var(--tier-onyx))",
+          obsidian: "hsl(var(--tier-obsidian))",
+          royal: "hsl(var(--tier-royal))",
         },
+        // Additional Luxury Colors
+        sapphire: "hsl(var(--sapphire))",
+        "burgundy-crystal": "hsl(var(--burgundy-crystal))",
+        "crystal-white": "hsl(var(--crystal-white))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
