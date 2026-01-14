@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { useMemo } from 'react';
 
 interface CrystalBackgroundProps {
-  variant?: 'subtle' | 'ambient' | 'full' | 'intense';
+  variant?: 'subtle' | 'ambient' | 'full' | 'intense' | 'tiffany';
   className?: string;
   children?: React.ReactNode;
 }
@@ -45,9 +45,9 @@ export function CrystalBackground({
 }: CrystalBackgroundProps) {
   
   // Generate crystal strands based on variant
-  const strandCount = variant === 'intense' ? 28 : variant === 'full' ? 22 : variant === 'ambient' ? 14 : 8;
-  const sparkleCount = variant === 'intense' ? 35 : variant === 'full' ? 25 : variant === 'ambient' ? 12 : 0;
-  const glintCount = variant === 'intense' ? 14 : variant === 'full' ? 10 : variant === 'ambient' ? 5 : 0;
+  const strandCount = variant === 'tiffany' ? 35 : variant === 'intense' ? 28 : variant === 'full' ? 22 : variant === 'ambient' ? 14 : 8;
+  const sparkleCount = variant === 'tiffany' ? 45 : variant === 'intense' ? 35 : variant === 'full' ? 25 : variant === 'ambient' ? 12 : 0;
+  const glintCount = variant === 'tiffany' ? 20 : variant === 'intense' ? 14 : variant === 'full' ? 10 : variant === 'ambient' ? 5 : 0;
   
   const strands = useMemo<CrystalStrand[]>(() => {
     return Array.from({ length: strandCount }, (_, i) => ({
@@ -80,10 +80,11 @@ export function CrystalBackground({
     }));
   }, [glintCount]);
 
-  const showWarmGradient = variant === 'full' || variant === 'intense';
+  const showWarmGradient = variant === 'full' || variant === 'intense' || variant === 'tiffany';
   const showSparkles = variant !== 'subtle';
-  const showGlints = variant === 'full' || variant === 'intense';
-  const showDepthLayer = variant === 'full' || variant === 'intense';
+  const showGlints = variant === 'full' || variant === 'intense' || variant === 'tiffany';
+  const showDepthLayer = variant === 'full' || variant === 'intense' || variant === 'tiffany';
+  const isTiffany = variant === 'tiffany';
 
   return (
     <div className={cn('relative overflow-hidden', className)}>
@@ -123,13 +124,42 @@ export function CrystalBackground({
       )}
       
       {/* Shimmer layer - horizontal light sweep */}
-      {(variant === 'full' || variant === 'ambient' || variant === 'intense') && (
+      {(variant === 'full' || variant === 'ambient' || variant === 'intense' || isTiffany) && (
         <div className="absolute inset-0 crystal-shimmer opacity-[0.04]" 
           style={{
             background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.1) 50%, transparent 100%)',
             backgroundSize: '200% 100%',
           }}
         />
+      )}
+
+      {/* Tiffany prismatic overlay */}
+      {isTiffany && (
+        <>
+          {/* Central spotlight glow */}
+          <div 
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse 60% 50% at 50% 40%, hsl(var(--gold) / 0.08) 0%, transparent 70%)',
+            }}
+          />
+          {/* Prismatic rainbow refraction */}
+          <div 
+            className="absolute inset-0 pointer-events-none animate-pulse"
+            style={{
+              background: `
+                linear-gradient(135deg, 
+                  transparent 20%,
+                  hsl(200 60% 60% / 0.02) 25%,
+                  hsl(280 60% 60% / 0.02) 35%,
+                  hsl(350 60% 60% / 0.02) 45%,
+                  transparent 50%
+                )
+              `,
+              animationDuration: '8s',
+            }}
+          />
+        </>
       )}
       
       {/* Vertical crystal strands */}
