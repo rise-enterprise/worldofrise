@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useMembers } from '@/hooks/useMembers';
+import { useDemoMember } from '@/hooks/useDemoMember';
 import { useTiers } from '@/hooks/useTiers';
 import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { CrystalMedallion } from '@/components/ui/crystal-medallion';
@@ -32,9 +32,8 @@ import { cn } from '@/lib/utils';
 
 export default function MemberPortal() {
   const navigate = useNavigate();
-  const { data: guests = [], isLoading } = useMembers();
+  const { data: member, isLoading, error } = useDemoMember();
   const { data: tiers } = useTiers();
-  const member = guests[0]; // Demo member
   
   const [showChat, setShowChat] = useState(false);
   const [showQR, setShowQR] = useState(false);
@@ -52,13 +51,15 @@ export default function MemberPortal() {
     );
   }
 
-  if (!member) {
+  if (error || !member) {
     return (
       <CrystalPageWrapper variant="subtle" sparkleCount={10}>
         <div className="flex items-center justify-center min-h-screen p-4">
           <Card variant="obsidian" className="max-w-md w-full crystal-panel-gold">
             <CardContent className="p-8 text-center">
-              <p className="text-muted-foreground tracking-wide">No member data available</p>
+              <p className="text-muted-foreground tracking-wide">
+                {error ? 'Unable to load member data' : 'No member data available'}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -163,7 +164,7 @@ export default function MemberPortal() {
               className="h-14 w-14 ring-2 ring-primary/30 ring-offset-2 ring-offset-background cursor-pointer transition-all duration-500 hover:ring-primary/50"
               onClick={() => navigate('/member/profile/edit')}
             >
-              <AvatarImage src={member.avatarUrl} alt={member.name} />
+              <AvatarImage src={member.avatarUrl || undefined} alt={member.name} />
               <AvatarFallback className="bg-muted text-foreground font-display text-lg">
                 {getInitials(member.name)}
               </AvatarFallback>
