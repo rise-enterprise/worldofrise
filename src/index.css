@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,155 +6,119 @@
 
 @layer base {
   :root {
-    /* Crystal Day Mode - "Tiffany Daylight" */
-    --background: 140 4% 96%;
-    --foreground: 200 5% 30%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 200 5% 30%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 200 5% 30%;
-
-    /* Platinum Silver - Refined Accent */
-    --primary: 200 5% 55%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Frosted Crystal Gray */
-    --secondary: 160 4% 90%;
-    --secondary-foreground: 200 5% 35%;
-
-    /* Muted Tones - Ice */
-    --muted: 160 4% 93%;
-    --muted-foreground: 200 5% 55%;
-
-    /* Accent - Soft Ice */
-    --accent: 165 8% 92%;
-    --accent-foreground: 200 5% 35%;
-
-    /* Status Colors */
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 100%;
-
-    --success: 152 45% 45%;
-    --success-foreground: 0 0% 100%;
-
-    /* Borders & Inputs - Platinum */
-    --border: 200 5% 85%;
-    --input: 200 5% 90%;
-    --ring: 200 5% 55%;
-
-    --radius: 0.75rem;
-
+    /* ═══════════════════════════════════════════════════════════
+       RISE PRIVATE SOCIETY — Elite Luxury Design System
+       Noir Aristocratic Palette
+    ═══════════════════════════════════════════════════════════ */
+    
+    /* Base Surfaces — Noir Foundation */
+    --background: 220 14% 4%;              /* #07080A - Onyx Noir */
+    --foreground: 220 20% 93%;             /* #E9EEF7 - Crystal Silver */
+    
+    /* Cards & Elevated Surfaces */
+    --card: 220 12% 7%;                    /* #0E1116 - Obsidian Surface */
+    --card-foreground: 220 20% 93%;
+    
+    /* Popover & Overlays */
+    --popover: 220 12% 6%;
+    --popover-foreground: 220 20% 93%;
+    
+    /* Primary — Gilded Gold */
+    --primary: 42 50% 54%;                 /* #C8A24A - Gilded Gold */
+    --primary-foreground: 220 14% 4%;      /* Onyx for contrast */
+    
+    /* Secondary — Deep Obsidian */
+    --secondary: 220 10% 10%;
+    --secondary-foreground: 220 20% 93%;
+    
+    /* Muted — Charcoal Depths */
+    --muted: 220 10% 12%;                  /* #1A1D24 */
+    --muted-foreground: 220 10% 60%;       /* #8A92A3 */
+    
+    /* Accent — Royal Teal */
+    --accent: 195 62% 32%;                 /* #1F6E86 - Royal Teal */
+    --accent-foreground: 220 20% 93%;
+    
+    /* Luxury Accent Colors */
+    --gold: 42 50% 54%;                    /* #C8A24A - Gilded Gold */
+    --gold-shadow: 42 60% 26%;             /* #6F5418 - Antique Gold */
+    --burgundy: 350 65% 18%;               /* #4A0F18 - Burgundy Velvet */
+    --teal: 195 62% 32%;                   /* #1F6E86 - Royal Teal */
+    
     /* Brand Colors */
-    --noir: 200 10% 12%;
-    --noir-accent: 200 8% 25%;
-    --sasso: 25 20% 35%;
-    --sasso-accent: 25 30% 45%;
-
-    /* Tier Colors - Refined */
-    --tier-initiation: 200 5% 65%;
-    --tier-connoisseur: 200 10% 50%;
-    --tier-elite: 200 15% 40%;
-    --tier-inner-circle: 200 20% 30%;
-    --tier-black: 200 10% 12%;
-
-    /* Crystal Gradients */
-    --gradient-crystal: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(160, 4%, 96%) 100%);
-    --gradient-glass: linear-gradient(145deg, hsl(0, 0%, 100% / 0.95) 0%, hsl(160, 4%, 98% / 0.9) 100%);
-    --gradient-platinum: linear-gradient(135deg, hsl(200, 5%, 70%) 0%, hsl(200, 5%, 50%) 100%);
-
-    /* Crystal Shadows */
-    --shadow-crystal: 0 8px 32px -8px hsl(200, 10%, 50% / 0.08);
-    --shadow-glass: 0 4px 24px -4px hsl(200, 10%, 50% / 0.06);
-    --shadow-elevated: 0 24px 48px -12px hsl(200, 10%, 50% / 0.12);
-
-    /* Sidebar - Crystal */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 200 5% 35%;
-    --sidebar-primary: 200 5% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 4% 96%;
-    --sidebar-accent-foreground: 200 5% 30%;
-    --sidebar-border: 200 5% 90%;
-    --sidebar-ring: 200 5% 55%;
-
+    --noir: 220 12% 7%;
+    --noir-accent: 220 10% 15%;
+    --sasso: 25 30% 20%;
+    --sasso-accent: 25 40% 35%;
+    
+    /* Success */
+    --success: 152 45% 35%;
+    --success-foreground: 220 20% 93%;
+    
+    /* Destructive */
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders & Inputs — Crystal Lines */
+    --border: 220 15% 20%;
+    --input: 220 12% 15%;
+    --ring: 42 50% 54%;                    /* Gold focus ring */
+    
+    /* Chart Colors */
+    --chart-1: 42 50% 54%;                 /* Gold */
+    --chart-2: 195 62% 32%;                /* Teal */
+    --chart-3: 350 65% 25%;                /* Burgundy */
+    --chart-4: 220 20% 40%;                /* Silver */
+    --chart-5: 42 60% 40%;                 /* Antique Gold */
+    
+    /* Radius */
+    --radius: 0.5rem;
+    
+    /* Tier Colors */
+    --tier-initiation: 220 10% 50%;
+    --tier-connoisseur: 35 50% 45%;
+    --tier-elite: 38 60% 50%;
+    --tier-inner-circle: 40 70% 55%;
+    --tier-black: 42 50% 54%;
+    
+    /* Sidebar — Noir Depths */
+    --sidebar-background: 220 14% 5%;
+    --sidebar-foreground: 220 20% 93%;
+    --sidebar-primary: 42 50% 54%;
+    --sidebar-primary-foreground: 220 14% 4%;
+    --sidebar-accent: 220 10% 12%;
+    --sidebar-accent-foreground: 220 20% 93%;
+    --sidebar-border: 220 15% 15%;
+    --sidebar-ring: 42 50% 54%;
+    
     /* Design Tokens */
     --blur-glass: 16px;
     --blur-heavy: 24px;
-    --transition-crystal: 700ms;
-    --easing-crystal: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-luxury: 220ms;
+    --easing-luxury: cubic-bezier(0.23, 1, 0.32, 1);
   }
 
+  /* Dark mode inherits same palette — this IS the dark mode */
   .dark {
-    /* Crystal Dark Mode - "Private Viewing Room" */
-    --background: 210 10% 7%;
-    --foreground: 200 10% 85%;
-
-    --card: 210 8% 11%;
-    --card-foreground: 200 10% 85%;
-
-    --popover: 210 8% 9%;
-    --popover-foreground: 200 10% 85%;
-
-    /* Platinum Silver - Dark */
-    --primary: 200 10% 70%;
-    --primary-foreground: 210 10% 7%;
-
-    /* Graphite */
-    --secondary: 210 6% 15%;
-    --secondary-foreground: 200 10% 80%;
-
-    /* Muted Tones - Charcoal */
-    --muted: 210 6% 14%;
-    --muted-foreground: 200 8% 55%;
-
-    /* Accent - Dark Crystal */
-    --accent: 210 6% 16%;
-    --accent-foreground: 200 10% 80%;
-
-    /* Status Colors */
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 200 10% 90%;
-
-    --success: 152 45% 45%;
-    --success-foreground: 200 10% 90%;
-
-    /* Borders & Inputs */
-    --border: 210 6% 18%;
-    --input: 210 6% 16%;
-    --ring: 200 10% 70%;
-
-    /* Brand Colors - Dark */
-    --noir: 210 10% 8%;
-    --noir-accent: 200 8% 30%;
-
-    /* Tier Colors - Dark */
-    --tier-initiation: 200 5% 45%;
-    --tier-connoisseur: 200 8% 50%;
-    --tier-elite: 200 12% 55%;
-    --tier-inner-circle: 200 15% 65%;
-    --tier-black: 0 0% 95%;
-
-    /* Crystal Gradients - Dark */
-    --gradient-crystal: linear-gradient(180deg, hsl(210, 8%, 12%) 0%, hsl(210, 10%, 7%) 100%);
-    --gradient-glass: linear-gradient(145deg, hsl(210, 8%, 14% / 0.95) 0%, hsl(210, 8%, 10% / 0.9) 100%);
-    --gradient-platinum: linear-gradient(135deg, hsl(200, 10%, 60%) 0%, hsl(200, 10%, 75%) 100%);
-
-    /* Crystal Shadows - Dark */
-    --shadow-crystal: 0 8px 32px -8px hsl(0, 0%, 0% / 0.4);
-    --shadow-glass: 0 4px 24px -4px hsl(0, 0%, 0% / 0.3);
-    --shadow-elevated: 0 24px 48px -12px hsl(0, 0%, 0% / 0.5);
-
-    /* Sidebar - Dark */
-    --sidebar-background: 210 10% 5%;
-    --sidebar-foreground: 200 10% 80%;
-    --sidebar-primary: 200 10% 70%;
-    --sidebar-primary-foreground: 210 10% 7%;
-    --sidebar-accent: 210 6% 12%;
-    --sidebar-accent-foreground: 200 10% 85%;
-    --sidebar-border: 210 6% 15%;
-    --sidebar-ring: 200 10% 70%;
+    --background: 220 14% 4%;
+    --foreground: 220 20% 93%;
+    --card: 220 12% 7%;
+    --card-foreground: 220 20% 93%;
+    --popover: 220 12% 6%;
+    --popover-foreground: 220 20% 93%;
+    --primary: 42 50% 54%;
+    --primary-foreground: 220 14% 4%;
+    --secondary: 220 10% 10%;
+    --secondary-foreground: 220 20% 93%;
+    --muted: 220 10% 12%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 195 62% 32%;
+    --accent-foreground: 220 20% 93%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 15% 20%;
+    --input: 220 12% 15%;
+    --ring: 42 50% 54%;
   }
 }
 
@@ -164,196 +128,212 @@
   }
 
   html {
-    transition: background-color var(--transition-crystal) var(--easing-crystal),
-                color var(--transition-crystal) var(--easing-crystal);
+    transition: background-color var(--transition-luxury) var(--easing-luxury),
+                color var(--transition-luxury) var(--easing-luxury);
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 400;
-    letter-spacing: 0.01em;
+    font-family: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* RTL Support */
+  [dir="rtl"] body {
+    font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+  }
+
+  /* Ceremonial Headings */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cormorant Garamond', serif;
-    @apply font-medium tracking-wide;
-    letter-spacing: 0.04em;
+    font-family: "Playfair Display", "Noto Naskh Arabic", serif;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4,
+  [dir="rtl"] h5,
+  [dir="rtl"] h6 {
+    font-family: "Noto Naskh Arabic", "Playfair Display", serif;
+    letter-spacing: 0;
   }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   LUXURY UTILITY CLASSES
+═══════════════════════════════════════════════════════════ */
+
 @layer utilities {
+  /* Font Families */
   .font-display {
-    font-family: 'Cormorant Garamond', serif;
-    letter-spacing: 0.04em;
+    font-family: "Playfair Display", "Noto Naskh Arabic", serif;
+  }
+
+  .font-arabic-display {
+    font-family: "Noto Naskh Arabic", serif;
   }
 
   .font-body {
-    font-family: 'Outfit', sans-serif;
-    letter-spacing: 0.01em;
+    font-family: "IBM Plex Sans Arabic", "Inter", sans-serif;
   }
 
-  /* Crystal Glass Utilities */
+  /* Refined Tracking */
+  .tracking-refined {
+    letter-spacing: 0.03em;
+  }
+
+  .tracking-ceremonial {
+    letter-spacing: 0.08em;
+  }
+
+  .tracking-regal {
+    letter-spacing: 0.12em;
+  }
+
+  /* Glass Panels (legacy support) */
   .glass-panel {
     background-color: hsl(var(--card) / 0.95);
     @apply backdrop-blur-xl border border-border/50;
-    box-shadow: var(--shadow-glass);
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.4);
   }
 
   .glass-panel-heavy {
     background-color: hsl(var(--card) / 0.98);
     @apply backdrop-blur-2xl border border-border/30;
-    box-shadow: var(--shadow-crystal);
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.5);
   }
 
-  .crystal-border {
-    @apply border border-border/40;
-    border-image: linear-gradient(
-      to bottom,
-      hsl(var(--border) / 0.6),
-      hsl(var(--border) / 0.2)
-    ) 1;
-  }
-
-  .crystal-accent {
-    @apply relative;
-  }
-
-  .crystal-accent::before {
-    content: '';
-    @apply absolute left-0 top-1/4 bottom-1/4 w-px;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      hsl(var(--primary) / 0.4),
-      transparent
-    );
-  }
-
-  /* Light Shift Effect */
+  /* Crystal/Light shift (legacy support) */
   .light-shift {
-    @apply transition-all duration-700;
-    transition-timing-function: var(--easing-crystal);
+    @apply transition-all duration-300;
+    transition-timing-function: var(--easing-luxury);
   }
 
   .light-shift:hover {
-    @apply border-primary/30;
+    border-color: hsl(42 50% 54% / 0.3);
     box-shadow: 
-      var(--shadow-glass),
-      inset 0 1px 0 0 hsl(var(--primary) / 0.05);
+      0 4px 24px -4px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 0 rgba(200, 162, 74, 0.05);
   }
 
-  /* Crystal Text */
-  .text-crystal {
-    @apply text-foreground;
-    text-shadow: 0 1px 2px hsl(var(--foreground) / 0.05);
+  /* Obsidian Panels */
+  .obsidian-panel {
+    @apply bg-card border border-border/40 rounded-lg;
+    background: linear-gradient(180deg, hsl(220 12% 8%) 0%, hsl(220 12% 6%) 100%);
+    box-shadow: 
+      0 4px 24px -4px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 0 rgba(233, 238, 247, 0.03);
+  }
+
+  .obsidian-panel-hover {
+    @apply obsidian-panel transition-all duration-200 ease-out;
+  }
+
+  .obsidian-panel-hover:hover {
+    border-color: hsl(42 50% 54% / 0.3);
+    box-shadow: 
+      0 8px 32px -4px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 0 rgba(200, 162, 74, 0.05),
+      inset 0 0 40px 0 rgba(200, 162, 74, 0.02);
+  }
+
+  /* Gold Accents */
+  .gold-text {
+    @apply text-primary;
+  }
+
+  .gold-gradient-text {
+    background: linear-gradient(135deg, hsl(42 50% 60%) 0%, hsl(42 50% 50%) 50%, hsl(42 60% 40%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Legacy text gradients */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(42 50% 60%) 0%, hsl(42 50% 50%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .text-platinum {
-    background: var(--gradient-platinum);
+    background: linear-gradient(135deg, hsl(42 50% 60%) 0%, hsl(42 50% 50%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Legacy gradient support */
-  .text-gradient-gold {
-    background: var(--gradient-platinum);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
+  /* Legacy gradients */
   .bg-gradient-luxury {
-    background: var(--gradient-crystal);
+    background: linear-gradient(180deg, hsl(220 14% 6%) 0%, hsl(220 14% 3%) 100%);
   }
 
   .bg-gradient-card {
-    background: var(--gradient-glass);
+    background: linear-gradient(145deg, hsl(220 12% 8% / 0.95) 0%, hsl(220 12% 6% / 0.9) 100%);
   }
 
   .bg-gradient-gold {
-    background: var(--gradient-platinum);
+    background: linear-gradient(135deg, hsl(42 50% 50%) 0%, hsl(42 60% 40%) 100%);
   }
 
-  /* Crystal Shadows */
+  /* Crystal Borders */
+  .crystal-border {
+    border: 1px solid rgba(217, 222, 231, 0.12);
+  }
+
+  .crystal-border-gold {
+    border: 1px solid rgba(200, 162, 74, 0.25);
+  }
+
+  /* VIP Gold Glow */
+  .gold-glow {
+    box-shadow: 0 0 20px rgba(200, 162, 74, 0.15);
+  }
+
+  .gold-glow-strong {
+    box-shadow: 0 0 40px rgba(200, 162, 74, 0.25);
+  }
+
+  /* Legacy shadows */
   .shadow-luxury {
-    box-shadow: var(--shadow-elevated);
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.5);
   }
 
   .shadow-crystal {
-    box-shadow: var(--shadow-crystal);
+    box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.4);
   }
 
   .shadow-glass {
-    box-shadow: var(--shadow-glass);
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.3);
   }
 
-  /* Animations - Slow, Cinematic */
-  .animate-fade-in {
-    animation: crystalFadeIn 800ms var(--easing-crystal) forwards;
+  /* Noir Gradients */
+  .noir-gradient {
+    background: linear-gradient(180deg, hsl(220 14% 6%) 0%, hsl(220 14% 3%) 100%);
   }
 
-  .animate-slide-up {
-    animation: crystalSlideUp 900ms var(--easing-crystal) forwards;
+  .noir-gradient-radial {
+    background: radial-gradient(ellipse at top, hsl(220 12% 10%) 0%, hsl(220 14% 4%) 70%);
   }
 
-  .animate-scale-in {
-    animation: crystalScaleIn 700ms var(--easing-crystal) forwards;
+  /* Luxury Transitions */
+  .transition-luxury {
+    transition: all 220ms ease-out;
   }
 
-  .animate-crystal-reveal {
-    animation: crystalReveal 1000ms var(--easing-crystal) forwards;
+  .transition-ceremonial {
+    transition: all 400ms ease-out;
   }
 }
 
-/* Crystal Keyframes - Slow, Museum-grade */
-@keyframes crystalFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* ═══════════════════════════════════════════════════════════
+   ANIMATION KEYFRAMES — Slow, Deliberate, Expensive
+═══════════════════════════════════════════════════════════ */
 
-@keyframes crystalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes crystalScaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes crystalReveal {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-    filter: blur(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-/* Crystal Background Animations - Ultra-slow, Museum-grade */
-@keyframes crystalShimmer {
+@keyframes goldSweep {
   0% {
     background-position: -200% 0;
   }
@@ -362,104 +342,36 @@
   }
 }
 
-@keyframes crystalAmbient1 {
+@keyframes crystalPrism {
   0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.03;
+    opacity: 0.3;
   }
   50% {
-    transform: translate(10px, -10px) scale(1.05);
-    opacity: 0.06;
+    opacity: 0.6;
   }
 }
 
-@keyframes crystalAmbient2 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.02;
+@keyframes softReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
-  50% {
-    transform: translate(-15px, 10px) scale(1.08);
-    opacity: 0.05;
-  }
-}
-
-@keyframes crystalAmbient3 {
-  0%, 100% {
-    transform: translate(0, 0);
-    opacity: 0.02;
-  }
-  50% {
-    transform: translate(5px, -5px);
-    opacity: 0.04;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes crystalRefract {
+@keyframes gentlePulse {
   0%, 100% {
-    opacity: 0.02;
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    opacity: 0.05;
-    filter: hue-rotate(10deg);
-  }
-}
-
-@keyframes crystalLinePulse {
-  0%, 100% {
-    opacity: 0.15;
-  }
-  50% {
-    opacity: 0.35;
-  }
-}
-
-/* Crystal Strand Animations */
-@keyframes crystalStrandGlow {
-  0%, 100% {
-    opacity: 0.12;
-  }
-  50% {
-    opacity: 0.35;
-  }
-}
-
-@keyframes crystalStrandGlowSlow {
-  0%, 100% {
-    opacity: 0.08;
-  }
-  50% {
-    opacity: 0.25;
-  }
-}
-
-/* Crystal Sparkle/Twinkle Animation */
-@keyframes crystalTwinkle {
-  0%, 100% {
-    opacity: 0.1;
-    transform: rotate(45deg) scale(0.8);
+    opacity: 0.4;
   }
   50% {
     opacity: 0.7;
-    transform: rotate(45deg) scale(1.1);
   }
 }
 
-/* Crystal Light Glint Flash */
-@keyframes crystalGlint {
-  0%, 85%, 100% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  90%, 95% {
-    opacity: 1;
-    transform: scale(1.2);
-  }
-}
-
-/* Crystal Float Animation */
-@keyframes crystalFloat {
+@keyframes noirFloat {
   0%, 100% {
     transform: translateY(0);
   }
@@ -468,161 +380,212 @@
   }
 }
 
-/* Crystal Background Utilities */
-.crystal-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    hsl(var(--primary) / 0.1) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: crystalShimmer 25s linear infinite;
-  will-change: background-position;
+@keyframes medallionShine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-.crystal-ambient-1 {
-  animation: crystalAmbient1 18s ease-in-out infinite;
-  will-change: transform, opacity;
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: rgba(200, 162, 74, 0.2);
+  }
+  50% {
+    border-color: rgba(200, 162, 74, 0.4);
+  }
 }
 
-.crystal-ambient-2 {
-  animation: crystalAmbient2 22s ease-in-out infinite;
-  will-change: transform, opacity;
+/* Legacy keyframes */
+@keyframes crystalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.crystal-ambient-3 {
-  animation: crystalAmbient3 30s ease-in-out infinite;
-  will-change: transform, opacity;
+@keyframes crystalSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.crystal-refract {
-  animation: crystalRefract 30s ease-in-out infinite;
-  will-change: opacity, filter;
+@keyframes crystalScaleIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.crystal-line-pulse {
-  animation: crystalLinePulse 8s ease-in-out infinite;
+@keyframes crystalReveal {
+  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
-.crystal-strand-glow {
-  animation: crystalStrandGlow 10s ease-in-out infinite;
-  will-change: opacity;
+@keyframes lightShift {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
 }
 
-.crystal-strand-glow-slow {
-  animation: crystalStrandGlowSlow 14s ease-in-out infinite;
-  will-change: opacity;
+/* Animation Classes */
+.animate-gold-sweep {
+  animation: goldSweep 3s ease-in-out infinite;
 }
 
-.crystal-twinkle {
-  animation: crystalTwinkle 4s ease-in-out infinite;
+.animate-crystal-prism {
+  animation: crystalPrism 4s ease-in-out infinite;
+}
+
+.animate-soft-reveal {
+  animation: softReveal 600ms ease-out forwards;
+}
+
+.animate-gentle-pulse {
+  animation: gentlePulse 3s ease-in-out infinite;
+}
+
+.animate-noir-float {
+  animation: noirFloat 6s ease-in-out infinite;
+}
+
+.animate-medallion-shine {
+  animation: medallionShine 4s ease-in-out infinite;
+}
+
+.animate-border-glow {
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+/* Legacy animation classes */
+.animate-fade-in {
+  animation: crystalFadeIn 600ms ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: crystalSlideUp 700ms ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: crystalScaleIn 500ms ease-out forwards;
+}
+
+.animate-crystal-reveal {
+  animation: crystalReveal 800ms ease-out forwards;
+}
+
+.animate-light-shift {
+  animation: lightShift 3s ease-in-out infinite;
+}
+
+/* Stagger delays for reveal animations */
+.reveal-delay-1 { animation-delay: 100ms; }
+.reveal-delay-2 { animation-delay: 200ms; }
+.reveal-delay-3 { animation-delay: 300ms; }
+.reveal-delay-4 { animation-delay: 400ms; }
+.reveal-delay-5 { animation-delay: 500ms; }
+
+/* ═══════════════════════════════════════════════════════════
+   CRYSTAL BACKGROUND EFFECTS
+═══════════════════════════════════════════════════════════ */
+
+@keyframes crystalStrandGlow {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scaleY(1.02);
+  }
+}
+
+@keyframes crystalTwinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8) rotate(0deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@keyframes crystalGlint {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-crystal-strand {
+  animation: crystalStrandGlow var(--strand-duration, 4s) ease-in-out infinite;
+  animation-delay: var(--strand-delay, 0s);
   will-change: opacity, transform;
 }
 
-.crystal-glint {
-  animation: crystalGlint 3s ease-in-out infinite;
+.animate-crystal-twinkle {
+  animation: crystalTwinkle var(--sparkle-duration, 3s) ease-in-out infinite;
+  animation-delay: var(--sparkle-delay, 0s);
   will-change: opacity, transform;
 }
 
-.crystal-float {
-  animation: crystalFloat 6s ease-in-out infinite;
-  will-change: transform;
+.animate-crystal-glint {
+  animation: crystalGlint var(--glint-duration, 2s) ease-in-out infinite;
+  animation-delay: var(--glint-delay, 0s);
+  will-change: opacity;
 }
 
-/* Custom Scrollbar - Crystal */
+/* ═══════════════════════════════════════════════════════════
+   SCROLLBAR STYLING — Noir Luxury
+═══════════════════════════════════════════════════════════ */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
+  background: hsl(220 14% 6%);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--border));
+  background: hsl(220 15% 25%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.5);
+  background: hsl(42 50% 54%);
 }
 
-/* RTL Support */
-html.rtl {
-  direction: rtl;
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(220 15% 25%) hsl(220 14% 6%);
 }
 
-html.rtl .font-display,
-html.rtl .font-body {
-  font-family: 'Outfit', 'Segoe UI', Tahoma, sans-serif;
+/* ═══════════════════════════════════════════════════════════
+   FORM FOCUS STATES — Crystal Ring
+═══════════════════════════════════════════════════════════ */
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: hsl(42 50% 54% / 0.5);
+  box-shadow: 
+    0 0 0 3px hsl(42 50% 54% / 0.1),
+    inset 0 0 20px hsl(42 50% 54% / 0.03);
 }
 
-/* RTL Layout Adjustments */
-html.rtl .ml-auto { margin-right: auto; margin-left: unset; }
-html.rtl .mr-auto { margin-left: auto; margin-right: unset; }
-html.rtl .text-left { text-align: right; }
-html.rtl .text-right { text-align: left; }
+/* ═══════════════════════════════════════════════════════════
+   SELECTION — Gold Highlight
+═══════════════════════════════════════════════════════════ */
 
-/* RTL Flex Direction */
-html.rtl .flex-row { flex-direction: row-reverse; }
-html.rtl .space-x-2 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
-}
-html.rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
-}
-html.rtl .space-x-4 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-x-reverse: 1;
+::selection {
+  background: hsl(42 50% 54% / 0.3);
+  color: hsl(220 20% 93%);
 }
 
-/* RTL Gap adjustments */
-html.rtl .gap-2, html.rtl .gap-3, html.rtl .gap-4 {
-  /* Gap works the same in RTL */
-}
-
-/* RTL Icon rotation for directional icons */
-html.rtl .rtl-flip {
-  transform: scaleX(-1);
-}
-
-/* RTL Sidebar positioning */
-html.rtl aside.fixed.left-0 {
-  left: unset;
-  right: 0;
-}
-
-html.rtl aside.fixed {
-  border-right: none;
-  border-left: 1px solid hsl(var(--sidebar-border));
-}
-
-/* RTL Padding adjustments */
-html.rtl .pl-64 { padding-left: 0; padding-right: 16rem; }
-html.rtl .pl-8 { padding-left: 0; padding-right: 2rem; }
-html.rtl .pl-10 { padding-left: 0; padding-right: 2.5rem; }
-html.rtl .pl-12 { padding-left: 0; padding-right: 3rem; }
-html.rtl .pr-4 { padding-right: 0; padding-left: 1rem; }
-
-/* RTL Sheet positioning */
-html.rtl [data-side="left"] {
-  left: unset !important;
-  right: 0 !important;
-}
-
-/* Crystal accent line */
-.crystal-line {
-  @apply relative;
-}
-
-.crystal-line::after {
-  content: '';
-  @apply absolute right-0 top-0 bottom-0 w-px;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    hsl(var(--primary) / 0.3),
-    transparent
-  );
+::-moz-selection {
+  background: hsl(42 50% 54% / 0.3);
+  color: hsl(220 20% 93%);
 }
