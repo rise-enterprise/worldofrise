@@ -69,13 +69,26 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
     <Card 
       variant="obsidian"
       className={cn(
-        'cursor-pointer transition-all duration-300 ease-out animate-slide-up hover:shadow-[inset_0_0_20px_rgba(200,162,74,0.03)]',
-        isTopTier && 'border-primary/20'
+        'cursor-pointer transition-all duration-300 ease-out animate-slide-up hover:shadow-[inset_0_0_30px_rgba(200,162,74,0.05)] relative overflow-hidden group',
+        isTopTier && 'border-primary/25'
       )}
       style={{ animationDelay: `${delay}ms` }}
       onClick={onClick}
     >
-      <CardContent className="p-5">
+      {/* Crystal border glow for VIPs */}
+      {isTopTier && (
+        <>
+          <div className="absolute top-0 left-0 w-6 h-px bg-gradient-to-r from-primary/50 to-transparent" />
+          <div className="absolute top-0 left-0 w-px h-6 bg-gradient-to-b from-primary/50 to-transparent" />
+          <div className="absolute bottom-0 right-0 w-6 h-px bg-gradient-to-l from-primary/50 to-transparent" />
+          <div className="absolute bottom-0 right-0 w-px h-6 bg-gradient-to-t from-primary/50 to-transparent" />
+        </>
+      )}
+      
+      {/* Prismatic hover sweep */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.02] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
+      
+      <CardContent className="p-5 relative">
         <div className="flex items-start gap-4">
           <Avatar className={cn(
             "h-12 w-12 border",

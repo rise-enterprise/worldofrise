@@ -126,9 +126,13 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
 
   return (
     <header className={cn(
-      "flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-[rgba(217,222,231,0.08)] bg-[#07080A]/90 backdrop-blur-xl sticky top-0 z-30 gap-4",
+      "flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-primary/10 bg-gradient-to-r from-[#07080A]/95 via-[#0E1116]/90 to-[#07080A]/95 backdrop-blur-2xl sticky top-0 z-30 gap-4 relative overflow-hidden",
       isRTL && "flex-row-reverse"
     )}>
+      {/* Crystal gradient border effect */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+      {/* Inner glow */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] to-transparent pointer-events-none" />
       <div className={cn("flex items-center gap-3 animate-fade-in min-w-0", isRTL && "flex-row-reverse")}>
         {/* Mobile Menu Button */}
         {isMobile && (

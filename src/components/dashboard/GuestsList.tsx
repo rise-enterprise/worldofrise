@@ -97,18 +97,20 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
       </div>
 
       {/* Filters */}
-      <Card variant="obsidian" className="animate-slide-up">
-        <CardContent className="p-3 md:p-4">
+      <Card variant="obsidian" className="animate-slide-up relative overflow-hidden">
+        {/* Crystal glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] to-transparent pointer-events-none" />
+        <CardContent className="p-3 md:p-4 relative">
           <div className="flex flex-col gap-3 md:gap-4">
             {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary/70 transition-colors" />
               <input
                 type="text"
                 placeholder="Search by name, email, or phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-[#0B0D11] border border-[rgba(217,222,231,0.12)] rounded-lg text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#0B0D11] border border-primary/10 rounded-lg text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"
               />
             </div>
 
