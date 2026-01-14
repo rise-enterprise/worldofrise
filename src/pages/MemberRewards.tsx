@@ -4,71 +4,11 @@ import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { RewardCard } from '@/components/ui/reward-card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Gift, Star, Wine, Crown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const mockRewards = [
-  { 
-    id: '1', 
-    title: 'Private Chef\'s Table', 
-    description: 'An intimate dining experience curated by our head chef, featuring a bespoke 7-course tasting menu',
-    category: 'experience' as const, 
-    brand: 'sasso' as const, 
-    tier: 'obsidian' as const, 
-    pointsCost: 5000, 
-    availability: 'limited' as const,
-  },
-  { 
-    id: '2', 
-    title: 'VIP Lounge Access', 
-    description: 'Complimentary access to our private lounge with premium beverages and personalized service',
-    category: 'vip_table' as const, 
-    brand: 'noir' as const, 
-    tier: 'onyx' as const, 
-    pointsCost: 2500, 
-    availability: 'available' as const,
-  },
-  { 
-    id: '3', 
-    title: 'Secret Menu Tasting', 
-    description: 'Experience our hidden culinary creations, available only to those who know',
-    category: 'secret_menu' as const, 
-    brand: 'both' as const, 
-    tier: 'crystal' as const, 
-    pointsCost: 1500, 
-    availability: 'available' as const,
-  },
-  { 
-    id: '4', 
-    title: 'Royal Gala Invitation', 
-    description: 'An exclusive invitation to our annual Royal Gala, featuring world-renowned performers',
-    category: 'invitation' as const, 
-    brand: 'both' as const, 
-    tier: 'royal' as const, 
-    pointsCost: 10000, 
-    availability: 'limited' as const,
-  },
-  { 
-    id: '5', 
-    title: 'Signature Cocktail Creation', 
-    description: 'Work with our mixologist to create your own signature cocktail, named after you',
-    category: 'experience' as const, 
-    brand: 'noir' as const, 
-    tier: 'onyx' as const, 
-    pointsCost: 3000, 
-    availability: 'available' as const,
-  },
-  { 
-    id: '6', 
-    title: 'Wine Cellar Experience', 
-    description: 'A private tour and tasting in our exclusive wine cellar with our sommelier',
-    category: 'experience' as const, 
-    brand: 'sasso' as const, 
-    tier: 'obsidian' as const, 
-    pointsCost: 4500, 
-    availability: 'available' as const,
-  },
-];
+import { useRewards, Reward } from '@/hooks/useRewards';
+import { useDemoMember } from '@/hooks/useMembers';
 
 const categories = [
   { id: 'all', label: 'All Privileges', icon: Gift },
@@ -79,17 +19,20 @@ const categories = [
 
 export default function MemberRewards() {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedReward, setSelectedReward] = useState<typeof mockRewards[0] | null>(null);
+  const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [isRedeemDialogOpen, setIsRedeemDialogOpen] = useState(false);
   const [redeemSuccess, setRedeemSuccess] = useState(false);
 
-  const memberPoints = 7500;
+  const { data: rewards = [], isLoading: rewardsLoading } = useRewards();
+  const { data: member } = useDemoMember();
+  
+  const memberPoints = member?.totalPoints || 0;
 
   const filteredRewards = selectedCategory === 'all' 
-    ? mockRewards 
-    : mockRewards.filter(r => r.category === selectedCategory);
+    ? rewards 
+    : rewards.filter(r => r.category === selectedCategory);
 
-  const handleRedeem = (reward: typeof mockRewards[0]) => {
+  const handleRedeem = (reward: Reward) => {
     setSelectedReward(reward);
     setIsRedeemDialogOpen(true);
   };
@@ -102,6 +45,27 @@ export default function MemberRewards() {
       setSelectedReward(null);
     }, 2000);
   };
+
+  if (rewardsLoading) {
+    return (
+      <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <Skeleton className="h-12 w-48 mb-8" />
+          <Skeleton className="h-24 w-full max-w-xl mx-auto mb-12" />
+          <div className="flex justify-center gap-2 mb-12">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-9 w-32" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="h-64 w-full" />
+            ))}
+          </div>
+        </div>
+      </CrystalPageWrapper>
+    );
+  }
 
   return (
     <CrystalPageWrapper variant="tiffany" sparkleCount={20}>
@@ -154,7 +118,14 @@ export default function MemberRewards() {
           {filteredRewards.map((reward) => (
             <RewardCard
               key={reward.id}
-              {...reward}
+              id={reward.id}
+              title={reward.title}
+              description={reward.description || ''}
+              brand={reward.brand}
+              pointsCost={reward.pointsCost}
+              isLimited={reward.availability === 'limited'}
+              isUnlocked={reward.availability !== 'sold_out'}
+              tierRequired={reward.tier}
               onRedeem={() => handleRedeem(reward)}
               className="animate-slide-up"
             />
