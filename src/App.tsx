@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import AdminResetPassword from "./pages/AdminResetPassword";
 import AdminSetupPassword from "./pages/AdminSetupPassword";
+import MemberWelcome from "./pages/MemberWelcome";
 import MemberPortal from "./pages/MemberPortal";
 import MemberHistory from "./pages/MemberHistory";
 import MemberEvents from "./pages/MemberEvents";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             
             {/* Member Routes - Open Access */}
+            <Route path="/member/welcome" element={<MemberWelcome />} />
             <Route path="/member" element={<MemberPortal />} />
             <Route path="/member/history" element={<MemberHistory />} />
             <Route path="/member/events" element={<MemberEvents />} />

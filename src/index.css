@@ -7,8 +7,8 @@
 @layer base {
   :root {
     /* ═══════════════════════════════════════════════════════════
-       RISE PRIVATE SOCIETY — Elite Luxury Design System
-       Noir Aristocratic Palette
+       RISE LUXURY LOYALTY — Crystal Elite Design System
+       Noir Aristocratic Palette with Light Mode Support
     ═══════════════════════════════════════════════════════════ */
     
     /* Base Surfaces — Noir Foundation */
@@ -43,7 +43,10 @@
     --gold: 42 50% 54%;                    /* #C8A24A - Gilded Gold */
     --gold-shadow: 42 60% 26%;             /* #6F5418 - Antique Gold */
     --burgundy: 350 65% 18%;               /* #4A0F18 - Burgundy Velvet */
+    --burgundy-crystal: 350 65% 25%;       /* Lighter burgundy for accents */
     --teal: 195 62% 32%;                   /* #1F6E86 - Royal Teal */
+    --sapphire: 215 70% 22%;               /* Deep Sapphire Blue */
+    --crystal-white: 220 20% 98%;          /* Crystal White for light mode */
     
     /* Brand Colors */
     --noir: 220 12% 7%;
@@ -74,7 +77,13 @@
     /* Radius */
     --radius: 0.5rem;
     
-    /* Tier Colors */
+    /* NEW: Crystal Tier Colors */
+    --tier-crystal: 220 20% 75%;           /* Silver/White Crystal */
+    --tier-onyx: 220 10% 15%;              /* Deep Black */
+    --tier-obsidian: 220 12% 10%;          /* Black with depth */
+    --tier-royal: 42 60% 50%;              /* Pure Gold */
+    
+    /* Legacy Tier Colors */
     --tier-initiation: 220 10% 50%;
     --tier-connoisseur: 35 50% 45%;
     --tier-elite: 38 60% 50%;
@@ -96,6 +105,44 @@
     --blur-heavy: 24px;
     --transition-luxury: 220ms;
     --easing-luxury: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     LIGHT MODE — Crystal Daylight
+  ═══════════════════════════════════════════════════════════ */
+  .light {
+    --background: 220 20% 98%;             /* Crystal White */
+    --foreground: 220 14% 10%;             /* Deep Noir for text */
+    
+    --card: 0 0% 100%;
+    --card-foreground: 220 14% 10%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 14% 10%;
+    
+    --primary: 42 55% 45%;                 /* Deeper gold for light mode */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 14% 10%;
+    
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 10% 40%;
+    
+    --accent: 42 60% 90%;                  /* Light champagne */
+    --accent-foreground: 220 14% 10%;
+    
+    --border: 220 15% 88%;
+    --input: 220 15% 94%;
+    --ring: 42 55% 45%;
+    
+    --gold: 42 55% 45%;
+    --gold-shadow: 42 50% 60%;
+    
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 14% 10%;
+    --sidebar-primary: 42 55% 45%;
+    --sidebar-border: 220 15% 90%;
   }
 
   /* Dark mode inherits same palette — this IS the dark mode */
