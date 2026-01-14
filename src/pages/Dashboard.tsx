@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Brand, Guest, DashboardMetrics } from '@/types/loyalty';
-import { useMembers } from '@/hooks/useMembers';
+import { useVIPGuests } from '@/hooks/useMembers';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   const isMobile = useIsMobile();
   const { isRTL } = useLanguage();
-  const { data: guests = [], isLoading: guestsLoading } = useMembers();
+  const { data: vipGuests = [], isLoading: vipLoading } = useVIPGuests();
   const { data: metrics = emptyMetrics, isLoading: metricsLoading } = useDashboardMetrics();
 
   const handleSelectGuest = (guest: Guest) => {
@@ -54,7 +54,7 @@ export default function Dashboard() {
     setActiveView('guests');
   };
 
-  const isLoading = guestsLoading || metricsLoading;
+  const isLoading = vipLoading || metricsLoading;
 
   return (
     <CrystalPageWrapper variant="ambient" sparkleCount={20} showSparkles={true}>
@@ -90,9 +90,9 @@ export default function Dashboard() {
               </div>
             </div>
           ) : (
-            <Overview 
+          <Overview 
               metrics={metrics} 
-              guests={guests}
+              guests={vipGuests}
               activeBrand={activeBrand}
             />
           )
