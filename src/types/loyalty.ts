@@ -167,11 +167,15 @@ export const TIER_CONFIG: Record<Tier, TierConfig> = {
 // Helper to map database tier name to Tier type
 export function mapDbTierToTier(tierName: string): Tier {
   const normalized = tierName.toLowerCase().replace(/\s+/g, '-');
+  
+  // Map database tier names (Bronze/Silver/Gold/Platinum/Black) to code tier names
   if (normalized === 'rise-black' || normalized === 'black') return 'black';
-  if (normalized === 'inner-circle') return 'inner-circle';
-  if (normalized === 'elite' || normalized === 'élite') return 'elite';
-  if (normalized === 'connoisseur') return 'connoisseur';
-  return 'initiation';
+  if (normalized === 'platinum' || normalized === 'inner-circle') return 'inner-circle';
+  if (normalized === 'gold' || normalized === 'elite' || normalized === 'élite') return 'elite';
+  if (normalized === 'silver' || normalized === 'connoisseur') return 'connoisseur';
+  if (normalized === 'bronze' || normalized === 'initiation') return 'initiation';
+  
+  return 'initiation'; // Default fallback
 }
 
 // Helper to map database brand to Brand type
