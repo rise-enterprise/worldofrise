@@ -9,10 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvatarUpload } from '@/components/member/AvatarUpload';
-import { NotificationSettings } from '@/components/member/NotificationSettings';
-import { useMember } from '@/hooks/useMembers';
-import { useMemberAuthContext } from '@/contexts/MemberAuthContext';
-import { useUpdateMemberProfile } from '@/hooks/useUpdateMemberProfile';
+import { useMembers } from '@/hooks/useMembers';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -29,9 +26,8 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function MemberProfileEdit() {
   const navigate = useNavigate();
-  const { member: memberAuth } = useMemberAuthContext();
-  const { data: member, isLoading } = useMember(memberAuth?.memberId || undefined);
-  const updateProfile = useUpdateMemberProfile();
+  const { data: guests = [], isLoading } = useMembers();
+  const member = guests[0]; // Demo member - first guest
 
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: '',
@@ -42,6 +38,7 @@ export default function MemberProfileEdit() {
     preferred_language: 'en',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (member) {
@@ -80,15 +77,13 @@ export default function MemberProfileEdit() {
       return;
     }
 
-    updateProfile.mutate(result.data, {
-      onSuccess: () => {
-        toast.success('Profile updated successfully');
-        navigate('/member/portal');
-      },
-      onError: (error) => {
-        toast.error('Failed to update profile');
-      },
-    });
+    setIsSaving(true);
+    // Demo mode - just show success
+    setTimeout(() => {
+      toast.success('Profile updated successfully');
+      setIsSaving(false);
+      navigate('/member');
+    }, 500);
   };
 
   if (isLoading) {
@@ -107,7 +102,7 @@ export default function MemberProfileEdit() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border">
         <div className="flex items-center gap-3 p-4 max-w-lg mx-auto">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/member/portal')}>
+          <Button variant="ghost" size="icon" onClick={() => navigate('/member')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <h1 className="text-lg font-semibold text-foreground">Edit Profile</h1>
@@ -261,20 +256,15 @@ export default function MemberProfileEdit() {
           </CardContent>
         </Card>
 
-        {/* Notification Settings */}
-        {memberAuth?.memberId && (
-          <NotificationSettings memberId={memberAuth.memberId} />
-        )}
-
         {/* Submit Button */}
         <Button 
           type="submit" 
           className="w-full gap-2" 
           size="lg"
-          disabled={updateProfile.isPending}
+          disabled={isSaving}
         >
           <Save className="h-4 w-4" />
-          {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+          {isSaving ? 'Saving...' : 'Save Changes'}
         </Button>
       </form>
     </div>
