@@ -71,12 +71,21 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
 
         {/* Right Column - VIP Guests */}
         <div className="lg:col-span-1">
-          <Card variant="obsidian" className="animate-slide-up" style={{ animationDelay: '500ms' }}>
-            <CardHeader className="pb-4 md:pb-6">
+          <Card variant="obsidian" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '500ms' }}>
+            {/* Crystal accents */}
+            <div className="absolute top-0 left-0 w-8 h-px bg-gradient-to-r from-primary/50 to-transparent" />
+            <div className="absolute top-0 left-0 w-px h-8 bg-gradient-to-b from-primary/50 to-transparent" />
+            <div className="absolute top-0 right-0 w-8 h-px bg-gradient-to-l from-primary/50 to-transparent" />
+            <div className="absolute top-0 right-0 w-px h-8 bg-gradient-to-b from-primary/50 to-transparent" />
+            
+            <CardHeader className="pb-4 md:pb-6 relative">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base md:text-lg tracking-wide font-display">Distinguished Guests</CardTitle>
-                  <p className="text-xs text-muted-foreground/60 mt-1 tracking-refined">Your most valued members</p>
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-6 bg-gradient-to-b from-primary to-primary/30 rounded-full" />
+                  <div>
+                    <CardTitle className="text-base md:text-lg tracking-wide font-display">Distinguished Guests</CardTitle>
+                    <p className="text-xs text-muted-foreground/60 mt-1 tracking-refined">Your most valued members</p>
+                  </div>
                 </div>
                 <span className="text-xs text-primary font-medium cursor-pointer hover:text-primary/70 transition-colors duration-300 tracking-refined">
                   Explore Further

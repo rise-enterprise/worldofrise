@@ -57,7 +57,7 @@ export default function Dashboard() {
   const isLoading = guestsLoading || metricsLoading;
 
   return (
-    <CrystalPageWrapper variant="subtle" sparkleCount={10} showSparkles={!isMobile}>
+    <CrystalPageWrapper variant="ambient" sparkleCount={20} showSparkles={true}>
       <Sidebar 
         activeView={activeView}
         setActiveView={setActiveView}

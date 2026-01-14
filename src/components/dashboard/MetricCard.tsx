@@ -57,12 +57,21 @@ export function MetricCard({ title, value, subtitle, icon: Icon, trend, classNam
     <Card 
       variant="obsidian" 
       className={cn(
-        'animate-slide-up group hover:shadow-[inset_0_0_30px_rgba(200,162,74,0.05)] transition-all duration-500',
+        'animate-slide-up group hover:shadow-[inset_0_0_40px_rgba(200,162,74,0.06)] transition-all duration-500 relative overflow-hidden',
         className
       )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <CardContent className="p-6">
+      {/* Crystal corner accents */}
+      <div className="absolute top-0 left-0 w-6 h-px bg-gradient-to-r from-primary/40 to-transparent" />
+      <div className="absolute top-0 left-0 w-px h-6 bg-gradient-to-b from-primary/40 to-transparent" />
+      <div className="absolute top-0 right-0 w-6 h-px bg-gradient-to-l from-primary/40 to-transparent" />
+      <div className="absolute top-0 right-0 w-px h-6 bg-gradient-to-b from-primary/40 to-transparent" />
+      
+      {/* Prismatic light sweep on hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.03] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-out pointer-events-none" />
+      
+      <CardContent className="p-6 relative">
         <div className="flex items-start justify-between">
           <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/60 font-body">{title}</p>
@@ -93,12 +102,14 @@ export function MetricCard({ title, value, subtitle, icon: Icon, trend, classNam
             )}
           </div>
           <motion.div 
-            className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] text-primary/70 group-hover:text-primary group-hover:border-primary/20 group-hover:shadow-[0_0_20px_rgba(200,162,74,0.15)] transition-all duration-500"
+            className="p-3 rounded-xl bg-gradient-to-br from-[#0B0D11] to-[#0E1116] border border-primary/10 text-primary/70 group-hover:text-primary group-hover:border-primary/30 group-hover:shadow-[0_0_25px_rgba(200,162,74,0.2)] transition-all duration-500 relative"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: delay / 1000, duration: 0.3 }}
           >
-            <Icon className="h-5 w-5" />
+            {/* Diamond-cut icon container effect */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <Icon className="h-5 w-5 relative z-10" />
           </motion.div>
         </div>
       </CardContent>

@@ -15,10 +15,17 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
   const sassoPercentage = 100 - noirPercentage;
 
   return (
-    <Card variant="obsidian" className="animate-slide-up" style={{ animationDelay: '300ms' }}>
-      <CardHeader>
-        <CardTitle className="text-lg tracking-wide font-display">Brand Performance</CardTitle>
-        <p className="text-xs text-muted-foreground/60 tracking-refined">Visits this month by experience</p>
+    <Card variant="obsidian" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '300ms' }}>
+      {/* Crystal corner accents */}
+      <div className="absolute top-0 left-0 w-6 h-px bg-gradient-to-r from-primary/40 to-transparent" />
+      <div className="absolute top-0 left-0 w-px h-6 bg-gradient-to-b from-primary/40 to-transparent" />
+      
+      <CardHeader className="relative">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-5 bg-gradient-to-b from-primary to-primary/30 rounded-full" />
+          <CardTitle className="text-lg tracking-wide font-display">Brand Performance</CardTitle>
+        </div>
+        <p className="text-xs text-muted-foreground/60 tracking-refined ml-3">Visits this month by experience</p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* NOIR */}
@@ -38,9 +45,9 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
               <p className="text-xs text-muted-foreground/50 tracking-refined">{noirPercentage}% of total</p>
             </div>
           </div>
-          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden">
+          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
             <div 
-              className="h-full bg-foreground/40 rounded-full transition-all duration-1000 ease-out"
+              className="h-full bg-gradient-to-r from-foreground/50 to-foreground/30 rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${noirPercentage}%` }}
             />
           </div>
@@ -63,24 +70,26 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
               <p className="text-xs text-muted-foreground/50 tracking-refined">{sassoPercentage}% of total</p>
             </div>
           </div>
-          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden">
+          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
             <div 
-              className="h-full bg-primary/50 rounded-full transition-all duration-1000 ease-out"
+              className="h-full bg-gradient-to-r from-primary to-primary/50 rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(200,162,74,0.3)]"
               style={{ width: `${sassoPercentage}%` }}
             />
           </div>
         </div>
 
         {/* Combined visualization */}
-        <div className="pt-5 border-t border-[rgba(217,222,231,0.08)] animate-slide-up" style={{ animationDelay: '600ms' }}>
+        <div className="pt-5 border-t border-primary/10 animate-slide-up relative" style={{ animationDelay: '600ms' }}>
+          {/* Crystal divider glow */}
+          <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
           <p className="text-xs text-muted-foreground/50 mb-3 tracking-[0.2em] uppercase">Distribution</p>
-          <div className="flex h-2 rounded-full overflow-hidden bg-[#0B0D11]">
+          <div className="flex h-2 rounded-full overflow-hidden bg-[#0B0D11] shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
             <div 
-              className="bg-foreground/40 transition-all duration-1000 ease-out"
+              className="bg-gradient-to-r from-foreground/50 to-foreground/30 transition-all duration-1000 ease-out"
               style={{ width: `${noirPercentage}%` }}
             />
             <div 
-              className="bg-primary/50 transition-all duration-1000 ease-out"
+              className="bg-gradient-to-r from-primary to-primary/50 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(200,162,74,0.3)]"
               style={{ width: `${sassoPercentage}%` }}
             />
           </div>

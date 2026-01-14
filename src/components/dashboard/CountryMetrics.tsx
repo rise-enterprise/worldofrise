@@ -12,10 +12,17 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
   const total = (visitsByCountry.doha || 0) + (visitsByCountry.riyadh || 0) || 1;
 
   return (
-    <Card variant="obsidian" className="animate-slide-up" style={{ animationDelay: '400ms' }}>
-      <CardHeader>
-        <CardTitle className="text-lg tracking-wide font-display">Regional Presence</CardTitle>
-        <p className="text-xs text-muted-foreground/60 tracking-refined">Guest activity by location</p>
+    <Card variant="obsidian" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '400ms' }}>
+      {/* Crystal corner accents */}
+      <div className="absolute top-0 left-0 w-6 h-px bg-gradient-to-r from-primary/40 to-transparent" />
+      <div className="absolute top-0 left-0 w-px h-6 bg-gradient-to-b from-primary/40 to-transparent" />
+      
+      <CardHeader className="relative">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-5 bg-gradient-to-b from-primary to-primary/30 rounded-full" />
+          <CardTitle className="text-lg tracking-wide font-display">Regional Presence</CardTitle>
+        </div>
+        <p className="text-xs text-muted-foreground/60 tracking-refined ml-3">Guest activity by location</p>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
