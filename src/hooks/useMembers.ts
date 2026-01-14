@@ -224,6 +224,88 @@ async function updateMember(id: string, updates: Partial<CreateMemberInput>) {
   return data;
 }
 
+// Fetch a single demo member with LIMIT 1 for performance
+async function fetchDemoMember(): Promise<Guest | null> {
+  const { data: member, error } = await supabase
+    .from('members')
+    .select(`
+      *,
+      member_tiers (
+        tier_id,
+        tiers (
+          name,
+          color
+        )
+      )
+    `)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!member) return null;
+
+  const { data: visits, error: visitsError } = await supabase
+    .from('visits')
+    .select(`
+      id,
+      brand,
+      visit_datetime,
+      notes,
+      locations (
+        name,
+        city
+      )
+    `)
+    .eq('member_id', member.id)
+    .eq('is_voided', false)
+    .order('visit_datetime', { ascending: false })
+    .limit(20);
+
+  if (visitsError) throw visitsError;
+
+  const tierInfo = (member as any).member_tiers?.[0]?.tiers;
+  const tierName = tierInfo?.name || 'Initiation';
+
+  return {
+    id: member.id,
+    name: member.full_name,
+    email: member.email,
+    phone: member.phone,
+    country: mapDbCityToCountry(member.city),
+    tier: mapDbTierToTier(tierName),
+    tierName: tierName,
+    totalVisits: member.total_visits || 0,
+    lifetimeVisits: member.total_visits || 0,
+    lastVisit: visits?.[0]
+      ? new Date(visits[0].visit_datetime)
+      : new Date(member.created_at || Date.now()),
+    joinedAt: new Date(member.created_at || Date.now()),
+    favoriteBrand: mapDbBrandToBrand(member.brand_affinity),
+    visits: (visits || []).map(v => ({
+      id: v.id,
+      date: new Date(v.visit_datetime),
+      brand: mapDbBrandToBrand(v.brand),
+      country: mapDbCityToCountry((v.locations as any)?.city || 'doha'),
+      location: (v.locations as any)?.name || 'Unknown',
+      notes: v.notes || undefined,
+    })),
+    tags: [],
+    notes: member.notes || undefined,
+    avatarUrl: member.avatar_url || undefined,
+    totalPoints: member.total_points || 0,
+    status: member.status || 'active',
+  };
+}
+
+export function useDemoMember() {
+  return useQuery({
+    queryKey: ['demo-member'],
+    queryFn: fetchDemoMember,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
 export function useMembers() {
   return useQuery({
     queryKey: ['members'],
