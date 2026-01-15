@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { CrystalBackground } from '@/components/effects/CrystalBackground';
-import { CrystalEmblem } from '@/components/effects/CrystalEmblem';
-import { DiamondSparkles } from '@/components/effects/DiamondSparkles';
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { CrystalBackground } from "@/components/effects/CrystalBackground";
+import { CrystalEmblem } from "@/components/effects/CrystalEmblem";
+import { DiamondSparkles } from "@/components/effects/DiamondSparkles";
 
 const Gate = () => {
   const navigate = useNavigate();
@@ -11,7 +11,7 @@ const Gate = () => {
     <CrystalBackground variant="tiffany" className="min-h-screen flex flex-col">
       {/* Diamond sparkles overlay */}
       <DiamondSparkles count={35} />
-      
+
       {/* Header - Private Society */}
       <motion.header
         className="pt-12 pb-6 text-center relative z-10"
@@ -22,7 +22,7 @@ const Gate = () => {
         <span
           className="text-xs tracking-[0.4em] uppercase font-body"
           style={{
-            color: 'hsl(var(--gold) / 0.7)',
+            color: "hsl(var(--gold) / 0.7)",
           }}
         >
           ─── Private Society ───
@@ -53,7 +53,7 @@ const Gate = () => {
         {/* Unified Brand Portal */}
         <motion.button
           className="w-full max-w-md group relative overflow-hidden"
-          onClick={() => navigate('/member')}
+          onClick={() => navigate("/member")}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
@@ -64,8 +64,8 @@ const Gate = () => {
           <div
             className="relative p-10 transition-all duration-500"
             style={{
-              background: 'linear-gradient(135deg, hsl(var(--noir-obsidian)) 0%, hsl(220 25% 9%) 100%)',
-              border: '1px solid hsl(var(--gold) / 0.25)',
+              background: "linear-gradient(135deg, hsl(var(--noir-obsidian)) 0%, hsl(220 25% 9%) 100%)",
+              border: "1px solid hsl(var(--gold) / 0.25)",
               boxShadow: `
                 0 0 60px hsl(var(--gold) / 0.08),
                 inset 0 1px 0 hsl(var(--gold) / 0.15)
@@ -92,28 +92,25 @@ const Gate = () => {
                   <div
                     className="w-3 h-3 rotate-45 mb-2 transition-all duration-500 group-hover:scale-110"
                     style={{
-                      background: 'linear-gradient(135deg, hsl(210 20% 60%) 0%, hsl(210 30% 80%) 100%)',
-                      boxShadow: '0 0 12px hsl(210 30% 70% / 0.5)',
+                      background: "linear-gradient(135deg, hsl(210 20% 60%) 0%, hsl(210 30% 80%) 100%)",
+                      boxShadow: "0 0 12px hsl(210 30% 70% / 0.5)",
                     }}
                   />
-                  <span
-                    className="text-lg font-display tracking-[0.4em]"
-                    style={{ color: 'hsl(var(--foreground))' }}
-                  >
+                  <span className="text-lg font-display tracking-[0.4em]" style={{ color: "hsl(var(--foreground))" }}>
                     NOIR
                   </span>
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
-                    style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}
+                    style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
                   >
-                    Chocolatier & Café
+                    Café & Ultra experience
                   </span>
                 </div>
 
                 {/* Divider */}
                 <div
                   className="h-12 w-[1px]"
-                  style={{ background: 'linear-gradient(180deg, transparent, hsl(var(--gold) / 0.4), transparent)' }}
+                  style={{ background: "linear-gradient(180deg, transparent, hsl(var(--gold) / 0.4), transparent)" }}
                 />
 
                 {/* SASSO diamond */}
@@ -121,19 +118,16 @@ const Gate = () => {
                   <div
                     className="w-3 h-3 rotate-45 mb-2 transition-all duration-500 group-hover:scale-110"
                     style={{
-                      background: 'linear-gradient(135deg, hsl(var(--gold-muted)) 0%, hsl(var(--gold)) 100%)',
-                      boxShadow: '0 0 12px hsl(var(--gold) / 0.5)',
+                      background: "linear-gradient(135deg, hsl(var(--gold-muted)) 0%, hsl(var(--gold)) 100%)",
+                      boxShadow: "0 0 12px hsl(var(--gold) / 0.5)",
                     }}
                   />
-                  <span
-                    className="text-lg font-display tracking-[0.4em]"
-                    style={{ color: 'hsl(var(--foreground))' }}
-                  >
+                  <span className="text-lg font-display tracking-[0.4em]" style={{ color: "hsl(var(--foreground))" }}>
                     SASSO
                   </span>
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
-                    style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}
+                    style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
                   >
                     Fine Dining Italian
                   </span>
@@ -144,26 +138,18 @@ const Gate = () => {
               <div
                 className="w-24 h-[1px] mx-auto mb-4 transition-all duration-500 group-hover:w-32"
                 style={{
-                  background: 'linear-gradient(90deg, transparent, hsl(var(--gold) / 0.5), transparent)',
+                  background: "linear-gradient(90deg, transparent, hsl(var(--gold) / 0.5), transparent)",
                 }}
               />
 
               {/* Tagline */}
-              <p
-                className="text-xs tracking-wide text-center"
-                style={{ color: 'hsl(var(--gold) / 0.7)' }}
-              >
+              <p className="text-xs tracking-wide text-center" style={{ color: "hsl(var(--gold) / 0.7)" }}>
                 Enter the Private Salon
               </p>
 
               {/* Enter arrow */}
-              <div
-                className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0 text-center"
-              >
-                <span
-                  className="text-xs tracking-widest uppercase"
-                  style={{ color: 'hsl(var(--gold) / 0.6)' }}
-                >
+              <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0 text-center">
+                <span className="text-xs tracking-widest uppercase" style={{ color: "hsl(var(--gold) / 0.6)" }}>
                   Enter →
                 </span>
               </div>
@@ -173,7 +159,7 @@ const Gate = () => {
             <motion.div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none"
               style={{
-                background: 'linear-gradient(135deg, transparent 0%, hsl(var(--gold) / 0.05) 50%, transparent 100%)',
+                background: "linear-gradient(135deg, transparent 0%, hsl(var(--gold) / 0.05) 50%, transparent 100%)",
               }}
               initial={false}
               transition={{ duration: 0.5 }}
@@ -182,19 +168,19 @@ const Gate = () => {
             {/* Corner accents */}
             <div
               className="absolute top-0 left-0 w-10 h-[1px] transition-all duration-500 group-hover:w-14"
-              style={{ background: 'hsl(var(--gold) / 0.4)' }}
+              style={{ background: "hsl(var(--gold) / 0.4)" }}
             />
             <div
               className="absolute top-0 left-0 w-[1px] h-10 transition-all duration-500 group-hover:h-14"
-              style={{ background: 'hsl(var(--gold) / 0.4)' }}
+              style={{ background: "hsl(var(--gold) / 0.4)" }}
             />
             <div
               className="absolute bottom-0 right-0 w-10 h-[1px] transition-all duration-500 group-hover:w-14"
-              style={{ background: 'hsl(var(--gold) / 0.4)' }}
+              style={{ background: "hsl(var(--gold) / 0.4)" }}
             />
             <div
               className="absolute bottom-0 right-0 w-[1px] h-10 transition-all duration-500 group-hover:h-14"
-              style={{ background: 'hsl(var(--gold) / 0.4)' }}
+              style={{ background: "hsl(var(--gold) / 0.4)" }}
             />
           </div>
         </motion.button>
@@ -202,7 +188,7 @@ const Gate = () => {
         {/* Request Invitation Button */}
         <motion.button
           className="mt-16 group relative overflow-hidden"
-          onClick={() => navigate('/request-invitation')}
+          onClick={() => navigate("/request-invitation")}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1 }}
@@ -212,15 +198,15 @@ const Gate = () => {
           <div
             className="px-8 py-3 border transition-all duration-500"
             style={{
-              borderColor: 'hsl(var(--gold) / 0.4)',
-              background: 'hsl(var(--background) / 0.6)',
-              backdropFilter: 'blur(12px)',
+              borderColor: "hsl(var(--gold) / 0.4)",
+              background: "hsl(var(--background) / 0.6)",
+              backdropFilter: "blur(12px)",
             }}
           >
             <span
               className="text-xs tracking-[0.3em] uppercase font-body"
               style={{
-                color: 'hsl(var(--gold))',
+                color: "hsl(var(--gold))",
               }}
             >
               Request an Invitation
@@ -230,7 +216,7 @@ const Gate = () => {
           <div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             style={{
-              background: 'linear-gradient(90deg, transparent 0%, hsl(var(--gold) / 0.1) 50%, transparent 100%)',
+              background: "linear-gradient(90deg, transparent 0%, hsl(var(--gold) / 0.1) 50%, transparent 100%)",
             }}
           />
         </motion.button>
@@ -244,10 +230,10 @@ const Gate = () => {
         transition={{ duration: 0.8, delay: 1.2 }}
       >
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate("/dashboard")}
           className="text-xs tracking-widest uppercase transition-colors duration-300 hover:text-foreground"
           style={{
-            color: 'hsl(var(--muted-foreground) / 0.5)',
+            color: "hsl(var(--muted-foreground) / 0.5)",
           }}
         >
           Administration
