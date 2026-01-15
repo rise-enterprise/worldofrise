@@ -103,7 +103,7 @@ const Gate = () => {
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
                     style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
                   >
-                    Café & Ultra experience
+                    Ultra dining experience
                   </span>
                 </div>
 
