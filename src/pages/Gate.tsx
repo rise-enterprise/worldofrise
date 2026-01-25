@@ -144,7 +144,7 @@ const Gate = () => {
 
               {/* Tagline */}
               <p className="text-xs tracking-wide text-center" style={{ color: "hsl(var(--gold) / 0.7)" }}>
-                Enter the Private Salon
+                Enter the Ultra loyalty experience
               </p>
 
               {/* Enter arrow */}
