@@ -31,6 +31,8 @@ const Gate = () => {
     observer.observe(document.documentElement, { attributes: true });
     return () => observer.disconnect();
   }, []);
+  
+  const currentNoirLogo = theme === "light" ? noirLogoLight : noirLogoDark;
   return (
     <CrystalBackground variant="tiffany" className="min-h-screen flex flex-col relative">
       {/* Theme Toggle */}
@@ -123,20 +125,13 @@ const Gate = () => {
               <div className="flex items-center justify-center gap-8 mb-6">
                 {/* NOIR logo */}
                 <div className="flex flex-col items-center">
-                  <div className="relative h-24 w-32 flex items-center justify-center">
-                    <img 
-                      src={noirLogoDark}
-                      alt="NOIR" 
-                      className={`absolute h-24 object-contain transition-opacity duration-300 group-hover:scale-110 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
-                    />
-                    <img 
-                      src={noirLogoLight}
-                      alt="NOIR" 
-                      className={`absolute h-24 object-contain transition-opacity duration-300 group-hover:scale-110 ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
-                    />
-                  </div>
+                <img 
+                    src={currentNoirLogo} 
+                    alt="NOIR" 
+                    className="h-24 mb-2 transition-all duration-500 group-hover:scale-110"
+                  />
                   <span
-                    className="text-[10px] tracking-[0.15em] uppercase mt-3"
+                    className="text-[10px] tracking-[0.15em] uppercase mt-1"
                     style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
                   >
                     Ultra dining experience
