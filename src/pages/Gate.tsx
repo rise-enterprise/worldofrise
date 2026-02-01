@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { CrystalBackground } from "@/components/effects/CrystalBackground";
 import { CrystalEmblem } from "@/components/effects/CrystalEmblem";
 import { DiamondSparkles } from "@/components/effects/DiamondSparkles";
+import noirLogo from "@/assets/noir-logo.png";
 
 const Gate = () => {
   const navigate = useNavigate();
@@ -87,18 +88,13 @@ const Gate = () => {
             <div className="relative z-10">
               {/* Brand diamonds */}
               <div className="flex items-center justify-center gap-8 mb-6">
-                {/* NOIR diamond */}
+                {/* NOIR logo */}
                 <div className="flex flex-col items-center">
-                  <div
-                    className="w-3 h-3 rotate-45 mb-2 transition-all duration-500 group-hover:scale-110"
-                    style={{
-                      background: "linear-gradient(135deg, hsl(210 20% 60%) 0%, hsl(210 30% 80%) 100%)",
-                      boxShadow: "0 0 12px hsl(210 30% 70% / 0.5)",
-                    }}
+                  <img 
+                    src={noirLogo} 
+                    alt="NOIR" 
+                    className="h-8 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
-                  <span className="text-lg font-display tracking-[0.4em]" style={{ color: "hsl(var(--foreground))" }}>
-                    NOIR
-                  </span>
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
                     style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
