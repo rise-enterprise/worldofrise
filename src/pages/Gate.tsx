@@ -4,6 +4,7 @@ import { CrystalBackground } from "@/components/effects/CrystalBackground";
 import { CrystalEmblem } from "@/components/effects/CrystalEmblem";
 import { DiamondSparkles } from "@/components/effects/DiamondSparkles";
 import noirLogo from "@/assets/noir-logo.png";
+import sassoLogo from "@/assets/sasso-logo.png";
 
 const Gate = () => {
   const navigate = useNavigate();
@@ -109,18 +110,13 @@ const Gate = () => {
                   style={{ background: "linear-gradient(180deg, transparent, hsl(var(--gold) / 0.4), transparent)" }}
                 />
 
-                {/* SASSO diamond */}
+                {/* SASSO logo */}
                 <div className="flex flex-col items-center">
-                  <div
-                    className="w-3 h-3 rotate-45 mb-2 transition-all duration-500 group-hover:scale-110"
-                    style={{
-                      background: "linear-gradient(135deg, hsl(var(--gold-muted)) 0%, hsl(var(--gold)) 100%)",
-                      boxShadow: "0 0 12px hsl(var(--gold) / 0.5)",
-                    }}
+                  <img 
+                    src={sassoLogo} 
+                    alt="SASSO" 
+                    className="h-8 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
-                  <span className="text-lg font-display tracking-[0.4em]" style={{ color: "hsl(var(--foreground))" }}>
-                    SASSO
-                  </span>
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
                     style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
