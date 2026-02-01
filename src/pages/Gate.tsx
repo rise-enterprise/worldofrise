@@ -1,19 +1,38 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 import { CrystalBackground } from "@/components/effects/CrystalBackground";
 import { CrystalEmblem } from "@/components/effects/CrystalEmblem";
 import { DiamondSparkles } from "@/components/effects/DiamondSparkles";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import noirLogo from "@/assets/noir-logo.png";
+import noirLogoDark from "@/assets/noir-logo.png";
 import noirLogoLight from "@/assets/noir-logo-light.png";
 import sassoLogo from "@/assets/sasso-logo.png";
 
 const Gate = () => {
   const navigate = useNavigate();
-  const { resolvedTheme } = useTheme();
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   
-  const currentNoirLogo = resolvedTheme === "light" ? noirLogoLight : noirLogo;
+  useEffect(() => {
+    // Check initial theme
+    const isDark = document.documentElement.classList.contains('dark');
+    setTheme(isDark ? 'dark' : 'light');
+    
+    // Watch for theme changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          const isDark = document.documentElement.classList.contains('dark');
+          setTheme(isDark ? 'dark' : 'light');
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
+  
+  const currentNoirLogo = theme === "light" ? noirLogoLight : noirLogoDark;
   return (
     <CrystalBackground variant="tiffany" className="min-h-screen flex flex-col relative">
       {/* Theme Toggle */}
