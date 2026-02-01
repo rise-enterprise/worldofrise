@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { CrystalBackground } from "@/components/effects/CrystalBackground";
 import { CrystalEmblem } from "@/components/effects/CrystalEmblem";
 import { DiamondSparkles } from "@/components/effects/DiamondSparkles";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import noirLogo from "@/assets/noir-logo.png";
 import noirLogoLight from "@/assets/noir-logo-light.png";
 import sassoLogo from "@/assets/sasso-logo.png";
@@ -14,7 +15,17 @@ const Gate = () => {
   
   const currentNoirLogo = resolvedTheme === "light" ? noirLogoLight : noirLogo;
   return (
-    <CrystalBackground variant="tiffany" className="min-h-screen flex flex-col">
+    <CrystalBackground variant="tiffany" className="min-h-screen flex flex-col relative">
+      {/* Theme Toggle */}
+      <motion.div
+        className="absolute top-4 right-4 z-20"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 1.4 }}
+      >
+        <ThemeToggle className="text-gold/60 hover:text-gold hover:bg-gold/10" />
+      </motion.div>
+
       {/* Diamond sparkles overlay */}
       <DiamondSparkles count={35} />
 
