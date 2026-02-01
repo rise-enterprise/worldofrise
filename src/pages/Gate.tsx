@@ -122,24 +122,26 @@ const Gate = () => {
               {/* Brand diamonds */}
               <div className="flex items-center justify-center gap-8 mb-6">
                 {/* NOIR logo */}
-                <div className="flex flex-col items-center relative h-24 w-32">
-                  <img 
-                    src={noirLogoDark}
-                    alt="NOIR" 
-                    className={`absolute inset-0 h-24 w-full object-contain mb-2 transition-opacity duration-300 group-hover:scale-110 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
-                  />
-                  <img 
-                    src={noirLogoLight}
-                    alt="NOIR" 
-                    className={`absolute inset-0 h-24 w-full object-contain mb-2 transition-opacity duration-300 group-hover:scale-110 ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
-                  />
+                <div className="flex flex-col items-center">
+                  <div className="relative h-24 w-32 flex items-center justify-center">
+                    <img 
+                      src={noirLogoDark}
+                      alt="NOIR" 
+                      className={`absolute h-24 object-contain transition-opacity duration-300 group-hover:scale-110 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
+                    />
+                    <img 
+                      src={noirLogoLight}
+                      alt="NOIR" 
+                      className={`absolute h-24 object-contain transition-opacity duration-300 group-hover:scale-110 ${theme === 'light' ? 'opacity-100' : 'opacity-0'}`}
+                    />
+                  </div>
+                  <span
+                    className="text-[10px] tracking-[0.15em] uppercase mt-3"
+                    style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
+                  >
+                    Ultra dining experience
+                  </span>
                 </div>
-                <span
-                  className="text-[10px] tracking-[0.15em] uppercase mt-1"
-                  style={{ color: "hsl(var(--muted-foreground) / 0.6)" }}
-                >
-                  Ultra dining experience
-                </span>
 
                 {/* Divider */}
                 <div
