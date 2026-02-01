@@ -1,14 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 import { CrystalBackground } from "@/components/effects/CrystalBackground";
 import { CrystalEmblem } from "@/components/effects/CrystalEmblem";
 import { DiamondSparkles } from "@/components/effects/DiamondSparkles";
 import noirLogo from "@/assets/noir-logo.png";
+import noirLogoLight from "@/assets/noir-logo-light.png";
 import sassoLogo from "@/assets/sasso-logo.png";
 
 const Gate = () => {
   const navigate = useNavigate();
-
+  const { resolvedTheme } = useTheme();
+  
+  const currentNoirLogo = resolvedTheme === "light" ? noirLogoLight : noirLogo;
   return (
     <CrystalBackground variant="tiffany" className="min-h-screen flex flex-col">
       {/* Diamond sparkles overlay */}
@@ -92,7 +96,7 @@ const Gate = () => {
                 {/* NOIR logo */}
                 <div className="flex flex-col items-center">
                 <img 
-                    src={noirLogo} 
+                    src={currentNoirLogo} 
                     alt="NOIR" 
                     className="h-24 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
