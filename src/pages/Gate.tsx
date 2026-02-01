@@ -94,7 +94,7 @@ const Gate = () => {
                 <img 
                     src={noirLogo} 
                     alt="NOIR" 
-                    className="h-16 mb-2 transition-all duration-500 group-hover:scale-110"
+                    className="h-24 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
@@ -115,7 +115,7 @@ const Gate = () => {
                 <img 
                     src={sassoLogo} 
                     alt="SASSO" 
-                    className="h-14 mb-2 transition-all duration-500 group-hover:scale-110"
+                    className="h-24 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
