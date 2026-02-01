@@ -91,10 +91,10 @@ const Gate = () => {
               <div className="flex items-center justify-center gap-8 mb-6">
                 {/* NOIR logo */}
                 <div className="flex flex-col items-center">
-                  <img 
+                <img 
                     src={noirLogo} 
                     alt="NOIR" 
-                    className="h-12 mb-2 transition-all duration-500 group-hover:scale-110"
+                    className="h-16 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
@@ -112,10 +112,10 @@ const Gate = () => {
 
                 {/* SASSO logo */}
                 <div className="flex flex-col items-center">
-                  <img 
+                <img 
                     src={sassoLogo} 
                     alt="SASSO" 
-                    className="h-8 mb-2 transition-all duration-500 group-hover:scale-110"
+                    className="h-14 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
