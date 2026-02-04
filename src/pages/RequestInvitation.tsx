@@ -46,6 +46,18 @@ export default function RequestInvitation() {
         });
 
       if (error) throw error;
+
+      // Send notification email to marketing
+      await supabase.functions.invoke('notify-invitation-request', {
+        body: {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone || undefined,
+          preferredBrand: formData.preferredBrand || undefined,
+          referralSource: formData.referralSource || undefined,
+          message: formData.message || undefined
+        }
+      });
       
       setIsSubmitted(true);
     } catch (error) {
