@@ -1,56 +1,35 @@
 
+## Fix Dashboard Light Mode UI Issues
 
-## Fix Day Mode: Replace All Hardcoded Dark Colors with Theme-Aware Variables
+The dashboard in day mode has several visual problems: heavy dark shadows on cards, crystal background effects that are too intense, and glass material properties tuned exclusively for dark backgrounds.
 
-The dashboard has hundreds of hardcoded dark hex colors (`#0B0D11`, `#0E1116`, `#07080A`, etc.) scattered across ~11 component files and CSS utility classes. These don't respond to the light/dark theme toggle, causing black areas to persist in day mode.
+### Issues Identified
 
-### Strategy
+1. **Card shadows too harsh** -- The `obsidian` and `crystal-panel` card variants use `hsl(0 0% 0% / 0.4-0.5)` shadows which look like heavy dark borders on light backgrounds
+2. **Crystal background effects too visible** -- Gold crystal strands, sparkles, and ambient orbs designed for dark noir backgrounds appear overly prominent on light surfaces
+3. **Glass panel shadows not theme-aware** -- `.crystal-panel`, `.crystal-panel-elevated`, and `.obsidian-panel` utilities all have hardcoded dark shadow values
+4. **Bevel effects mismatched** -- Inset shadows meant for dark mode create unnatural depth artifacts in light mode
 
-Replace all hardcoded dark colors with CSS variable-based equivalents that automatically adapt to the active theme.
+### Changes
 
-### Color Mapping
+**1. `src/index.css` -- Add light mode shadow overrides**
+- Add `.light` scoped overrides for `.crystal-panel`, `.crystal-panel-elevated`, `.crystal-panel-gold`, `.obsidian-panel`, and `.obsidian-panel-hover` with softer, lighter shadows (e.g., `hsl(0 0% 0% / 0.08)` instead of `0.4-0.5`)
+- Add `.light` scoped overrides for `.glass-panel` and `.glass-panel-heavy`
+- Adjust `.shadow-luxury`, `.shadow-crystal`, and `.shadow-glass` for light mode with much reduced opacity
 
-| Hardcoded Dark Color | Replacement |
-|---|---|
-| `#07080A` / `hsl(220 14% 4%)` | `bg-background` or `hsl(var(--background))` |
-| `#0B0D11` / `hsl(220 12% 5%)` | `bg-muted` or `hsl(var(--muted))` |
-| `#0E1116` / `hsl(220 12% 7%)` | `bg-card` or `hsl(var(--card))` |
-| `rgba(217,222,231,0.08)` borders | `border-border/30` or similar |
+**2. `src/components/ui/card.tsx` -- Add light-mode-aware shadow tokens**
+- Update the `obsidian` and `luxury` card variants to use a CSS variable-based shadow approach, or add `.light` class scoping so the heavy `0_8px_32px_-8px_hsl(0_0%_0%/0.5)` shadows become much softer like `0_4px_16px_-4px_hsl(0_0%_0%/0.08)`
 
-### Files to Update
+**3. `src/components/effects/CrystalBackground.tsx` -- Reduce light mode intensity**
+- Detect the current theme and reduce crystal strand opacity, sparkle count, and ambient orb intensity when in light mode
+- Alternatively, reduce the opacity values via CSS: the strands and sparkles use inline styles with fixed opacity values that need to halve in light mode
 
-**1. CSS Utility Classes (`src/index.css`)**
-- `.obsidian-panel` -- replace hardcoded `hsl(220 12% 9%)` / `hsl(220 12% 6%)` with `hsl(var(--card))` 
-- `.bg-gradient-luxury` -- replace with CSS variable-based gradient
-- `.bg-gradient-card` -- replace with CSS variable-based gradient
-- `.bg-gradient-crystal` -- replace with CSS variable-based gradient
-- `.noir-gradient` / `.noir-gradient-radial` -- replace with CSS variable-based equivalents
+**4. `src/components/effects/DiamondSparkles.tsx` -- Tone down for light mode**
+- Reduce glow intensity of diamond sparkles and prismatic flares when the light class is active, so they don't create jarring bright spots on a white background
 
-**2. Dashboard Components (replace `bg-[#0B0D11]`, `bg-[#0E1116]`, `bg-[#07080A]`, `from-[#0B0D11]`, `to-[#0E1116]` with theme tokens):**
-- `MetricCard.tsx` -- icon container gradient
-- `TierDistribution.tsx` -- progress bar background
-- `GuestsList.tsx` -- search input, avatar fallback
-- `GuestProfile.tsx` -- page background, header, badges, dialog, tabs, cards (~30+ instances)
-- `AnalyticsView.tsx` -- icon containers, list items
-- `CMSView.tsx` -- tabs, inputs, settings rows, upload areas
-- `RewardsManagement.tsx` -- dialog, inputs, selects
-- `NotificationsView.tsx` -- hardcoded dark backgrounds
-- `SettingsView.tsx` -- hardcoded dark backgrounds
-- `EventsView.tsx` -- hardcoded dark backgrounds
-- `PrivilegesView.tsx` -- hardcoded dark backgrounds
-- `AdminsView.tsx` -- hardcoded dark backgrounds
+### Technical Approach
 
-**3. CrystalBackground.tsx**
-- The base gradient layer uses `from-background` which is good, but `to-accent/20` may need checking
-
-### Approach
-
-- All `bg-[#0B0D11]` becomes `bg-muted` (adapts per theme)
-- All `bg-[#0E1116]` becomes `bg-card` (adapts per theme)
-- All `bg-[#07080A]` becomes `bg-background` (adapts per theme)
-- All `from-[#0B0D11] to-[#0E1116]` gradients become `from-muted to-card`
-- All `border-[rgba(217,222,231,0.08)]` becomes `border-border/30`
-- CSS gradient utilities get updated to use `hsl(var(--card))` and `hsl(var(--background))` instead of hardcoded HSL values
-
-This is a systematic find-and-replace across all affected files. The light mode CSS variables are already defined in `index.css` and will provide proper light colors automatically once the hardcoded values are removed.
-
+The most efficient approach:
+- Add a block of `.light` overrides in `index.css` for all shadow/glass utility classes (single location, comprehensive fix)
+- Use a CSS class `.light` on the crystal effects container to reduce opacity via CSS rather than adding theme state detection in every component
+- Update card.tsx obsidian/luxury variants to reference a CSS custom property for shadow intensity
