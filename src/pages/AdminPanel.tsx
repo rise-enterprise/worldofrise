@@ -19,8 +19,9 @@ const LoyaltyAnalytics = lazy(() => import("@/components/admin/loyalty/LoyaltyAn
 const LoyaltyDigitalCard = lazy(() => import("@/components/admin/loyalty/LoyaltyDigitalCard"));
 const LoyaltyMultiBrand = lazy(() => import("@/components/admin/loyalty/LoyaltyMultiBrand"));
 const LoyaltyGlobalSettings = lazy(() => import("@/components/admin/loyalty/LoyaltyGlobalSettings"));
+const AdminUsers = lazy(() => import("@/components/dashboard/AdminsView").then(m => ({ default: m.AdminsView })));
 
-const LOYALTY_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
+const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
   "loyalty-members": LoyaltyMembers,
   "loyalty-points": LoyaltyPointsEngine,
   "loyalty-rewards": LoyaltyRewards,
@@ -31,6 +32,7 @@ const LOYALTY_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>
   "loyalty-digital-card": LoyaltyDigitalCard,
   "loyalty-multi-brand": LoyaltyMultiBrand,
   "loyalty-settings": LoyaltyGlobalSettings,
+  "admin-users": AdminUsers as any,
 };
 
 export default function AdminPanel() {
@@ -42,7 +44,7 @@ export default function AdminPanel() {
   const [activeView, setActiveView] = useState("loyalty-members");
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ loyalty: true });
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ loyalty: true, administration: true });
 
   const toggleSection = useCallback((id: string) => {
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -102,9 +104,9 @@ export default function AdminPanel() {
           />
 
           <main className="flex-1 overflow-y-auto">
-            {LOYALTY_VIEWS[activeView] ? (
+            {ALL_VIEWS[activeView] ? (
               <Suspense fallback={<div className="flex items-center justify-center h-64 text-muted-foreground">Loading...</div>}>
-                {(() => { const C = LOYALTY_VIEWS[activeView]; return <C />; })()}
+                {(() => { const C = ALL_VIEWS[activeView]; return <C />; })()}
               </Suspense>
             ) : (
               <div className="flex items-center justify-center h-64 text-muted-foreground">
