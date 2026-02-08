@@ -1,35 +1,47 @@
 
-## Fix Dashboard Light Mode UI Issues
 
-The dashboard in day mode has several visual problems: heavy dark shadows on cards, crystal background effects that are too intense, and glass material properties tuned exclusively for dark backgrounds.
+## Show All Guest Information in Distinguished Guests Card
 
-### Issues Identified
+Currently the VIPGuestCard only shows: name, tier badge, brand, country, visits count, last visit date, and up to 2 tags. The Guest object has many more fields that should be visible.
 
-1. **Card shadows too harsh** -- The `obsidian` and `crystal-panel` card variants use `hsl(0 0% 0% / 0.4-0.5)` shadows which look like heavy dark borders on light backgrounds
-2. **Crystal background effects too visible** -- Gold crystal strands, sparkles, and ambient orbs designed for dark noir backgrounds appear overly prominent on light surfaces
-3. **Glass panel shadows not theme-aware** -- `.crystal-panel`, `.crystal-panel-elevated`, and `.obsidian-panel` utilities all have hardcoded dark shadow values
-4. **Bevel effects mismatched** -- Inset shadows meant for dark mode create unnatural depth artifacts in light mode
+### Fields to Add
+
+| Field | Display |
+|---|---|
+| `email` | Email icon + address |
+| `phone` | Phone icon + number |
+| `totalPoints` | Points counter with star icon |
+| `birthday` | Cake icon + formatted date |
+| `salutation` | Shown before name (e.g. "Mr. John Doe") |
+| `joinedAt` | "Member since" label with formatted date |
+| `status` | Small colored dot indicator (green=active, red=blocked) |
+| `isVip` | Crown/diamond icon badge next to name |
 
 ### Changes
 
-**1. `src/index.css` -- Add light mode shadow overrides**
-- Add `.light` scoped overrides for `.crystal-panel`, `.crystal-panel-elevated`, `.crystal-panel-gold`, `.obsidian-panel`, and `.obsidian-panel-hover` with softer, lighter shadows (e.g., `hsl(0 0% 0% / 0.08)` instead of `0.4-0.5`)
-- Add `.light` scoped overrides for `.glass-panel` and `.glass-panel-heavy`
-- Adjust `.shadow-luxury`, `.shadow-crystal`, and `.shadow-glass` for light mode with much reduced opacity
+**File: `src/components/dashboard/VIPGuestCard.tsx`**
 
-**2. `src/components/ui/card.tsx` -- Add light-mode-aware shadow tokens**
-- Update the `obsidian` and `luxury` card variants to use a CSS variable-based shadow approach, or add `.light` class scoping so the heavy `0_8px_32px_-8px_hsl(0_0%_0%/0.5)` shadows become much softer like `0_4px_16px_-4px_hsl(0_0%_0%/0.08)`
+**Desktop (non-compact) layout:**
+- Prepend `salutation` before `guest.name` in the title (e.g., "Mr. John Doe")
+- Add a VIP diamond icon next to the name if `isVip` is true
+- Add a status dot (green/red) near the name
+- Add a second info row below brand/country showing email and phone (with Mail and Phone icons)
+- Expand the stats section at the bottom to include:
+  - Visits (existing)
+  - Last visit (existing)
+  - Points (new, with Star icon)
+  - Member since (new, with Calendar icon)
+- Show birthday with Cake icon if available
+- Keep tags display as-is
 
-**3. `src/components/effects/CrystalBackground.tsx` -- Reduce light mode intensity**
-- Detect the current theme and reduce crystal strand opacity, sparkle count, and ambient orb intensity when in light mode
-- Alternatively, reduce the opacity values via CSS: the strands and sparkles use inline styles with fixed opacity values that need to halve in light mode
+**Mobile (compact) layout:**
+- Add salutation before name
+- Add email and phone as small text lines below the name
+- Add points next to visits count
 
-**4. `src/components/effects/DiamondSparkles.tsx` -- Tone down for light mode**
-- Reduce glow intensity of diamond sparkles and prismatic flares when the light class is active, so they don't create jarring bright spots on a white background
+### Technical Details
 
-### Technical Approach
+- Import additional icons from `lucide-react`: `Mail`, `Phone`, `Star`, `Cake`, `Calendar`, `Diamond`
+- Add a `formatFullDate` helper for birthday and joinedAt formatting
+- No new dependencies or data fetching needed -- all fields already exist on the Guest object
 
-The most efficient approach:
-- Add a block of `.light` overrides in `index.css` for all shadow/glass utility classes (single location, comprehensive fix)
-- Use a CSS class `.light` on the crystal effects container to reduce opacity via CSS rather than adding theme state detection in every component
-- Update card.tsx obsidian/luxury variants to reference a CSS custom property for shadow intensity
