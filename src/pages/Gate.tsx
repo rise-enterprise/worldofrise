@@ -78,7 +78,7 @@ const Gate = () => {
 
         {/* Tagline */}
         <motion.p
-          className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-16"
+          className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-10 md:mb-16"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
@@ -98,7 +98,7 @@ const Gate = () => {
         >
           {/* Card background */}
           <div
-            className="relative p-10 transition-all duration-500"
+            className="relative p-6 md:p-10 transition-all duration-500"
             style={{
               background: "linear-gradient(135deg, hsl(var(--noir-obsidian)) 0%, hsl(220 25% 9%) 100%)",
               border: "1px solid hsl(var(--gold) / 0.25)",
@@ -122,13 +122,13 @@ const Gate = () => {
             {/* Content */}
             <div className="relative z-10">
               {/* Brand diamonds */}
-              <div className="flex items-center justify-center gap-8 mb-6">
+              <div className="flex items-center justify-center gap-4 md:gap-8 mb-6">
                 {/* NOIR logo */}
                 <div className="flex flex-col items-center">
                 <img 
                     src={currentNoirLogo} 
                     alt="NOIR" 
-                    className="h-24 mb-2 transition-all duration-500 group-hover:scale-110"
+                    className="h-16 md:h-24 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
@@ -149,7 +149,7 @@ const Gate = () => {
                 <img 
                     src={sassoLogo} 
                     alt="SASSO" 
-                    className="h-24 mb-2 transition-all duration-500 group-hover:scale-110"
+                    className="h-16 md:h-24 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
                   <span
                     className="text-[10px] tracking-[0.15em] uppercase mt-1"
@@ -213,7 +213,7 @@ const Gate = () => {
 
         {/* Request Invitation Button */}
         <motion.button
-          className="mt-16 group relative overflow-hidden"
+          className="mt-10 md:mt-16 group relative overflow-hidden w-full max-w-md md:w-auto"
           onClick={() => navigate("/request-invitation")}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

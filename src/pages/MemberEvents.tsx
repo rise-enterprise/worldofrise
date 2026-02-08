@@ -220,7 +220,7 @@ export default function MemberEvents() {
                   <Button 
                     variant="vip-gold" 
                     size="sm" 
-                    className="w-full mt-4"
+                    className="w-full mt-4 min-h-[44px]"
                     onClick={() => handleRegister(event.id)}
                     disabled={event.registered >= event.capacity}
                   >

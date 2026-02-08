@@ -86,7 +86,7 @@ export default function MemberRewards() {
 
         {/* Title */}
         <div className="text-center mb-12">
-          <h1 className="font-display text-4xl md:text-5xl font-medium text-foreground tracking-crystal">
+          <h1 className="font-display text-2xl md:text-4xl lg:text-5xl font-medium text-foreground tracking-crystal">
             Exclusive Privileges
           </h1>
           <p className="text-muted-foreground/60 mt-4 max-w-xl mx-auto">
@@ -95,7 +95,7 @@ export default function MemberRewards() {
         </div>
 
         {/* Category Filter */}
-        <div className="flex justify-center gap-2 mb-12 flex-wrap">
+        <div className="flex justify-center gap-2 mb-12 flex-wrap overflow-x-auto scrollbar-hide px-2">
           {categories.map((cat) => (
             <Button
               key={cat.id}

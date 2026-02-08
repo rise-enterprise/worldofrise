@@ -84,7 +84,7 @@ export default function MemberHistory() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <Card className="crystal-panel">
             <CardContent className="p-4 text-center">
-              <p className="font-display text-3xl font-medium text-primary">{member.totalVisits}</p>
+              <p className="font-display text-2xl md:text-3xl font-medium text-primary">{member.totalVisits}</p>
               <p className="text-xs text-muted-foreground">Total Visits</p>
             </CardContent>
           </Card>

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Bell, Search, Plus, Upload, Menu } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -41,6 +41,8 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: DashboardHeaderProps) {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const showMenuButton = isMobile || isTablet;
   const { t } = useTranslation();
   const { language, isRTL } = useLanguage();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -136,8 +138,8 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
       <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] to-transparent pointer-events-none" />
       <div className={cn("flex items-center gap-3 animate-fade-in min-w-0", isRTL && "flex-row-reverse")}>
         {/* Mobile Menu Button */}
-        {isMobile && (
-          <Button variant="ghost" size="icon" onClick={onMenuClick} className="shrink-0 text-muted-foreground hover:text-foreground">
+        {showMenuButton && (
+          <Button variant="ghost" size="icon" onClick={onMenuClick} className="shrink-0 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px]">
             <Menu className="h-5 w-5" />
           </Button>
         )}

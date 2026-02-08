@@ -56,7 +56,7 @@ export function AnalyticsView() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/60">Loyalty ROI</p>
-                <p className="font-display text-3xl font-medium text-foreground mt-2">342%</p>
+                <p className="font-display text-2xl md:text-3xl font-medium text-foreground mt-2">342%</p>
                 <div className="flex items-center gap-1 mt-2 text-emerald-500">
                   <ArrowUp className="h-3 w-3" />
                   <span className="text-xs">+18% vs Q1</span>
@@ -74,7 +74,7 @@ export function AnalyticsView() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/60">Member LTV</p>
-                <p className="font-display text-3xl font-medium text-foreground mt-2">$2,847</p>
+                <p className="font-display text-2xl md:text-3xl font-medium text-foreground mt-2">$2,847</p>
                 <div className="flex items-center gap-1 mt-2 text-emerald-500">
                   <ArrowUp className="h-3 w-3" />
                   <span className="text-xs">+12% growth</span>
@@ -92,7 +92,7 @@ export function AnalyticsView() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/60">Retention Rate</p>
-                <p className="font-display text-3xl font-medium text-foreground mt-2">92%</p>
+                <p className="font-display text-2xl md:text-3xl font-medium text-foreground mt-2">92%</p>
                 <div className="flex items-center gap-1 mt-2 text-emerald-500">
                   <ArrowUp className="h-3 w-3" />
                   <span className="text-xs">+4% this month</span>
@@ -110,7 +110,7 @@ export function AnalyticsView() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/60">Tier Upgrades</p>
-                <p className="font-display text-3xl font-medium text-foreground mt-2">47</p>
+                <p className="font-display text-2xl md:text-3xl font-medium text-foreground mt-2">47</p>
                 <div className="flex items-center gap-1 mt-2 text-amber-500">
                   <ArrowDown className="h-3 w-3" />
                   <span className="text-xs">-3 vs last month</span>
@@ -133,7 +133,7 @@ export function AnalyticsView() {
             <p className="text-xs text-muted-foreground/60">Total revenue contribution per tier</p>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[200px] md:h-[250px] lg:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={tierData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} />
@@ -162,7 +162,7 @@ export function AnalyticsView() {
             <p className="text-xs text-muted-foreground/60">Monthly member retention rate</p>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[200px] md:h-[250px] lg:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={retentionData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} />
@@ -191,7 +191,7 @@ export function AnalyticsView() {
             <p className="text-xs text-muted-foreground/60">NOIR vs SASSO monthly visits</p>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[200px] md:h-[250px] lg:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={brandComparison}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} />

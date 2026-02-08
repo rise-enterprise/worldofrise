@@ -55,7 +55,7 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
       </div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
         {/* Left Column - Tier Distribution */}
         <div className="lg:col-span-1">
           <TierDistribution distribution={metrics.tierDistribution} />
@@ -68,8 +68,8 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
         </div>
 
         {/* Right Column - VIP Guests */}
-        <div className="lg:col-span-1">
-          <Card variant="obsidian" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '500ms' }}>
+        <div className="md:col-span-1">
+          <Card variant="obsidian" className="animate-slide-up relative overflow-hidden md:col-span-2 lg:col-span-1" style={{ animationDelay: '500ms' }}>
             {/* Crystal accents */}
             <div className="absolute top-0 left-0 w-8 h-px bg-gradient-to-r from-primary/50 to-transparent" />
             <div className="absolute top-0 left-0 w-px h-8 bg-gradient-to-b from-primary/50 to-transparent" />

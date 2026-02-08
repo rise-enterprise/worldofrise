@@ -28,14 +28,14 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
         <div className="grid grid-cols-2 gap-4">
           {/* Qatar */}
           <div 
-            className="p-5 rounded-xl bg-muted border border-border/30 animate-slide-up hover:border-border/50 transition-all duration-300"
+            className="p-3 md:p-5 rounded-xl bg-muted border border-border/30 animate-slide-up hover:border-border/50 transition-all duration-300"
             style={{ animationDelay: '500ms' }}
           >
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="h-4 w-4 text-muted-foreground/50" />
               <span className="text-sm font-medium text-foreground tracking-refined">Qatar</span>
             </div>
-            <p className="font-display text-3xl font-medium text-foreground mb-1 tracking-wide">
+            <p className="font-display text-2xl md:text-3xl font-medium text-foreground mb-1 tracking-wide">
               {(visitsByCountry.doha || 0).toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground/50 tracking-refined">
@@ -48,14 +48,14 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
 
           {/* Saudi Arabia */}
           <div 
-            className="p-5 rounded-xl bg-muted border border-border/30 animate-slide-up hover:border-primary/20 transition-all duration-300"
+            className="p-3 md:p-5 rounded-xl bg-muted border border-border/30 animate-slide-up hover:border-primary/20 transition-all duration-300"
             style={{ animationDelay: '600ms' }}
           >
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="h-4 w-4 text-primary/50" />
               <span className="text-sm font-medium text-foreground tracking-refined">Saudi Arabia</span>
             </div>
-            <p className="font-display text-3xl font-medium text-primary mb-1 tracking-wide">
+            <p className="font-display text-2xl md:text-3xl font-medium text-primary mb-1 tracking-wide">
               {visitsByCountry.riyadh.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground/50 tracking-refined">
