@@ -20,6 +20,7 @@ const MemberEvents = lazy(() => import("./pages/MemberEvents"));
 const MemberProfileEdit = lazy(() => import("./pages/MemberProfileEdit"));
 const MemberRewards = lazy(() => import("./pages/MemberRewards"));
 const MemberExperiences = lazy(() => import("./pages/MemberExperiences"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
               
               {/* Admin Routes */}
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin" element={<AdminPanel />} />
               
               {/* Member Routes - Open Access */}
               <Route path="/member/welcome" element={<MemberWelcome />} />
