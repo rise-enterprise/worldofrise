@@ -117,13 +117,13 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
             </AvatarFallback>
           </Avatar>
           
-          <div className="min-w-0 flex flex-col gap-1.5">
+          <div className="min-w-0 flex-1 flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
               <div className={cn(
                 "h-2 w-2 rounded-full shrink-0",
                 guest.status === 'blocked' ? 'bg-destructive' : 'bg-emerald-500 dark:bg-emerald-400'
               )} />
-              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-wide">
+                <h4 className="font-display text-sm font-medium text-foreground tracking-wide">
                 {displayName}
               </h4>
               {guest.isVip && <Diamond className="h-3.5 w-3.5 text-primary shrink-0" />}
