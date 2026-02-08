@@ -1,122 +1,108 @@
 
-## Master Control Admin Panel -- New `/admin` Route
 
-Build a separate SevenRooms-style "Master Control" admin panel at `/admin` with a fully expandable sidebar and placeholder views for all sections. The existing `/dashboard` remains untouched.
+## Loyalty Master Control Panel -- Expand `/admin` with 10 Functional Sections
 
----
-
-### Architecture
-
-- **New route**: `/admin` in `App.tsx` (lazy-loaded)
-- **New page**: `src/pages/AdminPanel.tsx` -- layout shell with sidebar + content area
-- **New sidebar**: `src/components/admin/AdminSidebar.tsx` -- expandable, collapsible sections with the SevenRooms-style navigation structure
-- **New placeholder**: `src/components/admin/AdminPlaceholder.tsx` -- reusable placeholder component for unbuilt sections
-- **New header**: `src/components/admin/AdminHeader.tsx` -- top bar with global search, publish button, activity log trigger, theme/language toggles
+This plan adds 10 new loyalty-focused sections to the existing `/admin` panel. Each section gets a fully designed UI with forms, tables, toggles, and filters -- all using mock/local state for now, ready to be wired to the database later.
 
 ---
 
-### Sidebar Structure (Expandable Sections)
+### Strategy
 
-Each top-level section is a collapsible group. Clicking a sub-item sets the active view.
+The existing `/admin` panel already has 8 sidebar categories (Floorplan, People, etc.) with placeholders. This plan:
+
+1. Adds a new **"Loyalty Program"** top-level sidebar section with 10 sub-items
+2. Creates 10 new view components, each with functional UI (not placeholders)
+3. Updates `AdminPanel.tsx` to render the correct component based on `activeView`
+4. Sets the default view to "Members Management" instead of "Floorplan Layouts"
+
+---
+
+### New Sidebar Section: LOYALTY PROGRAM
 
 ```text
-RISE (Logo)
------
-FLOORPLAN
-  Floorplan Layouts
-  Rooms
-  Seating Areas
-  Tables
-  Table Combinations
-  Reservation Statuses
-
-PEOPLE
-  User Accounts
-  Booked By Names
-  Server Names
-
-GUEST-FACING LANGUAGE
-  Widgets
-  Pages
-  Emails
-  Text Content
-  Policies
-  Language Settings
-
-GENERAL
-  Venue Settings
-  Client Tags
-  Reservation Tags
-  Tax Rates
-
-INTEGRATIONS
-  Payment Processors
-  Email Service Providers
-  Point of Sale
-  Messaging Providers
-
-AVAILABILITY
-  Shifts
-  Access Rules
-  Daily Program
-  Blackout Dates
-  Availability Quick View
-  Shift Reporting Periods
-
-WIDGET SETTINGS
-  Reservation Widget
-  Event Widget
-  Waitlist Widget
-  Subscription Widget
-  Landing Page Settings
-  Custom Audiences
-
-ORDERING
-  Ordering Sites
-  Menu Management
-  Product Inventory
+LOYALTY PROGRAM (Crown icon)
+  Members Management
+  Points Engine
+  Rewards Control
+  Tiers System
+  Campaigns & Automations
+  Customer Segmentation
+  Loyalty Analytics
+  Digital Card Control
+  Multi-Brand Control
+  Global Settings
 ```
 
 ---
 
-### Design Approach
+### Section Details
 
-- **Crystal DNA aesthetic** -- same luxury glass morphism, gold accents, `CrystalPageWrapper` with `ambient` variant
-- **Dark + Light mode** -- inherits the existing theme system via `ThemeToggle`
-- **Responsive** -- uses `useIsMobile` / `useIsTablet` hooks; sidebar becomes a Sheet drawer on mobile/tablet
-- **RTL support** -- mirrors layout direction using existing `useLanguage` hook
-- **Expandable groups** -- each section uses Radix `Collapsible` with smooth accordion animation; active section auto-expands
-- **Icons** -- each section gets a distinct Lucide icon (Map for Floorplan, Users for People, Globe for Language, Settings for General, Plug for Integrations, Clock for Availability, Layout for Widgets, ShoppingBag for Ordering)
+#### 1. Members Management
+- Search bar (name, phone, email)
+- Table with columns: Name, Phone, Tier, Points, Visits, Status
+- Each row expands or links to a profile card showing:
+  - Total spend, visits, points, tier, redemption count
+  - Action buttons: Add/Remove Points, Upgrade/Downgrade Tier, Toggle VIP, Block Account
+- Uses existing `members` table data via query
 
----
+#### 2. Points Engine
+- Cards for earning rules (points per visit, points per currency)
+- Bonus rules section: double-points days toggle, happy hour multipliers
+- Points expiration settings (days until expiry, toggle)
+- Manual adjustments log table (read from `points_ledger`)
+- Fraud detection alerts section (placeholder metrics)
 
-### Placeholder Page Component
+#### 3. Rewards Control
+- Reuses patterns from existing `RewardsManagement.tsx`
+- Grid of reward cards with: title, points cost, valid dates, redemption limits, brand scope
+- Create/Edit dialog with full form
+- Toggle active/inactive per reward
+- Branch-specific assignment
 
-Each sub-section renders a shared `AdminPlaceholder` component that displays:
-- Section title + parent group name
-- "Coming Soon" badge
-- Description of what this section will control
-- Luxury card with glass border styling
+#### 4. Tiers System
+- Visual tier hierarchy display (cards stacked vertically)
+- Each tier card shows: name, min visits, min points, color, benefits list
+- Edit tier thresholds and benefits inline
+- Points multiplier per tier
+- Reads from existing `tiers` table
 
----
+#### 5. Campaigns & Automations
+- List of campaign cards with: name, status (draft/active/completed), channel, reach
+- Auto-trigger rules: Welcome bonus, Birthday, Tier upgrade, Inactive reactivation
+- Template selector per channel (SMS, WhatsApp, Email)
+- Simple campaign builder form
+- Reads from existing `campaigns` table
 
-### Admin Header
+#### 6. Customer Segmentation
+- Segment builder with filter chips: Tier, City, Brand, Last Visit, Visit Count, Points
+- Preview count of matching members
+- Save segment with name
+- List of saved segments
+- "Target This Segment" button (links to campaigns)
 
-- Hamburger menu (mobile/tablet)
-- "Master Control" title
-- **Global Search bar** -- searches across all section names to jump to any setting instantly
-- **Instant Publish** button (gold accent)
-- **Activity Log** button
-- Theme toggle + Language switcher (reuses existing components)
+#### 7. Loyalty Analytics
+- KPI cards: Total Members, Active vs Inactive, Redemption Rate, Points Issued vs Redeemed
+- Charts: Member growth (line), Top spenders (bar), ROI per reward (bar), Tier distribution (pie)
+- Reuses Recharts patterns from existing `AnalyticsView.tsx`
 
----
+#### 8. Digital Card Control
+- QR membership card preview mockup
+- Apple Wallet / Google Wallet toggle (placeholder)
+- RFID linking section (placeholder)
+- Card design customization: logo, colors, tier badge position
 
-### Global Admin Powers (Placeholders)
+#### 9. Multi-Brand Control
+- Brand cards for NOIR and SASSO
+- Toggle: Shared points system vs Independent
+- Per-brand earning rules override
+- Per-brand tier mapping display
 
-- **Global Search**: Filters sidebar items in real time. Matching items highlight; non-matching sections collapse.
-- **Activity Log**: Opens a Sheet/Dialog showing recent changes (placeholder data for now).
-- **Version History**: Listed as a sub-feature inside each placeholder ("Restore previous version" button, non-functional).
-- **Publish Button**: Gold accent button in the header, shows a toast confirmation.
+#### 10. Global Settings
+- Points-to-currency conversion ratio
+- Default expiration policy
+- Default tier thresholds
+- Regional settings (timezone, currency, language defaults)
+- Save button with toast confirmation
 
 ---
 
@@ -124,25 +110,30 @@ Each sub-section renders a shared `AdminPlaceholder` component that displays:
 
 | File | Purpose |
 |------|---------|
-| `src/pages/AdminPanel.tsx` | Layout shell: sidebar + header + content |
-| `src/components/admin/AdminSidebar.tsx` | Expandable sidebar with all 8 sections and 35+ sub-items |
-| `src/components/admin/AdminHeader.tsx` | Top bar with search, publish, activity log |
-| `src/components/admin/AdminPlaceholder.tsx` | Reusable placeholder for unbuilt sections |
-| `src/components/admin/AdminActivityLog.tsx` | Activity log side panel (placeholder data) |
+| `src/components/admin/loyalty/LoyaltyMembers.tsx` | Members search, table, profile actions |
+| `src/components/admin/loyalty/LoyaltyPointsEngine.tsx` | Earning rules, bonuses, expiration |
+| `src/components/admin/loyalty/LoyaltyRewards.tsx` | Rewards CRUD with cards |
+| `src/components/admin/loyalty/LoyaltyTiers.tsx` | Tier hierarchy editor |
+| `src/components/admin/loyalty/LoyaltyCampaigns.tsx` | Campaign list and builder |
+| `src/components/admin/loyalty/LoyaltySegmentation.tsx` | Segment builder with filters |
+| `src/components/admin/loyalty/LoyaltyAnalytics.tsx` | Charts and KPIs |
+| `src/components/admin/loyalty/LoyaltyDigitalCard.tsx` | Card preview and settings |
+| `src/components/admin/loyalty/LoyaltyMultiBrand.tsx` | Brand control toggles |
+| `src/components/admin/loyalty/LoyaltyGlobalSettings.tsx` | Global config form |
 
 ### Files to Modify
 
 | File | Change |
 |------|--------|
-| `src/App.tsx` | Add `/admin` route (lazy-loaded) |
+| `src/components/admin/adminNavConfig.ts` | Add "Loyalty Program" section with Crown icon and 10 items |
+| `src/pages/AdminPanel.tsx` | Import and render loyalty components based on activeView; change default to `loyalty-members` |
 
 ---
 
-### Technical Details
+### Technical Approach
 
-- Sidebar navigation state is a single `activeView` string (e.g., `"floorplan-layouts"`, `"people-user-accounts"`)
-- Each section group tracks its own `open` boolean for expand/collapse
-- Global search filters the navigation config array and auto-expands matching sections
-- The sidebar width is `w-72` on desktop, full Sheet drawer on mobile/tablet
-- All components use existing Tailwind theme tokens (`bg-card`, `text-primary`, `border-primary/10`) for automatic dark/light mode
-- No database changes needed -- this is a pure UI scaffold
+- All 10 views use **local state and mock data** for immediate visual feedback. Database wiring comes in a follow-up phase.
+- Existing `members`, `tiers`, `campaigns`, `rewards`, `points_ledger` tables are referenced in queries where appropriate (Members, Tiers) but most views start with mock data for rapid delivery.
+- Each component follows the luxury Crystal DNA aesthetic: `Card variant="obsidian"`, gold accent badges, serif headings, tracked uppercase labels.
+- Responsive design: 1-column on mobile, 2 on tablet, 3-4 on desktop for grids.
+- No new dependencies needed -- uses existing Recharts, Radix UI, Lucide icons, and Tailwind.
