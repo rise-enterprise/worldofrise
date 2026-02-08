@@ -57,7 +57,6 @@ export function CMSView() {
   };
 
   const handleSave = () => {
-    // Save to database in real implementation
     setHasChanges(false);
   };
 
@@ -92,7 +91,7 @@ export function CMSView() {
       </div>
 
       <Tabs defaultValue="theme" className="space-y-6">
-        <TabsList className="bg-[#0E1116] border border-[rgba(217,222,231,0.08)]">
+        <TabsList className="bg-card border border-border/30">
           <TabsTrigger value="theme" className="data-[state=active]:bg-primary/10">
             <Palette className="h-4 w-4 mr-2" />
             Theme
@@ -134,13 +133,13 @@ export function CMSView() {
                         type="color"
                         value={color.value}
                         onChange={(e) => handleColorChange(color.id, e.target.value)}
-                        className="w-12 h-10 p-1 bg-transparent border-[rgba(217,222,231,0.08)] cursor-pointer"
+                        className="w-12 h-10 p-1 bg-transparent border-border/30 cursor-pointer"
                       />
                       <Input
                         type="text"
                         value={color.value}
                         onChange={(e) => handleColorChange(color.id, e.target.value)}
-                        className="w-24 bg-[#0B0D11] border-[rgba(217,222,231,0.08)] text-xs"
+                        className="w-24 bg-muted border-border/30 text-xs"
                       />
                     </div>
                   </div>
@@ -154,7 +153,7 @@ export function CMSView() {
                 <CardTitle className="text-lg font-display">Display Mode</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between p-4 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted border border-border/30">
                   <div>
                     <p className="text-sm font-medium">Default Theme</p>
                     <p className="text-xs text-muted-foreground/60 mt-1">
@@ -171,13 +170,13 @@ export function CMSView() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                <div className="p-4 rounded-lg bg-muted border border-border/30">
                   <p className="text-sm font-medium mb-3">Preview Theme Toggle</p>
                   <ThemeToggle />
                 </div>
 
                 {/* Live Preview */}
-                <div className="p-4 rounded-lg border border-[rgba(217,222,231,0.08)]" style={{ backgroundColor: colors[1].value }}>
+                <div className="p-4 rounded-lg border border-border/30" style={{ backgroundColor: colors[1].value }}>
                   <p className="text-xs uppercase tracking-widest mb-3" style={{ color: colors[0].value }}>
                     Live Preview
                   </p>
@@ -211,7 +210,7 @@ export function CMSView() {
                   <Input
                     value={text.value}
                     onChange={(e) => handleTextChange(text.id, e.target.value)}
-                    className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]"
+                    className="bg-muted border-border/30"
                   />
                 </div>
               ))}
@@ -233,7 +232,7 @@ export function CMSView() {
                 <div key={asset} className="space-y-2">
                   <Label className="text-sm">{asset}</Label>
                   <div className="flex gap-3">
-                    <div className="flex-1 h-32 rounded-lg bg-[#0B0D11] border border-dashed border-[rgba(217,222,231,0.2)] flex items-center justify-center">
+                    <div className="flex-1 h-32 rounded-lg bg-muted border border-dashed border-border/50 flex items-center justify-center">
                       <div className="text-center">
                         <Image className="h-8 w-8 mx-auto text-muted-foreground/40" />
                         <p className="text-xs text-muted-foreground/60 mt-2">Drop image or click to upload</p>
@@ -265,7 +264,7 @@ export function CMSView() {
                 { label: 'Show Tier Progress', description: 'Display progress towards next tier', enabled: true },
                 { label: 'Enable Event RSVPs', description: 'Allow members to RSVP for exclusive events', enabled: true },
               ].map((setting, index) => (
-                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-muted border border-border/30">
                   <div>
                     <p className="text-sm font-medium">{setting.label}</p>
                     <p className="text-xs text-muted-foreground/60 mt-1">{setting.description}</p>

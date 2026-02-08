@@ -102,7 +102,7 @@ export function MetricCard({ title, value, subtitle, icon: Icon, trend, classNam
             )}
           </div>
           <motion.div 
-            className="p-3 rounded-xl bg-gradient-to-br from-[#0B0D11] to-[#0E1116] border border-primary/10 text-primary/70 group-hover:text-primary group-hover:border-primary/30 group-hover:shadow-[0_0_25px_rgba(200,162,74,0.2)] transition-all duration-500 relative"
+            className="p-3 rounded-xl bg-gradient-to-br from-muted to-card border border-primary/10 text-primary/70 group-hover:text-primary group-hover:border-primary/30 group-hover:shadow-[0_0_25px_rgba(200,162,74,0.2)] transition-all duration-500 relative"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: delay / 1000, duration: 0.3 }}

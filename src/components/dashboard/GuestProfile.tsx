@@ -48,9 +48,9 @@ const tierColors: Record<string, string> = {
 };
 
 const brandColors: Record<string, string> = {
-  'Noir': 'bg-[#0B0D11] text-foreground border border-[rgba(217,222,231,0.12)]',
+  'Noir': 'bg-muted text-foreground border border-border/30',
   'Sasso': 'bg-primary/10 text-primary border border-primary/20',
-  'Both': 'bg-gradient-to-r from-[#0B0D11] to-primary/20 text-foreground',
+  'Both': 'bg-gradient-to-r from-muted to-primary/20 text-foreground',
 };
 
 export function GuestProfile({ guest, onBack }: GuestProfileProps) {
@@ -115,21 +115,20 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
   const tierColor = tierColors[guest.tierName] || tierColors['Initiation'];
   const isTopTier = guest.tier === 'black' || guest.tier === 'inner-circle';
 
-  // Parse notes into array for display
   const notesList = guest.notes?.split('\n\n').filter(Boolean) || [];
 
   return (
-    <div className="min-h-screen bg-[#07080A]">
+    <div className="min-h-screen bg-background">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-[#07080A]/95 backdrop-blur-xl border-b border-[rgba(217,222,231,0.08)]">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/30">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack} className="text-muted-foreground hover:text-foreground hover:bg-[#151921]">
+            <Button variant="ghost" size="icon" onClick={onBack} className="text-muted-foreground hover:text-foreground hover:bg-muted">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-3">
               <Avatar className={cn(
-                "h-10 w-10 ring-2 ring-offset-2 ring-offset-[#07080A]",
+                "h-10 w-10 ring-2 ring-offset-2 ring-offset-background",
                 isTopTier ? "ring-primary" : tierColor.replace('bg-', 'ring-')
               )}>
                 <AvatarImage src={guest.avatarUrl} alt={guest.name} />
@@ -160,7 +159,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                   {!isMobile && 'Record Presence'}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-[#0E1116] border-[rgba(217,222,231,0.12)]">
+              <DialogContent className="bg-card border-border/30">
                 <DialogHeader>
                   <DialogTitle className="font-display text-foreground">Record Presence</DialogTitle>
                 </DialogHeader>
@@ -175,7 +174,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                           "flex-1",
                           selectedBrand === 'noir' 
                             ? "bg-foreground text-background" 
-                            : "bg-transparent border-[rgba(217,222,231,0.12)]"
+                            : "bg-transparent border-border/30"
                         )}
                       >
                         Noir
@@ -187,7 +186,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                           "flex-1",
                           selectedBrand === 'sasso' 
                             ? "bg-primary text-primary-foreground" 
-                            : "bg-transparent border-[rgba(217,222,231,0.12)]"
+                            : "bg-transparent border-border/30"
                         )}
                       >
                         Sasso
@@ -197,7 +196,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                   <div>
                     <label className="text-xs uppercase tracking-widest text-muted-foreground/60 mb-2 block">Location (optional)</label>
                     <select 
-                      className="w-full p-2 border rounded-md bg-[#0B0D11] border-[rgba(217,222,231,0.12)] text-foreground focus:border-primary/50 focus:outline-none"
+                      className="w-full p-2 border rounded-md bg-muted border-border/30 text-foreground focus:border-primary/50 focus:outline-none"
                       value={selectedLocationId}
                       onChange={(e) => setSelectedLocationId(e.target.value)}
                     >
@@ -220,12 +219,12 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
 
             <Dialog open={isNoteDialogOpen} onOpenChange={setIsNoteDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" variant="outline" className="gap-1.5 bg-transparent border-[rgba(217,222,231,0.12)] hover:border-primary/30 hover:bg-[#151921]">
+                <Button size="sm" variant="outline" className="gap-1.5 bg-transparent border-border/30 hover:border-primary/30 hover:bg-muted">
                   <MessageSquare className="h-4 w-4" />
                   {!isMobile && 'Add Observation'}
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-[#0E1116] border-[rgba(217,222,231,0.12)]">
+              <DialogContent className="bg-card border-border/30">
                 <DialogHeader>
                   <DialogTitle className="font-display text-foreground">Add Observation</DialogTitle>
                 </DialogHeader>
@@ -234,10 +233,10 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                     placeholder="Record observations about this guest..."
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
-                    className="min-h-[120px] bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50"
+                    className="min-h-[120px] bg-muted border-border/30 focus:border-primary/50"
                   />
                   <div className="flex gap-2 justify-end">
-                    <Button variant="outline" onClick={() => setIsNoteDialogOpen(false)} className="bg-transparent border-[rgba(217,222,231,0.12)]">
+                    <Button variant="outline" onClick={() => setIsNoteDialogOpen(false)} className="bg-transparent border-border/30">
                       Cancel
                     </Button>
                     <Button 
@@ -258,7 +257,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
       <div className="p-4 space-y-4 max-w-4xl mx-auto">
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Card className="bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+          <Card className="bg-card border-border/30">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
                 <TrendingUp className="h-4 w-4" />
@@ -268,7 +267,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
             </CardContent>
           </Card>
           
-          <Card className="bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+          <Card className="bg-card border-border/30">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
                 <Star className="h-4 w-4" />
@@ -278,7 +277,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
             </CardContent>
           </Card>
           
-          <Card className="bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+          <Card className="bg-card border-border/30">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
                 <Clock className="h-4 w-4" />
@@ -290,7 +289,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
             </CardContent>
           </Card>
           
-          <Card className="bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+          <Card className="bg-card border-border/30">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 text-muted-foreground/60 mb-1">
                 <Sparkles className="h-4 w-4" />
@@ -304,7 +303,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
         </div>
 
         {/* Contact Info */}
-        <Card className="bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+        <Card className="bg-card border-border/30">
           <CardContent className="p-4">
             <div className="flex flex-wrap gap-4">
               {guest.phone && (
@@ -342,19 +341,19 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="visits" className="w-full">
-          <TabsList className="w-full grid grid-cols-2 bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
-            <TabsTrigger value="visits" className="gap-2 data-[state=active]:bg-[#151921] data-[state=active]:text-primary">
+          <TabsList className="w-full grid grid-cols-2 bg-muted border border-border/30">
+            <TabsTrigger value="visits" className="gap-2 data-[state=active]:bg-card data-[state=active]:text-primary">
               <Calendar className="h-4 w-4" />
               Visits ({guest.visits.length})
             </TabsTrigger>
-            <TabsTrigger value="notes" className="gap-2 data-[state=active]:bg-[#151921] data-[state=active]:text-primary">
+            <TabsTrigger value="notes" className="gap-2 data-[state=active]:bg-card data-[state=active]:text-primary">
               <MessageSquare className="h-4 w-4" />
               Notes ({notesList.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="visits" className="mt-4">
-            <Card className="bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+            <Card className="bg-card border-border/30">
               <CardContent className="p-0">
                 {guest.visits.length === 0 ? (
                   <EmptyState
@@ -370,14 +369,14 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                   />
                 ) : (
                   <ScrollArea className="h-[400px]">
-                    <div className="divide-y divide-[rgba(217,222,231,0.08)]">
+                    <div className="divide-y divide-border/30">
                       {guest.visits.map((visit) => (
-                        <div key={visit.id} className="p-4 hover:bg-[#151921]/50 transition-colors">
+                        <div key={visit.id} className="p-4 hover:bg-muted/50 transition-colors">
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3">
                               <div className={cn(
                                 "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
-                                visit.brand === 'noir' ? 'bg-[#0B0D11] border border-[rgba(217,222,231,0.12)]' : 'bg-primary/10 border border-primary/20'
+                                visit.brand === 'noir' ? 'bg-muted border border-border/30' : 'bg-primary/10 border border-primary/20'
                               )}>
                                 <span className={cn(
                                   "text-xs font-medium",
@@ -416,7 +415,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
           </TabsContent>
 
           <TabsContent value="notes" className="mt-4">
-            <Card className="bg-[#0E1116] border-[rgba(217,222,231,0.08)]">
+            <Card className="bg-card border-border/30">
               <CardContent className="p-0">
                 {notesList.length === 0 ? (
                   <EmptyState
@@ -432,7 +431,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
                   />
                 ) : (
                   <ScrollArea className="h-[400px]">
-                    <div className="divide-y divide-[rgba(217,222,231,0.08)]">
+                    <div className="divide-y divide-border/30">
                       {notesList.map((note, index) => (
                         <div key={index} className="p-4">
                           <p className="text-sm text-foreground whitespace-pre-wrap">{note}</p>
