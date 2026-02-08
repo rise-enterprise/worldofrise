@@ -1,47 +1,47 @@
 
+## Fix Distinguished Guests Card Layout and Typography
 
-## Show All Guest Information in Distinguished Guests Card
+### Problems
+The desktop VIPGuestCard currently uses a horizontal flex layout (`flex items-start gap-4`) that creates compressed, misaligned content. The stats section uses inline `flex` with dividers that wraps awkwardly. Text is not properly grouped or spaced.
 
-Currently the VIPGuestCard only shows: name, tier badge, brand, country, visits count, last visit date, and up to 2 tags. The Guest object has many more fields that should be visible.
+### Solution
+Restructure the desktop card to use a clean vertical flex-column layout with consistent spacing and clear visual grouping.
 
-### Fields to Add
+### Changes (single file: `src/components/dashboard/VIPGuestCard.tsx`)
 
-| Field | Display |
-|---|---|
-| `email` | Email icon + address |
-| `phone` | Phone icon + number |
-| `totalPoints` | Points counter with star icon |
-| `birthday` | Cake icon + formatted date |
-| `salutation` | Shown before name (e.g. "Mr. John Doe") |
-| `joinedAt` | "Member since" label with formatted date |
-| `status` | Small colored dot indicator (green=active, red=blocked) |
-| `isVip` | Crown/diamond icon badge next to name |
+**Desktop (non-compact) card restructure:**
 
-### Changes
+1. **Top section** -- Avatar + Name row side-by-side (keep existing flex row), but tighten alignment:
+   - Status dot, display name, VIP diamond, tier badge all on one baseline
+   - Remove `items-start`, use `items-center` for the name row
 
-**File: `src/components/dashboard/VIPGuestCard.tsx`**
+2. **Info row** -- Brand, location, phone in a single horizontal row beneath the name, separated by subtle dividers or spacing (`gap-4`), all left-aligned with consistent icon sizing
 
-**Desktop (non-compact) layout:**
-- Prepend `salutation` before `guest.name` in the title (e.g., "Mr. John Doe")
-- Add a VIP diamond icon next to the name if `isVip` is true
-- Add a status dot (green/red) near the name
-- Add a second info row below brand/country showing email and phone (with Mail and Phone icons)
-- Expand the stats section at the bottom to include:
-  - Visits (existing)
-  - Last visit (existing)
-  - Points (new, with Star icon)
-  - Member since (new, with Calendar icon)
-- Show birthday with Cake icon if available
-- Keep tags display as-is
+3. **Contact row** -- Email below the info row, left-aligned with Mail icon
 
-**Mobile (compact) layout:**
-- Add salutation before name
-- Add email and phone as small text lines below the name
-- Add points next to visits count
+4. **Stats section** -- Replace the current inline `flex` with wrapping dividers approach with a clean 2x2 or 4-column CSS grid:
+   - `grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5`
+   - Each cell: uppercase label on top, value below
+   - Equal spacing, no manual dividers
+   - Cells: VISITS, LAST VISIT, POINTS, MEMBER SINCE
+
+5. **Birthday** -- Below the stats grid, left-aligned with Cake icon, `mt-3`
+
+6. **Tags** -- Below birthday, left-aligned, `mt-3`
+
+7. **Padding and spacing**:
+   - CardContent padding increased to `p-6`
+   - Section gaps: `space-y-3` between info/contact/stats sections
+   - Line height on labels: `leading-relaxed`
+
+**Compact card** -- Minor tweaks only:
+- Ensure text is left-aligned (already is)
+- No structural changes needed
 
 ### Technical Details
 
-- Import additional icons from `lucide-react`: `Mail`, `Phone`, `Star`, `Cake`, `Calendar`, `Diamond`
-- Add a `formatFullDate` helper for birthday and joinedAt formatting
-- No new dependencies or data fetching needed -- all fields already exist on the Guest object
-
+- Replace the stats `flex` block (lines 167-191) with a `grid` layout
+- Wrap the content below the name in a `div` with `space-y-3` for even vertical distribution
+- Change `p-5` to `p-6` on CardContent for breathing room
+- Remove manual `w-px h-8 bg-border/30` dividers, use grid gap instead
+- Keep all existing icons and data fields
