@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { CrystalPageWrapper } from "@/components/effects/CrystalPageWrapper";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminHeader from "@/components/admin/AdminHeader";
@@ -70,6 +70,7 @@ export default function AdminPanel() {
               side={isRTL ? "right" : "left"}
               className="w-72 p-0 bg-card/95 backdrop-blur-md border-border/40"
             >
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
               {sidebarContent}
             </SheetContent>
           </Sheet>
