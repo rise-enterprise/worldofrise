@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, lazy, Suspense } from "react";
 import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -8,16 +8,41 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import AdminPlaceholder from "@/components/admin/AdminPlaceholder";
 import { NAV_SECTIONS } from "@/components/admin/adminNavConfig";
 
+// Loyalty components
+const LoyaltyMembers = lazy(() => import("@/components/admin/loyalty/LoyaltyMembers"));
+const LoyaltyPointsEngine = lazy(() => import("@/components/admin/loyalty/LoyaltyPointsEngine"));
+const LoyaltyRewards = lazy(() => import("@/components/admin/loyalty/LoyaltyRewards"));
+const LoyaltyTiers = lazy(() => import("@/components/admin/loyalty/LoyaltyTiers"));
+const LoyaltyCampaigns = lazy(() => import("@/components/admin/loyalty/LoyaltyCampaigns"));
+const LoyaltySegmentation = lazy(() => import("@/components/admin/loyalty/LoyaltySegmentation"));
+const LoyaltyAnalytics = lazy(() => import("@/components/admin/loyalty/LoyaltyAnalytics"));
+const LoyaltyDigitalCard = lazy(() => import("@/components/admin/loyalty/LoyaltyDigitalCard"));
+const LoyaltyMultiBrand = lazy(() => import("@/components/admin/loyalty/LoyaltyMultiBrand"));
+const LoyaltyGlobalSettings = lazy(() => import("@/components/admin/loyalty/LoyaltyGlobalSettings"));
+
+const LOYALTY_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
+  "loyalty-members": LoyaltyMembers,
+  "loyalty-points": LoyaltyPointsEngine,
+  "loyalty-rewards": LoyaltyRewards,
+  "loyalty-tiers": LoyaltyTiers,
+  "loyalty-campaigns": LoyaltyCampaigns,
+  "loyalty-segmentation": LoyaltySegmentation,
+  "loyalty-analytics": LoyaltyAnalytics,
+  "loyalty-digital-card": LoyaltyDigitalCard,
+  "loyalty-multi-brand": LoyaltyMultiBrand,
+  "loyalty-settings": LoyaltyGlobalSettings,
+};
+
 export default function AdminPanel() {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const { isRTL } = useLanguage();
   const useDrawer = isMobile || isTablet;
 
-  const [activeView, setActiveView] = useState("floorplan-layouts");
+  const [activeView, setActiveView] = useState("loyalty-members");
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ floorplan: true });
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ loyalty: true });
 
   const toggleSection = useCallback((id: string) => {
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -86,7 +111,11 @@ export default function AdminPanel() {
           />
 
           <main className="flex-1 overflow-y-auto">
-            {activeInfo ? (
+            {LOYALTY_VIEWS[activeView] ? (
+              <Suspense fallback={<div className="flex items-center justify-center h-64 text-muted-foreground">Loading...</div>}>
+                {(() => { const C = LOYALTY_VIEWS[activeView]; return <C />; })()}
+              </Suspense>
+            ) : activeInfo ? (
               <AdminPlaceholder
                 sectionLabel={activeInfo.item.label}
                 groupLabel={activeInfo.section.label}
