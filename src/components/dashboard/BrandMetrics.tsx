@@ -4,6 +4,7 @@ import { Coffee, UtensilsCrossed } from 'lucide-react';
 import noirLogo from '@/assets/noir-logo.png';
 import noirLogoLight from '@/assets/noir-logo-light.png';
 import sassoLogo from '@/assets/sasso-logo.png';
+import sassoLogoLight from '@/assets/sasso-logo-light.png';
 import { useState, useEffect } from 'react';
 
 interface BrandMetricsProps {
@@ -28,6 +29,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
   }, []);
 
   const currentNoirLogo = theme === 'light' ? noirLogoLight : noirLogo;
+  const currentSassoLogo = theme === 'light' ? sassoLogoLight : sassoLogo;
 
   return (
     <Card variant="obsidian" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '300ms' }}>
@@ -76,7 +78,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
                 <UtensilsCrossed className="h-4 w-4 text-primary/70" />
               </div>
               <div>
-                <img src={sassoLogo} alt="SASSO" className="h-4 object-contain" />
+                <img src={currentSassoLogo} alt="SASSO" className="h-4 object-contain" />
                 <p className="text-xs text-muted-foreground/50 tracking-refined">Italian Fine Dining</p>
               </div>
             </div>
@@ -110,7 +112,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
           </div>
           <div className="flex justify-between mt-3 text-xs text-muted-foreground/50 tracking-refined">
             <img src={currentNoirLogo} alt="NOIR" className="h-3 object-contain" />
-            <img src={sassoLogo} alt="SASSO" className="h-3 object-contain" />
+            <img src={currentSassoLogo} alt="SASSO" className="h-3 object-contain" />
           </div>
         </div>
       </CardContent>
