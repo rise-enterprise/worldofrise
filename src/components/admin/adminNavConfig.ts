@@ -1,4 +1,4 @@
-import { Crown } from "lucide-react";
+import { Crown, ShieldCheck } from "lucide-react";
 
 export interface NavItem {
   id: string;
@@ -29,6 +29,14 @@ export const NAV_SECTIONS: NavSection[] = [
       { id: "loyalty-digital-card", label: "Digital Card Control", description: "Customize QR membership cards, Apple/Google Wallet passes, RFID linking, and card design." },
       { id: "loyalty-multi-brand", label: "Multi-Brand Control", description: "Manage shared vs independent points systems across NOIR and SASSO brands with tier mapping." },
       { id: "loyalty-settings", label: "Global Settings", description: "Configure points-to-currency conversion, expiration policies, default thresholds, and regional settings." },
+    ],
+  },
+  {
+    id: "administration",
+    label: "Administration",
+    icon: ShieldCheck,
+    items: [
+      { id: "admin-users", label: "Admin Users", description: "Invite, edit, deactivate, and delete admin accounts. Assign roles (Super Admin, Admin, Manager, Viewer) and manage access." },
     ],
   },
 ];
