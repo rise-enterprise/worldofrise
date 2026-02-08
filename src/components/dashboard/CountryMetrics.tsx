@@ -28,7 +28,7 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
         <div className="grid grid-cols-2 gap-4">
           {/* Qatar */}
           <div 
-            className="p-5 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] animate-slide-up hover:border-[rgba(217,222,231,0.15)] transition-all duration-300"
+            className="p-5 rounded-xl bg-muted border border-border/30 animate-slide-up hover:border-border/50 transition-all duration-300"
             style={{ animationDelay: '500ms' }}
           >
             <div className="flex items-center gap-2 mb-4">
@@ -48,7 +48,7 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
 
           {/* Saudi Arabia */}
           <div 
-            className="p-5 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] animate-slide-up hover:border-primary/20 transition-all duration-300"
+            className="p-5 rounded-xl bg-muted border border-border/30 animate-slide-up hover:border-primary/20 transition-all duration-300"
             style={{ animationDelay: '600ms' }}
           >
             <div className="flex items-center gap-2 mb-4">
