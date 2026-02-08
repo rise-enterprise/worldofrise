@@ -30,16 +30,15 @@ const cardVariants = cva(
         obsidian: [
           "bg-gradient-to-b from-card via-card to-background",
           "border border-border/30",
-          "shadow-[inset_0_1px_0_0_hsl(var(--crystal-silver)/0.06),inset_0_-1px_0_0_hsl(0_0%_0%/0.3),0_8px_32px_-8px_hsl(0_0%_0%/0.5)]",
+          "obsidian-panel",
           "hover:border-primary/30",
-          "hover:shadow-[inset_0_1px_0_0_hsl(var(--gold)/0.1),inset_0_-1px_0_0_hsl(0_0%_0%/0.3),0_12px_40px_-8px_hsl(0_0%_0%/0.6),inset_0_0_60px_-20px_hsl(var(--gold)/0.03)]",
         ].join(" "),
         
         // Luxury (legacy) — Same as obsidian
         luxury: [
           "bg-gradient-to-b from-card via-card to-background",
           "border border-border/30",
-          "shadow-[inset_0_1px_0_0_hsl(var(--crystal-silver)/0.06),0_8px_32px_-8px_hsl(0_0%_0%/0.5)]",
+          "obsidian-panel",
           "hover:border-primary/25",
         ].join(" "),
         

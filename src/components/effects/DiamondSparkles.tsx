@@ -34,7 +34,7 @@ export function DiamondSparkles({ count = 30, className }: DiamondSparklesProps)
   }, [count]);
 
   return (
-    <div className={cn('absolute inset-0 overflow-hidden pointer-events-none', className)}>
+    <div className={cn('absolute inset-0 overflow-hidden pointer-events-none light-mode-dim-effects', className)}>
       {sparkles.map((sparkle) => (
         <motion.div
           key={sparkle.id}

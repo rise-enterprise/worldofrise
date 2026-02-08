@@ -908,3 +908,123 @@ select:focus {
     0 0 0 3px hsl(var(--gold) / 0.15),
     inset 0 0 20px hsl(var(--gold) / 0.05);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHT MODE — Panel & Shadow Overrides
+═══════════════════════════════════════════════════════════ */
+
+.light .crystal-panel {
+  box-shadow: 
+    0 1px 3px 0 hsl(0 0% 0% / 0.06),
+    0 4px 16px -4px hsl(0 0% 0% / 0.08),
+    0 0 0 1px hsl(var(--border));
+  border-color: hsl(var(--border));
+}
+
+.light .crystal-panel-elevated {
+  box-shadow: 
+    0 2px 6px 0 hsl(0 0% 0% / 0.06),
+    0 8px 24px -8px hsl(0 0% 0% / 0.1),
+    0 0 0 1px hsl(var(--border));
+  border-color: hsl(var(--border));
+}
+
+.light .crystal-panel-gold {
+  box-shadow: 
+    0 4px 16px -4px hsl(var(--gold) / 0.1),
+    0 0 0 1px hsl(var(--gold) / 0.2);
+}
+
+.light .obsidian-panel,
+.light .obsidian-panel-hover {
+  background: hsl(var(--card));
+  box-shadow: 
+    0 1px 3px 0 hsl(0 0% 0% / 0.05),
+    0 4px 16px -4px hsl(0 0% 0% / 0.07);
+  border-color: hsl(var(--border));
+}
+
+.light .obsidian-panel-hover:hover {
+  box-shadow: 
+    0 2px 8px 0 hsl(var(--gold) / 0.08),
+    0 8px 24px -8px hsl(0 0% 0% / 0.1);
+}
+
+.light .glass-panel {
+  box-shadow: 
+    0 1px 3px 0 hsl(0 0% 0% / 0.05),
+    0 4px 12px -4px hsl(0 0% 0% / 0.06);
+}
+
+.light .glass-panel-heavy {
+  box-shadow: 
+    0 2px 6px 0 hsl(0 0% 0% / 0.06),
+    0 8px 24px -8px hsl(0 0% 0% / 0.08);
+}
+
+.light .crystal-bevel {
+  box-shadow: 
+    0 1px 2px 0 hsl(0 0% 0% / 0.04),
+    0 2px 8px -2px hsl(0 0% 0% / 0.06);
+}
+
+.light .light-shift:hover {
+  border-color: hsl(var(--gold) / 0.4);
+  box-shadow: 
+    0 2px 8px 0 hsl(var(--gold) / 0.06),
+    0 4px 16px -4px hsl(0 0% 0% / 0.08);
+}
+
+.light .shadow-luxury {
+  box-shadow: 0 12px 32px -8px hsl(0 0% 0% / 0.1);
+}
+
+.light .shadow-crystal {
+  box-shadow: 
+    0 4px 16px -4px hsl(0 0% 0% / 0.08),
+    0 0 0 1px hsl(var(--border));
+}
+
+.light .shadow-glass {
+  box-shadow: 
+    0 2px 12px -2px hsl(0 0% 0% / 0.06);
+}
+
+.light .gold-glow,
+.light .gold-glow-strong,
+.light .gold-glow-subtle {
+  box-shadow: 0 0 16px -4px hsl(var(--gold) / 0.1);
+}
+
+.light .crystal-glow {
+  box-shadow: 0 0 20px -8px hsl(var(--gold) / 0.06);
+}
+
+/* Reduce crystal background effects in light mode */
+.light .crystal-strand-glow,
+.light .crystal-strand-glow-slow {
+  opacity: 0.04 !important;
+}
+
+.light .crystal-twinkle {
+  opacity: 0.3 !important;
+}
+
+.light .crystal-glint {
+  opacity: 0.2 !important;
+}
+
+.light .crystal-ambient-1,
+.light .crystal-ambient-2,
+.light .crystal-ambient-3 {
+  opacity: 0.3;
+}
+
+.light .crystal-shimmer {
+  opacity: 0.02 !important;
+}
+
+/* DiamondSparkles — reduce glow and visibility in light mode */
+.light .light-mode-dim-effects {
+  opacity: 0.3;
+}
