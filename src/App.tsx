@@ -21,6 +21,8 @@ const MemberProfileEdit = lazy(() => import("./pages/MemberProfileEdit"));
 const MemberRewards = lazy(() => import("./pages/MemberRewards"));
 const MemberExperiences = lazy(() => import("./pages/MemberExperiences"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminAuthGuard = lazy(() => import("./components/admin/AdminAuthGuard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -41,7 +43,8 @@ const App = () => (
               
               {/* Admin Routes */}
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
               
               {/* Member Routes - Open Access */}
               <Route path="/member/welcome" element={<MemberWelcome />} />
