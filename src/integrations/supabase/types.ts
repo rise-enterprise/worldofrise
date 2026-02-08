@@ -230,6 +230,162 @@ export type Database = {
           },
         ]
       }
+      contacts: {
+        Row: {
+          address: string | null
+          alt_email: string | null
+          anniversary: string | null
+          avg_rating: number | null
+          birthday: string | null
+          cafe_noir_london_opt_in: boolean
+          cancels: number
+          city: string | null
+          company: string | null
+          country: string | null
+          created_date: string | null
+          email: string | null
+          first_name: string | null
+          gender: string | null
+          id: string
+          imported_at: string
+          imported_by: string | null
+          last_location: string | null
+          last_name: string | null
+          last_visit: string | null
+          loyalty_id: string | null
+          loyalty_rank: string | null
+          loyalty_tier: string | null
+          no_show: number
+          noir_cafe_abu_dhabi_opt_in: boolean
+          noir_cafe_al_hazm_opt_in: boolean
+          noir_cafe_old_doha_port_opt_in: boolean
+          noir_cafe_riyadh_opt_in: boolean
+          noir_cafe_tennis_opt_in: boolean
+          noir_cafe_west_walk_opt_in: boolean
+          notes: string | null
+          orders: number
+          phone: string | null
+          postal_code: string | null
+          salutation: string | null
+          sasso_al_hazm_opt_in: boolean
+          sasso_london_opt_in: boolean
+          sasso_riyadh_opt_in: boolean
+          sasso_west_walk_opt_in: boolean
+          spend_per_cover: number | null
+          spend_per_visit: number | null
+          state: string | null
+          tags: string | null
+          title: string | null
+          total_spend: number | null
+          venue_group_marketing_opt_in: boolean
+          vip: boolean
+          visits: number
+          work_phone: string | null
+        }
+        Insert: {
+          address?: string | null
+          alt_email?: string | null
+          anniversary?: string | null
+          avg_rating?: number | null
+          birthday?: string | null
+          cafe_noir_london_opt_in?: boolean
+          cancels?: number
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          created_date?: string | null
+          email?: string | null
+          first_name?: string | null
+          gender?: string | null
+          id?: string
+          imported_at?: string
+          imported_by?: string | null
+          last_location?: string | null
+          last_name?: string | null
+          last_visit?: string | null
+          loyalty_id?: string | null
+          loyalty_rank?: string | null
+          loyalty_tier?: string | null
+          no_show?: number
+          noir_cafe_abu_dhabi_opt_in?: boolean
+          noir_cafe_al_hazm_opt_in?: boolean
+          noir_cafe_old_doha_port_opt_in?: boolean
+          noir_cafe_riyadh_opt_in?: boolean
+          noir_cafe_tennis_opt_in?: boolean
+          noir_cafe_west_walk_opt_in?: boolean
+          notes?: string | null
+          orders?: number
+          phone?: string | null
+          postal_code?: string | null
+          salutation?: string | null
+          sasso_al_hazm_opt_in?: boolean
+          sasso_london_opt_in?: boolean
+          sasso_riyadh_opt_in?: boolean
+          sasso_west_walk_opt_in?: boolean
+          spend_per_cover?: number | null
+          spend_per_visit?: number | null
+          state?: string | null
+          tags?: string | null
+          title?: string | null
+          total_spend?: number | null
+          venue_group_marketing_opt_in?: boolean
+          vip?: boolean
+          visits?: number
+          work_phone?: string | null
+        }
+        Update: {
+          address?: string | null
+          alt_email?: string | null
+          anniversary?: string | null
+          avg_rating?: number | null
+          birthday?: string | null
+          cafe_noir_london_opt_in?: boolean
+          cancels?: number
+          city?: string | null
+          company?: string | null
+          country?: string | null
+          created_date?: string | null
+          email?: string | null
+          first_name?: string | null
+          gender?: string | null
+          id?: string
+          imported_at?: string
+          imported_by?: string | null
+          last_location?: string | null
+          last_name?: string | null
+          last_visit?: string | null
+          loyalty_id?: string | null
+          loyalty_rank?: string | null
+          loyalty_tier?: string | null
+          no_show?: number
+          noir_cafe_abu_dhabi_opt_in?: boolean
+          noir_cafe_al_hazm_opt_in?: boolean
+          noir_cafe_old_doha_port_opt_in?: boolean
+          noir_cafe_riyadh_opt_in?: boolean
+          noir_cafe_tennis_opt_in?: boolean
+          noir_cafe_west_walk_opt_in?: boolean
+          notes?: string | null
+          orders?: number
+          phone?: string | null
+          postal_code?: string | null
+          salutation?: string | null
+          sasso_al_hazm_opt_in?: boolean
+          sasso_london_opt_in?: boolean
+          sasso_riyadh_opt_in?: boolean
+          sasso_west_walk_opt_in?: boolean
+          spend_per_cover?: number | null
+          spend_per_visit?: number | null
+          state?: string | null
+          tags?: string | null
+          title?: string | null
+          total_spend?: number | null
+          venue_group_marketing_opt_in?: boolean
+          vip?: boolean
+          visits?: number
+          work_phone?: string | null
+        }
+        Relationships: []
+      }
       experience_invitations: {
         Row: {
           attended_at: string | null

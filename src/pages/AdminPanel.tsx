@@ -21,6 +21,10 @@ const LoyaltyMultiBrand = lazy(() => import("@/components/admin/loyalty/LoyaltyM
 const LoyaltyGlobalSettings = lazy(() => import("@/components/admin/loyalty/LoyaltyGlobalSettings"));
 const AdminUsers = lazy(() => import("@/components/dashboard/AdminsView").then(m => ({ default: m.AdminsView })));
 
+// CRM components
+const ContactsView = lazy(() => import("@/components/admin/contacts/ContactsView"));
+const ContactsImportView = lazy(() => import("@/components/admin/contacts/ContactsImportView"));
+
 const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
   "loyalty-members": LoyaltyMembers,
   "loyalty-points": LoyaltyPointsEngine,
@@ -33,8 +37,9 @@ const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = 
   "loyalty-multi-brand": LoyaltyMultiBrand,
   "loyalty-settings": LoyaltyGlobalSettings,
   "admin-users": AdminUsers as any,
+  "crm-contacts": ContactsView,
+  "crm-import": ContactsImportView,
 };
-
 export default function AdminPanel() {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
