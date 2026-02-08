@@ -1,41 +1,30 @@
 
 
-## Add Admin Users Management to the Master Control Panel
+## Add Admin Panel Navigation to the Dashboard
 
-Bring the existing admin user management functionality into the `/admin` Loyalty Master Control Panel as a new sidebar section, so you can manage all admin roles (Super Admin, Admin, Manager, Viewer) directly from the same panel.
-
----
-
-### What Changes
-
-#### 1. New sidebar section: "Administration"
-A new top-level category appears below "Loyalty Program" in the sidebar with one item:
-- **Admin Users** -- Invite, edit, deactivate, and delete admin accounts with role assignment
-
-#### 2. Reuse existing component
-The fully functional `AdminsView` component (currently used in the old dashboard at `/dashboard`) already supports:
-- Invite new admins with email + name + role
-- Edit admin name and role
-- Deactivate / permanently delete admins
-- Resend activation links
-- Role-based access (only super admins see this section)
-
-This component will be lazy-loaded into the Master Control Panel just like the loyalty views.
+Add a link/button in the Dashboard page that navigates to the `/admin` Master Control Panel, so admins can easily switch between the two interfaces.
 
 ---
 
-### Files to Modify
+### Changes
 
-| File | Change |
-|------|--------|
-| `src/components/admin/adminNavConfig.ts` | Add a second `NavSection` with id `"administration"`, label `"Administration"`, `ShieldCheck` icon, and one item: `{ id: "admin-users", label: "Admin Users", description: "..." }` |
-| `src/pages/AdminPanel.tsx` | Add lazy import for `AdminsView`, add `"admin-users"` to the views map, auto-expand the administration section in `openSections` default |
+#### 1. `src/components/dashboard/Sidebar.tsx`
+- Add a navigation item to the super admin section that links to `/admin` (Master Control)
+- Use `useNavigate` from react-router-dom to handle the route change
+- Add a new entry with icon `Crown` or `Settings` and label "Master Control" that navigates to `/admin` instead of setting an internal view
+- Place it in the `superAdminNavigation` array or as a standalone button below the admin section
 
-No new files need to be created. No database changes required -- the `admins` table and `invite-admin` edge function already exist and work.
+#### 2. `src/components/dashboard/DashboardHeader.tsx`
+- Add a small icon button (e.g., `ShieldCheck` icon) in the header action bar that links to `/admin`
+- Provides quick access from the header without needing the sidebar
 
 ---
 
 ### Technical Details
 
-- `adminNavConfig.ts`: Import `ShieldCheck` from lucide-react alongside `Crown`. Add a second entry to `NAV_SECTIONS` array.
-- `AdminPanel.tsx`: Add `const AdminUsers = lazy(() => import("@/components/dashboard/AdminsView").then(m => ({ default: m.AdminsView })))` since it uses a named export. Add `"admin-users": AdminUsers` to the views map. Update default `openSections` to include `administration: true`.
+| File | Change |
+|------|--------|
+| `src/components/dashboard/Sidebar.tsx` | Import `useNavigate`, add a "Master Control" button in the admin section that calls `navigate('/admin')` |
+| `src/components/dashboard/DashboardHeader.tsx` | Add a `ShieldCheck` icon button linking to `/admin` in the action bar |
+
+No database changes needed. Both additions use standard react-router-dom navigation.
