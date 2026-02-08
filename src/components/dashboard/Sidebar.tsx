@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Brand } from '@/types/loyalty';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -211,13 +211,15 @@ function SidebarContent({
 
 export function Sidebar({ activeView, setActiveView, activeBrand, setActiveBrand, mobileOpen, onMobileClose }: SidebarProps) {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   const { isRTL } = useLanguage();
+  const useDrawer = isMobile || isTablet;
 
-  // Mobile: Sheet drawer
-  if (isMobile) {
+  // Mobile & Tablet: Sheet drawer
+  if (useDrawer) {
     return (
       <Sheet open={mobileOpen} onOpenChange={(open) => !open && onMobileClose?.()}>
-        <SheetContent side={isRTL ? "right" : "left"} className="w-72 p-0 bg-card border-primary/10">
+        <SheetContent side={isRTL ? "right" : "left"} className={cn(isTablet ? "w-80" : "w-72", "p-0 bg-card border-primary/10")}>
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation Menu</SheetTitle>
           </SheetHeader>

@@ -254,7 +254,7 @@ export function GuestProfile({ guest, onBack }: GuestProfileProps) {
         </div>
       </div>
 
-      <div className="p-4 space-y-4 max-w-4xl mx-auto">
+      <div className="p-4 space-y-4 max-w-4xl mx-auto md:grid md:grid-cols-[1fr] lg:grid-cols-1 md:gap-4">
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Card className="bg-card border-border/30">

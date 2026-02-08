@@ -152,7 +152,7 @@ export default function MemberPortal() {
       </Dialog>
 
       {/* Main Content */}
-      <div className="p-4 max-w-lg mx-auto space-y-6 pb-24">
+      <div className="p-4 max-w-lg mx-auto space-y-6 pb-safe pb-24">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -204,7 +204,7 @@ export default function MemberPortal() {
             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary/40 rounded-br-xl" />
             
             <CardContent className="p-6">
-              <div className="flex items-start gap-6">
+              <div className="flex items-start gap-4 md:gap-6">
                 {/* Tier Medallion */}
                 <CrystalMedallion 
                   tier={member.tierName || 'crystal'} 
@@ -224,7 +224,7 @@ export default function MemberPortal() {
                   {/* Progress to next tier */}
                   {nextTier && (
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                      <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-1">
                         <span className="text-muted-foreground tracking-refined">
                           Progress to {nextTier.displayName}
                         </span>
@@ -351,7 +351,7 @@ export default function MemberPortal() {
         >
           <Button 
             variant="crystal" 
-            className="h-auto py-5 flex-col gap-2"
+            className="h-auto py-5 flex-col gap-2 min-h-[44px]"
             onClick={() => navigate('/member/history')}
           >
             <History className="h-5 w-5" />
@@ -359,7 +359,7 @@ export default function MemberPortal() {
           </Button>
           <Button 
             variant="crystal" 
-            className="h-auto py-5 flex-col gap-2"
+            className="h-auto py-5 flex-col gap-2 min-h-[44px]"
             onClick={() => navigate('/member/events')}
           >
             <CalendarCheck className="h-5 w-5" />
@@ -367,7 +367,7 @@ export default function MemberPortal() {
           </Button>
           <Button 
             variant="crystal" 
-            className="h-auto py-5 flex-col gap-2 relative"
+            className="h-auto py-5 flex-col gap-2 relative min-h-[44px]"
             onClick={() => navigate('/member/rewards')}
           >
             <Gift className="h-5 w-5" />

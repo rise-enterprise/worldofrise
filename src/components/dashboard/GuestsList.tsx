@@ -124,7 +124,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                     size="sm"
                     onClick={() => setSelectedTier(tier.id)}
                     className={cn(
-                      "whitespace-nowrap h-8 text-xs md:text-sm transition-all duration-200",
+                      "whitespace-nowrap h-9 px-3 py-2 text-xs md:text-sm transition-all duration-200 min-h-[44px]",
                       selectedTier === tier.id 
                         ? "bg-primary text-primary-foreground" 
                         : "bg-transparent border-border/30 text-muted-foreground hover:text-foreground hover:border-primary/30"
@@ -185,7 +185,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                     style={{ animationDelay: `${index * 30}ms` }}
                     onClick={() => onSelectGuest(guest)}
                   >
-                    <CardContent className="p-3 md:p-4">
+                    <CardContent className="p-3 md:p-4 min-h-[56px] flex items-center">
                       <div className="flex items-center gap-3 md:gap-4">
                         <Avatar className={cn(
                           "h-12 w-12 md:h-14 md:w-14 border shrink-0",

@@ -1028,3 +1028,35 @@ select:focus {
 .light .light-mode-dim-effects {
   opacity: 0.3;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   SAFE AREA SUPPORT — iPhone Notch / Dynamic Island
+═══════════════════════════════════════════════════════════ */
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Ensure fixed bottom elements respect safe areas */
+.fixed-bottom-safe {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Touch target minimum for Apple HIG compliance */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

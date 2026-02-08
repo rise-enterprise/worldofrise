@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Brand, Guest, DashboardMetrics } from '@/types/loyalty';
 import { useVIPGuests } from '@/hooks/useMembers';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { Sidebar } from '@/components/dashboard/Sidebar';
@@ -40,7 +40,9 @@ export default function Dashboard() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   const { isRTL } = useLanguage();
+  const useDrawer = isMobile || isTablet;
   const { data: vipGuests = [], isLoading: vipLoading } = useVIPGuests();
   const { data: metrics = emptyMetrics, isLoading: metricsLoading } = useDashboardMetrics();
 
@@ -69,7 +71,7 @@ export default function Dashboard() {
 
       <main className={cn(
         'relative z-10',
-        isMobile ? '' : (isRTL ? 'mr-64' : 'ml-64')
+        !useDrawer && (isRTL ? 'mr-64' : 'ml-64')
       )}>
         <DashboardHeader 
           onMenuClick={() => setMobileMenuOpen(true)}
