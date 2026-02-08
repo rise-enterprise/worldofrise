@@ -8,7 +8,6 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import noirLogoDark from "@/assets/noir-logo.png";
 import noirLogoLight from "@/assets/noir-logo-light.png";
 import sassoLogo from "@/assets/sasso-logo.png";
-import sassoLogoLight from "@/assets/sasso-logo-light.png";
 
 const Gate = () => {
   const navigate = useNavigate();
@@ -148,7 +147,7 @@ const Gate = () => {
                 {/* SASSO logo */}
                 <div className="flex flex-col items-center">
                 <img 
-                    src={theme === 'light' ? sassoLogoLight : sassoLogo} 
+                    src={sassoLogo} 
                     alt="SASSO" 
                     className="h-24 mb-2 transition-all duration-500 group-hover:scale-110"
                   />
