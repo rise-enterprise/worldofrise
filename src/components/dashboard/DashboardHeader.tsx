@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Bell, Search, Plus, Upload, Menu } from 'lucide-react';
+import { Bell, Search, Plus, Upload, Menu, ShieldCheck } from 'lucide-react';
 import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { Guest, Country } from '@/types/loyalty';
 import { useMembers, useCreateMember } from '@/hooks/useMembers';
 import { DataImport } from './DataImport';
@@ -40,6 +41,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: DashboardHeaderProps) {
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const showMenuButton = isMobile || isTablet;
@@ -153,6 +155,17 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
       </div>
 
       <div className={cn("flex items-center gap-2 md:gap-3 animate-fade-in shrink-0", isRTL && "flex-row-reverse")} style={{ animationDelay: '100ms' }}>
+        {/* Master Control */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative h-9 w-9 md:h-10 md:w-10 text-primary/70 hover:text-primary hover:bg-primary/5"
+          onClick={() => navigate('/admin')}
+          title="Master Control"
+        >
+          <ShieldCheck className="h-4 w-4" />
+        </Button>
+
         {/* Theme Toggle */}
         <ThemeToggle />
 
