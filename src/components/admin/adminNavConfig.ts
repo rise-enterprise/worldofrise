@@ -1,4 +1,4 @@
-import { Crown, ShieldCheck } from "lucide-react";
+import { Crown, ShieldCheck, Users } from "lucide-react";
 
 export interface NavItem {
   id: string;
@@ -29,6 +29,15 @@ export const NAV_SECTIONS: NavSection[] = [
       { id: "loyalty-digital-card", label: "Digital Card Control", description: "Customize QR membership cards, Apple/Google Wallet passes, RFID linking, and card design." },
       { id: "loyalty-multi-brand", label: "Multi-Brand Control", description: "Manage shared vs independent points systems across NOIR and SASSO brands with tier mapping." },
       { id: "loyalty-settings", label: "Global Settings", description: "Configure points-to-currency conversion, expiration policies, default thresholds, and regional settings." },
+    ],
+  },
+  {
+    id: "crm",
+    label: "CRM",
+    icon: Users,
+    items: [
+      { id: "crm-contacts", label: "Contacts Database", description: "Browse, search, filter, and export the full contacts database for NOIR and SASSO." },
+      { id: "crm-import", label: "Import / Replace", description: "Upload a CSV or XLSX file to replace all existing contact records with a new dataset." },
     ],
   },
   {
