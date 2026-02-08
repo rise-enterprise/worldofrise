@@ -5,7 +5,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { CrystalPageWrapper } from "@/components/effects/CrystalPageWrapper";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminHeader from "@/components/admin/AdminHeader";
-import AdminPlaceholder from "@/components/admin/AdminPlaceholder";
+
 import { NAV_SECTIONS } from "@/components/admin/adminNavConfig";
 
 // Loyalty components
@@ -59,15 +59,6 @@ export default function AdminPanel() {
     }
   }, [useDrawer]);
 
-  // Resolve active item info
-  const activeInfo = useMemo(() => {
-    for (const section of NAV_SECTIONS) {
-      const item = section.items.find((i) => i.id === activeView);
-      if (item) return { item, section };
-    }
-    return null;
-  }, [activeView]);
-
   const sidebarContent = (
     <AdminSidebar
       activeView={activeView}
@@ -115,12 +106,6 @@ export default function AdminPanel() {
               <Suspense fallback={<div className="flex items-center justify-center h-64 text-muted-foreground">Loading...</div>}>
                 {(() => { const C = LOYALTY_VIEWS[activeView]; return <C />; })()}
               </Suspense>
-            ) : activeInfo ? (
-              <AdminPlaceholder
-                sectionLabel={activeInfo.item.label}
-                groupLabel={activeInfo.section.label}
-                description={activeInfo.item.description}
-              />
             ) : (
               <div className="flex items-center justify-center h-64 text-muted-foreground">
                 Select a section from the sidebar
