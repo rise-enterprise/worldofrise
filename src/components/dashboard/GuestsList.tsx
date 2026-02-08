@@ -110,7 +110,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                 placeholder="Search by name, email, or phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-[#0B0D11] border border-primary/10 rounded-lg text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"
+                className="w-full pl-10 pr-4 py-2.5 bg-muted border border-primary/10 rounded-lg text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
               />
             </div>
 
@@ -127,7 +127,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                       "whitespace-nowrap h-8 text-xs md:text-sm transition-all duration-200",
                       selectedTier === tier.id 
                         ? "bg-primary text-primary-foreground" 
-                        : "bg-transparent border-[rgba(217,222,231,0.12)] text-muted-foreground hover:text-foreground hover:border-primary/30"
+                        : "bg-transparent border-border/30 text-muted-foreground hover:text-foreground hover:border-primary/30"
                     )}
                   >
                     {tier.label}
@@ -147,12 +147,12 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
             <Card key={i} variant="obsidian">
               <CardContent className="p-3 md:p-4">
                 <div className="flex items-center gap-3 md:gap-4">
-                  <Skeleton className="h-12 w-12 md:h-14 md:w-14 rounded-full shrink-0 bg-[#151921]" />
+                  <Skeleton className="h-12 w-12 md:h-14 md:w-14 rounded-full shrink-0 bg-muted" />
                   <div className="flex-1 space-y-2 min-w-0">
-                    <Skeleton className="h-4 w-32 md:w-48 bg-[#151921]" />
-                    <Skeleton className="h-3 w-24 md:w-32 bg-[#151921]" />
+                    <Skeleton className="h-4 w-32 md:w-48 bg-muted" />
+                    <Skeleton className="h-3 w-24 md:w-32 bg-muted" />
                   </div>
-                  <Skeleton className="h-5 w-5 shrink-0 bg-[#151921]" />
+                  <Skeleton className="h-5 w-5 shrink-0 bg-muted" />
                 </div>
               </CardContent>
             </Card>
@@ -189,10 +189,10 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                       <div className="flex items-center gap-3 md:gap-4">
                         <Avatar className={cn(
                           "h-12 w-12 md:h-14 md:w-14 border shrink-0",
-                          isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-[rgba(217,222,231,0.12)]"
+                          isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-border/30"
                         )}>
                           <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-                          <AvatarFallback className="bg-[#0B0D11] text-muted-foreground font-display text-base md:text-lg">
+                          <AvatarFallback className="bg-muted text-muted-foreground font-display text-base md:text-lg">
                             {initials}
                           </AvatarFallback>
                         </Avatar>
@@ -274,7 +274,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                       size="sm"
                       onClick={() => goToPage(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className="h-9 px-3 bg-transparent border-[rgba(217,222,231,0.12)] hover:border-primary/30"
+                      className="h-9 px-3 bg-transparent border-border/30 hover:border-primary/30"
                     >
                       <ChevronLeft className="h-4 w-4" />
                       <span className="hidden sm:inline ml-1">Prev</span>
@@ -290,7 +290,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                       size="sm"
                       onClick={() => goToPage(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className="h-9 px-3 bg-transparent border-[rgba(217,222,231,0.12)] hover:border-primary/30"
+                      className="h-9 px-3 bg-transparent border-border/30 hover:border-primary/30"
                     >
                       <span className="hidden sm:inline mr-1">Next</span>
                       <ChevronRight className="h-4 w-4" />

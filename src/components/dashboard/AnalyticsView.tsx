@@ -62,7 +62,7 @@ export function AnalyticsView() {
                   <span className="text-xs">+18% vs Q1</span>
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] text-primary/70">
+              <div className="p-3 rounded-xl bg-muted border border-border/30 text-primary/70">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </div>
@@ -80,7 +80,7 @@ export function AnalyticsView() {
                   <span className="text-xs">+12% growth</span>
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] text-primary/70">
+              <div className="p-3 rounded-xl bg-muted border border-border/30 text-primary/70">
                 <Users className="h-5 w-5" />
               </div>
             </div>
@@ -98,7 +98,7 @@ export function AnalyticsView() {
                   <span className="text-xs">+4% this month</span>
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] text-primary/70">
+              <div className="p-3 rounded-xl bg-muted border border-border/30 text-primary/70">
                 <Target className="h-5 w-5" />
               </div>
             </div>
@@ -116,7 +116,7 @@ export function AnalyticsView() {
                   <span className="text-xs">-3 vs last month</span>
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] text-primary/70">
+              <div className="p-3 rounded-xl bg-muted border border-border/30 text-primary/70">
                 <Award className="h-5 w-5" />
               </div>
             </div>
@@ -136,14 +136,15 @@ export function AnalyticsView() {
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={tierData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(217,222,231,0.08)" />
-                  <XAxis type="number" stroke="rgba(217,222,231,0.4)" fontSize={12} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
-                  <YAxis type="category" dataKey="name" stroke="rgba(217,222,231,0.4)" fontSize={12} width={80} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} />
+                  <XAxis type="number" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} fontSize={12} tickFormatter={(v) => `$${(v/1000).toFixed(0)}k`} />
+                  <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} fontSize={12} width={80} />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#0E1116', 
-                      border: '1px solid rgba(217,222,231,0.08)',
-                      borderRadius: '8px'
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      color: 'hsl(var(--foreground))'
                     }}
                     formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
                   />
@@ -164,14 +165,15 @@ export function AnalyticsView() {
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={retentionData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(217,222,231,0.08)" />
-                  <XAxis dataKey="month" stroke="rgba(217,222,231,0.4)" fontSize={12} />
-                  <YAxis stroke="rgba(217,222,231,0.4)" fontSize={12} domain={[70, 100]} tickFormatter={(v) => `${v}%`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} fontSize={12} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} fontSize={12} domain={[70, 100]} tickFormatter={(v) => `${v}%`} />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#0E1116', 
-                      border: '1px solid rgba(217,222,231,0.08)',
-                      borderRadius: '8px'
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      color: 'hsl(var(--foreground))'
                     }}
                     formatter={(value: number) => [`${value}%`, 'Retention']}
                   />
@@ -192,14 +194,15 @@ export function AnalyticsView() {
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={brandComparison}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(217,222,231,0.08)" />
-                  <XAxis dataKey="month" stroke="rgba(217,222,231,0.4)" fontSize={12} />
-                  <YAxis stroke="rgba(217,222,231,0.4)" fontSize={12} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.3} />
+                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} fontSize={12} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" strokeOpacity={0.4} fontSize={12} />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#0E1116', 
-                      border: '1px solid rgba(217,222,231,0.08)',
-                      borderRadius: '8px'
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                      color: 'hsl(var(--foreground))'
                     }}
                   />
                   <Legend />
@@ -222,7 +225,7 @@ export function AnalyticsView() {
               {topVIPs.map((vip, index) => (
                 <div 
                   key={vip.name}
-                  className="flex items-center justify-between p-3 rounded-lg bg-[#0B0D11] border border-[rgba(217,222,231,0.08)] hover:border-primary/20 transition-all duration-300"
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted border border-border/30 hover:border-primary/20 transition-all duration-300"
                 >
                   <div className="flex items-center gap-3">
                     <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-medium">

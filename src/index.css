@@ -411,7 +411,7 @@
   /* Obsidian Panels with Crystal Edge */
   .obsidian-panel {
     @apply bg-card border border-border/40 rounded-xl;
-    background: linear-gradient(180deg, hsl(220 12% 9%) 0%, hsl(220 12% 6%) 100%);
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
     box-shadow: 
       var(--bevel-highlight),
       var(--bevel-shadow),
@@ -496,14 +496,14 @@
 
   .bg-gradient-luxury {
     background: linear-gradient(180deg, 
-      hsl(220 14% 6%) 0%, 
-      hsl(220 14% 3%) 100%);
+      hsl(var(--card)) 0%, 
+      hsl(var(--background)) 100%);
   }
 
   .bg-gradient-card {
     background: linear-gradient(145deg, 
-      hsl(220 12% 9% / 0.95) 0%, 
-      hsl(220 12% 6% / 0.9) 100%);
+      hsl(var(--card) / 0.95) 0%, 
+      hsl(var(--background) / 0.9) 100%);
   }
 
   .bg-gradient-gold {
@@ -514,9 +514,9 @@
 
   .bg-gradient-crystal {
     background: linear-gradient(180deg,
-      hsl(220 14% 5%) 0%,
-      hsl(220 12% 7%) 50%,
-      hsl(220 14% 4%) 100%);
+      hsl(var(--muted)) 0%,
+      hsl(var(--card)) 50%,
+      hsl(var(--background)) 100%);
   }
 
   .bg-gradient-burgundy {
@@ -533,14 +533,14 @@
 
   .noir-gradient {
     background: linear-gradient(180deg, 
-      hsl(220 14% 6%) 0%, 
-      hsl(220 14% 3%) 100%);
+      hsl(var(--card)) 0%, 
+      hsl(var(--background)) 100%);
   }
 
   .noir-gradient-radial {
     background: radial-gradient(ellipse at top, 
-      hsl(220 12% 10%) 0%, 
-      hsl(220 14% 4%) 70%);
+      hsl(var(--muted)) 0%, 
+      hsl(var(--background)) 70%);
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -833,7 +833,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(220 14% 6%);
+  background: hsl(var(--background));
 }
 
 ::-webkit-scrollbar-thumb {
@@ -848,7 +848,7 @@
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(220 15% 25%) hsl(220 14% 6%);
+  scrollbar-color: hsl(220 15% 25%) hsl(var(--background));
 }
 
 /* ═══════════════════════════════════════════════════════════

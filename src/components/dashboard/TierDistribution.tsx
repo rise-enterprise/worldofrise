@@ -86,7 +86,7 @@ export function TierDistribution({ distribution }: TierDistributionProps) {
                   <span className="text-xs text-muted-foreground/50 font-body">({percentage}%)</span>
                 </div>
               </div>
-              <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden">
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                 <motion.div
                   className={cn(
                     'h-full rounded-full',
@@ -107,7 +107,7 @@ export function TierDistribution({ distribution }: TierDistributionProps) {
         
         {/* Total indicator */}
         <motion.div 
-          className="pt-4 border-t border-[rgba(217,222,231,0.08)] flex justify-between items-center"
+          className="pt-4 border-t border-border/30 flex justify-between items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}

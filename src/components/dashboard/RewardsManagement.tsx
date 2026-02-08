@@ -89,7 +89,7 @@ export function RewardsManagement() {
               Create Reward
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0E1116] border-[rgba(217,222,231,0.08)] max-w-lg">
+          <DialogContent className="bg-card border-border/30 max-w-lg">
             <DialogHeader>
               <DialogTitle className="font-display text-xl">
                 {editingReward ? 'Edit Reward' : 'Create New Reward'}
@@ -101,7 +101,7 @@ export function RewardsManagement() {
                 <Input 
                   placeholder="Reward title" 
                   defaultValue={editingReward?.title}
-                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]"
+                  className="bg-muted border-border/30"
                 />
               </div>
               <div className="space-y-2">
@@ -109,14 +109,14 @@ export function RewardsManagement() {
                 <Textarea 
                   placeholder="Reward description" 
                   defaultValue={editingReward?.description}
-                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]"
+                  className="bg-muted border-border/30"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Category</Label>
                   <Select defaultValue={editingReward?.category || 'experience'}>
-                    <SelectTrigger className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]">
+                    <SelectTrigger className="bg-muted border-border/30">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -130,7 +130,7 @@ export function RewardsManagement() {
                 <div className="space-y-2">
                   <Label>Brand</Label>
                   <Select defaultValue={editingReward?.brand || 'both'}>
-                    <SelectTrigger className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]">
+                    <SelectTrigger className="bg-muted border-border/30">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -145,7 +145,7 @@ export function RewardsManagement() {
                 <div className="space-y-2">
                   <Label>Minimum Tier</Label>
                   <Select defaultValue={editingReward?.minTier || 'crystal'}>
-                    <SelectTrigger className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]">
+                    <SelectTrigger className="bg-muted border-border/30">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -162,7 +162,7 @@ export function RewardsManagement() {
                     type="number"
                     placeholder="0" 
                     defaultValue={editingReward?.pointsCost}
-                    className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]"
+                    className="bg-muted border-border/30"
                   />
                 </div>
               </div>
@@ -172,7 +172,7 @@ export function RewardsManagement() {
                   type="number"
                   placeholder="Unlimited" 
                   defaultValue={editingReward?.inventory || ''}
-                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.08)]"
+                  className="bg-muted border-border/30"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-4">
@@ -250,7 +250,7 @@ export function RewardsManagement() {
                     {reward.inventory ? `${reward.inventory} left` : 'Unlimited'}
                   </div>
                 </div>
-                <div className="flex gap-2 mt-4 pt-4 border-t border-[rgba(217,222,231,0.08)]">
+                <div className="flex gap-2 mt-4 pt-4 border-t border-border/30">
                   <Button 
                     variant="outline" 
                     size="sm" 
