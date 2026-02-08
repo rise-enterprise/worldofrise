@@ -1,47 +1,35 @@
 
-## Fix Distinguished Guests Card Layout and Typography
 
-### Problems
-The desktop VIPGuestCard currently uses a horizontal flex layout (`flex items-start gap-4`) that creates compressed, misaligned content. The stats section uses inline `flex` with dividers that wraps awkwardly. Text is not properly grouped or spaced.
+## Fix Distinguished Guests Card -- Layout, Spacing, and Alignment
 
-### Solution
-Restructure the desktop card to use a clean vertical flex-column layout with consistent spacing and clear visual grouping.
+### Problems Identified
+1. **Stats grid spacing is off** -- The 2x2 / 4-column grid has inconsistent cell sizing; labels with icons (Points, Member since) are wider than plain labels (Visits, Last visit), creating visual imbalance.
+2. **Text still centered/misaligned** -- The name row uses `flex-wrap` with `items-center` causing elements to float awkwardly when they wrap. The avatar + name section doesn't anchor content to the top-left.
+3. **Card feels too compressed** -- Sections are packed together without enough breathing room; the `space-y-3` gap is too tight for the amount of content.
 
 ### Changes (single file: `src/components/dashboard/VIPGuestCard.tsx`)
 
-**Desktop (non-compact) card restructure:**
+**1. Header section (lines 109-133) -- Fix name alignment**
+- Change the name/badge area from a single wrapping flex row to a stacked layout:
+  - Top line: status dot + name + VIP diamond (horizontal flex, `items-center`)
+  - Below: tier badge on its own line
+- This prevents awkward wrapping and keeps the name always left-aligned next to the avatar.
 
-1. **Top section** -- Avatar + Name row side-by-side (keep existing flex row), but tighten alignment:
-   - Status dot, display name, VIP diamond, tier badge all on one baseline
-   - Remove `items-start`, use `items-center` for the name row
+**2. Increase vertical spacing (line 135)**
+- Change `space-y-3` to `space-y-4` for more breathing room between the info sections.
 
-2. **Info row** -- Brand, location, phone in a single horizontal row beneath the name, separated by subtle dividers or spacing (`gap-4`), all left-aligned with consistent icon sizing
+**3. Stats grid (lines 160-180) -- Fix alignment and consistency**
+- Force a consistent `grid-cols-2` layout (remove `sm:grid-cols-4`) so each stat gets equal width in a clean 2x2 grid.
+- Increase gap from `gap-4` to `gap-x-6 gap-y-4` for better horizontal separation.
+- Remove inline icons from the label text (Star, Calendar icons) -- place them as decorative elements above or remove entirely to keep labels uniform.
+- Increase the top margin/padding: change `mt-5 pt-4` to `mt-6 pt-5` for more separation from the content above.
 
-3. **Contact row** -- Email below the info row, left-aligned with Mail icon
+**4. Card padding (line 108)**
+- Increase CardContent padding from `p-6` to `p-7` (or `px-6 py-7`) to give more breathing room overall, pushing content to fill the card more naturally.
 
-4. **Stats section** -- Replace the current inline `flex` with wrapping dividers approach with a clean 2x2 or 4-column CSS grid:
-   - `grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5`
-   - Each cell: uppercase label on top, value below
-   - Equal spacing, no manual dividers
-   - Cells: VISITS, LAST VISIT, POINTS, MEMBER SINCE
+**5. Birthday and tags spacing (lines 183-199)**
+- Increase `mt-3` to `mt-4` on birthday and tags sections for consistent vertical rhythm.
 
-5. **Birthday** -- Below the stats grid, left-aligned with Cake icon, `mt-3`
+### Technical Summary
 
-6. **Tags** -- Below birthday, left-aligned, `mt-3`
-
-7. **Padding and spacing**:
-   - CardContent padding increased to `p-6`
-   - Section gaps: `space-y-3` between info/contact/stats sections
-   - Line height on labels: `leading-relaxed`
-
-**Compact card** -- Minor tweaks only:
-- Ensure text is left-aligned (already is)
-- No structural changes needed
-
-### Technical Details
-
-- Replace the stats `flex` block (lines 167-191) with a `grid` layout
-- Wrap the content below the name in a `div` with `space-y-3` for even vertical distribution
-- Change `p-5` to `p-6` on CardContent for breathing room
-- Remove manual `w-px h-8 bg-border/30` dividers, use grid gap instead
-- Keep all existing icons and data fields
+All changes are in `src/components/dashboard/VIPGuestCard.tsx`, desktop layout only (lines 87-203). The compact mobile layout remains unchanged. No new dependencies.
