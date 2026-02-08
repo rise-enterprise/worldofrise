@@ -1,6 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Coffee, UtensilsCrossed } from 'lucide-react';
+import noirLogo from '@/assets/noir-logo.png';
+import noirLogoLight from '@/assets/noir-logo-light.png';
+import sassoLogo from '@/assets/sasso-logo.png';
+import { useState, useEffect } from 'react';
 
 interface BrandMetricsProps {
   visitsByBrand: {
@@ -11,8 +15,19 @@ interface BrandMetricsProps {
 
 export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
   const total = visitsByBrand.noir + visitsByBrand.sasso;
-  const noirPercentage = Math.round((visitsByBrand.noir / total) * 100);
+  const noirPercentage = total > 0 ? Math.round((visitsByBrand.noir / total) * 100) : 50;
   const sassoPercentage = 100 - noirPercentage;
+
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  useEffect(() => {
+    const check = () => setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  const currentNoirLogo = theme === 'light' ? noirLogoLight : noirLogo;
 
   return (
     <Card variant="obsidian" className="animate-slide-up relative overflow-hidden" style={{ animationDelay: '300ms' }}>
@@ -36,7 +51,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
                 <Coffee className="h-4 w-4 text-foreground/70" />
               </div>
               <div>
-                <p className="font-display text-sm font-medium text-foreground tracking-wide">NOIR Café</p>
+                <img src={currentNoirLogo} alt="NOIR" className="h-4 object-contain" />
                 <p className="text-xs text-muted-foreground/50 tracking-refined">نوار كافيه</p>
               </div>
             </div>
@@ -61,7 +76,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
                 <UtensilsCrossed className="h-4 w-4 text-primary/70" />
               </div>
               <div>
-                <p className="font-display text-sm font-medium text-foreground tracking-wide">SASSO</p>
+                <img src={sassoLogo} alt="SASSO" className="h-4 object-contain" />
                 <p className="text-xs text-muted-foreground/50 tracking-refined">Italian Fine Dining</p>
               </div>
             </div>
@@ -94,8 +109,8 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
             />
           </div>
           <div className="flex justify-between mt-3 text-xs text-muted-foreground/50 tracking-refined">
-            <span>NOIR</span>
-            <span>SASSO</span>
+            <img src={currentNoirLogo} alt="NOIR" className="h-3 object-contain" />
+            <img src={sassoLogo} alt="SASSO" className="h-3 object-contain" />
           </div>
         </div>
       </CardContent>
