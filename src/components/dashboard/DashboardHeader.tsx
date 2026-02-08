@@ -31,6 +31,7 @@ import { Guest, Country } from '@/types/loyalty';
 import { useMembers, useCreateMember } from '@/hooks/useMembers';
 import { DataImport } from './DataImport';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface DashboardHeaderProps {
   onSearch?: (query: string) => void;
@@ -150,6 +151,9 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
       </div>
 
       <div className={cn("flex items-center gap-2 md:gap-3 animate-fade-in shrink-0", isRTL && "flex-row-reverse")} style={{ animationDelay: '100ms' }}>
+        {/* Theme Toggle */}
+        <ThemeToggle />
+
         {/* Language Switcher */}
         <LanguageSwitcher />
 
