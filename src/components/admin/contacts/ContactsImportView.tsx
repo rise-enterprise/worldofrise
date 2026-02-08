@@ -20,7 +20,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CONTACT_COLUMNS, HEADER_TO_DB_MAP } from "./contactColumns";
 import { autoMapHeaders, normalizeRow, deduplicateRows } from "./contactUtils";
 import { useContactsCount } from "@/hooks/useContacts";
-import * as XLSX from "xlsx";
 
 type ImportStep = "upload" | "mapping" | "confirm" | "importing" | "done";
 
@@ -69,6 +68,7 @@ export default function ContactsImportView() {
     setFileName(file.name);
 
     try {
+      const XLSX = await import("xlsx");
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data, { type: "array", cellDates: true });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
