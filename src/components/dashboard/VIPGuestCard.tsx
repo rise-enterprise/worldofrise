@@ -105,8 +105,8 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
       
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/[0.02] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 pointer-events-none" />
       
-      <CardContent className="p-6 relative">
-        <div className="flex items-center gap-4 mb-4">
+      <CardContent className="px-6 py-7 relative">
+        <div className="flex items-start gap-4 mb-5">
           <Avatar className={cn(
             "h-12 w-12 border shrink-0",
             isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-border/30"
@@ -117,22 +117,24 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
             </AvatarFallback>
           </Avatar>
           
-          <div className="flex items-center gap-2 min-w-0 flex-wrap">
-            <div className={cn(
-              "h-2 w-2 rounded-full shrink-0",
-              guest.status === 'blocked' ? 'bg-destructive' : 'bg-emerald-500 dark:bg-emerald-400'
-            )} />
-            <h4 className="font-display text-sm font-medium text-foreground truncate tracking-wide">
-              {displayName}
-            </h4>
-            {guest.isVip && <Diamond className="h-3.5 w-3.5 text-primary shrink-0" />}
-            <Badge variant={guest.tier as any} className="text-[10px] shrink-0">
+          <div className="min-w-0 flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <div className={cn(
+                "h-2 w-2 rounded-full shrink-0",
+                guest.status === 'blocked' ? 'bg-destructive' : 'bg-emerald-500 dark:bg-emerald-400'
+              )} />
+              <h4 className="font-display text-sm font-medium text-foreground truncate tracking-wide">
+                {displayName}
+              </h4>
+              {guest.isVip && <Diamond className="h-3.5 w-3.5 text-primary shrink-0" />}
+            </div>
+            <Badge variant={guest.tier as any} className="text-[10px] shrink-0 w-fit">
               {tierConfig.displayName}
             </Badge>
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {/* Brand, Location, Phone row */}
           <div className="flex items-center gap-4 text-xs text-muted-foreground/60 tracking-refined flex-wrap">
             <span className="flex items-center gap-1.5">
@@ -158,7 +160,7 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
           )}
 
           {/* Stats grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5 pt-4 border-t border-border/20">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 mt-6 pt-5 border-t border-border/20">
             <div>
               <p className="text-[10px] text-muted-foreground/50 tracking-[0.2em] uppercase leading-relaxed">Visits</p>
               <p className="font-display text-lg font-medium text-primary tracking-wide">{guest.totalVisits}</p>
@@ -169,27 +171,26 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
             </div>
             {guest.totalPoints != null && (
               <div>
-                <p className="text-[10px] text-muted-foreground/50 tracking-[0.2em] uppercase leading-relaxed flex items-center gap-1"><Star className="h-3 w-3" />Points</p>
+                <p className="text-[10px] text-muted-foreground/50 tracking-[0.2em] uppercase leading-relaxed">Points</p>
                 <p className="font-display text-lg font-medium text-primary tracking-wide">{guest.totalPoints}</p>
               </div>
             )}
             <div>
-              <p className="text-[10px] text-muted-foreground/50 tracking-[0.2em] uppercase leading-relaxed flex items-center gap-1"><Calendar className="h-3 w-3" />Member since</p>
+              <p className="text-[10px] text-muted-foreground/50 tracking-[0.2em] uppercase leading-relaxed">Member since</p>
               <p className="text-sm text-foreground tracking-refined">{formatFullDate(guest.joinedAt)}</p>
             </div>
           </div>
 
           {/* Birthday */}
           {guest.birthday && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60 tracking-refined mt-3">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground/60 tracking-refined mt-4">
               <Cake className="h-3 w-3" />
               {formatFullDate(guest.birthday)}
             </div>
           )}
 
-          {/* Tags */}
           {guest.tags.length > 0 && (
-            <div className="flex gap-1.5 mt-3">
+            <div className="flex gap-1.5 mt-4">
               {guest.tags.slice(0, 2).map((tag) => (
                 <Badge key={tag} variant="outline" className="text-[10px] tracking-refined border-border/30 text-muted-foreground/60 hover:border-primary/20 hover:text-primary/70 transition-colors">
                   {tag}
