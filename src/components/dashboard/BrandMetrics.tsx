@@ -32,7 +32,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
         <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+              <div className="p-3 rounded-xl bg-muted border border-border/30">
                 <Coffee className="h-4 w-4 text-foreground/70" />
               </div>
               <div>
@@ -45,7 +45,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
               <p className="text-xs text-muted-foreground/50 tracking-refined">{noirPercentage}% of total</p>
             </div>
           </div>
-          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-foreground/50 to-foreground/30 rounded-full transition-all duration-1000 ease-out"
               style={{ width: `${noirPercentage}%` }}
@@ -57,7 +57,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
         <div className="animate-slide-up" style={{ animationDelay: '500ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-[#0B0D11] border border-[rgba(217,222,231,0.08)]">
+              <div className="p-3 rounded-xl bg-muted border border-border/30">
                 <UtensilsCrossed className="h-4 w-4 text-primary/70" />
               </div>
               <div>
@@ -70,7 +70,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
               <p className="text-xs text-muted-foreground/50 tracking-refined">{sassoPercentage}% of total</p>
             </div>
           </div>
-          <div className="h-1.5 bg-[#0B0D11] rounded-full overflow-hidden shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-primary to-primary/50 rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(200,162,74,0.3)]"
               style={{ width: `${sassoPercentage}%` }}
@@ -83,7 +83,7 @@ export function BrandMetrics({ visitsByBrand }: BrandMetricsProps) {
           {/* Crystal divider glow */}
           <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
           <p className="text-xs text-muted-foreground/50 mb-3 tracking-[0.2em] uppercase">Distribution</p>
-          <div className="flex h-2 rounded-full overflow-hidden bg-[#0B0D11] shadow-[inset_0_1px_3px_rgba(0,0,0,0.4)]">
+          <div className="flex h-2 rounded-full overflow-hidden bg-muted">
             <div 
               className="bg-gradient-to-r from-foreground/50 to-foreground/30 transition-all duration-1000 ease-out"
               style={{ width: `${noirPercentage}%` }}

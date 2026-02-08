@@ -127,7 +127,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
 
   return (
     <header className={cn(
-      "flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-primary/10 bg-gradient-to-r from-[#07080A]/95 via-[#0E1116]/90 to-[#07080A]/95 backdrop-blur-2xl sticky top-0 z-30 gap-4 relative overflow-hidden",
+      "flex items-center justify-between py-4 md:py-6 px-4 md:px-8 border-b border-primary/10 bg-gradient-to-r from-background/95 via-card/90 to-background/95 backdrop-blur-2xl sticky top-0 z-30 gap-4 relative overflow-hidden",
       isRTL && "flex-row-reverse"
     )}>
       {/* Crystal gradient border effect */}
@@ -160,11 +160,11 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         {/* Search Button */}
         <Popover open={searchOpen} onOpenChange={setSearchOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10 text-muted-foreground hover:text-foreground hover:bg-[#151921]">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10 text-muted-foreground hover:text-foreground hover:bg-muted">
               <Search className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80 bg-[#0E1116] border-[rgba(217,222,231,0.12)]" align="end">
+          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80 bg-card border-border" align="end">
             <div className="space-y-3">
               <h4 className="font-medium text-sm text-foreground">{t('header.searchGuests')}</h4>
               <Input 
@@ -173,14 +173,14 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                 onChange={(e) => handleSearch(e.target.value)}
                 autoFocus
                 dir={isRTL ? 'rtl' : 'ltr'}
-                className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50 focus:ring-primary/20"
+                className="bg-muted border-border focus:border-primary/50 focus:ring-primary/20"
               />
               {searchResults.length > 0 && (
                 <div className="max-h-64 overflow-y-auto space-y-2">
                   {searchResults.map((guest) => (
                     <div 
                       key={guest.id}
-                      className="p-3 rounded-lg bg-[#0B0D11] border border-transparent hover:border-primary/20 transition-all duration-200 cursor-pointer"
+                      className="p-3 rounded-lg bg-muted border border-transparent hover:border-primary/20 transition-all duration-200 cursor-pointer"
                       onClick={() => {
                         setSearchOpen(false);
                         setSearchQuery('');
@@ -206,14 +206,14 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         {/* Notifications Button */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10 text-muted-foreground hover:text-foreground hover:bg-[#151921]">
+            <Button variant="ghost" size="icon" className="relative h-9 w-9 md:h-10 md:w-10 text-muted-foreground hover:text-foreground hover:bg-muted">
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
                 <span className="absolute top-1 right-1 md:top-1.5 md:right-1.5 w-2 h-2 bg-primary rounded-full animate-pulse" />
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80 bg-[#0E1116] border-[rgba(217,222,231,0.12)]" align="end">
+          <PopoverContent className="w-[calc(100vw-2rem)] md:w-80 bg-card border-border" align="end">
             <div className="space-y-3">
               <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
                 <h4 className="font-medium text-sm text-foreground">{t('header.notifications')}</h4>
@@ -233,8 +233,8 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                     className={cn(
                       "p-3 rounded-lg transition-all duration-200 cursor-pointer border",
                       notif.read 
-                        ? 'bg-[#0B0D11]/50 border-transparent' 
-                        : 'bg-[#0B0D11] border-primary/10 hover:border-primary/20'
+                        ? 'bg-muted/50 border-transparent' 
+                        : 'bg-muted border-primary/10 hover:border-primary/20'
                     )}
                     onClick={() => {
                       setNotifications(prev => 
@@ -262,7 +262,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         <Button 
           variant="outline" 
           className={cn(
-            "gap-2 h-9 md:h-10 px-3 md:px-4 bg-transparent border-[rgba(217,222,231,0.12)] text-muted-foreground hover:text-foreground hover:bg-[#151921] hover:border-primary/30",
+            "gap-2 h-9 md:h-10 px-3 md:px-4 bg-transparent border-border text-muted-foreground hover:text-foreground hover:bg-muted hover:border-primary/30",
             isRTL && "flex-row-reverse"
           )}
           onClick={() => setImportOpen(true)}
@@ -283,7 +283,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
             <Plus className="h-4 w-4" />
             <span className="hidden md:inline">{t('header.newGuest')}</span>
           </Button>
-          <DialogContent className="max-w-[calc(100vw-2rem)] md:max-w-lg bg-[#0E1116] border-[rgba(217,222,231,0.12)]">
+          <DialogContent className="max-w-[calc(100vw-2rem)] md:max-w-lg">
             <DialogHeader>
               <DialogTitle className="font-display text-foreground">{t('header.registerNewGuest')}</DialogTitle>
               <DialogDescription className="text-muted-foreground/60">
@@ -298,7 +298,6 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                   placeholder={t('header.fullName')}
                   value={newGuest.name}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, name: e.target.value }))}
-                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -309,7 +308,6 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                   type="email"
                   value={newGuest.email}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, email: e.target.value }))}
-                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -320,7 +318,6 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                   type="tel"
                   value={newGuest.phone}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, phone: e.target.value }))}
-                  className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)] focus:border-primary/50"
                 />
               </div>
               <div className="space-y-2">
@@ -331,10 +328,10 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
                     setNewGuest(prev => ({ ...prev, country: value }))
                   }
                 >
-                  <SelectTrigger className="bg-[#0B0D11] border-[rgba(217,222,231,0.12)]">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#0E1116] border-[rgba(217,222,231,0.12)]">
+                  <SelectContent>
                     <SelectItem value="doha">{t('header.qatar')}</SelectItem>
                     <SelectItem value="riyadh">{t('header.saudiArabia')}</SelectItem>
                   </SelectContent>
@@ -343,7 +340,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
               <div className={cn("flex gap-3 pt-2", isRTL && "flex-row-reverse")}>
                 <Button 
                   variant="outline" 
-                  className="flex-1 bg-transparent border-[rgba(217,222,231,0.12)] hover:bg-[#151921]" 
+                  className="flex-1" 
                   onClick={() => setNewGuestOpen(false)}
                 >
                   {t('common.cancel')}

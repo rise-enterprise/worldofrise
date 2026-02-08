@@ -40,10 +40,10 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
           <div className="flex items-center gap-3 mb-3">
             <Avatar className={cn(
               "h-10 w-10 border shrink-0",
-              isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-[rgba(217,222,231,0.12)]"
+              isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-border/30"
             )}>
               <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-              <AvatarFallback className="bg-[#0B0D11] text-foreground font-display text-sm">
+              <AvatarFallback className="bg-muted text-foreground font-display text-sm">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -92,10 +92,10 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
         <div className="flex items-start gap-4">
           <Avatar className={cn(
             "h-12 w-12 border",
-            isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-[rgba(217,222,231,0.12)]"
+            isTopTier ? "border-primary/40 ring-1 ring-primary/20" : "border-border/30"
           )}>
             <AvatarImage src={guest.avatarUrl} alt={guest.name} />
-            <AvatarFallback className="bg-[#0B0D11] text-foreground font-display">
+            <AvatarFallback className="bg-muted text-foreground font-display">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -131,7 +131,7 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
                   <p className="text-xs text-muted-foreground/50 tracking-[0.2em] uppercase">Visits</p>
                   <p className="font-display text-lg font-medium text-primary tracking-wide">{guest.totalVisits}</p>
                 </div>
-                <div className="w-px h-8 bg-[rgba(217,222,231,0.08)]" />
+                <div className="w-px h-8 bg-border/30" />
                 <div>
                   <p className="text-xs text-muted-foreground/50 tracking-[0.2em] uppercase">Last visit</p>
                   <p className="text-sm text-foreground tracking-refined">{formatDate(guest.lastVisit)}</p>
@@ -141,7 +141,7 @@ export function VIPGuestCard({ guest, onClick, delay = 0, compact = false }: VIP
               {guest.tags.length > 0 && (
                 <div className="flex gap-1.5">
                   {guest.tags.slice(0, 2).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-[10px] tracking-refined border-[rgba(217,222,231,0.12)] text-muted-foreground/60 hover:border-primary/20 hover:text-primary/70 transition-colors">
+                    <Badge key={tag} variant="outline" className="text-[10px] tracking-refined border-border/30 text-muted-foreground/60 hover:border-primary/20 hover:text-primary/70 transition-colors">
                       {tag}
                     </Badge>
                   ))}
