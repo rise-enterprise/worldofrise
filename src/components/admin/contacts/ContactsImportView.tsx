@@ -127,33 +127,63 @@ export default function ContactsImportView() {
     setIsImporting(true);
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
+      const sb = supabase as any;
 
-      if (!token) {
-        throw new Error("Not authenticated. Please log in.");
+      // Step 1: Delete all existing contacts
+      const { error: deleteError } = await sb
+        .from("contacts")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000");
+
+      if (deleteError) throw new Error(`Failed to clear contacts: ${deleteError.message}`);
+
+      // Step 2: Batch insert (chunks of 200 to stay within payload limits)
+      const BATCH_SIZE = 200;
+      let totalInserted = 0;
+      const rejected: { row: number; reason: string }[] = [];
+
+      for (let i = 0; i < processedRows.length; i += BATCH_SIZE) {
+        const batch = processedRows.slice(i, i + BATCH_SIZE);
+        const { error: insertError } = await sb.from("contacts").insert(batch);
+
+        if (insertError) {
+          // Try one-by-one for this batch
+          for (let j = 0; j < batch.length; j++) {
+            const { error: singleErr } = await sb.from("contacts").insert([batch[j]]);
+            if (singleErr) {
+              rejected.push({ row: i + j + 1, reason: singleErr.message });
+            } else {
+              totalInserted++;
+            }
+          }
+        } else {
+          totalInserted += batch.length;
+        }
       }
 
-      const response = await supabase.functions.invoke("import-contacts", {
-        body: { rows: processedRows, fileName },
+      // Step 3: Log the import to audit_logs
+      await sb.from("audit_logs").insert({
+        action_type: "import",
+        entity_type: "contacts",
+        after_json: {
+          file_name: fileName,
+          total_rows: rawRows.length,
+          inserted: totalInserted,
+          rejected: rejected.length,
+        },
       });
 
-      if (response.error) {
-        throw new Error(response.error.message || "Import failed");
-      }
-
-      const data = response.data;
       setResult({
         totalRows: rawRows.length,
-        inserted: data.inserted,
+        inserted: totalInserted,
         deduped: dupCount,
-        rejected: data.rejected,
-        rejectedDetails: data.rejectedDetails || [],
+        rejected: rejected.length,
+        rejectedDetails: rejected.slice(0, 100),
       });
 
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       queryClient.invalidateQueries({ queryKey: ["contacts-count"] });
-      toast.success(`Successfully imported ${data.inserted} contacts`);
+      toast.success(`Successfully imported ${totalInserted} contacts`);
       setStep("done");
     } catch (err) {
       setErrors([(err as Error).message]);
