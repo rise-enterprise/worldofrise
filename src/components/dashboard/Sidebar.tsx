@@ -3,6 +3,7 @@ import { Brand } from '@/types/loyalty';
 import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigate } from 'react-router-dom';
 import {
   Sheet,
   SheetContent,
@@ -69,6 +70,8 @@ function SidebarContent({
     { id: 'notifications', labelKey: 'nav.notifications', icon: Bell },
     { id: 'settings', labelKey: 'nav.settings', icon: Settings },
   ];
+
+  const navigate = useNavigate();
 
   const superAdminNavigation = [
     { id: 'admins', labelKey: 'nav.adminUsers', icon: ShieldCheck },
@@ -193,6 +196,19 @@ function SidebarContent({
                   <span className="tracking-refined">{t(item.labelKey)}</span>
                 </button>
               ))}
+              
+              {/* Master Control Link */}
+              <button
+                onClick={() => navigate('/admin')}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out',
+                  isRTL && 'flex-row-reverse',
+                  'text-primary/80 hover:text-primary hover:bg-primary/5 border border-primary/15 hover:border-primary/30 mt-2'
+                )}
+              >
+                <Crown className="h-4 w-4" />
+                <span className="tracking-refined font-medium">{t('nav.masterControl', 'Master Control')}</span>
+              </button>
             </div>
           </>
         )}
