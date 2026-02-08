@@ -1,34 +1,41 @@
 
 
-## Remove Placeholder Sections -- Keep Only Loyalty Program
+## Add Admin Users Management to the Master Control Panel
 
-Strip out the 8 placeholder sidebar categories (Floorplan, People, Guest-Facing Language, General, Integrations, Availability, Widget Settings, Ordering) so the admin panel shows only the Loyalty Program section.
+Bring the existing admin user management functionality into the `/admin` Loyalty Master Control Panel as a new sidebar section, so you can manage all admin roles (Super Admin, Admin, Manager, Viewer) directly from the same panel.
 
 ---
 
-### Changes
+### What Changes
 
-#### 1. `src/components/admin/adminNavConfig.ts`
-- Remove all 8 non-loyalty entries from the `NAV_SECTIONS` array (Floorplan, People, Language, General, Integrations, Availability, Widget Settings, Ordering)
-- Remove unused icon imports (`Map`, `Users`, `Globe`, `Settings`, `Plug`, `Clock`, `Layout`, `ShoppingBag`)
-- Only the Loyalty Program section with `Crown` icon and its 10 sub-items remains
+#### 1. New sidebar section: "Administration"
+A new top-level category appears below "Loyalty Program" in the sidebar with one item:
+- **Admin Users** -- Invite, edit, deactivate, and delete admin accounts with role assignment
 
-#### 2. `src/pages/AdminPanel.tsx`
-- Remove the `AdminPlaceholder` import (no longer needed since all placeholder sections are gone)
-- Remove the placeholder fallback branch in the render logic (the `activeInfo` / `AdminPlaceholder` block)
-- Keep only the `LOYALTY_VIEWS` rendering path and the "Select a section" fallback
+#### 2. Reuse existing component
+The fully functional `AdminsView` component (currently used in the old dashboard at `/dashboard`) already supports:
+- Invite new admins with email + name + role
+- Edit admin name and role
+- Deactivate / permanently delete admins
+- Resend activation links
+- Role-based access (only super admins see this section)
 
-#### 3. `src/components/admin/AdminPlaceholder.tsx`
-- Delete this file entirely -- it is no longer used by any component
+This component will be lazy-loaded into the Master Control Panel just like the loyalty views.
+
+---
+
+### Files to Modify
+
+| File | Change |
+|------|--------|
+| `src/components/admin/adminNavConfig.ts` | Add a second `NavSection` with id `"administration"`, label `"Administration"`, `ShieldCheck` icon, and one item: `{ id: "admin-users", label: "Admin Users", description: "..." }` |
+| `src/pages/AdminPanel.tsx` | Add lazy import for `AdminsView`, add `"admin-users"` to the views map, auto-expand the administration section in `openSections` default |
+
+No new files need to be created. No database changes required -- the `admins` table and `invite-admin` edge function already exist and work.
 
 ---
 
 ### Technical Details
 
-| File | Action |
-|------|--------|
-| `src/components/admin/adminNavConfig.ts` | Edit: keep only Loyalty section |
-| `src/pages/AdminPanel.tsx` | Edit: remove placeholder import and render branch |
-| `src/components/admin/AdminPlaceholder.tsx` | Delete |
-
-No other files are affected. The sidebar, header, activity log, and all 10 loyalty views remain unchanged.
+- `adminNavConfig.ts`: Import `ShieldCheck` from lucide-react alongside `Crown`. Add a second entry to `NAV_SECTIONS` array.
+- `AdminPanel.tsx`: Add `const AdminUsers = lazy(() => import("@/components/dashboard/AdminsView").then(m => ({ default: m.AdminsView })))` since it uses a named export. Add `"admin-users": AdminUsers` to the views map. Update default `openSections` to include `administration: true`.
