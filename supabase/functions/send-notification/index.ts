@@ -131,7 +131,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "World of Rise <onboarding@resend.dev>",
+        from: "World of Rise <noreply@loyalty.rise.qa>",
         to: [member.email],
         subject: subject,
         html: emailHtml,
