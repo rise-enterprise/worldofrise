@@ -46,6 +46,7 @@ export const NAV_SECTIONS: NavSection[] = [
     icon: ShieldCheck,
     items: [
       { id: "admin-users", label: "Admin Users", description: "Invite, edit, deactivate, and delete admin accounts. Assign roles (Super Admin, Admin, Manager, Viewer) and manage access." },
+      { id: "admin-invitations", label: "Invitation Requests", description: "Review, approve, or reject membership applications. Manage rejected requests and reconsider applicants." },
     ],
   },
 ];

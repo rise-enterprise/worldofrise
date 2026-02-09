@@ -1050,6 +1050,79 @@ export type Database = {
           },
         ]
       }
+      rejected_invitation_requests: {
+        Row: {
+          can_reconsider: boolean | null
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          original_request_id: string | null
+          phone: string | null
+          preferred_brand: Database["public"]["Enums"]["brand_type"] | null
+          reconsidered_at: string | null
+          reconsidered_by: string | null
+          referral_source: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string
+        }
+        Insert: {
+          can_reconsider?: boolean | null
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          original_request_id?: string | null
+          phone?: string | null
+          preferred_brand?: Database["public"]["Enums"]["brand_type"] | null
+          reconsidered_at?: string | null
+          reconsidered_by?: string | null
+          referral_source?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason: string
+        }
+        Update: {
+          can_reconsider?: boolean | null
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          original_request_id?: string | null
+          phone?: string | null
+          preferred_brand?: Database["public"]["Enums"]["brand_type"] | null
+          reconsidered_at?: string | null
+          reconsidered_by?: string | null
+          referral_source?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rejected_invitation_requests_original_request_id_fkey"
+            columns: ["original_request_id"]
+            isOneToOne: false
+            referencedRelation: "invitation_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rejected_invitation_requests_reconsidered_by_fkey"
+            columns: ["reconsidered_by"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rejected_invitation_requests_rejected_by_fkey"
+            columns: ["rejected_by"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rewards: {
         Row: {
           brand_scope: Database["public"]["Enums"]["brand_type"] | null
