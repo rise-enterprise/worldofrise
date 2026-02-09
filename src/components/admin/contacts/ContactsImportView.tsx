@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { Upload, AlertTriangle, CheckCircle2, FileSpreadsheet, Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,7 @@ export default function ContactsImportView() {
   const [isImporting, setIsImporting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [progressText, setProgressText] = useState("");
+  const [progressPercent, setProgressPercent] = useState(0);
 
   const reset = () => {
     setStep("upload");
@@ -146,9 +148,10 @@ export default function ContactsImportView() {
 
       for (let i = 0; i < processedRows.length; i += BATCH_SIZE) {
         const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-        setProgressText(`Inserting batch ${batchNum} of ${totalBatches}...`);
-
         const batch = processedRows.slice(i, i + BATCH_SIZE);
+        setProgressText(`Inserting batch ${batchNum} of ${totalBatches}...`);
+        setProgressPercent(Math.round(((i + batch.length) / processedRows.length) * 100));
+
         const { error: insertError } = await sb.from("contacts").insert(batch);
 
         if (insertError) {
@@ -355,11 +358,14 @@ export default function ContactsImportView() {
       {/* Step: Importing */}
       {step === "importing" && (
         <Card>
-          <CardContent className="p-12 text-center">
-            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary mb-4" />
+          <CardContent className="p-12 text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
             <p className="text-lg font-medium">Importing contacts...</p>
-            {progressText && <p className="text-sm text-primary font-medium mt-1">{progressText}</p>}
-            <p className="text-sm text-muted-foreground mt-1">This may take a moment for large files.</p>
+            <div className="max-w-md mx-auto space-y-2">
+              <Progress value={progressPercent} className="h-3" />
+              <p className="text-sm text-primary font-medium">{progressPercent}% — {progressText}</p>
+            </div>
+            <p className="text-sm text-muted-foreground">This may take a moment for large files.</p>
           </CardContent>
         </Card>
       )}
