@@ -20,6 +20,7 @@ const LoyaltyDigitalCard = lazy(() => import("@/components/admin/loyalty/Loyalty
 const LoyaltyMultiBrand = lazy(() => import("@/components/admin/loyalty/LoyaltyMultiBrand"));
 const LoyaltyGlobalSettings = lazy(() => import("@/components/admin/loyalty/LoyaltyGlobalSettings"));
 const AdminUsers = lazy(() => import("@/components/dashboard/AdminsView").then(m => ({ default: m.AdminsView })));
+const InvitationRequestsView = lazy(() => import("@/components/admin/invitations").then(m => ({ default: m.InvitationRequestsView })));
 
 // CRM components
 const ContactsView = lazy(() => import("@/components/admin/contacts/ContactsView"));
@@ -37,6 +38,7 @@ const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = 
   "loyalty-multi-brand": LoyaltyMultiBrand,
   "loyalty-settings": LoyaltyGlobalSettings,
   "admin-users": AdminUsers as any,
+  "admin-invitations": InvitationRequestsView,
   "crm-contacts": ContactsView,
   "crm-import": ContactsImportView,
 };
