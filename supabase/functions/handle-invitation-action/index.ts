@@ -5,9 +5,6 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
-// Frontend URL for redirects
-const FRONTEND_URL = "https://worldofrise.lovable.app";
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const corsHeaders = {
@@ -83,14 +80,11 @@ const handler = async (req: Request): Promise<Response> => {
       // Send approval email to applicant
       await sendApprovalEmail(request.email, request.full_name);
 
-      // Redirect to admin panel with success message
-      return new Response(null, {
-        status: 302,
-        headers: {
-          ...corsHeaders,
-          "Location": `${FRONTEND_URL}/admin?tab=invitations&action=confirmed&name=${encodeURIComponent(request.full_name)}`,
-        },
-      });
+      return renderHtmlResponse(
+        "Member Added",
+        `${request.full_name} has been approved and added as a member.`,
+        "success"
+      );
     } else if (action === "reject") {
       // Check if this is a form submission with rejection reason
       if (req.method === "POST") {
@@ -127,14 +121,11 @@ const handler = async (req: Request): Promise<Response> => {
           })
           .eq("id", requestId);
 
-        // Redirect to admin panel with success message
-        return new Response(null, {
-          status: 302,
-          headers: {
-            ...corsHeaders,
-            "Location": `${FRONTEND_URL}/admin?tab=invitations&action=rejected&name=${encodeURIComponent(request.full_name)}`,
-          },
-        });
+        return renderHtmlResponse(
+          "Request Rejected",
+          `${request.full_name}'s request has been rejected and archived.`,
+          "success"
+        );
       }
 
       // Show rejection form

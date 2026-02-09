@@ -1,12 +1,10 @@
-import { useState, useCallback, useEffect, lazy, Suspense } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useCallback, useMemo, lazy, Suspense } from "react";
 import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { CrystalPageWrapper } from "@/components/effects/CrystalPageWrapper";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminHeader from "@/components/admin/AdminHeader";
-import { toast } from "sonner";
 
 import { NAV_SECTIONS } from "@/components/admin/adminNavConfig";
 
@@ -44,9 +42,7 @@ const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = 
   "crm-contacts": ContactsView,
   "crm-import": ContactsImportView,
 };
-
 export default function AdminPanel() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const { isRTL } = useLanguage();
@@ -56,28 +52,6 @@ export default function AdminPanel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({ loyalty: true, administration: true });
-
-  // Handle URL params from email action links
-  useEffect(() => {
-    const tab = searchParams.get("tab");
-    const action = searchParams.get("action");
-    const name = searchParams.get("name");
-
-    if (tab === "invitations") {
-      setActiveView("admin-invitations");
-      setOpenSections(prev => ({ ...prev, administration: true }));
-
-      if (action && name) {
-        if (action === "confirmed") {
-          toast.success(`${name} has been approved and added as a member`);
-        } else if (action === "rejected") {
-          toast.success(`${name}'s request has been rejected`);
-        }
-        // Clear the URL params after showing the toast
-        setSearchParams({});
-      }
-    }
-  }, [searchParams, setSearchParams]);
 
   const toggleSection = useCallback((id: string) => {
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
