@@ -272,7 +272,7 @@ export default function ContactsImportView() {
     setEtaText("");
 
     try {
-      const CHUNK_SIZE = 10000;
+      const CHUNK_SIZE = 2000;
       const totalChunks = Math.ceil(processedRows.length / CHUNK_SIZE);
       let totalInserted = 0;
       let totalRejected = 0;
@@ -291,14 +291,28 @@ export default function ContactsImportView() {
         setProgressText(`Chunk ${chunkIdx + 1} of ${totalChunks} (${chunk.length.toLocaleString()} rows)`);
         setProgressPercent(Math.round(((start + chunk.length) / processedRows.length) * 100));
 
-        const response = await supabase.functions.invoke("import-contacts", {
-          body: {
-            rows: chunk,
-            fileName,
-            clearFirst: isFirst,
-            isLastChunk: isLast,
-          },
-        });
+        let response;
+        try {
+          response = await supabase.functions.invoke("import-contacts", {
+            body: {
+              rows: chunk,
+              fileName,
+              clearFirst: isFirst,
+              isLastChunk: isLast,
+            },
+          });
+        } catch (networkErr) {
+          // Retry once on transient network failure
+          console.warn(`Chunk ${chunkIdx + 1} failed, retrying...`, networkErr);
+          response = await supabase.functions.invoke("import-contacts", {
+            body: {
+              rows: chunk,
+              fileName,
+              clearFirst: isFirst,
+              isLastChunk: isLast,
+            },
+          });
+        }
 
         if (response.error) {
           throw new Error(response.error.message || "Edge function call failed");
