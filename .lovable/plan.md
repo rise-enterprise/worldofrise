@@ -1,59 +1,36 @@
 
 
-## Fix Large File Upload (180MB+) for Contact Import
+## Speed Up Contact Import: Server-Side Batch Insertion
 
-### Problem
+### The Problem
 
-The current import reads the entire file into browser memory with `file.arrayBuffer()`, then SheetJS parses it (doubling memory usage), and all rows are stored in React state. For 180MB+ files this causes:
+The current code inserts rows directly from the browser using `supabase.from("contacts").insert(batch)`. With 335,566 rows and a batch size of 500, that's **672 separate HTTPS requests** from your browser to the database, each taking ~2 seconds due to network latency. Total: ~22 hours.
 
-- Browser tab crash / out-of-memory
-- UI freezing during parsing
-- Very slow insertion with batch size of 50
+### The Fix
 
-### Solution
+Send rows in large chunks (10,000 at a time) to the **backend function** that already exists (`import-contacts`). That function runs right next to the database, so each 500-row insert takes milliseconds instead of seconds. This turns a 22-hour import into roughly 5-10 minutes.
 
-A three-part fix to handle files of any size:
+### How It Works
 
-### 1. Move File Parsing to a Web Worker
+1. Browser parses the file (already working fine)
+2. Browser sends 10,000 rows per request to the backend function
+3. Backend function inserts in 500-row batches with near-zero latency
+4. Browser tracks progress across chunks and shows ETA
 
-Offload the heavy SheetJS parsing to a background thread so the browser UI stays responsive and memory pressure on the main thread is reduced.
+### Changes
 
-- Create a new file `src/workers/xlsxWorker.ts` that imports SheetJS, receives the file ArrayBuffer via `postMessage`, parses it, and sends back the JSON rows + headers.
-- In `ContactsImportView.tsx`, spawn this worker instead of calling SheetJS directly. Listen for the result message to continue the flow.
+| File | What Changes |
+|------|-------------|
+| `src/components/admin/contacts/ContactsImportView.tsx` | Replace direct DB inserts with calls to the `import-contacts` edge function. Send rows in chunks of 10,000. Track progress across chunks. |
+| `supabase/functions/import-contacts/index.ts` | Remove the "delete all" step (only the first chunk should delete). Accept a `clearFirst` flag so only the first chunk clears the table. Return inserted/rejected counts per chunk. |
 
-### 2. Stream Processing for CSV Files
+### Technical Details
 
-For CSV files specifically (which are the most common at 180MB+), use a streaming approach:
-
-- Detect file type by extension before processing.
-- For `.csv` files: read the file in chunks using `FileReader` + line splitting, processing rows incrementally instead of loading everything at once. This dramatically reduces peak memory usage.
-- For `.xlsx` files: continue using the Web Worker approach (SheetJS requires the full file in memory, but the worker prevents UI freezing).
-
-### 3. Increase Batch Size and Optimize Insertion
-
-- Increase `BATCH_SIZE` from 50 to 500 for database inserts -- the current value is overly conservative and makes large imports extremely slow.
-- Reduce the inter-batch delay from 50ms to 10ms.
-- Add a running count display showing "X of Y rows inserted" alongside the progress bar.
-- Add an estimated time remaining calculation based on batches completed so far.
-
-### 4. Add File Size Guardrails
-
-- Show a warning banner when a file exceeds 100MB, informing the user the import may take several minutes.
-- Display file size in the UI after selection.
-- Prevent double-clicks on the import button during processing.
-
-### Files Changed
-
-| File | Change |
-|------|--------|
-| `src/workers/xlsxWorker.ts` | New -- Web Worker for SheetJS parsing |
-| `src/components/admin/contacts/ContactsImportView.tsx` | Use Web Worker for parsing, streaming CSV reader, increase batch size to 500, add file size display and warnings, add ETA display |
-
-### Technical Notes
-
-- No database changes needed.
-- No new dependencies -- SheetJS is already installed, and Web Workers are native browser APIs.
-- The Web Worker approach uses `new Worker(new URL(..., import.meta.url))` which Vite supports natively.
-- For CSV streaming, rows are accumulated in chunks of 10,000 before being passed to the normalization/dedup step, keeping memory bounded.
-- The existing full-replace (delete all then insert) logic remains unchanged.
+- Each edge function call receives up to 10,000 rows + a `clearFirst` boolean flag
+- The edge function inserts in internal batches of 500 (already implemented)
+- The first chunk sends `clearFirst: true` to delete existing contacts; subsequent chunks send `false`
+- Progress bar updates after each 10,000-row chunk completes
+- ETA is calculated based on chunks completed so far
+- The audit log is written only on the final chunk
+- Expected speed improvement: **~100-200x faster** (same-datacenter DB calls vs cross-internet round-trips)
 
