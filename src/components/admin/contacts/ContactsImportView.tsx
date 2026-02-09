@@ -272,81 +272,74 @@ export default function ContactsImportView() {
     setEtaText("");
 
     try {
-      const sb = supabase as any;
-
-      // Step 1: Delete all existing contacts
-      setProgressText("Clearing existing contacts...");
-      setProgressPercent(0);
-      const { error: deleteError } = await sb
-        .from("contacts")
-        .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000");
-
-      if (deleteError) throw new Error(`Failed to clear contacts: ${deleteError.message}`);
-
-      // Step 2: Batch insert (chunks of 500)
-      const BATCH_SIZE = 500;
+      const CHUNK_SIZE = 10000;
+      const totalChunks = Math.ceil(processedRows.length / CHUNK_SIZE);
       let totalInserted = 0;
-      const rejected: { row: number; reason: string }[] = [];
-      const totalBatches = Math.ceil(processedRows.length / BATCH_SIZE);
+      let totalRejected = 0;
+      const allRejectedDetails: { row: number; reason: string }[] = [];
       const startTime = Date.now();
 
-      for (let i = 0; i < processedRows.length; i += BATCH_SIZE) {
-        const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-        const batch = processedRows.slice(i, i + BATCH_SIZE);
-        const currentProgress = Math.round(((i + batch.length) / processedRows.length) * 100);
-        setProgressText(`Batch ${batchNum} of ${totalBatches}`);
-        setProgressPercent(currentProgress);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
 
-        const { error: insertError } = await sb.from("contacts").insert(batch);
+      for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+        const start = chunkIdx * CHUNK_SIZE;
+        const chunk = processedRows.slice(start, start + CHUNK_SIZE);
+        const isFirst = chunkIdx === 0;
+        const isLast = chunkIdx === totalChunks - 1;
 
-        if (insertError) {
-          for (let j = 0; j < batch.length; j++) {
-            const { error: singleErr } = await sb.from("contacts").insert([batch[j]]);
-            if (singleErr) {
-              rejected.push({ row: i + j + 1, reason: singleErr.message });
-            } else {
-              totalInserted++;
-            }
-            await new Promise(resolve => setTimeout(resolve, 10));
-          }
-        } else {
-          totalInserted += batch.length;
+        setProgressText(`Chunk ${chunkIdx + 1} of ${totalChunks} (${chunk.length.toLocaleString()} rows)`);
+        setProgressPercent(Math.round(((start + chunk.length) / processedRows.length) * 100));
+
+        const response = await supabase.functions.invoke("import-contacts", {
+          body: {
+            rows: chunk,
+            fileName,
+            clearFirst: isFirst,
+            isLastChunk: isLast,
+          },
+        });
+
+        if (response.error) {
+          throw new Error(response.error.message || "Edge function call failed");
+        }
+
+        const data = response.data;
+        if (!data.success) {
+          throw new Error(data.error || "Import chunk failed");
+        }
+
+        totalInserted += data.inserted;
+        totalRejected += data.rejected;
+        if (data.rejectedDetails) {
+          allRejectedDetails.push(
+            ...data.rejectedDetails.map((r: { row: number; reason: string }) => ({
+              row: r.row + start,
+              reason: r.reason,
+            }))
+          );
         }
 
         setInsertedCount(totalInserted);
 
         // Calculate ETA
         const elapsed = (Date.now() - startTime) / 1000;
-        const rowsDone = i + batch.length;
+        const rowsDone = start + chunk.length;
         const rowsLeft = processedRows.length - rowsDone;
         const rate = rowsDone / elapsed;
         if (rate > 0 && rowsLeft > 0) {
           setEtaText(formatETA(rowsLeft / rate));
+        } else {
+          setEtaText("");
         }
-
-        // Brief yield between batches
-        await new Promise(resolve => setTimeout(resolve, 10));
       }
-
-      // Step 3: Log the import
-      await sb.from("audit_logs").insert({
-        action_type: "import",
-        entity_type: "contacts",
-        after_json: {
-          file_name: fileName,
-          total_rows: rawRowCount,
-          inserted: totalInserted,
-          rejected: rejected.length,
-        },
-      });
 
       setResult({
         totalRows: rawRowCount,
         inserted: totalInserted,
         deduped: dupCount,
-        rejected: rejected.length,
-        rejectedDetails: rejected.slice(0, 100),
+        rejected: totalRejected,
+        rejectedDetails: allRejectedDetails.slice(0, 100),
       });
 
       // Free memory
@@ -355,7 +348,7 @@ export default function ContactsImportView() {
 
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       queryClient.invalidateQueries({ queryKey: ["contacts-count"] });
-      toast.success(`Successfully imported ${totalInserted} contacts`);
+      toast.success(`Successfully imported ${totalInserted.toLocaleString()} contacts`);
       setStep("done");
     } catch (err) {
       setErrors([(err as Error).message]);
