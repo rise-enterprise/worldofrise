@@ -24,7 +24,8 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const data: InvitationRequestData = await req.json();
 
-    const emailHtml = `
+    // Email to marketing team
+    const marketingEmailHtml = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fafafa;">
         <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
           <h1 style="margin: 0; font-size: 24px; color: #fff; letter-spacing: 0.2em;">WORLD OF RISE</h1>
@@ -77,7 +78,46 @@ const handler = async (req: Request): Promise<Response> => {
       </div>
     `;
 
-    const emailResponse = await fetch("https://api.resend.com/emails", {
+    // Confirmation email to applicant - luxury ceremonial tone
+    const applicantEmailHtml = `
+      <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #07080A;">
+        <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(200, 162, 74, 0.2); border-radius: 12px;">
+          
+          <div style="text-align: center; margin-bottom: 40px;">
+            <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(200, 162, 74, 0.3); border-radius: 4px;">
+              <h1 style="margin: 0; font-size: 20px; color: #C8A24A; letter-spacing: 0.3em; font-weight: 300;">WORLD OF RISE</h1>
+            </div>
+          </div>
+          
+          <div style="text-align: center; margin-bottom: 35px;">
+            <p style="color: rgba(255,255,255,0.5); font-size: 11px; letter-spacing: 0.2em; margin: 0 0 20px; text-transform: uppercase;">Your Request Has Been Received</p>
+            <h2 style="color: #ffffff; font-size: 24px; font-weight: 300; margin: 0; letter-spacing: 0.05em;">Dear ${data.fullName},</h2>
+          </div>
+          
+          <div style="border-top: 1px solid rgba(200, 162, 74, 0.15); border-bottom: 1px solid rgba(200, 162, 74, 0.15); padding: 30px 0; margin: 0 20px;">
+            <p style="color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.8; margin: 0 0 20px; text-align: center;">
+              We have received your interest in joining our circle. Each application is reviewed with care and consideration.
+            </p>
+            <p style="color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.8; margin: 0; text-align: center;">
+              Should your request be approved, you will receive an invitation to complete your membership. We appreciate your patience as we maintain the exclusivity of our community.
+            </p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 35px;">
+            <p style="color: rgba(200, 162, 74, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
+              NOIR &middot; SASSO
+            </p>
+            <p style="color: rgba(255,255,255,0.3); font-size: 11px; margin: 15px 0 0; letter-spacing: 0.1em;">
+              This message was sent from an unmonitored address.
+            </p>
+          </div>
+          
+        </div>
+      </div>
+    `;
+
+    // Send notification to marketing
+    const marketingEmailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
@@ -87,17 +127,41 @@ const handler = async (req: Request): Promise<Response> => {
         from: "World of Rise <noreply@loyalty.rise.qa>",
         to: ["marketing@rise.qa"],
         subject: `New Invitation Request: ${data.fullName}`,
-        html: emailHtml,
+        html: marketingEmailHtml,
       }),
     });
 
-    const emailResult = await emailResponse.json();
+    const marketingResult = await marketingEmailResponse.json();
     
-    if (!emailResponse.ok) {
-      throw new Error(emailResult.message || "Failed to send email");
+    if (!marketingEmailResponse.ok) {
+      throw new Error(marketingResult.message || "Failed to send marketing notification");
     }
 
-    console.log("Invitation request email sent:", emailResult);
+    console.log("Marketing notification sent:", marketingResult);
+
+    // Send confirmation to applicant
+    const applicantEmailResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "World of Rise <noreply@loyalty.rise.qa>",
+        to: [data.email],
+        subject: "Your Request Has Been Received",
+        html: applicantEmailHtml,
+      }),
+    });
+
+    const applicantResult = await applicantEmailResponse.json();
+    
+    if (!applicantEmailResponse.ok) {
+      console.error("Failed to send applicant confirmation:", applicantResult);
+      // Don't throw - marketing email was sent successfully
+    } else {
+      console.log("Applicant confirmation sent:", applicantResult);
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
