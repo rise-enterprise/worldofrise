@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { rows, fileName } = await req.json();
+    const { rows, fileName, clearFirst, isLastChunk } = await req.json();
 
     if (!Array.isArray(rows) || rows.length === 0) {
       return new Response(JSON.stringify({ error: "No rows to import" }), {
@@ -62,14 +62,19 @@ Deno.serve(async (req) => {
     // Get admin ID for audit
     const { data: adminId } = await supabase.rpc("get_admin_id", { _user_id: user.id });
 
-    // Step 1: Delete all existing contacts
-    const { error: deleteError } = await supabase.from("contacts").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    // Only clear contacts on the first chunk
+    if (clearFirst) {
+      const { error: deleteError } = await supabase
+        .from("contacts")
+        .delete()
+        .neq("id", "00000000-0000-0000-0000-000000000000");
 
-    if (deleteError) {
-      throw new Error(`Failed to clear contacts: ${deleteError.message}`);
+      if (deleteError) {
+        throw new Error(`Failed to clear contacts: ${deleteError.message}`);
+      }
     }
 
-    // Step 2: Batch insert new rows (in chunks of 500)
+    // Batch insert (in chunks of 500)
     const BATCH_SIZE = 500;
     let totalInserted = 0;
     const rejected: { row: number; reason: string }[] = [];
@@ -98,18 +103,20 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Step 3: Log the import action
-    await supabase.from("audit_logs").insert({
-      admin_id: adminId,
-      action_type: "import",
-      entity_type: "contacts",
-      after_json: {
-        file_name: fileName,
-        total_rows: rows.length,
-        inserted: totalInserted,
-        rejected: rejected.length,
-      },
-    });
+    // Only log audit on the final chunk
+    if (isLastChunk) {
+      await supabase.from("audit_logs").insert({
+        admin_id: adminId,
+        action_type: "import",
+        entity_type: "contacts",
+        after_json: {
+          file_name: fileName,
+          total_rows: rows.length,
+          inserted: totalInserted,
+          rejected: rejected.length,
+        },
+      });
+    }
 
     return new Response(
       JSON.stringify({
