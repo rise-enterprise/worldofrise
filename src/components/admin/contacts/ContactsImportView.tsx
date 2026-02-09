@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Upload, AlertTriangle, CheckCircle2, FileSpreadsheet, Loader2 } from "lucide-react";
+import { Upload, AlertTriangle, CheckCircle2, FileSpreadsheet, Loader2, Clock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +22,7 @@ import { CONTACT_COLUMNS, HEADER_TO_DB_MAP } from "./contactColumns";
 import { autoMapHeaders, normalizeRow, deduplicateRows } from "./contactUtils";
 import { useContactsCount } from "@/hooks/useContacts";
 
-type ImportStep = "upload" | "mapping" | "confirm" | "importing" | "done";
+type ImportStep = "upload" | "parsing" | "mapping" | "confirm" | "importing" | "done";
 
 interface ImportResult {
   totalRows: number;
@@ -32,6 +32,113 @@ interface ImportResult {
   rejectedDetails: { row: number; reason: string }[];
 }
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatETA(seconds: number): string {
+  if (seconds < 60) return `~${Math.ceil(seconds)}s remaining`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.ceil(seconds % 60);
+  return `~${m}m ${s}s remaining`;
+}
+
+/** Stream-parse a CSV file in chunks to avoid loading entire file into memory */
+async function streamParseCSV(
+  file: File,
+  onProgress: (pct: number) => void
+): Promise<{ rows: Record<string, unknown>[]; headers: string[] }> {
+  return new Promise((resolve, reject) => {
+    const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB chunks
+    let offset = 0;
+    let remainder = "";
+    let headers: string[] | null = null;
+    const rows: Record<string, unknown>[] = [];
+    const reader = new FileReader();
+
+    function parseCSVLine(line: string): string[] {
+      const result: string[] = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"') {
+            if (i + 1 < line.length && line[i + 1] === '"') {
+              current += '"';
+              i++;
+            } else {
+              inQuotes = false;
+            }
+          } else {
+            current += ch;
+          }
+        } else {
+          if (ch === '"') {
+            inQuotes = true;
+          } else if (ch === ",") {
+            result.push(current);
+            current = "";
+          } else {
+            current += ch;
+          }
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    function readNextChunk() {
+      const slice = file.slice(offset, offset + CHUNK_SIZE);
+      reader.readAsText(slice);
+    }
+
+    reader.onload = () => {
+      const text = remainder + (reader.result as string);
+      const lines = text.split(/\r?\n/);
+      // Last element may be incomplete — keep as remainder
+      remainder = lines.pop() || "";
+
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const values = parseCSVLine(line);
+        if (!headers) {
+          headers = values.map((v) => v.trim());
+          continue;
+        }
+        const row: Record<string, unknown> = {};
+        for (let i = 0; i < headers.length; i++) {
+          row[headers[i]] = i < values.length ? values[i].trim() || null : null;
+        }
+        rows.push(row);
+      }
+
+      offset += CHUNK_SIZE;
+      onProgress(Math.min(100, Math.round((offset / file.size) * 100)));
+
+      if (offset < file.size) {
+        readNextChunk();
+      } else {
+        // Process any remainder
+        if (remainder.trim() && headers) {
+          const values = parseCSVLine(remainder);
+          const row: Record<string, unknown> = {};
+          for (let i = 0; i < headers.length; i++) {
+            row[headers[i]] = i < values.length ? values[i].trim() || null : null;
+          }
+          rows.push(row);
+        }
+        resolve({ rows, headers: headers || [] });
+      }
+    };
+
+    reader.onerror = () => reject(new Error("Failed to read CSV file"));
+    readNextChunk();
+  });
+}
+
 export default function ContactsImportView() {
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -39,7 +146,8 @@ export default function ContactsImportView() {
 
   const [step, setStep] = useState<ImportStep>("upload");
   const [fileName, setFileName] = useState("");
-  const [rawRows, setRawRows] = useState<Record<string, unknown>[]>([]);
+  const [fileSize, setFileSize] = useState(0);
+  const [rawRowCount, setRawRowCount] = useState(0);
   const [fileHeaders, setFileHeaders] = useState<string[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [unmappedHeaders, setUnmappedHeaders] = useState<string[]>([]);
@@ -51,11 +159,19 @@ export default function ContactsImportView() {
   const [errors, setErrors] = useState<string[]>([]);
   const [progressText, setProgressText] = useState("");
   const [progressPercent, setProgressPercent] = useState(0);
+  const [parseProgress, setParseProgress] = useState(0);
+  const [insertedCount, setInsertedCount] = useState(0);
+  const [etaText, setEtaText] = useState("");
+
+  // Store raw rows in ref to avoid keeping huge arrays in React state
+  const rawRowsRef = useRef<Record<string, unknown>[]>([]);
 
   const reset = () => {
     setStep("upload");
     setFileName("");
-    setRawRows([]);
+    setFileSize(0);
+    setRawRowCount(0);
+    rawRowsRef.current = [];
     setFileHeaders([]);
     setMapping({});
     setUnmappedHeaders([]);
@@ -64,33 +180,81 @@ export default function ContactsImportView() {
     setResult(null);
     setErrors([]);
     setIsImporting(false);
+    setInsertedCount(0);
+    setEtaText("");
+    setParseProgress(0);
   };
+
+  const processAndPrepare = useCallback((rows: Record<string, unknown>[], map: Record<string, string>) => {
+    const normalized = rows.map((r) => normalizeRow(r, map));
+    const { unique, dupCount: dups } = deduplicateRows(normalized);
+    setProcessedRows(unique);
+    setDupCount(dups);
+    setStep("confirm");
+  }, []);
 
   const handleFile = useCallback(async (file: File) => {
     setErrors([]);
     setFileName(file.name);
+    setFileSize(file.size);
+    setStep("parsing");
+    setParseProgress(0);
+
+    const isCSV = file.name.toLowerCase().endsWith(".csv");
 
     try {
-      const XLSX = await import("xlsx");
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: "array", cellDates: true });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: null });
+      let rows: Record<string, unknown>[];
+      let headers: string[];
 
-      if (json.length === 0) {
+      if (isCSV) {
+        // Stream-parse CSV to avoid loading entire file in memory
+        const result = await streamParseCSV(file, setParseProgress);
+        rows = result.rows;
+        headers = result.headers;
+      } else {
+        // Use Web Worker for XLSX to prevent UI freezing
+        const workerResult = await new Promise<{ rows: Record<string, unknown>[]; headers: string[] }>(
+          (resolve, reject) => {
+            const worker = new Worker(
+              new URL("../../../workers/xlsxWorker.ts", import.meta.url),
+              { type: "module" }
+            );
+            worker.onmessage = (e) => {
+              worker.terminate();
+              if (e.data.success) {
+                resolve({ rows: e.data.rows, headers: e.data.headers });
+              } else {
+                reject(new Error(e.data.error));
+              }
+            };
+            worker.onerror = (err) => {
+              worker.terminate();
+              reject(new Error(`Worker error: ${err.message}`));
+            };
+            file.arrayBuffer().then((buffer) => {
+              setParseProgress(30);
+              worker.postMessage({ buffer, fileName: file.name }, [buffer]);
+            });
+          }
+        );
+        rows = workerResult.rows;
+        headers = workerResult.headers;
+      }
+
+      if (rows.length === 0) {
         setErrors(["File contains no data rows."]);
+        setStep("upload");
         return;
       }
 
-      const headers = Object.keys(json[0]);
       setFileHeaders(headers);
-      setRawRows(json);
+      rawRowsRef.current = rows;
+      setRawRowCount(rows.length);
 
       // Attempt auto-mapping
       const { mapping: autoMap, unmapped } = autoMapHeaders(headers);
       setMapping(autoMap);
 
-      // Check if all required columns are mapped
       const mappedDbFields = new Set(Object.values(autoMap));
       const allDbFields = CONTACT_COLUMNS.map((c) => c.dbField);
       const missingRequired = allDbFields.filter((f) => !mappedDbFields.has(f));
@@ -99,40 +263,35 @@ export default function ContactsImportView() {
         setUnmappedHeaders(unmapped);
         setStep("mapping");
       } else {
-        // Process directly
-        processAndPrepare(json, autoMap);
+        processAndPrepare(rows, autoMap);
       }
     } catch (err) {
       setErrors([`Failed to parse file: ${(err as Error).message}`]);
+      setStep("upload");
     }
-  }, []);
-
-  const processAndPrepare = (rows: Record<string, unknown>[], map: Record<string, string>) => {
-    const normalized = rows.map((r) => normalizeRow(r, map));
-    const { unique, dupCount: dups } = deduplicateRows(normalized);
-    setProcessedRows(unique);
-    setDupCount(dups);
-    setStep("confirm");
-  };
+  }, [processAndPrepare]);
 
   const handleMappingComplete = () => {
-    // Validate that at least some columns are mapped
     if (Object.keys(mapping).length === 0) {
       setErrors(["No columns mapped. Please map at least some columns."]);
       return;
     }
-    processAndPrepare(rawRows, mapping);
+    processAndPrepare(rawRowsRef.current, mapping);
   };
 
   const handleImport = async () => {
     setShowConfirm(false);
     setStep("importing");
     setIsImporting(true);
+    setInsertedCount(0);
+    setEtaText("");
 
     try {
       const sb = supabase as any;
 
       // Step 1: Delete all existing contacts
+      setProgressText("Clearing existing contacts...");
+      setProgressPercent(0);
       const { error: deleteError } = await sb
         .from("contacts")
         .delete()
@@ -140,22 +299,23 @@ export default function ContactsImportView() {
 
       if (deleteError) throw new Error(`Failed to clear contacts: ${deleteError.message}`);
 
-      // Step 2: Batch insert (chunks of 50 to avoid connection exhaustion)
-      const BATCH_SIZE = 50;
+      // Step 2: Batch insert (chunks of 500)
+      const BATCH_SIZE = 500;
       let totalInserted = 0;
       const rejected: { row: number; reason: string }[] = [];
       const totalBatches = Math.ceil(processedRows.length / BATCH_SIZE);
+      const startTime = Date.now();
 
       for (let i = 0; i < processedRows.length; i += BATCH_SIZE) {
         const batchNum = Math.floor(i / BATCH_SIZE) + 1;
         const batch = processedRows.slice(i, i + BATCH_SIZE);
-        setProgressText(`Inserting batch ${batchNum} of ${totalBatches}...`);
-        setProgressPercent(Math.round(((i + batch.length) / processedRows.length) * 100));
+        const currentProgress = Math.round(((i + batch.length) / processedRows.length) * 100);
+        setProgressText(`Batch ${batchNum} of ${totalBatches}`);
+        setProgressPercent(currentProgress);
 
         const { error: insertError } = await sb.from("contacts").insert(batch);
 
         if (insertError) {
-          // Try one-by-one for this batch with delay to avoid flooding
           for (let j = 0; j < batch.length; j++) {
             const { error: singleErr } = await sb.from("contacts").insert([batch[j]]);
             if (singleErr) {
@@ -163,35 +323,50 @@ export default function ContactsImportView() {
             } else {
               totalInserted++;
             }
-            await new Promise(resolve => setTimeout(resolve, 20));
+            await new Promise(resolve => setTimeout(resolve, 10));
           }
         } else {
           totalInserted += batch.length;
         }
 
-        // Yield between batches to prevent connection saturation
-        await new Promise(resolve => setTimeout(resolve, 50));
+        setInsertedCount(totalInserted);
+
+        // Calculate ETA
+        const elapsed = (Date.now() - startTime) / 1000;
+        const rowsDone = i + batch.length;
+        const rowsLeft = processedRows.length - rowsDone;
+        const rate = rowsDone / elapsed;
+        if (rate > 0 && rowsLeft > 0) {
+          setEtaText(formatETA(rowsLeft / rate));
+        }
+
+        // Brief yield between batches
+        await new Promise(resolve => setTimeout(resolve, 10));
       }
 
-      // Step 3: Log the import to audit_logs
+      // Step 3: Log the import
       await sb.from("audit_logs").insert({
         action_type: "import",
         entity_type: "contacts",
         after_json: {
           file_name: fileName,
-          total_rows: rawRows.length,
+          total_rows: rawRowCount,
           inserted: totalInserted,
           rejected: rejected.length,
         },
       });
 
       setResult({
-        totalRows: rawRows.length,
+        totalRows: rawRowCount,
         inserted: totalInserted,
         deduped: dupCount,
         rejected: rejected.length,
         rejectedDetails: rejected.slice(0, 100),
       });
+
+      // Free memory
+      rawRowsRef.current = [];
+      setProcessedRows([]);
 
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
       queryClient.invalidateQueries({ queryKey: ["contacts-count"] });
@@ -224,6 +399,8 @@ export default function ContactsImportView() {
       return { ...prev, [fileHeader]: dbField };
     });
   };
+
+  const isLargeFile = fileSize > 100 * 1024 * 1024;
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
@@ -269,6 +446,29 @@ export default function ContactsImportView() {
         </Card>
       )}
 
+      {/* Step: Parsing */}
+      {step === "parsing" && (
+        <Card>
+          <CardContent className="p-12 text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+            <p className="text-lg font-medium">Parsing {fileName}...</p>
+            {fileSize > 0 && (
+              <p className="text-sm text-muted-foreground">{formatFileSize(fileSize)}</p>
+            )}
+            <div className="max-w-md mx-auto space-y-2">
+              <Progress value={parseProgress} className="h-3" />
+              <p className="text-sm text-primary font-medium">{parseProgress}%</p>
+            </div>
+            {isLargeFile && (
+              <div className="flex items-center justify-center gap-2 text-amber-500">
+                <AlertTriangle className="h-4 w-4" />
+                <p className="text-sm">Large file — this may take several minutes.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Step: Column Mapping */}
       {step === "mapping" && (
         <Card>
@@ -276,6 +476,9 @@ export default function ContactsImportView() {
             <CardTitle className="text-base flex items-center gap-2">
               <FileSpreadsheet className="h-5 w-5" />
               Column Mapping — {fileName}
+              {fileSize > 0 && (
+                <Badge variant="outline" className="ml-2 font-normal">{formatFileSize(fileSize)}</Badge>
+              )}
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               Some headers don't match. Map each file column to the correct database field.
@@ -319,9 +522,17 @@ export default function ContactsImportView() {
             <CardTitle className="text-base">Import Summary Preview</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {isLargeFile && (
+              <div className="flex items-center gap-2 p-3 bg-amber-500/10 rounded-lg">
+                <Clock className="h-5 w-5 text-amber-500 shrink-0" />
+                <p className="text-sm text-foreground">
+                  Large file ({formatFileSize(fileSize)}) — import may take several minutes.
+                </p>
+              </div>
+            )}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-3 rounded-lg bg-muted/50">
-                <p className="text-2xl font-bold text-foreground">{rawRows.length.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-foreground">{rawRowCount.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground">Rows Read</p>
               </div>
               <div className="text-center p-3 rounded-lg bg-muted/50">
@@ -346,7 +557,7 @@ export default function ContactsImportView() {
             </div>
 
             <div className="flex gap-2">
-              <Button variant="destructive" onClick={() => setShowConfirm(true)}>
+              <Button variant="destructive" onClick={() => setShowConfirm(true)} disabled={isImporting}>
                 Replace All Contacts
               </Button>
               <Button variant="outline" onClick={reset}>Cancel</Button>
@@ -363,9 +574,16 @@ export default function ContactsImportView() {
             <p className="text-lg font-medium">Importing contacts...</p>
             <div className="max-w-md mx-auto space-y-2">
               <Progress value={progressPercent} className="h-3" />
-              <p className="text-sm text-primary font-medium">{progressPercent}% — {progressText}</p>
+              <p className="text-sm text-primary font-medium">
+                {insertedCount.toLocaleString()} of {processedRows.length.toLocaleString()} rows — {progressPercent}%
+              </p>
+              <p className="text-sm text-muted-foreground">{progressText}</p>
+              {etaText && (
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  <Clock className="h-3 w-3" /> {etaText}
+                </p>
+              )}
             </div>
-            <p className="text-sm text-muted-foreground">This may take a moment for large files.</p>
           </CardContent>
         </Card>
       )}
