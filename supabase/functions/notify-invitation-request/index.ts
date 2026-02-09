@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,12 +9,21 @@ const corsHeaders = {
 };
 
 interface InvitationRequestData {
+  requestId: string;
   fullName: string;
   email: string;
   phone?: string;
   preferredBrand?: string;
   referralSource?: string;
   message?: string;
+}
+
+async function generateToken(requestId: string): Promise<string> {
+  const secret = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "fallback";
+  const data = new TextEncoder().encode(requestId + secret);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.slice(0, 8).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -24,7 +34,13 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const data: InvitationRequestData = await req.json();
 
-    // Email to marketing team
+    // Generate action URLs
+    const token = await generateToken(data.requestId);
+    const baseActionUrl = `${SUPABASE_URL}/functions/v1/handle-invitation-action`;
+    const confirmUrl = `${baseActionUrl}?id=${data.requestId}&action=confirm&token=${token}`;
+    const rejectUrl = `${baseActionUrl}?id=${data.requestId}&action=reject&token=${token}`;
+
+    // Email to marketing team with action buttons
     const marketingEmailHtml = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fafafa;">
         <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
@@ -71,8 +87,21 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           ` : ''}
           
-          <p style="margin: 30px 0 0; color: #999; font-size: 12px; text-align: center;">
-            This request was submitted via the World of Rise membership portal.
+          <!-- Action Buttons -->
+          <div style="margin-top: 30px; padding-top: 25px; border-top: 2px solid #eee;">
+            <p style="color: #666; margin: 0 0 15px; font-size: 13px; text-align: center;">Take action on this request:</p>
+            <div style="text-align: center;">
+              <a href="${confirmUrl}" style="display: inline-block; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: #fff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-size: 14px; font-weight: 500; margin: 0 8px;">
+                ✓ Confirm & Add Member
+              </a>
+              <a href="${rejectUrl}" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: #fff; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-size: 14px; font-weight: 500; margin: 0 8px;">
+                ✕ Reject Application
+              </a>
+            </div>
+          </div>
+          
+          <p style="margin: 25px 0 0; color: #999; font-size: 11px; text-align: center;">
+            These action links are secure and single-use. You can also manage requests from the admin panel.
           </p>
         </div>
       </div>

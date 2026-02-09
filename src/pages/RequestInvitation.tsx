@@ -34,7 +34,7 @@ export default function RequestInvitation() {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
+      const { data: insertedRequest, error } = await supabase
         .from('invitation_requests')
         .insert({
           full_name: formData.fullName,
@@ -43,13 +43,16 @@ export default function RequestInvitation() {
           preferred_brand: formData.preferredBrand || null,
           referral_source: formData.referralSource || null,
           message: formData.message || null
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
-      // Send notification email to marketing
+      // Send notification email to marketing (with request ID for action links)
       await supabase.functions.invoke('notify-invitation-request', {
         body: {
+          requestId: insertedRequest.id,
           fullName: formData.fullName,
           email: formData.email,
           phone: formData.phone || undefined,
