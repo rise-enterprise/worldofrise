@@ -1,31 +1,59 @@
 
 
-## Add Progress Bar to Contact Import View
+## Fix Large File Upload (180MB+) for Contact Import
 
-Replace the text-only batch progress with a visual progress bar and percentage during the import step.
+### Problem
 
-### Changes
+The current import reads the entire file into browser memory with `file.arrayBuffer()`, then SheetJS parses it (doubling memory usage), and all rows are stored in React state. For 180MB+ files this causes:
 
-**File: `src/components/admin/contacts/ContactsImportView.tsx`**
+- Browser tab crash / out-of-memory
+- UI freezing during parsing
+- Very slow insertion with batch size of 50
 
-1. Import the `Progress` component from `@/components/ui/progress`
-2. Add a `progressPercent` state (number, default 0)
-3. Update the batch insert loop to calculate and set `progressPercent` after each batch: `Math.round(((i + batch.length) / processedRows.length) * 100)`
-4. Replace the importing step UI to include:
-   - The existing spinner
-   - A `<Progress value={progressPercent} />` bar
-   - Text showing `"{progressPercent}% -- Batch {batchNum} of {totalBatches}"`
-   - The existing "This may take a moment" note
+### Solution
 
-### Technical Details
+A three-part fix to handle files of any size:
 
-| Detail | Value |
-|--------|-------|
-| File | `src/components/admin/contacts/ContactsImportView.tsx` |
-| New state | `progressPercent: number` (default 0) |
-| Calculation | `Math.round(((i + batch.length) / totalRows) * 100)` after each batch |
-| Component | `<Progress>` from existing `src/components/ui/progress.tsx` |
-| Lines affected | ~5 lines for state + calculation, ~5 lines for UI |
+### 1. Move File Parsing to a Web Worker
 
-No new dependencies or database changes needed.
+Offload the heavy SheetJS parsing to a background thread so the browser UI stays responsive and memory pressure on the main thread is reduced.
+
+- Create a new file `src/workers/xlsxWorker.ts` that imports SheetJS, receives the file ArrayBuffer via `postMessage`, parses it, and sends back the JSON rows + headers.
+- In `ContactsImportView.tsx`, spawn this worker instead of calling SheetJS directly. Listen for the result message to continue the flow.
+
+### 2. Stream Processing for CSV Files
+
+For CSV files specifically (which are the most common at 180MB+), use a streaming approach:
+
+- Detect file type by extension before processing.
+- For `.csv` files: read the file in chunks using `FileReader` + line splitting, processing rows incrementally instead of loading everything at once. This dramatically reduces peak memory usage.
+- For `.xlsx` files: continue using the Web Worker approach (SheetJS requires the full file in memory, but the worker prevents UI freezing).
+
+### 3. Increase Batch Size and Optimize Insertion
+
+- Increase `BATCH_SIZE` from 50 to 500 for database inserts -- the current value is overly conservative and makes large imports extremely slow.
+- Reduce the inter-batch delay from 50ms to 10ms.
+- Add a running count display showing "X of Y rows inserted" alongside the progress bar.
+- Add an estimated time remaining calculation based on batches completed so far.
+
+### 4. Add File Size Guardrails
+
+- Show a warning banner when a file exceeds 100MB, informing the user the import may take several minutes.
+- Display file size in the UI after selection.
+- Prevent double-clicks on the import button during processing.
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `src/workers/xlsxWorker.ts` | New -- Web Worker for SheetJS parsing |
+| `src/components/admin/contacts/ContactsImportView.tsx` | Use Web Worker for parsing, streaming CSV reader, increase batch size to 500, add file size display and warnings, add ETA display |
+
+### Technical Notes
+
+- No database changes needed.
+- No new dependencies -- SheetJS is already installed, and Web Workers are native browser APIs.
+- The Web Worker approach uses `new Worker(new URL(..., import.meta.url))` which Vite supports natively.
+- For CSV streaming, rows are accumulated in chunks of 10,000 before being passed to the normalization/dedup step, keeping memory bounded.
+- The existing full-replace (delete all then insert) logic remains unchanged.
 
