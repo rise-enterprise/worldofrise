@@ -212,33 +212,18 @@ export default function ContactsImportView() {
         rows = result.rows;
         headers = result.headers;
       } else {
-        // Use Web Worker for XLSX to prevent UI freezing
-        const workerResult = await new Promise<{ rows: Record<string, unknown>[]; headers: string[] }>(
-          (resolve, reject) => {
-            const worker = new Worker(
-              new URL("../../../workers/xlsxWorker.ts", import.meta.url),
-              { type: "module" }
-            );
-            worker.onmessage = (e) => {
-              worker.terminate();
-              if (e.data.success) {
-                resolve({ rows: e.data.rows, headers: e.data.headers });
-              } else {
-                reject(new Error(e.data.error));
-              }
-            };
-            worker.onerror = (err) => {
-              worker.terminate();
-              reject(new Error(`Worker error: ${err.message}`));
-            };
-            file.arrayBuffer().then((buffer) => {
-              setParseProgress(30);
-              worker.postMessage({ buffer, fileName: file.name }, [buffer]);
-            });
-          }
-        );
-        rows = workerResult.rows;
-        headers = workerResult.headers;
+        // Parse XLSX inline with dynamic import
+        setParseProgress(20);
+        const XLSX = await import("xlsx");
+        setParseProgress(40);
+        const data = await file.arrayBuffer();
+        setParseProgress(60);
+        const workbook = XLSX.read(data, { type: "array", cellDates: true });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: null });
+        setParseProgress(90);
+        rows = json;
+        headers = json.length > 0 ? Object.keys(json[0]) : [];
       }
 
       if (rows.length === 0) {
