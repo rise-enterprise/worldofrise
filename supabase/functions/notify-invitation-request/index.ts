@@ -84,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "World of Rise <noreply@rise.qa>",
+        from: "World of Rise <noreply@loyalty.rise.qa>",
         to: ["marketing@rise.qa"],
         subject: `New Invitation Request: ${data.fullName}`,
         html: emailHtml,
