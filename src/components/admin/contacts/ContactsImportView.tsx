@@ -48,6 +48,7 @@ export default function ContactsImportView() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [progressText, setProgressText] = useState("");
 
   const reset = () => {
     setStep("upload");
@@ -137,17 +138,21 @@ export default function ContactsImportView() {
 
       if (deleteError) throw new Error(`Failed to clear contacts: ${deleteError.message}`);
 
-      // Step 2: Batch insert (chunks of 200 to stay within payload limits)
-      const BATCH_SIZE = 200;
+      // Step 2: Batch insert (chunks of 50 to avoid connection exhaustion)
+      const BATCH_SIZE = 50;
       let totalInserted = 0;
       const rejected: { row: number; reason: string }[] = [];
+      const totalBatches = Math.ceil(processedRows.length / BATCH_SIZE);
 
       for (let i = 0; i < processedRows.length; i += BATCH_SIZE) {
+        const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+        setProgressText(`Inserting batch ${batchNum} of ${totalBatches}...`);
+
         const batch = processedRows.slice(i, i + BATCH_SIZE);
         const { error: insertError } = await sb.from("contacts").insert(batch);
 
         if (insertError) {
-          // Try one-by-one for this batch
+          // Try one-by-one for this batch with delay to avoid flooding
           for (let j = 0; j < batch.length; j++) {
             const { error: singleErr } = await sb.from("contacts").insert([batch[j]]);
             if (singleErr) {
@@ -155,10 +160,14 @@ export default function ContactsImportView() {
             } else {
               totalInserted++;
             }
+            await new Promise(resolve => setTimeout(resolve, 20));
           }
         } else {
           totalInserted += batch.length;
         }
+
+        // Yield between batches to prevent connection saturation
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
 
       // Step 3: Log the import to audit_logs
@@ -349,7 +358,8 @@ export default function ContactsImportView() {
           <CardContent className="p-12 text-center">
             <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary mb-4" />
             <p className="text-lg font-medium">Importing contacts...</p>
-            <p className="text-sm text-muted-foreground">This may take a moment for large files.</p>
+            {progressText && <p className="text-sm text-primary font-medium mt-1">{progressText}</p>}
+            <p className="text-sm text-muted-foreground mt-1">This may take a moment for large files.</p>
           </CardContent>
         </Card>
       )}
