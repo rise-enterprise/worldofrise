@@ -1,36 +1,25 @@
 
 
-## Speed Up Contact Import: Server-Side Batch Insertion
+## Fix: "Failed to send a request to the Edge Function"
 
-### The Problem
+### Root Cause
 
-The current code inserts rows directly from the browser using `supabase.from("contacts").insert(batch)`. With 335,566 rows and a batch size of 500, that's **672 separate HTTPS requests** from your browser to the database, each taking ~2 seconds due to network latency. Total: ~22 hours.
+Each chunk sends 10,000 rows with ~40 fields each, producing a JSON payload of 10-20MB per request. This causes the browser's `fetch` to fail before the request even reaches the server. The edge function logs confirm it boots but never receives the request.
 
-### The Fix
+### Fix
 
-Send rows in large chunks (10,000 at a time) to the **backend function** that already exists (`import-contacts`). That function runs right next to the database, so each 500-row insert takes milliseconds instead of seconds. This turns a 22-hour import into roughly 5-10 minutes.
-
-### How It Works
-
-1. Browser parses the file (already working fine)
-2. Browser sends 10,000 rows per request to the backend function
-3. Backend function inserts in 500-row batches with near-zero latency
-4. Browser tracks progress across chunks and shows ETA
-
-### Changes
-
-| File | What Changes |
-|------|-------------|
-| `src/components/admin/contacts/ContactsImportView.tsx` | Replace direct DB inserts with calls to the `import-contacts` edge function. Send rows in chunks of 10,000. Track progress across chunks. |
-| `supabase/functions/import-contacts/index.ts` | Remove the "delete all" step (only the first chunk should delete). Accept a `clearFirst` flag so only the first chunk clears the table. Return inserted/rejected counts per chunk. |
+Reduce `CHUNK_SIZE` from 10,000 to **2,000** rows per request. This keeps each payload under 2-3MB, well within limits, while still being far faster than the old direct-insert approach (only ~168 requests for 335K rows instead of 672).
 
 ### Technical Details
 
-- Each edge function call receives up to 10,000 rows + a `clearFirst` boolean flag
-- The edge function inserts in internal batches of 500 (already implemented)
-- The first chunk sends `clearFirst: true` to delete existing contacts; subsequent chunks send `false`
-- Progress bar updates after each 10,000-row chunk completes
-- ETA is calculated based on chunks completed so far
-- The audit log is written only on the final chunk
-- Expected speed improvement: **~100-200x faster** (same-datacenter DB calls vs cross-internet round-trips)
+| File | Change |
+|------|--------|
+| `src/components/admin/contacts/ContactsImportView.tsx` | Change `CHUNK_SIZE` from `10000` to `2000` on line 275. Add a `try/catch` around each chunk call with a retry (1 attempt) for transient network failures. |
+
+### Why This Works
+
+- 2,000 rows x ~1KB/row = ~2MB payload per request (safe margin)
+- 335K rows / 2,000 = ~168 requests, each taking ~1-3 seconds server-side
+- Total estimated time: ~5-8 minutes (vs hours with old approach)
+- Adding a single retry per chunk handles transient network hiccups gracefully
 
