@@ -9,6 +9,7 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import { NAV_SECTIONS } from "@/components/admin/adminNavConfig";
 
 // Loyalty components
+const LoyaltyDashboard = lazy(() => import("@/components/admin/loyalty/LoyaltyDashboard"));
 const LoyaltyMembers = lazy(() => import("@/components/admin/loyalty/LoyaltyMembers"));
 const LoyaltyPointsEngine = lazy(() => import("@/components/admin/loyalty/LoyaltyPointsEngine"));
 const LoyaltyRewards = lazy(() => import("@/components/admin/loyalty/LoyaltyRewards"));
@@ -27,6 +28,7 @@ const ContactsView = lazy(() => import("@/components/admin/contacts/ContactsView
 const ContactsImportView = lazy(() => import("@/components/admin/contacts/ContactsImportView"));
 
 const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
+  "loyalty-dashboard": LoyaltyDashboard,
   "loyalty-members": LoyaltyMembers,
   "loyalty-points": LoyaltyPointsEngine,
   "loyalty-rewards": LoyaltyRewards,
@@ -48,7 +50,7 @@ export default function AdminPanel() {
   const { isRTL } = useLanguage();
   const useDrawer = isMobile || isTablet;
 
-  const [activeView, setActiveView] = useState("loyalty-members");
+  const [activeView, setActiveView] = useState("loyalty-dashboard");
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({ loyalty: true, administration: true });

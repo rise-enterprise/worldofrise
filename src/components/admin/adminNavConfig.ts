@@ -19,6 +19,7 @@ export const NAV_SECTIONS: NavSection[] = [
     label: "Loyalty Program",
     icon: Crown,
     items: [
+      { id: "loyalty-dashboard", label: "Dashboard", description: "Overview of loyalty program metrics, tier distribution, brand performance, and member activity." },
       { id: "loyalty-members", label: "Members Management", description: "Search, view, and manage loyalty program members. View profiles, adjust points, change tiers, and manage VIP status." },
       { id: "loyalty-points", label: "Points Engine", description: "Configure earning rules, bonus multipliers, double-points days, expiration policies, and review manual adjustments." },
       { id: "loyalty-rewards", label: "Rewards Control", description: "Create and manage rewards including free items, discounts, and exclusive access with branch-specific assignments." },
