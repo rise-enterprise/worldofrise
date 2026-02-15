@@ -74,8 +74,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Batch insert (in chunks of 500000)
-    const BATCH_SIZE = 500000;
+    // Batch insert in sub-batches of 500 rows
+    const BATCH_SIZE = 500;
     let totalInserted = 0;
     const rejected: { row: number; reason: string }[] = [];
 
@@ -89,14 +89,9 @@ Deno.serve(async (req) => {
       const { error: insertError } = await supabase.from("contacts").insert(batch);
 
       if (insertError) {
-        // If batch fails, try inserting one by one
+        // Mark entire sub-batch as rejected — no row-by-row fallback
         for (let j = 0; j < batch.length; j++) {
-          const { error: singleError } = await supabase.from("contacts").insert([batch[j]]);
-          if (singleError) {
-            rejected.push({ row: i + j + 1, reason: singleError.message });
-          } else {
-            totalInserted++;
-          }
+          rejected.push({ row: i + j + 1, reason: insertError.message });
         }
       } else {
         totalInserted += batch.length;
