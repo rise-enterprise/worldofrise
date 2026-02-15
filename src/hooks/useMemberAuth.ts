@@ -130,54 +130,19 @@ export function useMemberAuth(): UseMemberAuthReturn {
       if (signUpError) return { error: signUpError };
 
       if (data.user) {
-        // Check if member already exists with this phone
-        const { data: existingMember } = await supabase
-          .from('members')
-          .select('id')
-          .eq('phone', phone)
-          .maybeSingle();
+        // Use server-side edge function for member creation
+        const { data: result, error: fnError } = await supabase.functions.invoke('create-member', {
+          body: { phone, fullName },
+        });
 
-        let memberId: string | null = null;
-
-        if (existingMember) {
-          // Link to existing member
-          memberId = existingMember.id;
-        } else {
-          // Create new member
-          const { data: newMember, error: memberError } = await supabase
-            .from('members')
-            .insert({
-              full_name: fullName,
-              phone: phone,
-              email: email,
-              city: 'doha',
-              brand_affinity: 'both',
-              status: 'active',
-            })
-            .select()
-            .single();
-
-          if (memberError) {
-            // If member creation fails, sign out and return error
-            await supabase.auth.signOut();
-            return { error: new Error('Failed to create member profile. Please try again.') };
-          }
-
-          memberId = newMember.id;
+        if (fnError) {
+          await supabase.auth.signOut();
+          return { error: new Error('Failed to create member profile. Please try again.') };
         }
 
-        // Create member_auth entry
-        const { error: authError } = await supabase
-          .from('member_auth')
-          .insert({
-            user_id: data.user.id,
-            phone: phone,
-            member_id: memberId,
-          });
-
-        if (authError) {
+        if (result?.error) {
           await supabase.auth.signOut();
-          return { error: new Error('Failed to link account. Please try again.') };
+          return { error: new Error(result.error) };
         }
       }
 
