@@ -74,8 +74,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Batch insert (in chunks of 500)
-    const BATCH_SIZE = 500;
+    // Batch insert (in chunks of 500000)
+    const BATCH_SIZE = 500000;
     let totalInserted = 0;
     const rejected: { row: number; reason: string }[] = [];
 
