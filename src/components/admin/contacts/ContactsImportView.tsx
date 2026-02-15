@@ -208,14 +208,16 @@ export default function ContactsImportView() {
 
       if (isCSV) {
         // Stream-parse CSV to avoid loading entire file in memory
-        const result = await streamParseCSV(file, setParseProgress);
+        const result = await streamParseCSV(file, (pct) => {
+          setParseProgress(pct);
+        });
         rows = result.rows;
         headers = result.headers;
       } else {
         // Parse XLSX inline with dynamic import
-        setParseProgress(20);
+        setParseProgress(10);
         const XLSX = await import("xlsx");
-        setParseProgress(40);
+        setParseProgress(30);
         const data = await file.arrayBuffer();
         setParseProgress(60);
         const workbook = XLSX.read(data, { type: "array", cellDates: true });
@@ -226,11 +228,16 @@ export default function ContactsImportView() {
         headers = json.length > 0 ? Object.keys(json[0]) : [];
       }
 
+      setParseProgress(100);
+
       if (rows.length === 0) {
         setErrors(["File contains no data rows."]);
         setStep("upload");
         return;
       }
+
+      // Ensure the parsing UI is visible for at least 800ms so the user sees feedback
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
       setFileHeaders(headers);
       rawRowsRef.current = rows;
@@ -251,6 +258,7 @@ export default function ContactsImportView() {
         processAndPrepare(rows, autoMap);
       }
     } catch (err) {
+      console.error("File parse error:", err);
       setErrors([`Failed to parse file: ${(err as Error).message}`]);
       setStep("upload");
     }
@@ -449,7 +457,9 @@ export default function ContactsImportView() {
             )}
             <div className="max-w-md mx-auto space-y-2">
               <Progress value={parseProgress} className="h-3" />
-              <p className="text-sm text-primary font-medium">{parseProgress}%</p>
+              <p className="text-sm text-primary font-medium">
+                {parseProgress < 100 ? `Parsing... ${parseProgress}%` : "Processing columns..."}
+              </p>
             </div>
             {isLargeFile && (
               <div className="flex items-center justify-center gap-2 text-amber-500">
