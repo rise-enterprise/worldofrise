@@ -250,23 +250,6 @@ const Gate = () => {
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
-      <motion.footer
-        className="py-8 text-center relative z-10"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.2 }}
-      >
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="text-xs tracking-widest uppercase transition-colors duration-300 hover:text-foreground"
-          style={{
-            color: "hsl(var(--muted-foreground) / 0.5)",
-          }}
-        >
-          Administration
-        </button>
-      </motion.footer>
     </CrystalBackground>
   );
 };
