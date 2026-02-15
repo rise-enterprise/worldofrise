@@ -298,79 +298,40 @@ async function fetchDemoMember(): Promise<Guest | null> {
   };
 }
 
-// Fetch VIP guests (Black, Platinum, Gold tiers) with limit for Overview
+// Fetch VIP guests from contacts database
 async function fetchVIPGuests(): Promise<Guest[]> {
-  // Get tier IDs for VIP tiers (DB names: Black, Platinum, Gold)
-  const { data: vipTiers, error: tiersError } = await supabase
-    .from('tiers')
-    .select('id, name')
-    .in('name', ['Black', 'Platinum', 'Gold']);
-
-  if (tiersError) throw tiersError;
-  
-  const vipTierIds = vipTiers?.map(t => t.id) || [];
-  
-  if (vipTierIds.length === 0) {
-    return [];
-  }
-
-  // Fetch member_tiers for VIP members
-  const { data: memberTiers, error: memberTiersError } = await supabase
-    .from('member_tiers')
-    .select('member_id')
-    .in('tier_id', vipTierIds)
+  const { data: contacts, error } = await (supabase as any)
+    .from('contacts')
+    .select('id, first_name, last_name, loyalty_tier, visits, total_spend, vip, city, country, last_visit, last_location, email, phone, notes')
+    .eq('vip', true)
+    .order('total_spend', { ascending: false })
     .limit(10);
 
-  if (memberTiersError) throw memberTiersError;
-  
-  const memberIds = memberTiers?.map(mt => mt.member_id) || [];
-  
-  if (memberIds.length === 0) {
-    return [];
-  }
+  if (error) throw error;
 
-  // Fetch those specific members with their tiers
-  const { data: members, error: membersError } = await supabase
-    .from('members')
-    .select(`
-      *,
-      member_tiers (
-        tier_id,
-        tiers (
-          name,
-          color
-        )
-      )
-    `)
-    .in('id', memberIds)
-    .limit(10);
-
-  if (membersError) throw membersError;
-
-  // Transform to Guest format (no need to fetch visits for VIP cards)
-  return (members || []).map((member: any) => {
-    const tierInfo = member.member_tiers?.[0]?.tiers;
-    const tierName = tierInfo?.name || 'Initiation';
+  return (contacts ?? []).map((c: any) => {
+    const fullName = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Unknown';
+    const tierName = c.loyalty_tier || 'Initiation';
 
     return {
-      id: member.id,
-      name: member.full_name,
-      email: member.email,
-      phone: member.phone,
-      country: mapDbCityToCountry(member.city),
+      id: c.id,
+      name: fullName,
+      email: c.email || null,
+      phone: c.phone || '',
+      country: (c.country || c.city || 'Qatar') as any,
       tier: mapDbTierToTier(tierName),
       tierName: tierName,
-      totalVisits: member.total_visits || 0,
-      lifetimeVisits: member.total_visits || 0,
-      lastVisit: new Date(member.created_at || Date.now()),
-      joinedAt: new Date(member.created_at || Date.now()),
-      favoriteBrand: mapDbBrandToBrand(member.brand_affinity),
+      totalVisits: c.visits || 0,
+      lifetimeVisits: c.visits || 0,
+      lastVisit: c.last_visit ? new Date(c.last_visit) : new Date(),
+      joinedAt: new Date(),
+      favoriteBrand: (c.last_location || '').toLowerCase().includes('sasso') ? 'SASSO' as any : 'NOIR' as any,
       visits: [],
       tags: [],
-      notes: member.notes || undefined,
-      avatarUrl: member.avatar_url || undefined,
-      totalPoints: member.total_points || 0,
-      status: member.status || 'active',
+      notes: c.notes || undefined,
+      avatarUrl: undefined,
+      totalPoints: 0,
+      status: 'active' as const,
     };
   });
 }
