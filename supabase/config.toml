@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.create-member]
 verify_jwt = true
+
+[functions.dashboard-metrics]
+verify_jwt = false
