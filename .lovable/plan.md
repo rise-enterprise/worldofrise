@@ -1,77 +1,29 @@
 
 
-## Plan: Update Import Chunk Size and Source All Dashboard Widgets from Contacts Database
+## Fix: Edge Function Memory and CPU Limits During Contact Import
 
-### 1. Change Client-Side Import Chunk Size to 100,000
+### Root Cause
+The edge function is failing with two distinct errors:
+1. **Memory limit exceeded** - 5,000 rows x 45 columns creates a JSON payload too large for the edge function's ~150MB memory limit
+2. **CPU Time exceeded** - When a batch insert fails, the fallback logic tries inserting rows one-by-one, which exhausts the CPU time limit
 
+### Changes
+
+#### 1. Reduce client-side chunk size to 500 rows
 **File:** `src/components/admin/contacts/ContactsImportView.tsx`
-- Change `CHUNK_SIZE` from `500` to `100000` at line 283 (the upload chunk, not the CSV parse chunk)
+- Change `CHUNK_SIZE` from `5000` to `500`
+- With 45 columns per row, 500 rows keeps the payload well under memory limits
 
-### 2. Update `useDashboardMetrics` Hook
+#### 2. Simplify edge function - remove one-by-one fallback
+**File:** `supabase/functions/import-contacts/index.ts`
+- Insert the batch in sub-batches of 500 rows (server-side) to stay within Supabase insert limits
+- Remove the row-by-row fallback that causes CPU time exhaustion
+- If a sub-batch fails, record all rows in that sub-batch as rejected rather than retrying individually
+- Reduce server-side `BATCH_SIZE` from 500,000 to 500 to match
 
-**File:** `src/hooks/useDashboardMetrics.ts`
+### Technical Details
 
-Already sources from `contacts` table. No changes needed -- it already provides:
-- Visits This Month (from contacts with `last_visit` this month)
-- VIP Members (from `vip` boolean)
-- Re-engagement Needed (contacts with `last_visit` > 30 days ago)
-- Tier Distribution / Privilege Hierarchy (from `loyalty_tier`)
-- Brand Performance (from `last_location`)
-- Regional Presence (from `country`/`city`)
+The edge function memory limit is approximately 150MB. A single row with 45 columns is roughly 1-2KB of JSON. At 500 rows, the payload is ~500KB-1MB which is safe. The previous 5,000 rows created ~5-10MB payloads which, combined with parsing overhead and Supabase client memory, exceeded the limit.
 
-These are already wired to the Overview page components (TierDistribution, BrandMetrics, CountryMetrics, MetricCards).
-
-### 3. Source "Distinguished Guests" from Contacts Database
-
-**File:** `src/hooks/useMembers.ts` -- modify `fetchVIPGuests()` function
-
-Currently fetches from the `members` table via tier joins. Will be rewritten to query the `contacts` table instead:
-- Select contacts where `vip = true`, ordered by `total_spend` descending, limit 10
-- Map contact fields to the `Guest` interface (using `first_name`/`last_name`, `loyalty_tier`, `city`/`country`, `last_visit`, `visits`, `last_location`, etc.)
-
-### 4. Source Analytics Dashboard from Contacts Database
-
-**File:** `src/components/dashboard/AnalyticsView.tsx`
-
-Currently uses hardcoded mock data for all charts (tier spend, retention, brand comparison, top VIPs). Will be updated to:
-- Import and use `useDashboardMetrics` for KPI cards (replacing hardcoded 342%, $2,847, etc. with real contact counts)
-- Replace the hardcoded `topVIPs` array with a new `useTopContacts` hook that fetches the top 5 contacts by `total_spend` from the `contacts` table
-- Replace hardcoded tier spend data with aggregated `total_spend` per `loyalty_tier` from contacts
-- Brand comparison will use `last_location`-based counts from contacts
-- Retention trend data will remain as-is (historical trend data requires time-series tracking not available in the contacts table)
-
-### 5. New Hook: `useTopContacts`
-
-**File:** `src/hooks/useTopContacts.ts` (new)
-
-A small hook querying:
-```sql
-SELECT * FROM contacts
-WHERE total_spend IS NOT NULL
-ORDER BY total_spend DESC
-LIMIT 5
-```
-Returns the top spenders for the Analytics "Top VIP Guests" section and can also serve the "Distinguished Guests" widget.
-
-### 6. New Hook: `useTierSpendMetrics`
-
-**File:** `src/hooks/useTierSpendMetrics.ts` (new)
-
-Aggregates `total_spend` by `loyalty_tier` from the contacts table for the "Spend by Tier" chart in AnalyticsView.
-
-### Summary of Changes
-
-| File | Change |
-|------|--------|
-| `ContactsImportView.tsx` | Chunk size 500 to 100,000 |
-| `useMembers.ts` (fetchVIPGuests) | Query `contacts` table instead of `members` |
-| `AnalyticsView.tsx` | Replace hardcoded data with real contact queries |
-| `useTopContacts.ts` (new) | Top 5 contacts by spend |
-| `useTierSpendMetrics.ts` (new) | Spend aggregation by tier |
-
-### Technical Notes
-
-- The `contacts` table has no foreign keys or joins needed -- all metrics are derived from flat fields (`vip`, `visits`, `total_spend`, `loyalty_tier`, `last_location`, `city`, `country`, `last_visit`)
-- The Supabase default 1000-row limit applies to the `useDashboardMetrics` fetch; for datasets larger than 1000 contacts, pagination or server-side aggregation via an Edge Function may be needed in future
-- Retention trend chart will keep placeholder data since historical monthly retention requires time-series data not stored in the contacts table
+The one-by-one fallback (lines 93-100 in the edge function) is especially dangerous because inserting thousands of individual rows sequentially can take minutes, far exceeding the CPU time budget.
 
