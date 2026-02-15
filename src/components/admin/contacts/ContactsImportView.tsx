@@ -280,7 +280,7 @@ export default function ContactsImportView() {
     setEtaText("");
 
     try {
-      const CHUNK_SIZE = 150000;
+      const CHUNK_SIZE = 500;
       const totalChunks = Math.ceil(processedRows.length / CHUNK_SIZE);
       let totalInserted = 0;
       let totalRejected = 0;
