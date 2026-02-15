@@ -1,38 +1,60 @@
 
 
-## Fix: Dashboard Timing Out on 186K Contact Queries
+## Fix: Dashboard Still Timing Out After Indexes
 
 ### Root Cause
-The security hardening migration added RLS policies to the `contacts` table that use `is_admin(auth.uid())`. While the function itself is efficient, the combination of RLS evaluation + unindexed `ILIKE` filters on 186K rows causes the database to time out (all the 500 errors in the network tab are "statement timeout" errors).
 
-The specific problematic queries filter on `loyalty_tier`, `last_location`, `country`, `city` using `ILIKE '%term%'`, and `last_visit` using date comparisons -- none of which have proper indexes.
+The trigram indexes were applied successfully, but the queries still time out. The problem is not the indexes -- it's the **RLS policy evaluation**. The `is_admin(auth.uid())` function in the contacts RLS policy is being evaluated per-row by the Postgres query planner across 186,000 rows, even though the result is the same for every row. This causes each of the 15 HEAD count queries to exceed the statement timeout.
 
-### Solution
+### Solution: Move Dashboard Metrics to a Server-Side Edge Function
 
-Two changes are needed:
+Replace the 15 client-side Supabase queries with a single call to a new edge function that:
+1. Validates the caller is an authenticated admin (JWT check)
+2. Runs all counts server-side using the service role (bypasses RLS)
+3. Returns the aggregated metrics as JSON
 
-#### 1. Add database indexes (SQL migration)
+This is both faster (single HTTP call, no RLS overhead) and more secure (admin check happens once, explicitly).
 
-Add a `pg_trgm` trigram extension and GIN indexes for the `ILIKE` pattern-match queries, plus a btree index on `last_visit` for date range filters:
+### Changes
+
+#### 1. New Edge Function: `supabase/functions/dashboard-metrics/index.ts`
+
+- Accepts GET requests with an Authorization header
+- Verifies the JWT and checks `is_admin` via a direct query to the `admins` table
+- Runs a single SQL query with conditional aggregation (one query instead of 15):
 
 ```sql
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
-CREATE INDEX idx_contacts_last_visit ON public.contacts USING btree (last_visit);
-CREATE INDEX idx_contacts_loyalty_tier_trgm ON public.contacts USING gin (loyalty_tier gin_trgm_ops);
-CREATE INDEX idx_contacts_last_location_trgm ON public.contacts USING gin (last_location gin_trgm_ops);
-CREATE INDEX idx_contacts_country_trgm ON public.contacts USING gin (country gin_trgm_ops);
-CREATE INDEX idx_contacts_city_trgm ON public.contacts USING gin (city gin_trgm_ops);
+SELECT
+  count(*) as total,
+  count(*) FILTER (WHERE vip = true) as vip_count,
+  count(*) FILTER (WHERE last_visit < $1) as churn_old,
+  count(*) FILTER (WHERE last_visit IS NULL) as churn_null,
+  count(*) FILTER (WHERE last_visit >= $2) as visits_month,
+  count(*) FILTER (WHERE last_location ILIKE '%noir%') as noir,
+  count(*) FILTER (WHERE last_location ILIKE '%sasso%') as sasso,
+  count(*) FILTER (WHERE country ILIKE '%qatar%') as qatar,
+  count(*) FILTER (WHERE city ILIKE '%doha%') as doha,
+  count(*) FILTER (WHERE country ILIKE '%saudi%') as saudi,
+  count(*) FILTER (WHERE city ILIKE '%riyadh%') as riyadh,
+  count(*) FILTER (WHERE loyalty_tier ILIKE '%black%') as black,
+  count(*) FILTER (WHERE loyalty_tier ILIKE '%inner%') as inner_circle,
+  count(*) FILTER (WHERE loyalty_tier ILIKE '%elite%') as elite,
+  count(*) FILTER (WHERE loyalty_tier ILIKE '%connoisseur%') as connoisseur
+FROM contacts
 ```
 
-Trigram (GIN) indexes support `ILIKE '%pattern%'` queries efficiently, unlike standard btree indexes which only work for prefix matches. This will bring query times from timeout (8+ seconds) down to milliseconds.
+This does a single sequential scan of the table instead of 15 separate scans, and avoids RLS entirely.
 
-#### 2. No code changes needed
+- Returns the computed `DashboardMetrics` JSON object
 
-The `useDashboardMetrics.ts` hook is correctly structured with server-side count queries. The queries themselves are fine -- they just need proper indexes to perform well on 186K rows with RLS enabled.
+#### 2. Update `src/hooks/useDashboardMetrics.ts`
+
+- Replace the 15 parallel Supabase client queries with a single `supabase.functions.invoke('dashboard-metrics')` call
+- Parse the response into the existing `DashboardMetrics` type
+- No changes to the React Query wrapper or any consuming components
 
 ### Impact
-- Dashboard will load in under 1-2 seconds instead of timing out
-- No visual or functional changes
-- All existing queries benefit from the new indexes (contacts list, analytics, etc.)
+- Dashboard will load in under 1 second (single optimized query, no RLS overhead)
+- No UI changes -- all existing components continue to work as-is
+- More secure: admin verification happens explicitly in the function, not via per-row RLS evaluation
 
