@@ -187,7 +187,28 @@ serve(async (req) => {
       });
     }
 
-    console.log('Authenticated user:', user.id);
+    // Verify user is an admin
+    const supabaseAdmin = createClient(
+      supabaseUrl,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
+    const { data: adminData, error: adminError } = await supabaseAdmin
+      .from('admins')
+      .select('role, is_active')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .single();
+
+    if (adminError || !adminData) {
+      console.error('Admin check failed for user:', user.id);
+      return new Response(JSON.stringify({ error: 'Admin access required' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Authenticated admin:', user.id, 'role:', adminData.role);
 
     const { guest } = await req.json() as { guest: GuestData };
     
