@@ -228,7 +228,8 @@ serve(async (req) => {
     // Generate personalized message using Lovable AI
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
+      console.error('LOVABLE_API_KEY not configured');
+      throw new Error('AI service temporarily unavailable');
     }
 
     const brandTone = guest.favoriteBrand === 'noir' 

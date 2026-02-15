@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -21,25 +21,32 @@ Deno.serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify user is super admin
-    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
-    const {
-      data: { user },
-    } = await anonClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    // Validate JWT using anon client with user's token
+    const anonClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
-    if (!user) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await anonClient.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Check super admin role
+    const userId = claimsData.claims.sub;
+
+    // Use service role for admin operations
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Verify user is super admin
     const { data: roleCheck } = await supabase.rpc("admin_has_role", {
-      _user_id: user.id,
+      _user_id: userId,
       _roles: ["super_admin"],
     });
 
@@ -60,7 +67,7 @@ Deno.serve(async (req) => {
     }
 
     // Get admin ID for audit
-    const { data: adminId } = await supabase.rpc("get_admin_id", { _user_id: user.id });
+    const { data: adminId } = await supabase.rpc("get_admin_id", { _user_id: userId });
 
     // Only clear contacts on the first chunk
     if (clearFirst) {
@@ -89,7 +96,6 @@ Deno.serve(async (req) => {
       const { error: insertError } = await supabase.from("contacts").insert(batch);
 
       if (insertError) {
-        // Mark entire sub-batch as rejected — no row-by-row fallback
         for (let j = 0; j < batch.length; j++) {
           rejected.push({ row: i + j + 1, reason: insertError.message });
         }
@@ -127,7 +133,7 @@ Deno.serve(async (req) => {
       }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "Import failed" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

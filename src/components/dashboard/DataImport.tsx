@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { sanitizeTextField } from '@/lib/sanitize';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -235,12 +236,12 @@ export function DataImport({ open, onOpenChange }: DataImportProps) {
         const notes = notesParts.length > 0 ? notesParts.join(' | ') : null;
 
         const { error } = await supabase.from('members').insert({
-          full_name: member.full_name,
+          full_name: sanitizeTextField(member.full_name, 200) || member.full_name,
           phone: member.phone,
           city: member.city,
           brand_affinity: 'both',
           total_visits: member.visits_count,
-          notes: notes,
+          notes: sanitizeTextField(notes, 500),
         });
 
         if (error) {
