@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { sanitizeTextField, validateEmail } from '@/lib/sanitize';
 import {
   Dialog,
   DialogContent,
@@ -378,18 +379,18 @@ export default function SevenRoomsImport({ open, onOpenChange }: SevenRoomsImpor
         
         let fullName = '';
         if (salutation) {
-          fullName = `${salutation} ${first} ${last}`.trim();
+          fullName = sanitizeTextField(`${salutation} ${first} ${last}`.trim(), 200) || `${first} ${last}`.trim();
         } else {
-          fullName = `${first} ${last}`.trim();
+          fullName = sanitizeTextField(`${first} ${last}`.trim(), 200) || `${first} ${last}`.trim();
         }
 
         const phone = columnMapping.phone ? normalizePhone(row.data[columnMapping.phone] || '') : '';
-        const email = columnMapping.email ? row.data[columnMapping.email]?.trim() || null : null;
+        const email = columnMapping.email ? validateEmail(row.data[columnMapping.email]) : null;
         const totalVisits = columnMapping.total_visits
           ? parseInt(row.data[columnMapping.total_visits]) || 0
           : 0;
-        const notes = columnMapping.notes ? row.data[columnMapping.notes]?.trim() || null : null;
-        const tags = columnMapping.tags ? row.data[columnMapping.tags]?.trim() || null : null;
+        const notes = columnMapping.notes ? sanitizeTextField(row.data[columnMapping.notes], 500) : null;
+        const tags = columnMapping.tags ? sanitizeTextField(row.data[columnMapping.tags], 200) : null;
         const isVip = columnMapping.is_vip ? parseVipStatus(row.data[columnMapping.is_vip] || '') : false;
         const birthday = columnMapping.birthday ? parseBirthday(row.data[columnMapping.birthday] || '') : null;
         const lastVisitDate = columnMapping.last_visit_date ? parseLastVisitDate(row.data[columnMapping.last_visit_date] || '') : null;
