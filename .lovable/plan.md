@@ -1,33 +1,38 @@
 
 
-## Fix: Dashboard Freezing Due to 186K Row Client-Side Download
+## Fix: Dashboard Timing Out on 186K Contact Queries
 
 ### Root Cause
-The `useDashboardMetrics` hook downloads **all 186,066 contacts** twice (once for visits, once for tier distribution) by paginating 1,000 rows at a time. This means ~372 sequential network requests on every page load, freezing the browser completely.
+The security hardening migration added RLS policies to the `contacts` table that use `is_admin(auth.uid())`. While the function itself is efficient, the combination of RLS evaluation + unindexed `ILIKE` filters on 186K rows causes the database to time out (all the 500 errors in the network tab are "statement timeout" errors).
+
+The specific problematic queries filter on `loyalty_tier`, `last_location`, `country`, `city` using `ILIKE '%term%'`, and `last_visit` using date comparisons -- none of which have proper indexes.
 
 ### Solution
-Replace the two `fetchAllColumn` calls with efficient server-side count queries that return only numbers, not row data.
 
-### Changes
+Two changes are needed:
 
-**File:** `src/hooks/useDashboardMetrics.ts`
+#### 1. Add database indexes (SQL migration)
 
-1. **Remove the `fetchAllColumn` helper function entirely** -- it's no longer needed
+Add a `pg_trgm` trigram extension and GIN indexes for the `ILIKE` pattern-match queries, plus a btree index on `last_visit` for date range filters:
 
-2. **Visits This Month** (line 74-77): Replace the paginated fetch + client-side sum with a single server-side count query:
-   - `select('*', { count: 'exact', head: true }).gte('last_visit', monthStart)` 
-   - This returns just the count of contacts who visited this month, with zero row data
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
-3. **Tier Distribution** (lines 80-91): Replace the paginated fetch + client-side grouping with 5 parallel count queries, one per tier:
-   - `select('*', { count: 'exact', head: true }).ilike('loyalty_tier', '%black%')`
-   - `select('*', { count: 'exact', head: true }).ilike('loyalty_tier', '%inner%')`
-   - `select('*', { count: 'exact', head: true }).ilike('loyalty_tier', '%elite%')`
-   - `select('*', { count: 'exact', head: true }).ilike('loyalty_tier', '%connoisseur%')`
-   - Initiation = totalMembers minus the sum of the other 4 tiers
+CREATE INDEX idx_contacts_last_visit ON public.contacts USING btree (last_visit);
+CREATE INDEX idx_contacts_loyalty_tier_trgm ON public.contacts USING gin (loyalty_tier gin_trgm_ops);
+CREATE INDEX idx_contacts_last_location_trgm ON public.contacts USING gin (last_location gin_trgm_ops);
+CREATE INDEX idx_contacts_country_trgm ON public.contacts USING gin (country gin_trgm_ops);
+CREATE INDEX idx_contacts_city_trgm ON public.contacts USING gin (city gin_trgm_ops);
+```
 
-4. **Add all new queries to the existing `Promise.all`** so everything runs in a single parallel batch (~15 lightweight count queries instead of ~372 paginated data fetches)
+Trigram (GIN) indexes support `ILIKE '%pattern%'` queries efficiently, unlike standard btree indexes which only work for prefix matches. This will bring query times from timeout (8+ seconds) down to milliseconds.
+
+#### 2. No code changes needed
+
+The `useDashboardMetrics.ts` hook is correctly structured with server-side count queries. The queries themselves are fine -- they just need proper indexes to perform well on 186K rows with RLS enabled.
 
 ### Impact
-- Dashboard load: from ~372 sequential requests downloading 186K rows to ~15 parallel count queries returning only numbers
-- Page should load in under 1 second instead of freezing indefinitely
-- No visual or functional changes -- all metrics remain identical
+- Dashboard will load in under 1-2 seconds instead of timing out
+- No visual or functional changes
+- All existing queries benefit from the new indexes (contacts list, analytics, etc.)
+
