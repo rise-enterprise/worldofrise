@@ -238,7 +238,7 @@ export type Database = {
           avg_rating: number | null
           birthday: string | null
           cafe_noir_london_opt_in: boolean
-          cancels: number
+          cancels: number | null
           city: string | null
           company: string | null
           country: string | null
@@ -255,7 +255,7 @@ export type Database = {
           loyalty_id: string | null
           loyalty_rank: string | null
           loyalty_tier: string | null
-          no_show: number
+          no_show: number | null
           noir_cafe_abu_dhabi_opt_in: boolean
           noir_cafe_al_hazm_opt_in: boolean
           noir_cafe_old_doha_port_opt_in: boolean
@@ -263,7 +263,7 @@ export type Database = {
           noir_cafe_tennis_opt_in: boolean
           noir_cafe_west_walk_opt_in: boolean
           notes: string | null
-          orders: number
+          orders: number | null
           phone: string | null
           postal_code: string | null
           salutation: string | null
@@ -289,7 +289,7 @@ export type Database = {
           avg_rating?: number | null
           birthday?: string | null
           cafe_noir_london_opt_in?: boolean
-          cancels?: number
+          cancels?: number | null
           city?: string | null
           company?: string | null
           country?: string | null
@@ -306,7 +306,7 @@ export type Database = {
           loyalty_id?: string | null
           loyalty_rank?: string | null
           loyalty_tier?: string | null
-          no_show?: number
+          no_show?: number | null
           noir_cafe_abu_dhabi_opt_in?: boolean
           noir_cafe_al_hazm_opt_in?: boolean
           noir_cafe_old_doha_port_opt_in?: boolean
@@ -314,7 +314,7 @@ export type Database = {
           noir_cafe_tennis_opt_in?: boolean
           noir_cafe_west_walk_opt_in?: boolean
           notes?: string | null
-          orders?: number
+          orders?: number | null
           phone?: string | null
           postal_code?: string | null
           salutation?: string | null
@@ -340,7 +340,7 @@ export type Database = {
           avg_rating?: number | null
           birthday?: string | null
           cafe_noir_london_opt_in?: boolean
-          cancels?: number
+          cancels?: number | null
           city?: string | null
           company?: string | null
           country?: string | null
@@ -357,7 +357,7 @@ export type Database = {
           loyalty_id?: string | null
           loyalty_rank?: string | null
           loyalty_tier?: string | null
-          no_show?: number
+          no_show?: number | null
           noir_cafe_abu_dhabi_opt_in?: boolean
           noir_cafe_al_hazm_opt_in?: boolean
           noir_cafe_old_doha_port_opt_in?: boolean
@@ -365,7 +365,7 @@ export type Database = {
           noir_cafe_tennis_opt_in?: boolean
           noir_cafe_west_walk_opt_in?: boolean
           notes?: string | null
-          orders?: number
+          orders?: number | null
           phone?: string | null
           postal_code?: string | null
           salutation?: string | null

@@ -1,0 +1,3 @@
+ALTER TABLE public.contacts ALTER COLUMN cancels DROP NOT NULL;
+ALTER TABLE public.contacts ALTER COLUMN no_show DROP NOT NULL;
+ALTER TABLE public.contacts ALTER COLUMN orders DROP NOT NULL;
