@@ -279,7 +279,7 @@ export type Database = {
           total_spend: number | null
           venue_group_marketing_opt_in: boolean
           vip: boolean
-          visits: number
+          visits: number | null
           work_phone: string | null
         }
         Insert: {
@@ -330,7 +330,7 @@ export type Database = {
           total_spend?: number | null
           venue_group_marketing_opt_in?: boolean
           vip?: boolean
-          visits?: number
+          visits?: number | null
           work_phone?: string | null
         }
         Update: {
@@ -381,7 +381,7 @@ export type Database = {
           total_spend?: number | null
           venue_group_marketing_opt_in?: boolean
           vip?: boolean
-          visits?: number
+          visits?: number | null
           work_phone?: string | null
         }
         Relationships: []
