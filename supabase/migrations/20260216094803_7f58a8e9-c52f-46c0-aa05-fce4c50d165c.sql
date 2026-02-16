@@ -1,0 +1,1 @@
+ALTER TABLE public.contacts ALTER COLUMN visits DROP NOT NULL;
