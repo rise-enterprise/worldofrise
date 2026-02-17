@@ -48,6 +48,7 @@ export function EditableGridLayout({
         draggableHandle=".widget-drag-handle"
         compactType="vertical"
         useCSSTransforms
+        autoSize
       >
         {children}
       </ResponsiveGridLayout>
