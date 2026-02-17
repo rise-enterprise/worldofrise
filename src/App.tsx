@@ -23,6 +23,7 @@ const MemberExperiences = lazy(() => import("./pages/MemberExperiences"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminAuthGuard = lazy(() => import("./components/admin/AdminAuthGuard"));
+const MemberAuthGuard = lazy(() => import("./components/member/MemberAuthGuard"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -42,18 +43,18 @@ const App = () => (
               <Route path="/verification-pending" element={<VerificationPending />} />
               
               {/* Admin Routes */}
-              <Route path="/admin/dashboard" element={<Dashboard />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminAuthGuard><Dashboard /></AdminAuthGuard>} />
               <Route path="/admin" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
               
-              {/* Member Routes - Open Access */}
-              <Route path="/member/welcome" element={<MemberWelcome />} />
-              <Route path="/member" element={<MemberPortal />} />
-              <Route path="/member/history" element={<MemberHistory />} />
-              <Route path="/member/events" element={<MemberEvents />} />
-              <Route path="/member/profile/edit" element={<MemberProfileEdit />} />
-              <Route path="/member/rewards" element={<MemberRewards />} />
-              <Route path="/member/experiences" element={<MemberExperiences />} />
+              {/* Member Routes - Require Login */}
+              <Route path="/member/welcome" element={<MemberAuthGuard><MemberWelcome /></MemberAuthGuard>} />
+              <Route path="/member" element={<MemberAuthGuard><MemberPortal /></MemberAuthGuard>} />
+              <Route path="/member/history" element={<MemberAuthGuard><MemberHistory /></MemberAuthGuard>} />
+              <Route path="/member/events" element={<MemberAuthGuard><MemberEvents /></MemberAuthGuard>} />
+              <Route path="/member/profile/edit" element={<MemberAuthGuard><MemberProfileEdit /></MemberAuthGuard>} />
+              <Route path="/member/rewards" element={<MemberAuthGuard><MemberRewards /></MemberAuthGuard>} />
+              <Route path="/member/experiences" element={<MemberAuthGuard><MemberExperiences /></MemberAuthGuard>} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
