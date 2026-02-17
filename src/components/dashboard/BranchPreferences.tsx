@@ -6,10 +6,17 @@ import { MapPin } from 'lucide-react';
 
 interface BranchPreferencesProps {
   activeBrand: Brand;
+  allowedBranches?: string[];
 }
 
-export function BranchPreferences({ activeBrand }: BranchPreferencesProps) {
-  const { data: branches = [], isLoading } = useBranchPreferences(activeBrand);
+export function BranchPreferences({ activeBrand, allowedBranches }: BranchPreferencesProps) {
+  const { data: rawBranches = [], isLoading } = useBranchPreferences(activeBrand);
+
+  const branches = allowedBranches
+    ? rawBranches.filter(b =>
+        allowedBranches.some(ab => ab.toLowerCase() === b.branch_name.toLowerCase())
+      )
+    : rawBranches;
 
   const maxCount = branches.length > 0 ? branches[0].visit_count : 1;
 

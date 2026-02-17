@@ -6,6 +6,7 @@ import { TierDistribution } from './TierDistribution';
 import { VIPGuestCard } from './VIPGuestCard';
 import { BrandMetrics } from './BrandMetrics';
 import { CountryMetrics } from './CountryMetrics';
+import { BranchPreferences } from './BranchPreferences';
 import { EditableGridLayout } from './EditableGridLayout';
 import {
   WIDGET_IDS,
@@ -156,7 +157,18 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
         {/* Brand Metrics */}
         <div key={WIDGET_IDS.BRAND_METRICS}>
           <WidgetWrapper isEditing={isEditing}>
-            <BrandMetrics visitsByBrand={metrics.visitsByBrand} />
+            {activeBrand === 'all' ? (
+              <BrandMetrics visitsByBrand={metrics.visitsByBrand} />
+            ) : (
+              <BranchPreferences
+                activeBrand={activeBrand}
+                allowedBranches={
+                  activeBrand === 'noir'
+                    ? ['NOIR Café - Riyadh', 'NOIR Café - West Walk', 'NOIR Café - Al Hazm', 'NOIR Café - Old Doha Port']
+                    : ['SASSO - West Walk', 'SASSO - Al Hazm']
+                }
+              />
+            )}
           </WidgetWrapper>
         </div>
 
