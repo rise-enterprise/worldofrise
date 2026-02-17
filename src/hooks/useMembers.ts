@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Guest, mapDbTierToTier, mapDbBrandToBrand, mapDbCityToCountry } from '@/types/loyalty';
+import { Guest, Brand, Country, mapDbTierToTier, mapDbBrandToBrand, mapDbCityToCountry } from '@/types/loyalty';
 
 interface MemberWithTier {
   id: string;
@@ -298,39 +298,61 @@ async function fetchDemoMember(): Promise<Guest | null> {
   };
 }
 
+// Infer tier from visit count when loyalty_tier is null
+function inferTierFromVisits(visits: number): string {
+  if (visits >= 50) return 'Black';
+  if (visits >= 30) return 'Inner Circle';
+  if (visits >= 15) return 'Elite';
+  if (visits >= 5) return 'Connoisseur';
+  return 'Initiation';
+}
+
+// Derive brand from last_location string
+function deriveBrandFromLocation(location: string | null): Brand {
+  if (!location) return 'both';
+  const lower = location.toLowerCase();
+  if (lower.includes('sasso')) return 'sasso';
+  if (lower.includes('noir')) return 'noir';
+  return 'both';
+}
+
 // Fetch VIP guests from contacts database
 async function fetchVIPGuests(): Promise<Guest[]> {
   const { data: contacts, error } = await (supabase as any)
     .from('contacts')
-    .select('id, first_name, last_name, loyalty_tier, visits, total_spend, vip, city, country, last_visit, last_location, email, phone, notes')
+    .select('id, first_name, last_name, loyalty_tier, visits, total_spend, vip, city, country, last_visit, last_location, email, phone, notes, salutation, birthday, created_date, tags')
     .eq('vip', true)
-    .order('total_spend', { ascending: false })
+    .order('visits', { ascending: false })
+    .order('last_visit', { ascending: false })
     .limit(10);
 
   if (error) throw error;
 
   return (contacts ?? []).map((c: any) => {
     const fullName = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Unknown';
-    const tierName = c.loyalty_tier || 'Initiation';
+    const inferredTier = c.loyalty_tier || inferTierFromVisits(c.visits || 0);
 
     return {
       id: c.id,
       name: fullName,
+      salutation: c.salutation || undefined,
       email: c.email || null,
       phone: c.phone || '',
-      country: (c.country || c.city || 'Qatar') as any,
-      tier: mapDbTierToTier(tierName),
-      tierName: tierName,
+      country: (c.last_location || '').toLowerCase().includes('riyadh') ? 'riyadh' as Country : 'doha' as Country,
+      tier: mapDbTierToTier(inferredTier),
+      tierName: inferredTier,
       totalVisits: c.visits || 0,
       lifetimeVisits: c.visits || 0,
       lastVisit: c.last_visit ? new Date(c.last_visit) : new Date(),
-      joinedAt: new Date(),
-      favoriteBrand: (c.last_location || '').toLowerCase().includes('sasso') ? 'SASSO' as any : 'NOIR' as any,
+      joinedAt: c.created_date ? new Date(c.created_date) : new Date(),
+      favoriteBrand: deriveBrandFromLocation(c.last_location),
       visits: [],
-      tags: [],
+      tags: c.tags ? c.tags.split(',').map((t: string) => t.trim()) : [],
       notes: c.notes || undefined,
       avatarUrl: undefined,
-      totalPoints: 0,
+      isVip: true,
+      birthday: c.birthday || undefined,
+      totalPoints: c.total_spend ? Number(c.total_spend) : 0,
       status: 'active' as const,
     };
   });
