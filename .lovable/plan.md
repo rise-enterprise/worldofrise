@@ -1,50 +1,59 @@
 
 
-## Fix Brand View Filtering Across the Dashboard
+# Draggable & Resizable Dashboard Widgets
 
-The sidebar brand filter (All Brands / NOIR Cafe / SASSO) is not updating the data because two key data sources query the wrong table. Here's what needs to change:
+## Overview
+Add the ability to drag, move, and resize all dashboard widgets in the Overview section, with snap-to-grid behavior so everything stays aligned and tidy.
 
-### Problem
+## Approach
+We'll use `react-grid-layout`, a well-established library for grid-based drag-and-drop layouts. Each widget (metric cards, tier distribution, brand metrics, country metrics, VIP guests) becomes a grid item that can be freely repositioned and resized while snapping to grid cells.
 
-The **Guest Directory** (Guests tab) uses the `usePaginatedMembers` hook, which queries the `members` table -- a table with **zero records**. All 335K+ contacts live in the `contacts` table. Additionally, the brand filter logic uses a `brand_affinity` column that doesn't exist on `contacts`.
+## What You'll See
+- An "Edit Layout" toggle button in the dashboard header area
+- When editing is enabled, widgets show drag handles and resize corners
+- Dragging a widget snaps it to the nearest grid position
+- Resizing snaps to grid increments
+- Your custom layout is saved and remembered between sessions (stored in browser local storage)
+- A "Reset Layout" button to return to the default arrangement
 
-The **Dashboard Overview** metrics and VIP guests are correctly wired to `contacts` and the edge function, but the edge function may need redeployment to ensure the latest brand filtering code is active.
+## Technical Details
 
-### Changes
+### 1. Install dependency
+- Add `react-grid-layout` (includes TypeScript types)
 
-#### 1. Rewrite `src/hooks/usePaginatedMembers.ts` to query `contacts` table
+### 2. Create a layout configuration file
+- `src/components/dashboard/dashboardLayoutConfig.ts`
+- Define default grid positions and sizes for each widget
+- Define min/max width/height constraints per widget
+- Store layout in localStorage for persistence
 
-- Replace `supabase.from('members')` with `supabase.from('contacts')`
-- Replace `brand_affinity` brand filter with `.ilike('last_location', '%noir%')` or `'%sasso%'`
-- Replace `full_name` search with `first_name`/`last_name` search via `.or()`
-- Replace `member_tiers` join with direct use of the `loyalty_tier` column on contacts
-- Map contact fields (`first_name`, `last_name`, `loyalty_tier`, `visits`, `total_spend`, `last_visit`, `last_location`) to the Guest type
-- Apply tier filter using the `loyalty_tier` column server-side with `.ilike('loyalty_tier', '%black%')` etc.
-- Remove the visits sub-query (contacts already have `visits` count and `last_visit` date)
+### 3. Create an EditableGridLayout wrapper component
+- `src/components/dashboard/EditableGridLayout.tsx`
+- Wraps `react-grid-layout`'s `ResponsiveGridLayout`
+- Props: `isEditing`, `onLayoutChange`, `children`
+- Handles responsive breakpoints (lg, md, sm)
+- Adds visual indicators when in edit mode (dashed borders, drag handles)
+- Snaps to a 12-column grid
 
-#### 2. Redeploy `supabase/functions/dashboard-metrics/index.ts`
+### 4. Refactor Overview component
+- Wrap each widget in a grid item `<div key="widget-id">`
+- Replace the current CSS grid with the `EditableGridLayout`
+- Add an "Edit Layout" toggle button and "Reset" button
+- Pass `isEditing` state to control drag/resize capability
+- When not editing, layout is fully locked (no accidental moves)
 
-The edge function already has correct brand filtering code, but needs to be redeployed to ensure the latest version is live. This was confirmed during investigation -- the function was returning 404 until redeployed just now.
+### 5. Import required CSS
+- Import `react-grid-layout/css/styles.css` and `react-resizable/css/styles.css`
+- Add custom styling overrides to match the dark obsidian theme (gold accent drag handles, subtle grid lines when editing)
 
-### What Users Will See
+### 6. Default widget layout (12-column grid)
 
-- Selecting **NOIR Cafe** in the sidebar will show only contacts whose last location contains "noir"
-- Selecting **SASSO** will show only contacts at SASSO locations
-- Selecting **All Brands** shows the full dataset
-- This filtering applies consistently to: metric cards, tier distribution, regional presence, brand performance, distinguished guests, and the guest directory
+```text
+Row 0-2:  [Metric1 w=3] [Metric2 w=3] [Metric3 w=3] [Metric4 w=3]
+Row 2-8:  [TierDist w=4] [Brand+Country w=4] [VIP Guests w=4]
+```
 
-### Technical Details
-
-The `usePaginatedMembers` rewrite maps fields as follows:
-
-| Current (members table) | New (contacts table) |
-|---|---|
-| `full_name` | `first_name` + `last_name` |
-| `brand_affinity` | `last_location` (ilike filter) |
-| `member_tiers.tiers.name` | `loyalty_tier` |
-| `total_visits` | `visits` |
-| `total_points` | `total_spend` |
-| `created_at` | `created_date` |
-
-The tier filter changes from client-side post-filtering to server-side `.ilike('loyalty_tier', '%tier_name%')` for better performance with 335K+ records.
+Each widget will have constraints:
+- Metric cards: min 2 cols wide, max 6
+- Larger widgets: min 3 cols wide, max 12
 
