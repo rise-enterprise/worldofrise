@@ -74,10 +74,8 @@ Deno.serve(async (req) => {
       visitsMonthRes,
       noirRes,
       sassoRes,
-      qatarRes,
-      dohaRes,
-      saudiRes,
-      riyadhRes,
+      riyadhLocationRes,
+      qatarLocationRes,
       blackRes,
       innerRes,
       eliteRes,
@@ -90,17 +88,15 @@ Deno.serve(async (req) => {
       serviceClient.from("contacts").select("*", { count: "exact", head: true }).gte("last_visit", monthStart),
       serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%noir%"),
       serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%sasso%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("country", "%qatar%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("city", "%doha%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("country", "%saudi%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("city", "%riyadh%"),
+      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%Riyadh%"),
+      serviceClient.from("contacts").select("*", { count: "exact", head: true }).not("last_location", "ilike", "%Riyadh%").not("last_location", "is", null),
       serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%black%"),
       serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%inner%"),
       serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%elite%"),
       serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%connoisseur%"),
     ]);
 
-    for (const r of [totalRes, vipRes, churnOldRes, churnNullRes, visitsMonthRes, noirRes, sassoRes, qatarRes, dohaRes, saudiRes, riyadhRes, blackRes, innerRes, eliteRes, connoisseurRes]) {
+    for (const r of [totalRes, vipRes, churnOldRes, churnNullRes, visitsMonthRes, noirRes, sassoRes, riyadhLocationRes, qatarLocationRes, blackRes, innerRes, eliteRes, connoisseurRes]) {
       if (r.error) throw r.error;
     }
 
@@ -111,8 +107,8 @@ Deno.serve(async (req) => {
     const connoisseurCount = connoisseurRes.count ?? 0;
     const initiationCount = totalMembers - blackCount - innerCount - eliteCount - connoisseurCount;
 
-    const dohaCount = Math.max(qatarRes.count ?? 0, dohaRes.count ?? 0);
-    const riyadhCount = Math.max(saudiRes.count ?? 0, riyadhRes.count ?? 0);
+    const dohaCount = qatarLocationRes.count ?? 0;
+    const riyadhCount = riyadhLocationRes.count ?? 0;
 
     const metrics = {
       totalMembers,

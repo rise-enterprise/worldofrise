@@ -39,10 +39,10 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
               {(visitsByCountry.doha || 0).toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground/50 tracking-refined">
-              {Math.round(((visitsByCountry.doha || 0) / total) * 100)}% of visits
+              {Math.round(((visitsByCountry.doha || 0) / total) * 100)}% of members
             </p>
             <div className="mt-4 flex items-center gap-2">
-              <span className="text-xs text-muted-foreground/40 tracking-refined">Doha</span>
+              <span className="text-xs text-muted-foreground/40 tracking-refined">4 locations</span>
             </div>
           </div>
 
@@ -59,10 +59,10 @@ export function CountryMetrics({ visitsByCountry }: CountryMetricsProps) {
               {visitsByCountry.riyadh.toLocaleString()}
             </p>
             <p className="text-xs text-muted-foreground/50 tracking-refined">
-              {Math.round((visitsByCountry.riyadh / total) * 100)}% of visits
+              {Math.round((visitsByCountry.riyadh / total) * 100)}% of members
             </p>
             <div className="mt-4 flex items-center gap-2">
-              <span className="text-xs text-muted-foreground/40 tracking-refined">Riyadh</span>
+              <span className="text-xs text-muted-foreground/40 tracking-refined">1 location</span>
             </div>
           </div>
         </div>
