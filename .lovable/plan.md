@@ -1,20 +1,24 @@
 
 
-## Fix NOT NULL Constraints on Remaining Integer Columns
+## Move Dashboard Route from `/dashboard` to `/admin/dashboard`
 
-The same issue that affected `visits` now occurs on `cancels` (and likely `no_show` and `orders` too). When importing contacts with missing values for these columns, the database rejects the rows.
+A straightforward route reorganization to place the Dashboard under the `/admin` path namespace.
 
 ### Changes
 
-**Database migration** -- Drop the NOT NULL constraint on `cancels`, `no_show`, and `orders` columns in the `contacts` table, all at once:
+1. **`src/App.tsx`** -- Update the route path from `/dashboard` to `/admin/dashboard`
 
-```sql
-ALTER TABLE public.contacts ALTER COLUMN cancels DROP NOT NULL;
-ALTER TABLE public.contacts ALTER COLUMN no_show DROP NOT NULL;
-ALTER TABLE public.contacts ALTER COLUMN orders DROP NOT NULL;
-```
+2. **`src/components/dashboard/Sidebar.tsx`** -- Update the `navigate('/admin')` call for Master Control (already correct) and verify no other hardcoded `/dashboard` references
 
-This allows imports with missing numeric fields to succeed. Existing default values of `0` will still apply when no value is provided, but explicit `null` values will no longer cause failures.
+3. **Search for any other references to `/dashboard`** across the codebase (navigation links, redirects, auth guards) and update them to `/admin/dashboard`
 
-The generated types file will be updated automatically to reflect these columns as `number | null`.
+### Technical Details
+
+Files to check for `/dashboard` references:
+- `src/components/admin/adminNavConfig.ts` -- may contain a redirect to `/dashboard`
+- `src/components/admin/AdminSidebar.tsx` -- the "Dashboard" button that navigates back
+- `src/components/auth/UnifiedLoginForm.tsx` -- post-login redirect for admins
+- Any other navigation or redirect logic
+
+All instances of `/dashboard` will be updated to `/admin/dashboard`.
 
