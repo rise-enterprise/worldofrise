@@ -43,8 +43,9 @@ export default function Dashboard() {
   const isTablet = useIsTablet();
   const { isRTL } = useLanguage();
   const useDrawer = isMobile || isTablet;
-  const { data: vipGuests = [], isLoading: vipLoading } = useVIPGuests();
-  const { data: metrics = emptyMetrics, isLoading: metricsLoading } = useDashboardMetrics();
+  const brandForQuery = activeBrand === 'all' ? 'both' : activeBrand;
+  const { data: vipGuests = [], isLoading: vipLoading } = useVIPGuests(brandForQuery as any);
+  const { data: metrics = emptyMetrics, isLoading: metricsLoading } = useDashboardMetrics(activeBrand);
 
   const handleSelectGuest = (guest: Guest) => {
     setSelectedGuest(guest);

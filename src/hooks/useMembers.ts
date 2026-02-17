@@ -317,11 +317,16 @@ function deriveBrandFromLocation(location: string | null): Brand {
 }
 
 // Fetch VIP guests from contacts database
-async function fetchVIPGuests(): Promise<Guest[]> {
-  const { data: contacts, error } = await (supabase as any)
+async function fetchVIPGuests(brand: Brand = 'both'): Promise<Guest[]> {
+  let query = (supabase as any)
     .from('contacts')
     .select('id, first_name, last_name, loyalty_tier, visits, total_spend, vip, city, country, last_visit, last_location, email, phone, notes, salutation, birthday, created_date, tags')
-    .eq('vip', true)
+    .eq('vip', true);
+
+  if (brand === 'noir') query = query.ilike('last_location', '%noir%');
+  if (brand === 'sasso') query = query.ilike('last_location', '%sasso%');
+
+  const { data: contacts, error } = await query
     .order('visits', { ascending: false })
     .order('last_visit', { ascending: false })
     .limit(10);
@@ -358,10 +363,10 @@ async function fetchVIPGuests(): Promise<Guest[]> {
   });
 }
 
-export function useVIPGuests() {
+export function useVIPGuests(brand: Brand = 'both') {
   return useQuery({
-    queryKey: ['vip-guests'],
-    queryFn: fetchVIPGuests,
+    queryKey: ['vip-guests', brand],
+    queryFn: () => fetchVIPGuests(brand),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

@@ -14,7 +14,14 @@ interface OverviewProps {
   activeBrand: Brand;
 }
 
+const brandLabels: Record<string, { members: string; visits: string }> = {
+  all: { members: 'Across all regions', visits: 'Combined brands' },
+  noir: { members: 'NOIR Cafe only', visits: 'NOIR locations' },
+  sasso: { members: 'SASSO only', visits: 'SASSO locations' },
+};
+
 export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
+  const labels = brandLabels[activeBrand] || brandLabels.all;
   // Guests are pre-filtered VIP members from useVIPGuests hook
   const vipGuests = guests.slice(0, 4);
 
@@ -25,7 +32,7 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
         <MetricCard
           title="Total Members"
           value={metrics.totalMembers.toLocaleString()}
-          subtitle="Across all regions"
+          subtitle={labels.members}
           icon={Users}
           trend={{ value: 12, label: 'this month' }}
           delay={0}
@@ -33,7 +40,7 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
         <MetricCard
           title="Visits This Month"
           value={metrics.totalVisitsThisMonth.toLocaleString()}
-          subtitle="Combined brands"
+          subtitle={labels.visits}
           icon={TrendingUp}
           trend={{ value: 8, label: 'vs last month' }}
           delay={100}
