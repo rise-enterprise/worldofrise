@@ -1,56 +1,58 @@
 
 
-## Fix Regional Presence to Use Actual Location Data
+## Make Brand View Filter the Dashboard Data
 
-The Regional Presence card currently shows 0 for both Qatar and Saudi Arabia because the edge function queries the `country` and `city` columns, which are null for virtually all 335K+ contacts. The real location data lives in the `last_location` column.
+Currently, switching between "All Brands", "NOIR Cafe", and "SASSO" in the sidebar has no effect on the dashboard -- all metrics remain global. This plan adds brand filtering so each card reflects only the selected brand's data.
 
-### Current Data Distribution (from `last_location`)
+### What Changes
 
-| Location | Count |
-|---|---|
-| NOIR Cafe - Riyadh | 48,944 |
-| NOIR Cafe - West Walk (Doha) | 40,110 |
-| NOIR Cafe - Al Hazm (Doha) | 30,614 |
-| SASSO - West Walk (Doha) | 25,909 |
-| SASSO - Al Hazm (Doha) | 25,584 |
-| NOIR Cafe - Old Doha Port | 8,717 |
-| + legacy variants | ~1,950 |
+When you select NOIR or SASSO in the sidebar:
+- **Total Members** shows only contacts whose last location matches that brand
+- **Visits This Month** shows only contacts who visited that brand this month
+- **VIP Members** shows only VIP contacts at that brand
+- **Re-engagement Needed** shows only churn-risk contacts at that brand
+- **Tier Distribution** shows tier breakdown for that brand only
+- **Regional Presence** shows location split for that brand only
+- **Distinguished Guests** shows top VIP guests from that brand only
 
-**Qatar total: ~127,000 | Saudi Arabia total: ~49,000**
-
-### Changes
-
-1. **`supabase/functions/dashboard-metrics/index.ts`** -- Replace the broken `country`/`city` queries with `last_location`-based queries:
-   - Qatar count: `ilike("last_location", "%West Walk%")` + `ilike("last_location", "%Al Hazm%")` + `ilike("last_location", "%Old Doha Port%")` + `ilike("last_location", "%Tennis%")`
-   - Saudi count: `ilike("last_location", "%Riyadh%")`
-   - This matches the actual data patterns and removes the 4 broken queries (qatarRes, dohaRes, saudiRes, riyadhRes), replacing them with 2 accurate ones
-
-2. **`src/components/dashboard/CountryMetrics.tsx`** -- Update the display labels:
-   - Change "Qatar" subtitle from "Doha" to show the actual branch count (e.g., "4 locations")
-   - Change "Saudi Arabia" subtitle from "Riyadh" to "1 location" or keep "Riyadh"
-   - Update the metric label from "visits" to "members" since these are contact counts, not visit counts
+When "All Brands" is selected, everything works as it does today (global view).
 
 ### Technical Details
 
-In the edge function, remove these 4 queries:
-- `qatarRes` (country ilike qatar)
-- `dohaRes` (city ilike doha)
-- `saudiRes` (country ilike saudi)
-- `riyadhRes` (city ilike riyadh)
+#### 1. Edge Function: `supabase/functions/dashboard-metrics/index.ts`
 
-Replace with 2 queries:
-```typescript
-// Riyadh - straightforward
-serviceClient.from("contacts").select("*", { count: "exact", head: true })
-  .ilike("last_location", "%Riyadh%"),
+Accept an optional `brand` query parameter (`noir`, `sasso`, or omitted for all).
 
-// Qatar - all non-Riyadh locations
-serviceClient.from("contacts").select("*", { count: "exact", head: true })
-  .not("last_location", "ilike", "%Riyadh%")
-  .not("last_location", "is", null),
-```
+When a brand is provided, add an `.ilike("last_location", "%noir%")` or `.ilike("last_location", "%sasso%")` filter to every count query. This chains onto each existing query so the counts reflect only that brand's contacts.
 
-The Qatar query uses a "not Riyadh and not null" approach, which is simpler and future-proof if new Qatar branches are added.
+The response shape stays identical -- no new fields needed.
 
-The `visitsByCountry` response shape stays `{ doha: number, riyadh: number }` so no frontend type changes are needed.
+#### 2. Hook: `src/hooks/useDashboardMetrics.ts`
+
+- Accept a `brand` parameter (type `Brand`)
+- Pass it as a query param to the edge function: `?brand=noir` or `?brand=sasso`
+- Include `brand` in the `queryKey` so React Query caches per-brand results separately: `['dashboard-metrics', brand]`
+
+#### 3. Dashboard page: `src/pages/Dashboard.tsx`
+
+- Pass `activeBrand` to `useDashboardMetrics(activeBrand)` so metrics update when the brand filter changes
+
+#### 4. VIP Guests hook: `src/hooks/useMembers.ts`
+
+- `useVIPGuests` accepts an optional `brand` parameter
+- When set, add `.ilike('last_location', '%noir%')` or `.ilike('last_location', '%sasso%')` to the contacts query
+- Include brand in the query key: `['vip-guests', brand]`
+
+#### 5. Dashboard page: `src/pages/Dashboard.tsx`
+
+- Pass `activeBrand` to `useVIPGuests(activeBrand)`
+
+#### 6. Overview subtitles: `src/components/dashboard/Overview.tsx`
+
+- Update subtitle text dynamically based on `activeBrand`:
+  - "All Brands" selected: "Across all regions" / "Combined brands"
+  - "NOIR" selected: "NOIR Cafe only" / "NOIR locations"
+  - "SASSO" selected: "SASSO only" / "SASSO locations"
+
+No database changes or new tables are needed. The filtering uses the existing `last_location` column which already contains brand names (e.g., "NOIR Cafe - West Walk", "SASSO - Al Hazm").
 
