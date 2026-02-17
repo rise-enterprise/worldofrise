@@ -1064,6 +1064,7 @@ select:focus {
 /* ═══ React Grid Layout — Crystal Theme Overrides ═══ */
 .editable-grid-layout .react-grid-item {
   transition: all 200ms ease;
+  overflow: hidden;
 }
 
 .editable-grid-layout.is-editing .react-grid-item {

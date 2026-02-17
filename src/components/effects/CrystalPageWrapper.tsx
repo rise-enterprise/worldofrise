@@ -18,7 +18,7 @@ export function CrystalPageWrapper({
   showSparkles = true
 }: CrystalPageWrapperProps) {
   return (
-    <div className={cn("min-h-screen bg-background relative overflow-hidden", className)}>
+    <div className={cn("min-h-screen bg-background relative overflow-x-hidden overflow-y-auto", className)}>
       <CrystalBackground variant={variant}>
         {showSparkles && <DiamondSparkles count={sparkleCount} className="z-[1]" />}
         <div className="relative z-10">
