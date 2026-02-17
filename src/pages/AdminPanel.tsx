@@ -64,7 +64,7 @@ export default function AdminPanel() {
 
   const handleNavigate = useCallback((id: string) => {
     if (id === "loyalty-dashboard") {
-      navigate("/dashboard");
+      navigate("/admin/dashboard");
       return;
     }
     setActiveView(id);

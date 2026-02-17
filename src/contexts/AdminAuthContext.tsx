@@ -95,7 +95,7 @@ export const AdminAuthProvider: React.FC<{ children: ReactNode }> = ({ children 
       return { error: new Error('This email is not registered as an admin. Please contact your administrator.') };
     }
 
-    const redirectUrl = `${window.location.origin}/dashboard`;
+    const redirectUrl = `${window.location.origin}/admin/dashboard`;
     
     const { error } = await supabase.auth.signInWithOtp({
       email,
