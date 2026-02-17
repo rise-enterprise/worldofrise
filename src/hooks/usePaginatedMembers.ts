@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Guest, mapDbTierToTier, mapDbBrandToBrand, mapDbCityToCountry, Tier, Brand } from '@/types/loyalty';
+import { Guest, mapDbTierToTier, mapDbCityToCountry, Tier, Brand } from '@/types/loyalty';
 
 const PAGE_SIZE = 20;
 
@@ -18,6 +18,17 @@ interface PaginatedResult {
   currentPage: number;
 }
 
+function mapTierFilterToIlike(tier: Tier): string {
+  if (tier === 'inner-circle') return '%inner%';
+  return `%${tier}%`;
+}
+
+function mapBrandToLocationFilter(brand: Brand): string | null {
+  if (brand === 'noir') return '%noir%';
+  if (brand === 'sasso') return '%sasso%';
+  return null;
+}
+
 async function fetchPaginatedMembers({
   page,
   searchQuery,
@@ -26,42 +37,42 @@ async function fetchPaginatedMembers({
 }: PaginationParams): Promise<PaginatedResult> {
   const offset = (page - 1) * PAGE_SIZE;
 
-  // Build the base query for counting
+  // Build the count query
   let countQuery = supabase
-    .from('members')
+    .from('contacts')
     .select('*', { count: 'exact', head: true });
 
   // Build the main query
   let query = supabase
-    .from('members')
-    .select(`
-      *,
-      member_tiers (
-        tier_id,
-        tiers (
-          name,
-          color
-        )
-      )
-    `)
-    .order('created_at', { ascending: false })
+    .from('contacts')
+    .select('*')
+    .order('last_visit', { ascending: false, nullsFirst: false })
     .range(offset, offset + PAGE_SIZE - 1);
 
   // Apply search filter
   if (searchQuery && searchQuery.trim()) {
     const search = `%${searchQuery.trim()}%`;
-    query = query.or(`full_name.ilike.${search},email.ilike.${search},phone.ilike.${search}`);
-    countQuery = countQuery.or(`full_name.ilike.${search},email.ilike.${search},phone.ilike.${search}`);
+    const searchFilter = `first_name.ilike.${search},last_name.ilike.${search},email.ilike.${search},phone.ilike.${search}`;
+    query = query.or(searchFilter);
+    countQuery = countQuery.or(searchFilter);
   }
 
   // Apply brand filter
-  if (brandFilter && brandFilter !== 'all') {
-    query = query.eq('brand_affinity', brandFilter);
-    countQuery = countQuery.eq('brand_affinity', brandFilter);
+  const brandLocationFilter = brandFilter ? mapBrandToLocationFilter(brandFilter) : null;
+  if (brandLocationFilter) {
+    query = query.ilike('last_location', brandLocationFilter);
+    countQuery = countQuery.ilike('last_location', brandLocationFilter);
+  }
+
+  // Apply tier filter server-side
+  if (tierFilter && tierFilter !== 'all') {
+    const tierIlike = mapTierFilterToIlike(tierFilter);
+    query = query.ilike('loyalty_tier', tierIlike);
+    countQuery = countQuery.ilike('loyalty_tier', tierIlike);
   }
 
   // Execute both queries
-  const [{ data: members, error }, { count, error: countError }] = await Promise.all([
+  const [{ data: contacts, error }, { count, error: countError }] = await Promise.all([
     query,
     countQuery,
   ]);
@@ -71,76 +82,43 @@ async function fetchPaginatedMembers({
 
   const totalCount = count || 0;
 
-  // If we have members, fetch their visits
-  if (members && members.length > 0) {
-    const memberIds = members.map(m => m.id);
-    
-    // Fetch only the most recent visit for each member (for display purposes)
-    const { data: visits, error: visitsError } = await supabase
-      .from('visits')
-      .select(`
-        id,
-        member_id,
-        brand,
-        visit_datetime,
-        notes,
-        locations (
-          name,
-          city
-        )
-      `)
-      .in('member_id', memberIds)
-      .eq('is_voided', false)
-      .order('visit_datetime', { ascending: false });
-
-    if (visitsError) throw visitsError;
-
-    // Group visits by member (only need most recent for list view)
-    const latestVisitByMember = new Map<string, any>();
-    visits?.forEach(visit => {
-      if (!latestVisitByMember.has(visit.member_id)) {
-        latestVisitByMember.set(visit.member_id, visit);
-      }
-    });
-
-    const guests: Guest[] = members.map((member: any) => {
-      const latestVisit = latestVisitByMember.get(member.id);
-      const tierInfo = member.member_tiers?.[0]?.tiers;
-      const tierName = tierInfo?.name || 'Initiation';
+  if (contacts && contacts.length > 0) {
+    const guests: Guest[] = contacts.map((contact: any) => {
+      const fullName = [contact.first_name, contact.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const tierName = contact.loyalty_tier || 'Initiation';
+      const lastLocation = contact.last_location || '';
+      
+      // Determine brand from last_location
+      let favBrand: Brand = 'both';
+      if (lastLocation.toLowerCase().includes('noir')) favBrand = 'noir';
+      else if (lastLocation.toLowerCase().includes('sasso')) favBrand = 'sasso';
 
       return {
-        id: member.id,
-        name: member.full_name,
-        email: member.email,
-        phone: member.phone,
-        country: mapDbCityToCountry(member.city),
+        id: contact.id,
+        name: fullName,
+        email: contact.email,
+        phone: contact.phone || undefined,
+        country: mapDbCityToCountry(lastLocation.toLowerCase().includes('riyadh') ? 'riyadh' : 'doha'),
         tier: mapDbTierToTier(tierName),
         tierName: tierName,
-        totalVisits: member.total_visits || 0,
-        lifetimeVisits: member.total_visits || 0,
-        lastVisit: latestVisit
-          ? new Date(latestVisit.visit_datetime)
-          : new Date(member.created_at || Date.now()),
-        joinedAt: new Date(member.created_at || Date.now()),
-        favoriteBrand: mapDbBrandToBrand(member.brand_affinity),
-        visits: [], // Don't load all visits for list view
-        tags: member.tags ? member.tags.split(',').map((t: string) => t.trim()) : [],
-        notes: member.notes || undefined,
-        totalPoints: member.total_points || 0,
-        status: member.status || 'active',
-        isVip: member.is_vip || false,
-        birthday: member.birthday || undefined,
-        salutation: member.salutation || undefined,
+        totalVisits: contact.visits || 0,
+        lifetimeVisits: contact.visits || 0,
+        lastVisit: contact.last_visit ? new Date(contact.last_visit) : new Date(contact.created_date || Date.now()),
+        joinedAt: new Date(contact.created_date || Date.now()),
+        favoriteBrand: favBrand,
+        visits: [],
+        tags: contact.tags ? contact.tags.split(',').map((t: string) => t.trim()) : [],
+        notes: contact.notes || undefined,
+        totalPoints: contact.total_spend ? Number(contact.total_spend) : 0,
+        status: 'active',
+        isVip: contact.vip || false,
+        birthday: contact.birthday || undefined,
+        salutation: contact.salutation || undefined,
       };
     });
 
-    // Apply tier filter client-side (since it requires join data)
-    const filteredGuests = tierFilter && tierFilter !== 'all'
-      ? guests.filter(g => g.tier === tierFilter)
-      : guests;
-
     return {
-      guests: filteredGuests,
+      guests,
       totalCount,
       totalPages: Math.ceil(totalCount / PAGE_SIZE),
       currentPage: page,
