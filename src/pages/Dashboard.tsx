@@ -19,7 +19,7 @@ import { AdminsView } from '@/components/dashboard/AdminsView';
 import { AnalyticsView } from '@/components/dashboard/AnalyticsView';
 import { RewardsManagement } from '@/components/dashboard/RewardsManagement';
 import { CMSView } from '@/components/dashboard/CMSView';
-import { BranchPreferences } from '@/components/dashboard/BranchPreferences';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -79,9 +79,7 @@ export default function Dashboard() {
           onMenuClick={() => setMobileMenuOpen(true)}
         />
         
-        <div className="flex flex-col lg:flex-row gap-0">
-          {/* Main content area */}
-          <div className="flex-1 min-w-0">
+        <div>
             {activeView === 'dashboard' && (
               isLoading ? (
                 <div className="p-4 md:p-8 space-y-4">
@@ -138,14 +136,6 @@ export default function Dashboard() {
             {activeView === 'admins' && <AdminsView />}
 
             {activeView === 'cms' && <CMSView />}
-          </div>
-
-          {/* Branch Preferences sidebar widget */}
-          <div className="w-full lg:w-80 shrink-0 p-4 md:p-6 lg:pt-8">
-            <div className="lg:sticky lg:top-4">
-              <BranchPreferences activeBrand={activeBrand} />
-            </div>
-          </div>
         </div>
       </main>
     </CrystalPageWrapper>
