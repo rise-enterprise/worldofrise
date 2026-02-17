@@ -42,7 +42,7 @@ const App = () => (
               <Route path="/verification-pending" element={<VerificationPending />} />
               
               {/* Admin Routes */}
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/admin/dashboard" element={<Dashboard />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
               
