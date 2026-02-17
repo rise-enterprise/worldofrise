@@ -1463,6 +1463,13 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["admin_role"]
       }
+      get_branch_visit_counts: {
+        Args: { brand_filter?: string }
+        Returns: {
+          branch_name: string
+          visit_count: number
+        }[]
+      }
       get_member_id: { Args: { _user_id: string }; Returns: string }
       get_my_admin_info: {
         Args: never

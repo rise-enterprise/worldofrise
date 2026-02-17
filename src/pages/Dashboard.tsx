@@ -19,6 +19,7 @@ import { AdminsView } from '@/components/dashboard/AdminsView';
 import { AnalyticsView } from '@/components/dashboard/AnalyticsView';
 import { RewardsManagement } from '@/components/dashboard/RewardsManagement';
 import { CMSView } from '@/components/dashboard/CMSView';
+import { BranchPreferences } from '@/components/dashboard/BranchPreferences';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -78,62 +79,74 @@ export default function Dashboard() {
           onMenuClick={() => setMobileMenuOpen(true)}
         />
         
-        {activeView === 'dashboard' && (
-          isLoading ? (
-            <div className="p-4 md:p-8 space-y-4">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="h-32 bg-card" />
-                ))}
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="h-64 bg-card" />
-                ))}
-              </div>
+        <div className="flex flex-col lg:flex-row gap-0">
+          {/* Main content area */}
+          <div className="flex-1 min-w-0">
+            {activeView === 'dashboard' && (
+              isLoading ? (
+                <div className="p-4 md:p-8 space-y-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <Skeleton key={i} className="h-32 bg-card" />
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {[...Array(3)].map((_, i) => (
+                      <Skeleton key={i} className="h-64 bg-card" />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+              <Overview 
+                  metrics={metrics} 
+                  guests={vipGuests}
+                  activeBrand={activeBrand}
+                />
+              )
+            )}
+
+            {activeView === 'guests' && (
+              <GuestsList 
+                activeBrand={activeBrand}
+                onSelectGuest={handleSelectGuest}
+              />
+            )}
+
+            {activeView === 'profile' && selectedGuest && (
+              <GuestProfile 
+                guest={selectedGuest}
+                onBack={handleBackToGuests}
+              />
+            )}
+
+            {activeView === 'insights' && (
+              <BulkInsightsView onSelectGuest={handleSelectGuest} />
+            )}
+
+            {activeView === 'privileges' && <PrivilegesView />}
+
+            {activeView === 'rewards' && <RewardsManagement />}
+
+            {activeView === 'events' && <EventsView />}
+
+            {activeView === 'analytics' && <AnalyticsView />}
+
+            {activeView === 'notifications' && <NotificationsView />}
+
+            {activeView === 'settings' && <SettingsView />}
+
+            {activeView === 'admins' && <AdminsView />}
+
+            {activeView === 'cms' && <CMSView />}
+          </div>
+
+          {/* Branch Preferences sidebar widget */}
+          <div className="w-full lg:w-80 shrink-0 p-4 md:p-6 lg:pt-8">
+            <div className="lg:sticky lg:top-4">
+              <BranchPreferences activeBrand={activeBrand} />
             </div>
-          ) : (
-          <Overview 
-              metrics={metrics} 
-              guests={vipGuests}
-              activeBrand={activeBrand}
-            />
-          )
-        )}
-
-        {activeView === 'guests' && (
-          <GuestsList 
-            activeBrand={activeBrand}
-            onSelectGuest={handleSelectGuest}
-          />
-        )}
-
-        {activeView === 'profile' && selectedGuest && (
-          <GuestProfile 
-            guest={selectedGuest}
-            onBack={handleBackToGuests}
-          />
-        )}
-
-        {activeView === 'insights' && (
-          <BulkInsightsView onSelectGuest={handleSelectGuest} />
-        )}
-
-        {activeView === 'privileges' && <PrivilegesView />}
-
-        {activeView === 'rewards' && <RewardsManagement />}
-
-        {activeView === 'events' && <EventsView />}
-
-        {activeView === 'analytics' && <AnalyticsView />}
-
-        {activeView === 'notifications' && <NotificationsView />}
-
-        {activeView === 'settings' && <SettingsView />}
-
-        {activeView === 'admins' && <AdminsView />}
-
-        {activeView === 'cms' && <CMSView />}
+          </div>
+        </div>
       </main>
     </CrystalPageWrapper>
   );
