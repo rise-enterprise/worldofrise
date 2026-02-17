@@ -1,45 +1,26 @@
 
 
-# Replace Brand Performance with Branch Preferences (Brand-Specific)
+# Fix Widget Overlapping and Enable Page Scrolling
 
-## What Changes
+## Problem
+Two issues are causing the broken layout:
+1. The `CrystalPageWrapper` component has `overflow-hidden` on its root container, which prevents the page from scrolling when the grid content exceeds the viewport height.
+2. The `react-grid-layout` grid may not be calculating height properly, causing widgets to overlap.
 
-When viewing **NOIR Cafe** or **SASSO** tabs, the "Brand Performance" widget in the grid will be replaced with the "Branch Preferences" widget, showing only the specific branches for that brand.
+## Solution
 
-On the **All Brands** tab, "Brand Performance" remains as-is.
+### 1. Fix page scrolling (CrystalPageWrapper.tsx)
+- Change `overflow-hidden` to `overflow-x-hidden overflow-y-auto` on the root div so vertical scrolling works while horizontal overflow is still clipped.
 
-### Branch Filtering
+### 2. Fix widget overlapping (EditableGridLayout.tsx)
+- Add `autoHeight` prop to the `ResponsiveGridLayout` so the container grows to fit all widgets instead of constraining them.
+- Ensure `compactType="vertical"` is working correctly (already set).
 
-**NOIR Cafe tab** shows only:
-- NOIR Cafe - Riyadh
-- NOIR Cafe - West Walk
-- NOIR Cafe - Al Hazm
-- NOIR Cafe - Old Doha Port
+### 3. Ensure grid items don't visually overlap (index.css)
+- Add `overflow: hidden` to `.react-grid-item` so widget content doesn't bleed outside its allocated grid cell.
 
-**SASSO tab** shows only:
-- SASSO - West Walk
-- SASSO - Al Hazm
+## Files Modified
+- `src/components/effects/CrystalPageWrapper.tsx` -- fix overflow to allow vertical scrolling
+- `src/components/dashboard/EditableGridLayout.tsx` -- add `autoHeight` prop
+- `src/index.css` -- add overflow containment to grid items
 
-## Technical Details
-
-### 1. Add `allowedBranches` prop to BranchPreferences
-- Add an optional `allowedBranches?: string[]` prop
-- When provided, client-side filter the results to only show branches whose names match (case-insensitive) the allowed list
-- This keeps the existing RPC call intact and just trims the display
-
-### 2. Update Overview component
-- Import `BranchPreferences`
-- Define branch name lists for noir and sasso
-- In the `BRAND_METRICS` grid slot, conditionally render:
-  - `activeBrand === 'all'` --> `BrandMetrics` (existing behavior)
-  - `activeBrand === 'noir'` --> `BranchPreferences` with NOIR branches
-  - `activeBrand === 'sasso'` --> `BranchPreferences` with SASSO branches
-
-### 3. Remove BranchPreferences from Dashboard sidebar
-- Since it now lives inside the grid for brand-specific views, remove the standalone sidebar `BranchPreferences` widget from `Dashboard.tsx` to avoid redundancy
-- The sidebar column (`lg:w-80`) will be removed, giving the main content full width
-
-### Files Modified
-- `src/components/dashboard/BranchPreferences.tsx` -- add `allowedBranches` prop
-- `src/components/dashboard/Overview.tsx` -- conditional widget swap
-- `src/pages/Dashboard.tsx` -- remove sidebar BranchPreferences
