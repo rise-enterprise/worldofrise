@@ -20,7 +20,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify JWT
     const anonClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -37,13 +36,11 @@ Deno.serve(async (req) => {
 
     const userId = user.id;
 
-    // Use service role to check admin + run query
     const serviceClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify admin
     const { data: adminRow, error: adminErr } = await serviceClient
       .from("admins")
       .select("id")
@@ -57,15 +54,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Compute date thresholds
+    // Parse optional brand filter
+    const url = new URL(req.url);
+    const brand = url.searchParams.get("brand"); // "noir" | "sasso" | null
+
+    // Helper: apply brand filter to a query builder
+    function applyBrand(query: any) {
+      if (brand === "noir") return query.ilike("last_location", "%noir%");
+      if (brand === "sasso") return query.ilike("last_location", "%sasso%");
+      return query;
+    }
+
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
 
-    // Single aggregated query via RPC isn't available, so use raw SQL through rpc
-    // We'll use the postgres function approach - but simpler: just do individual counts with service role (bypasses RLS)
     const [
       totalRes,
       vipRes,
@@ -81,19 +86,19 @@ Deno.serve(async (req) => {
       eliteRes,
       connoisseurRes,
     ] = await Promise.all([
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).eq("vip", true),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).lt("last_visit", thirtyDaysAgoISO),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).is("last_visit", null),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).gte("last_visit", monthStart),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%noir%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%sasso%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%Riyadh%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).not("last_location", "ilike", "%Riyadh%").not("last_location", "is", null),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%black%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%inner%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%elite%"),
-      serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%connoisseur%"),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true })),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).eq("vip", true)),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).lt("last_visit", thirtyDaysAgoISO)),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).is("last_visit", null)),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).gte("last_visit", monthStart)),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%noir%")),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%sasso%")),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%Riyadh%")),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).not("last_location", "ilike", "%Riyadh%").not("last_location", "is", null)),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%black%")),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%inner%")),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%elite%")),
+      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%connoisseur%")),
     ]);
 
     for (const r of [totalRes, vipRes, churnOldRes, churnNullRes, visitsMonthRes, noirRes, sassoRes, riyadhLocationRes, qatarLocationRes, blackRes, innerRes, eliteRes, connoisseurRes]) {
