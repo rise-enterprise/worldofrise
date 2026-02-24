@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo, lazy, Suspense } from "react";
-import { useNavigate } from "react-router-dom";
 import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
@@ -70,13 +69,7 @@ export default function AdminPanel() {
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
-  const navigate = useNavigate();
-
   const handleNavigate = useCallback((id: string) => {
-    if (id === "loyalty-dashboard") {
-      navigate("/admin/dashboard");
-      return;
-    }
     setActiveView(id);
     if (useDrawer) setDrawerOpen(false);
 
@@ -85,7 +78,7 @@ export default function AdminPanel() {
     if (parent) {
       setOpenSections((prev) => ({ ...prev, [parent.id]: true }));
     }
-  }, [useDrawer, navigate]);
+  }, [useDrawer]);
 
   const sidebarContent = (
     <AdminSidebar

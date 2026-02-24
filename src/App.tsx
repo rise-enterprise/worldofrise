@@ -44,7 +44,7 @@ const App = () => (
               
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<AdminAuthGuard><Dashboard /></AdminAuthGuard>} />
+              <Route path="/admin/dashboard" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
               <Route path="/admin" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
               
               {/* Member Routes - Require Login */}
