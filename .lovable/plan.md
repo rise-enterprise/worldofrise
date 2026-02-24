@@ -1,122 +1,62 @@
 
 
-# Full AI Copilot for RISE Master Control
+# Fix Member Login and Portal Access
 
-## Overview
+## Problem
 
-Transform the admin panel into an AI-first command center. The existing sidebar navigation stays intact, but the default landing view becomes an **AI Copilot** -- a conversational interface that can answer questions about your loyalty program, surface proactive insights, generate campaigns, draft re-engagement messages, and execute actions, all through natural language.
+The `member_auth` table is empty -- no user accounts are linked to member profiles. This means:
+- No one can log in as a member
+- The `MemberAuthGuard` always rejects access to `/member/*` routes
+- The member portal is completely inaccessible
 
-## What Changes
+## Solution
 
-### 1. New AI Copilot Dashboard (replaces static Loyalty Dashboard as default view)
+### Step 1: Link the admin user as a member (for testing)
 
-The default view when entering `/admin` becomes an AI-powered command center with three zones:
+Create a `member_auth` record linking `ibrahim@rise.qa` (user ID: `3efc4a20-8d48-4bc3-bab6-d46973e00d79`) to an existing member in the `members` table. This allows you to log in and see the member experience.
 
-```text
-+------------------+--------------------------------------+
-|                  |  AI Copilot Chat                     |
-|   Sidebar        |  +---------------------------------+ |
-|   (unchanged)    |  | Proactive Insight Cards (top)   | |
-|                  |  | "12 members at high churn risk" | |
-|                  |  | "SASSO Riyadh down 15% MoM"    | |
-|                  |  +---------------------------------+ |
-|                  |                                      |
-|                  |  Chat Messages                       |
-|                  |  [AI]: "Good morning. 334K members   |
-|                  |   active. 3 items need attention..." |
-|                  |  [You]: "Show me top VIPs at risk"   |
-|                  |  [AI]: renders table + action btns   |
-|                  |                                      |
-|                  |  +--Quick Actions--+                 |
-|                  |  | Run Churn Analysis |              |
-|                  |  | Draft Campaign     |              |
-|                  |  | Member Lookup      |              |
-|                  |  +----Input Box----+                 |
-+------------------+--------------------------------------+
-```
+Since the unified login prioritizes admin access (checks admin first), we also need to update the login form to let dual-role users choose their destination.
 
-**Key features:**
-- AI streams responses using Lovable AI (Gemini Flash) via a new edge function
-- Proactive insight cards at the top auto-refresh from `ai_insights` table
-- Quick action chips for common operations
-- AI can render rich content: metric cards, mini-charts, member lists, action buttons
-- All existing sidebar views remain accessible
+### Step 2: Update the login flow for dual-role users
 
-### 2. New Edge Function: `ai-copilot`
+Modify `UnifiedLoginForm.tsx` so that when a user is **both** an admin and a member, they see a choice screen instead of being auto-routed to admin. This way you can choose to enter either the Admin panel or the Member Salon.
 
-A streaming edge function that:
-- Receives the admin's natural language query + conversation history
-- Has access to dashboard metrics (calls `get_dashboard_metrics` RPC)
-- Has access to AI predictions data
-- Uses tool calling to query specific data (member lookup, churn stats, etc.)
-- Returns streaming SSE responses via Lovable AI gateway
-- System prompt is tuned for luxury hospitality context (RISE Holding, NOIR, SASSO)
+### Step 3: Fix MemberPortal data fetching for real members
 
-### 3. New Components
-
-| Component | Purpose |
-|---|---|
-| `AICopilotView.tsx` | Main copilot page with chat + insight cards |
-| `CopilotMessage.tsx` | Renders individual AI/user messages with rich content (markdown, tables, charts) |
-| `CopilotInsightCards.tsx` | Top bar showing proactive AI insights from the database |
-| `CopilotQuickActions.tsx` | Quick action chips below the chat |
-
-### 4. Updated Files
-
-| File | Change |
-|---|---|
-| `adminNavConfig.ts` | Add "AI Copilot" as the first item in the Intelligence section (or new top-level section) |
-| `AdminPanel.tsx` | Default `activeView` changes from `loyalty-dashboard` to `ai-copilot`; register new lazy component |
-| `AdminHeader.tsx` | Add a small AI sparkle button that scrolls/focuses the copilot input |
-
-### 5. Navigation Flow
-
-- `/admin` lands on the AI Copilot by default (instead of static dashboard)
-- All existing sidebar sections remain fully functional
-- The AI Copilot is also accessible from the sidebar under a new top-level "AI Copilot" entry
-- The old "Loyalty Dashboard" view stays available in the sidebar for direct metric access
+The `MemberPortal` currently uses `useDemoMember()` which fetches the first member in the table (not the logged-in user's member). Update it to fetch the **authenticated member's own data** using `get_member_id()` so each member sees their own profile.
 
 ## Technical Details
 
-### Edge Function: `supabase/functions/ai-copilot/index.ts`
+### Database change
+- Insert a row into `member_auth` linking user `3efc4a20-8d48-4bc3-bab6-d46973e00d79` to the first member record (e.g., Mr. Hamad / Alssada, ID `f1d3caa7-2d69-4939-bbe4-02e255ee9576`)
 
-- Authenticates the admin via Bearer token
-- Accepts `{ messages: Message[], context?: string }` 
-- Builds a system prompt with:
-  - Current dashboard metrics (fetched via `get_dashboard_metrics` RPC)
-  - Recent AI insights from `ai_insights` table
-  - Member count, churn stats, brand breakdown
-- Streams response via Lovable AI gateway (`google/gemini-3-flash-preview`)
-- Handles 429/402 rate limit errors gracefully
+### Files to modify
 
-### Frontend Streaming
+1. **`src/components/auth/UnifiedLoginForm.tsx`**
+   - After login, check both admin and member status
+   - If user is both, show a role selection UI (two buttons: "Admin Panel" and "Member Salon")
+   - If only one role, auto-navigate as before
 
-- Uses `fetch` with SSE parsing (line-by-line) as per Lovable AI best practices
-- Renders markdown via `react-markdown` (will need to add dependency)
-- Updates the last assistant message progressively (no buffering)
-- Quick actions pre-fill the chat input with contextual prompts
+2. **`src/hooks/useMembers.ts`** (the `useDemoMember` function)
+   - Update to accept an optional `memberId` parameter
+   - When called from member pages, fetch the logged-in user's own member record instead of a random first member
 
-### AI System Prompt Context
+3. **`src/pages/MemberPortal.tsx`**
+   - Use the authenticated member's ID (from `MemberAuthContext` or `get_member_id` RPC) instead of `useDemoMember()`
 
-The copilot will be aware of:
-- Total members, VIP count, churn risk count (from `get_dashboard_metrics`)
-- Recent AI insights and predictions
-- Brand names (NOIR, SASSO), cities (Doha, Riyadh), tier names
-- It can suggest navigating to specific admin views for deeper analysis
+4. **`src/pages/MemberWelcome.tsx`**, **`src/pages/MemberHistory.tsx`**, **`src/pages/MemberRewards.tsx`**, **`src/pages/MemberProfileEdit.tsx`**
+   - Same pattern: use the authenticated member's data instead of demo data
 
-### New Dependency
+### Flow after fix
 
-- `react-markdown` -- for rendering AI responses with proper formatting
-
-### Files to Create
-1. `supabase/functions/ai-copilot/index.ts` -- streaming AI edge function
-2. `src/components/admin/copilot/AICopilotView.tsx` -- main copilot view
-3. `src/components/admin/copilot/CopilotMessage.tsx` -- message renderer with markdown
-4. `src/components/admin/copilot/CopilotInsightCards.tsx` -- proactive insight cards
-5. `src/components/admin/copilot/CopilotQuickActions.tsx` -- quick action chips
-
-### Files to Modify
-1. `src/components/admin/adminNavConfig.ts` -- add AI Copilot nav entry
-2. `src/pages/AdminPanel.tsx` -- register copilot view, change default to `ai-copilot`
-3. `package.json` -- add `react-markdown` dependency
+```text
+User logs in as ibrahim@rise.qa
+  -> System detects: admin = true, member = true
+  -> Shows role picker: "Admin Panel" | "Member Salon"
+  -> User picks "Member Salon"
+  -> Navigates to /member
+  -> MemberAuthGuard: is_member() = true (member_auth row exists)
+  -> MemberPortal fetches OWN member data via get_member_id()
+  -> Portal renders with real member profile
+```
 
