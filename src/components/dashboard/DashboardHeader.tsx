@@ -58,7 +58,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
     { id: 3, message: `${t('notifications.upcomingEvent')}: Chef's Table Experience`, time: '3 hours ago', read: false },
   ]);
 
-  const { data: guests = [] } = useMembers();
+  const guests: Guest[] = []; // Removed useMembers() - causes timeout on 335K rows
   const createMember = useCreateMember();
 
   // New guest form state
