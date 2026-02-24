@@ -28,6 +28,9 @@ const InvitationRequestsView = lazy(() => import("@/components/admin/invitations
 const ContactsView = lazy(() => import("@/components/admin/contacts/ContactsView"));
 const ContactsImportView = lazy(() => import("@/components/admin/contacts/ContactsImportView"));
 
+// AI Intelligence components
+const AIIntelligenceOverview = lazy(() => import("@/components/admin/intelligence/AIIntelligenceOverview"));
+
 const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
   "loyalty-dashboard": LoyaltyDashboard,
   "loyalty-members": LoyaltyMembers,
@@ -44,6 +47,13 @@ const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = 
   "admin-invitations": InvitationRequestsView,
   "crm-contacts": ContactsView,
   "crm-import": ContactsImportView,
+  // AI Intelligence
+  "ai-overview": AIIntelligenceOverview,
+  "ai-churn": AIIntelligenceOverview, // TODO: dedicated churn view
+  "ai-ltv": AIIntelligenceOverview, // TODO: dedicated LTV view
+  "ai-segments": AIIntelligenceOverview, // TODO: dedicated segments view
+  "ai-reward-optimizer": AIIntelligenceOverview, // TODO: dedicated reward optimizer
+  "ai-branch-intel": AIIntelligenceOverview, // TODO: dedicated branch intel
 };
 export default function AdminPanel() {
   const isMobile = useIsMobile();
