@@ -1570,6 +1570,7 @@ export type Database = {
           visit_count: number
         }[]
       }
+      get_dashboard_metrics: { Args: { brand_filter?: string }; Returns: Json }
       get_member_id: { Args: { _user_id: string }; Returns: string }
       get_my_admin_info: {
         Args: never

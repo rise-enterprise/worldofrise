@@ -12,6 +12,18 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
+      console.error("Missing env vars:", { hasUrl: !!supabaseUrl, hasKey: !!serviceRoleKey, hasAnon: !!anonKey });
+      return new Response(JSON.stringify({ error: "Server configuration error" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -20,11 +32,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const anonClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    // Verify the user is authenticated
+    const anonClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
     const { data: { user }, error: userError } = await anonClient.auth.getUser();
     if (userError || !user) {
@@ -34,17 +45,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    const userId = user.id;
-
-    const serviceClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    // Verify admin access
+    const serviceClient = createClient(supabaseUrl, serviceRoleKey);
 
     const { data: adminRow, error: adminErr } = await serviceClient
       .from("admins")
       .select("id")
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .maybeSingle();
 
     if (adminErr || !adminRow) {
@@ -56,81 +63,18 @@ Deno.serve(async (req) => {
 
     // Parse optional brand filter
     const url = new URL(req.url);
-    const brand = url.searchParams.get("brand"); // "noir" | "sasso" | null
+    const brand = url.searchParams.get("brand") || null;
 
-    // Helper: apply brand filter to a query builder
-    function applyBrand(query: any) {
-      if (brand === "noir") return query.ilike("last_location", "%noir%");
-      if (brand === "sasso") return query.ilike("last_location", "%sasso%");
-      return query;
+    // Single optimized query via DB function
+    const { data: metrics, error: rpcError } = await serviceClient.rpc(
+      "get_dashboard_metrics",
+      { brand_filter: brand }
+    );
+
+    if (rpcError) {
+      console.error("RPC error:", rpcError);
+      throw rpcError;
     }
-
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const thirtyDaysAgoISO = thirtyDaysAgo.toISOString();
-
-    const [
-      totalRes,
-      vipRes,
-      churnOldRes,
-      churnNullRes,
-      visitsMonthRes,
-      noirRes,
-      sassoRes,
-      riyadhLocationRes,
-      qatarLocationRes,
-      blackRes,
-      innerRes,
-      eliteRes,
-      connoisseurRes,
-    ] = await Promise.all([
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true })),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).eq("vip", true)),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).lt("last_visit", thirtyDaysAgoISO)),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).is("last_visit", null)),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).gte("last_visit", monthStart)),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%noir%")),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%sasso%")),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("last_location", "%Riyadh%")),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).not("last_location", "ilike", "%Riyadh%").not("last_location", "is", null)),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%black%")),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%inner%")),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%elite%")),
-      applyBrand(serviceClient.from("contacts").select("*", { count: "exact", head: true }).ilike("loyalty_tier", "%connoisseur%")),
-    ]);
-
-    for (const r of [totalRes, vipRes, churnOldRes, churnNullRes, visitsMonthRes, noirRes, sassoRes, riyadhLocationRes, qatarLocationRes, blackRes, innerRes, eliteRes, connoisseurRes]) {
-      if (r.error) throw r.error;
-    }
-
-    const totalMembers = totalRes.count ?? 0;
-    const blackCount = blackRes.count ?? 0;
-    const innerCount = innerRes.count ?? 0;
-    const eliteCount = eliteRes.count ?? 0;
-    const connoisseurCount = connoisseurRes.count ?? 0;
-    const initiationCount = totalMembers - blackCount - innerCount - eliteCount - connoisseurCount;
-
-    const dohaCount = qatarLocationRes.count ?? 0;
-    const riyadhCount = riyadhLocationRes.count ?? 0;
-
-    const metrics = {
-      totalMembers,
-      activeMembers: totalMembers,
-      totalVisitsThisMonth: visitsMonthRes.count ?? 0,
-      visitsByBrand: { noir: noirRes.count ?? 0, sasso: sassoRes.count ?? 0 },
-      visitsByCountry: { doha: dohaCount, riyadh: riyadhCount },
-      tierDistribution: {
-        initiation: initiationCount,
-        connoisseur: connoisseurCount,
-        elite: eliteCount,
-        "inner-circle": innerCount,
-        black: blackCount,
-      },
-      churnRiskCount: (churnOldRes.count ?? 0) + (churnNullRes.count ?? 0),
-      vipGuestsCount: vipRes.count ?? 0,
-    };
 
     return new Response(JSON.stringify(metrics), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
