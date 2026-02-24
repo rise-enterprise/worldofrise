@@ -1,4 +1,4 @@
-import { Crown, ShieldCheck, Users, Brain } from "lucide-react";
+import { Crown, ShieldCheck, Users, Brain, Sparkles } from "lucide-react";
 
 export interface NavItem {
   id: string;
@@ -14,6 +14,14 @@ export interface NavSection {
 }
 
 export const NAV_SECTIONS: NavSection[] = [
+  {
+    id: "copilot",
+    label: "AI Copilot",
+    icon: Sparkles,
+    items: [
+      { id: "ai-copilot", label: "Copilot Chat", description: "AI-powered command center. Ask questions, get insights, draft campaigns, and manage your loyalty program through natural language." },
+    ],
+  },
   {
     id: "loyalty",
     label: "Loyalty Program",
