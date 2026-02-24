@@ -30,7 +30,11 @@ const ContactsImportView = lazy(() => import("@/components/admin/contacts/Contac
 // AI Intelligence components
 const AIIntelligenceOverview = lazy(() => import("@/components/admin/intelligence/AIIntelligenceOverview"));
 
+// AI Copilot
+const AICopilotView = lazy(() => import("@/components/admin/copilot/AICopilotView"));
+
 const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
+  "ai-copilot": AICopilotView,
   "loyalty-dashboard": LoyaltyDashboard,
   "loyalty-members": LoyaltyMembers,
   "loyalty-points": LoyaltyPointsEngine,
@@ -60,10 +64,10 @@ export default function AdminPanel() {
   const { isRTL } = useLanguage();
   const useDrawer = isMobile || isTablet;
 
-  const [activeView, setActiveView] = useState("loyalty-dashboard");
+  const [activeView, setActiveView] = useState("ai-copilot");
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ loyalty: true, administration: true });
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ copilot: true, loyalty: true, administration: true });
 
   const toggleSection = useCallback((id: string) => {
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
