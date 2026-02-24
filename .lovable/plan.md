@@ -1,26 +1,61 @@
+# AI-Powered Loyalty Intelligence Platform — Incremental Roadmap
 
+## Existing Foundation (Already Built)
+- Loyalty engine (tiers, points ledger, visits, rewards, redemptions)
+- Member portal with QR card, rewards, experiences
+- Admin panel with 10 loyalty modules
+- CRM contacts database (186K+ records)
+- AI guest insights (churn risk, re-engagement messages)
+- Campaign management, segmentation
+- Full RBAC, audit logging, RLS security
+- Crystal DNA design system, RTL/LTR, bilingual
 
-# Fix Widget Overlapping and Enable Page Scrolling
+---
 
-## Problem
-Two issues are causing the broken layout:
-1. The `CrystalPageWrapper` component has `overflow-hidden` on its root container, which prevents the page from scrolling when the grid content exceeds the viewport height.
-2. The `react-grid-layout` grid may not be calculating height properly, causing widgets to overlap.
+## Phase 1: AI Intelligence Layer (PRIORITY)
+### 1A — AI Predictions Edge Function
+- New `ai-predictions` edge function using Lovable AI
+- Churn prediction (0-100% score, Safe/At Risk/High Risk labels)
+- LTV prediction (6-month, 12-month projected value)
+- Smart auto-segmentation (Future VIP, Dormant, High-margin, Reward abusers)
+- Store predictions in new `ai_predictions` table
 
-## Solution
+### 1B — AI Predictions Table
+- `ai_predictions` table: member_id, prediction_type, score, label, metadata_json, generated_at
+- RLS: admins can read, system can insert
 
-### 1. Fix page scrolling (CrystalPageWrapper.tsx)
-- Change `overflow-hidden` to `overflow-x-hidden overflow-y-auto` on the root div so vertical scrolling works while horizontal overflow is still clipped.
+### 1C — Reward Optimization AI
+- Analyze reward redemption patterns
+- Suggest point pricing adjustments
+- Detect low-performing rewards
 
-### 2. Fix widget overlapping (EditableGridLayout.tsx)
-- Add `autoHeight` prop to the `ResponsiveGridLayout` so the container grows to fit all widgets instead of constraining them.
-- Ensure `compactType="vertical"` is working correctly (already set).
+### 1D — Branch Performance AI
+- Compare branch metrics
+- Detect underperformers
+- Suggest local retention strategies
 
-### 3. Ensure grid items don't visually overlap (index.css)
-- Add `overflow: hidden` to `.react-grid-item` so widget content doesn't bleed outside its allocated grid cell.
+---
 
-## Files Modified
-- `src/components/effects/CrystalPageWrapper.tsx` -- fix overflow to allow vertical scrolling
-- `src/components/dashboard/EditableGridLayout.tsx` -- add `autoHeight` prop
-- `src/index.css` -- add overflow containment to grid items
+## Phase 2: Advanced Analytics Dashboard
+### 2A — Retention Metrics (D7/D30/D90, repeat rate, cohort analysis)
+### 2B — RFM Analysis (scoring, heatmap, auto-segment)
+### 2C — Enhanced Charts (LTV, ARPU, Reward ROI, Campaign ROI, branch comparison, CSV export)
+### 2D — AI Risk Segmentation View
 
+---
+
+## Phase 3: Campaign Automation Engine
+### 3A — Enhanced Campaign Builder (AI segments, scheduling, A/B testing)
+### 3B — Hybrid Segmentation Builder (manual AND/OR + natural language AI)
+### 3C — Campaign Intelligence (best time, incentive, audience recommendations)
+### 3D — Integration Prep (Email/SMS/WhatsApp/Push)
+
+---
+
+## Phase 4: Guest Portal Enhancements
+- Personalized AI offers, dynamic insights, milestone visualization
+
+---
+
+## Phase 5: Operational Hardening
+- Dynamic earn/burn rule builder, fraud detection, consent management
