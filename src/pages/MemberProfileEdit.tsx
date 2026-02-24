@@ -10,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AvatarUpload } from '@/components/member/AvatarUpload';
-import { useDemoMember } from '@/hooks/useMembers';
+import { useMyMember } from '@/hooks/useMyMember';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -27,7 +27,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function MemberProfileEdit() {
   const navigate = useNavigate();
-  const { data: member, isLoading } = useDemoMember();
+  const { data: member, isLoading } = useMyMember();
 
   const [formData, setFormData] = useState<ProfileFormData>({
     full_name: '',
