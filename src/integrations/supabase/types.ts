@@ -73,6 +73,106 @@ export type Database = {
           },
         ]
       }
+      ai_insights: {
+        Row: {
+          created_at: string
+          details_json: Json | null
+          dismissed_by: string | null
+          expires_at: string | null
+          generated_at: string
+          id: string
+          insight_type: string
+          is_actionable: boolean | null
+          is_dismissed: boolean | null
+          severity: string | null
+          summary: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          details_json?: Json | null
+          dismissed_by?: string | null
+          expires_at?: string | null
+          generated_at?: string
+          id?: string
+          insight_type: string
+          is_actionable?: boolean | null
+          is_dismissed?: boolean | null
+          severity?: string | null
+          summary: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          details_json?: Json | null
+          dismissed_by?: string | null
+          expires_at?: string | null
+          generated_at?: string
+          id?: string
+          insight_type?: string
+          is_actionable?: boolean | null
+          is_dismissed?: boolean | null
+          severity?: string | null
+          summary?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_insights_dismissed_by_fkey"
+            columns: ["dismissed_by"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_predictions: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          expires_at: string | null
+          generated_at: string
+          id: string
+          label: string | null
+          member_id: string
+          metadata_json: Json | null
+          prediction_type: string
+          score: number | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          expires_at?: string | null
+          generated_at?: string
+          id?: string
+          label?: string | null
+          member_id: string
+          metadata_json?: Json | null
+          prediction_type: string
+          score?: number | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          expires_at?: string | null
+          generated_at?: string
+          id?: string
+          label?: string | null
+          member_id?: string
+          metadata_json?: Json | null
+          prediction_type?: string
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_predictions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action_type: Database["public"]["Enums"]["audit_action"]

@@ -1,4 +1,4 @@
-import { Crown, ShieldCheck, Users } from "lucide-react";
+import { Crown, ShieldCheck, Users, Brain } from "lucide-react";
 
 export interface NavItem {
   id: string;
@@ -39,6 +39,19 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { id: "crm-contacts", label: "Contacts Database", description: "Browse, search, filter, and export the full contacts database for NOIR and SASSO." },
       { id: "crm-import", label: "Import / Replace", description: "Upload a CSV or XLSX file to replace all existing contact records with a new dataset." },
+    ],
+  },
+  {
+    id: "intelligence",
+    label: "AI Intelligence",
+    icon: Brain,
+    items: [
+      { id: "ai-overview", label: "Intelligence Overview", description: "AI-powered dashboard with churn predictions, LTV analysis, smart segmentation, and actionable insights." },
+      { id: "ai-churn", label: "Churn Prediction", description: "View churn risk scores for all members. Identify at-risk and high-risk customers with AI-driven analysis." },
+      { id: "ai-ltv", label: "Lifetime Value", description: "Projected 6-month and 12-month LTV per member with value tier classification." },
+      { id: "ai-segments", label: "Smart Segments", description: "AI-generated customer segments: Future VIP, Dormant, High-margin, Reward abusers, and more." },
+      { id: "ai-reward-optimizer", label: "Reward Optimizer", description: "AI suggestions for reward pricing, underperforming rewards, and segment-specific recommendations." },
+      { id: "ai-branch-intel", label: "Branch Intelligence", description: "AI-driven branch performance comparison with retention strategy suggestions." },
     ],
   },
   {
