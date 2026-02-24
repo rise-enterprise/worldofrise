@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Gift, Star, Wine, Crown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRewards, Reward } from '@/hooks/useRewards';
-import { useDemoMember } from '@/hooks/useMembers';
+import { useMyMember } from '@/hooks/useMyMember';
 
 const categories = [
   { id: 'all', label: 'All Privileges', icon: Gift },
@@ -24,7 +24,7 @@ export default function MemberRewards() {
   const [redeemSuccess, setRedeemSuccess] = useState(false);
 
   const { data: rewards = [], isLoading: rewardsLoading } = useRewards();
-  const { data: member } = useDemoMember();
+  const { data: member } = useMyMember();
   
   const memberPoints = member?.totalPoints || 0;
 

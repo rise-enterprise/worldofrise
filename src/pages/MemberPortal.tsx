@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useDemoMember } from '@/hooks/useMembers';
+import { useMyMember } from '@/hooks/useMyMember';
 import { useTiers } from '@/hooks/useTiers';
 import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { CrystalMedallion } from '@/components/ui/crystal-medallion';
@@ -32,7 +32,7 @@ import { cn } from '@/lib/utils';
 
 export default function MemberPortal() {
   const navigate = useNavigate();
-  const { data: member, isLoading, error } = useDemoMember();
+  const { data: member, isLoading, error } = useMyMember();
   const { data: tiers } = useTiers();
   
   const [showChat, setShowChat] = useState(false);

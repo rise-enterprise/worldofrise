@@ -5,13 +5,12 @@ import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { CrystalMedallion } from '@/components/ui/crystal-medallion';
 import { CrystalEmblem } from '@/components/effects/CrystalEmblem';
 import { Button } from '@/components/ui/button';
-import { useMembers } from '@/hooks/useMembers';
+import { useMyMember } from '@/hooks/useMyMember';
 import { Sparkles } from 'lucide-react';
 
 export default function MemberWelcome() {
   const navigate = useNavigate();
-  const { data: guests = [], isLoading } = useMembers();
-  const member = guests[0];
+  const { data: member, isLoading } = useMyMember();
   const [showContent, setShowContent] = useState(false);
   const [showButton, setShowButton] = useState(false);
 

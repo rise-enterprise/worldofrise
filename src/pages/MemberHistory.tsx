@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useDemoMember } from '@/hooks/useMembers';
+import { useMyMember } from '@/hooks/useMyMember';
 import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 
 export default function MemberHistory() {
   const navigate = useNavigate();
-  const { data: member, isLoading } = useDemoMember();
+  const { data: member, isLoading } = useMyMember();
   
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', { 
