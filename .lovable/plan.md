@@ -1,61 +1,66 @@
-# AI-Powered Loyalty Intelligence Platform — Incremental Roadmap
 
-## Existing Foundation (Already Built)
-- Loyalty engine (tiers, points ledger, visits, rewards, redemptions)
-- Member portal with QR card, rewards, experiences
-- Admin panel with 10 loyalty modules
-- CRM contacts database (186K+ records)
-- AI guest insights (churn risk, re-engagement messages)
-- Campaign management, segmentation
-- Full RBAC, audit logging, RLS security
-- Crystal DNA design system, RTL/LTR, bilingual
 
----
+# Fix Admin Dashboard: Routing and Performance
 
-## Phase 1: AI Intelligence Layer (PRIORITY)
-### 1A — AI Predictions Edge Function
-- New `ai-predictions` edge function using Lovable AI
-- Churn prediction (0-100% score, Safe/At Risk/High Risk labels)
-- LTV prediction (6-month, 12-month projected value)
-- Smart auto-segmentation (Future VIP, Dormant, High-margin, Reward abusers)
-- Store predictions in new `ai_predictions` table
+## Problem Summary
 
-### 1B — AI Predictions Table
-- `ai_predictions` table: member_id, prediction_type, score, label, metadata_json, generated_at
-- RLS: admins can read, system can insert
+Two issues prevent the admin dashboard from working:
 
-### 1C — Reward Optimization AI
-- Analyze reward redemption patterns
-- Suggest point pricing adjustments
-- Detect low-performing rewards
+1. **Broken routing**: The admin sidebar's "Loyalty Dashboard" link navigates to `/admin/dashboard`, which loads the OLD `Dashboard` page (a completely different component) instead of showing the `LoyaltyDashboard` within the admin panel.
 
-### 1D — Branch Performance AI
-- Compare branch metrics
-- Detect underperformers
-- Suggest local retention strategies
+2. **Database timeout**: The old `Dashboard` page imports `DashboardHeader`, which calls `useMembers()` -- a query that fetches ALL rows from the `members` table with joins. On 335K+ rows with RLS, this always times out (the repeated 500 errors you see).
 
----
+## Plan
 
-## Phase 2: Advanced Analytics Dashboard
-### 2A — Retention Metrics (D7/D30/D90, repeat rate, cohort analysis)
-### 2B — RFM Analysis (scoring, heatmap, auto-segment)
-### 2C — Enhanced Charts (LTV, ARPU, Reward ROI, Campaign ROI, branch comparison, CSV export)
-### 2D — AI Risk Segmentation View
+### Step 1: Fix AdminPanel routing
 
----
+Remove the `navigate("/admin/dashboard")` redirect from `AdminPanel.tsx` so clicking "Loyalty Dashboard" stays in the admin panel and renders `LoyaltyDashboard` inline like all other sections.
 
-## Phase 3: Campaign Automation Engine
-### 3A — Enhanced Campaign Builder (AI segments, scheduling, A/B testing)
-### 3B — Hybrid Segmentation Builder (manual AND/OR + natural language AI)
-### 3C — Campaign Intelligence (best time, incentive, audience recommendations)
-### 3D — Integration Prep (Email/SMS/WhatsApp/Push)
+**File**: `src/pages/AdminPanel.tsx`
+- Remove the special case `if (id === "loyalty-dashboard") { navigate("/admin/dashboard"); return; }` from `handleNavigate`
+- This makes "Loyalty Dashboard" render inside the admin panel like every other view
 
----
+### Step 2: Consolidate admin routes
 
-## Phase 4: Guest Portal Enhancements
-- Personalized AI offers, dynamic insights, milestone visualization
+Update `App.tsx` to redirect `/admin/dashboard` to `/admin` so both paths land on the new admin panel.
 
----
+**File**: `src/App.tsx`  
+- Change `/admin/dashboard` route to redirect to `/admin`
+- Or point both routes to `AdminPanel`
 
-## Phase 5: Operational Hardening
-- Dynamic earn/burn rule builder, fraud detection, consent management
+### Step 3: Fix the members timeout in old Dashboard (safety net)
+
+Even though the old Dashboard will no longer be the primary view, fix `DashboardHeader` to stop calling `useMembers()` (which fetches all 335K rows). Replace with a lightweight query or remove the dependency entirely.
+
+**File**: `src/components/dashboard/DashboardHeader.tsx`
+- Remove or limit the `useMembers()` call that loads all members just for the header search
+
+## Technical Details
+
+### Root cause of "no changes visible"
+
+```text
+User clicks "Loyalty Dashboard" in admin sidebar
+  -> AdminPanel.handleNavigate("loyalty-dashboard")
+  -> navigate("/admin/dashboard")  // Leaves AdminPanel entirely!
+  -> Loads old Dashboard component
+  -> Dashboard calls useMembers() via DashboardHeader
+  -> Query times out on 335K rows
+  -> Blank screen / loading skeleton forever
+```
+
+### After fix
+
+```text
+User clicks "Loyalty Dashboard" in admin sidebar
+  -> AdminPanel.handleNavigate("loyalty-dashboard")
+  -> setActiveView("loyalty-dashboard")
+  -> Renders LoyaltyDashboard inline (uses optimized edge function)
+  -> Dashboard loads in under 1 second
+```
+
+### Files to modify
+1. `src/pages/AdminPanel.tsx` -- remove the navigate redirect
+2. `src/App.tsx` -- consolidate `/admin/dashboard` route  
+3. `src/components/dashboard/DashboardHeader.tsx` -- remove expensive `useMembers()` call
+
