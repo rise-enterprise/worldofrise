@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Shield, Wifi, Clock } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function HUDStatusBar() {
   const [time, setTime] = useState(new Date());
@@ -30,6 +31,7 @@ export default function HUDStatusBar() {
           <Wifi className="w-3 h-3" />
           <span>Connected</span>
         </div>
+        <ThemeToggle className="h-7 w-7 text-muted-foreground/50 hover:text-primary/70" />
         <div className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
           <span className="tabular-nums">
