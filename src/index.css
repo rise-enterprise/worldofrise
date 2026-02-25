@@ -1061,6 +1061,38 @@ select:focus {
   display: none;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   NOIR AI HUD — Scanline & Grid Effects
+═══════════════════════════════════════════════════════════ */
+
+@keyframes hudScanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes hudPulse {
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 4px hsl(var(--primary) / 0.1); }
+  50% { opacity: 0.8; box-shadow: 0 0 12px hsl(var(--primary) / 0.3); }
+}
+
+@keyframes hudGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.15); }
+}
+
+.hud-scanline {
+  animation: hudScanline 8s linear infinite;
+  opacity: 0.03;
+}
+
+.hud-pulse {
+  animation: hudPulse 3s ease-in-out infinite;
+}
+
+.hud-glow {
+  animation: hudGlow 4s ease-in-out infinite;
+}
+
 /* ═══ React Grid Layout — Crystal Theme Overrides ═══ */
 .editable-grid-layout .react-grid-item {
   transition: all 200ms ease;
