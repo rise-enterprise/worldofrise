@@ -47,15 +47,15 @@ Deno.serve(async (req) => {
     );
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claims, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claims?.claims?.sub) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: "Invalid token" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Verify admin
+    // Verify authenticated user (admin or member)
     const serviceClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -63,12 +63,18 @@ Deno.serve(async (req) => {
     const { data: admin } = await serviceClient
       .from("admins")
       .select("id")
-      .eq("user_id", claims.claims.sub)
+      .eq("user_id", user.id)
       .eq("is_active", true)
       .maybeSingle();
 
-    if (!admin) {
-      return new Response(JSON.stringify({ error: "Admin access required" }), {
+    const { data: memberAuth } = await serviceClient
+      .from("member_auth")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!admin && !memberAuth) {
+      return new Response(JSON.stringify({ error: "Access denied" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

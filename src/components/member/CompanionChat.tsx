@@ -142,6 +142,7 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
   const speakText = async (text: string) => {
     if (!voiceEnabled) return;
     try {
+      const token = await getToken();
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
         {
@@ -149,11 +150,11 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
           headers: {
             "Content-Type": "application/json",
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ 
             text: text.replace(/[*#_`]/g, '').slice(0, 500), 
-            voiceId: "JBFqnCBsd6RMkjVDRZzb" // George - deep executive tone
+            voiceId: "JBFqnCBsd6RMkjVDRZzb"
           }),
         }
       );
