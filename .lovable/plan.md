@@ -1,35 +1,28 @@
 
 
-# Add Voice Input to AI Command Center
+# Add Futuristic Ripple Animation to Mic Button
 
 ## Overview
 
-Add a microphone button to the AI Command Center input bar that uses the browser's native Web Speech API (`webkitSpeechRecognition` / `SpeechRecognition`) for hands-free voice commands. No external API keys or services required -- this works entirely client-side.
+Add concentric ripple rings that emanate outward from the mic button while listening, creating a cinematic "active voice" effect. This is a CSS-only approach using keyframe animations — no new dependencies.
 
 ## What Changes
 
-### Single file: `src/components/admin/hud/AICommandCenter.tsx`
+### 1. `src/index.css` — Add ripple keyframes
 
-1. **Add a `Mic` / `MicOff` icon** from lucide-react
-2. **Add voice state**: `isListening` boolean + `SpeechRecognition` instance ref
-3. **Add `toggleVoice` handler** that:
-   - Creates a `SpeechRecognition` instance (with `continuous: false`, `interimResults: true`, `lang: "en-US"`)
-   - On interim results: updates the textarea input live (user sees words appearing as they speak)
-   - On final result: auto-sends the command via `send()`
-   - On end/error: resets `isListening`
-4. **Render mic button** between the textarea and the Send button
-   - Idle: muted mic icon
-   - Listening: pulsing red/primary mic icon with a glow animation
-5. **Graceful fallback**: if `SpeechRecognition` is not supported (Firefox without flag), show a toast explaining browser compatibility
+Add a `@keyframes micRipple` animation that scales up and fades out concentric rings. Three rings at staggered delays create a sonar/pulse effect.
+
+### 2. `src/components/admin/hud/AICommandCenter.tsx` — Wrap mic button with ripple rings
+
+When `isListening` is true, render 3 absolutely-positioned `<span>` elements behind the mic button icon. Each span is a ring (border-only circle) that scales outward and fades using the `micRipple` keyframe at staggered `animation-delay` values (0s, 0.4s, 0.8s). When not listening, the spans are not rendered.
 
 ## Technical Details
 
 | Aspect | Detail |
 |---|---|
-| API | Browser-native `webkitSpeechRecognition` (Chrome/Edge/Safari) |
-| Dependencies | None -- zero new packages |
-| Behavior | Tap to start listening, tap again to cancel. Final transcript auto-sends. Interim text shows live in textarea. |
-| Auto-send | When speech recognition returns a final result, it calls `send()` automatically so the experience is truly hands-free |
-| Visual feedback | Mic button pulses with `animate-pulse` + primary color glow while listening |
-| File modified | `src/components/admin/hud/AICommandCenter.tsx` only |
+| Animation | 3 concentric rings scale from 100% to 250% while fading from 0.6 to 0 opacity, 1.6s infinite loop |
+| Stagger | Ring 1: 0s delay, Ring 2: 0.4s, Ring 3: 0.8s — creates continuous sonar pulse |
+| Color | `border-primary/40` (gold tint) when listening, matching the HUD aesthetic |
+| Positioning | `absolute inset-0` inside the mic button wrapper with `overflow-visible` so rings extend beyond the button bounds |
+| Files modified | `src/index.css` (keyframe), `src/components/admin/hud/AICommandCenter.tsx` (3 span elements + relative wrapper) |
 
