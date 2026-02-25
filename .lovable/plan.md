@@ -1,46 +1,53 @@
 
 
-# Add Audio Waveform Bar Visualizer to Mic Button
+# Integrate ElevenLabs TTS into the Command Vessel
 
 ## Overview
 
-Add a 5-bar audio waveform visualizer that appears next to the mic button when listening. It uses the Web Audio API (`AudioContext` + `AnalyserNode`) to capture real microphone volume and drive bar heights in real-time via `requestAnimationFrame`. When not listening, the bars are hidden.
+Replace the browser-native `SpeechSynthesis` TTS with ElevenLabs premium neural voice. The ElevenLabs connector is now linked — `ELEVENLABS_API_KEY` is available as an edge function secret.
 
 ## What Changes
 
-### 1. `src/components/admin/hud/AICommandCenter.tsx`
+### 1. New Edge Function: `supabase/functions/elevenlabs-tts/index.ts`
 
-**New state/refs:**
-- `analyserRef` — holds the `AnalyserNode` for frequency data
-- `animFrameRef` — holds the `requestAnimationFrame` ID for cleanup
-- `barsRef` — ref to the container div holding 5 bar `<span>` elements
-- `audioContextRef` / `streamRef` — for cleanup on stop
+A simple proxy that accepts `{ text }`, calls the ElevenLabs TTS API with a deep, executive male voice (George — `JBFqnCBsd6RMkjVDRZzb`), and returns raw MP3 audio bytes. Uses `eleven_turbo_v2_5` model for low-latency streaming playback.
 
-**In `toggleVoice`** (start path):
-- After creating `SpeechRecognition`, also call `navigator.mediaDevices.getUserMedia({ audio: true })` to get the mic stream
-- Create an `AudioContext`, connect the stream to an `AnalyserNode` (fftSize: 64)
-- Start a `requestAnimationFrame` loop that reads `getByteFrequencyData` and maps 5 frequency bins to CSS `scaleY` transforms on the bar spans
+- Requires auth (Bearer token from the admin session)
+- Verifies admin status before generating audio
+- Returns binary `audio/mpeg` response
+- Strips markdown from text server-side for cleaner speech
 
-**In `toggleVoice`** (stop path) and `recognition.onend`:
-- Cancel the animation frame, close the audio context, stop the media stream tracks
+### 2. Update `src/components/admin/vessel/VesselCommandInterface.tsx`
 
-**New JSX — waveform bars:**
-- Render a small flex container with 5 thin vertical bars (`w-[2px] h-4 bg-primary/60 rounded-full`) to the left of the mic button, only when `isListening`
-- Each bar's `scaleY` is driven by the analyser data, with a CSS `transition: transform 80ms` for smoothness
-- Bars have staggered base heights for visual variety when idle
+Replace the `speak()` function:
 
-### 2. No CSS changes needed
-Bar animations are driven by inline `transform` styles from the analyser data. The existing `micRipple` keyframe stays.
+**Current**: Uses `window.speechSynthesis` with `SpeechSynthesisUtterance`
+
+**New**: Calls the `elevenlabs-tts` edge function via `fetch()` with `.blob()`, creates an `Audio` object, and plays it. Includes:
+
+- `speakElevenLabs(text)` — fetches TTS audio from edge function, plays via `new Audio(URL.createObjectURL(blob))`
+- Tracks `audioRef` to allow stopping playback when TTS toggle is turned off or a new response arrives
+- Falls back silently if the TTS call fails (no toast spam — just logs)
+- Cancels any in-flight TTS request when a new command is sent (`AbortController`)
+- Cleans up object URLs on unmount
+
+**Remove**: All `window.speechSynthesis` references, voice selection logic, `SpeechSynthesisUtterance` code.
+
+### 3. Voice Selection
+
+Using **George** (`JBFqnCBsd6RMkjVDRZzb`) — a deep, calm, executive male voice that fits the luxury interstellar command aesthetic. The voice ID is hardcoded in the edge function but easy to swap later.
 
 ## Technical Details
 
 | Aspect | Detail |
 |---|---|
-| API | `navigator.mediaDevices.getUserMedia` + Web Audio API `AnalyserNode` |
-| Dependencies | None — all browser-native |
-| Performance | `fftSize: 64` keeps FFT tiny (32 bins), only reading 5 values per frame |
-| Cleanup | Audio context closed, media stream stopped, animation frame cancelled on stop |
-| Visual | 5 bars, each 2px wide, 16px tall max, `bg-primary/60`, `rounded-full`, 2px gap, smooth 80ms transitions |
-| Fallback | If `getUserMedia` fails (permission denied), voice still works — bars just won't animate |
-| File modified | `src/components/admin/hud/AICommandCenter.tsx` only |
+| Edge function | `elevenlabs-tts` — POST `{ text }`, returns `audio/mpeg` binary |
+| ElevenLabs model | `eleven_turbo_v2_5` (low latency, high quality) |
+| Voice | George (`JBFqnCBsd6RMkjVDRZzb`) — deep executive tone |
+| Output format | `mp3_44100_128` (high quality) |
+| Client playback | `fetch()` → `.blob()` → `URL.createObjectURL()` → `new Audio()` |
+| Text limit | First 500 chars of cleaned (markdown-stripped) text |
+| Auth | Admin-only, verified via session token |
+| Cleanup | AbortController for in-flight requests, `URL.revokeObjectURL` on unmount |
+| Files | 1 new edge function, 1 component edit |
 
