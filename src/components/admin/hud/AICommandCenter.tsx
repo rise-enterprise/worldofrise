@@ -273,19 +273,32 @@ export default function AICommandCenter() {
                 )}
                 rows={1}
               />
-              <Button
-                onClick={toggleVoice}
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "shrink-0 h-9 w-9 rounded-lg transition-all",
-                  isListening
-                    ? "text-destructive animate-pulse shadow-[0_0_12px_-2px_hsl(var(--destructive)/0.5)]"
-                    : "text-muted-foreground/50 hover:text-foreground"
+              <div className="relative shrink-0">
+                {isListening && (
+                  <>
+                    {[0, 0.4, 0.8].map((delay) => (
+                      <span
+                        key={delay}
+                        className="absolute inset-0 rounded-lg border border-primary/40 pointer-events-none"
+                        style={{ animation: `micRipple 1.6s ease-out ${delay}s infinite` }}
+                      />
+                    ))}
+                  </>
                 )}
-              >
-                {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-              </Button>
+                <Button
+                  onClick={toggleVoice}
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "relative h-9 w-9 rounded-lg transition-all overflow-visible",
+                    isListening
+                      ? "text-destructive shadow-[0_0_12px_-2px_hsl(var(--destructive)/0.5)]"
+                      : "text-muted-foreground/50 hover:text-foreground"
+                  )}
+                >
+                  {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                </Button>
+              </div>
               <Button
                 onClick={() => send(input)}
                 disabled={!input.trim() || isLoading}

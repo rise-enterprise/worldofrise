@@ -869,6 +869,17 @@ select:focus {
    SELECTION — Gold Highlight
 ═══════════════════════════════════════════════════════════ */
 
+@keyframes micRipple {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
 ::selection {
   background: hsl(var(--gold) / 0.3);
   color: hsl(220 20% 93%);
