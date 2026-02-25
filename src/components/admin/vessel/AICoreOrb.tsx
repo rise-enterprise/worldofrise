@@ -49,12 +49,20 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
       mat.opacity = 0.08 + pulseIntensity * 0.12 + Math.sin(t * 2.5) * 0.03;
     }
 
-    // Rotate orbital rings
+    // Rotate orbital rings + HUD arcs
     ringRefs.current.forEach((ring, i) => {
       if (ring) {
-        ring.rotation.x = t * (0.15 + i * 0.08);
-        ring.rotation.y = t * (0.1 + i * 0.05);
-        ring.rotation.z = i * Math.PI / 3;
+        if (i < 3) {
+          // Original orbital rings
+          ring.rotation.x = t * (0.15 + i * 0.08);
+          ring.rotation.y = t * (0.1 + i * 0.05);
+          ring.rotation.z = i * Math.PI / 3;
+        } else {
+          // HUD arc segments — slower, more deliberate rotation
+          const speeds = [0.12, -0.08, 0.15, -0.1];
+          const spd = speeds[i - 3] || 0.1;
+          ring.rotation.z = t * spd;
+        }
       }
     });
 
@@ -96,14 +104,37 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
       {/* Orbital rings */}
       {[1.2, 1.6, 2.1].map((radius, i) => (
         <mesh
-          key={i}
+          key={`ring-${i}`}
           ref={(el) => { ringRefs.current[i] = el; }}
         >
           <torusGeometry args={[radius, 0.008, 8, 128]} />
           <meshBasicMaterial
-            color={isCrisis ? "#ff4444" : "#C8A24A"}
+            color={isCrisis ? "#ff4444" : i % 2 === 0 ? "#00d4ff" : "#C8A24A"}
             transparent
-            opacity={0.25 - i * 0.05}
+            opacity={0.3 - i * 0.05}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+      ))}
+
+      {/* HUD arc segments — Jarvis-style partial arcs */}
+      {[
+        { radius: 2.6, arc: 0.6, speed: 0.12, color: "#00d4ff", opacity: 0.2 },
+        { radius: 3.0, arc: 0.35, speed: -0.08, color: "#C8A24A", opacity: 0.15 },
+        { radius: 3.4, arc: 0.5, speed: 0.15, color: "#00d4ff", opacity: 0.12 },
+        { radius: 3.8, arc: 0.25, speed: -0.1, color: "#C8A24A", opacity: 0.1 },
+      ].map((hud, i) => (
+        <mesh
+          key={`hud-arc-${i}`}
+          ref={(el) => { if (!ringRefs.current[3 + i]) ringRefs.current[3 + i] = el; }}
+          rotation={[Math.PI / 2, 0, i * Math.PI / 2]}
+        >
+          <torusGeometry args={[hud.radius, 0.012, 4, 64, Math.PI * 2 * hud.arc]} />
+          <meshBasicMaterial
+            color={isCrisis ? "#ff4444" : hud.color}
+            transparent
+            opacity={hud.opacity}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
           />
