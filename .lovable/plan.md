@@ -1,63 +1,68 @@
 
 
-# Batman / Iron Man HUD Dashboard Background
+# Redesign Metric Data Display — Static HUD Panels Instead of Orbiting Rings
 
-## Current State
-The 3D background is a cosmic starfield with a central gold orb and orbiting metric rings — feels like deep space. The user wants a tactical tech-HUD aesthetic like the Batcave computer or Jarvis/F.R.I.D.A.Y. interface from Iron Man.
+## Problem
+The 7 metric arcs orbit around the AI core and individually rotate, making them hard to read. The data is constantly moving, which kills readability and feels more like a screensaver than a command dashboard.
 
-## Visual Direction
-Shift from "deep space observatory" to "tactical command HUD":
-- **Holographic grid floor** — a glowing wireframe grid plane receding into depth (Iron Man war room feel)
-- **HUD ring arcs** — concentric rotating arc segments around the AI core (like Jarvis's circular HUD)
-- **Hex grid backdrop** — subtle hexagonal pattern behind the scene
-- **Scanning sweepline** — a rotating radar-style scan line
-- **Data stream particles** — vertical rising data particles instead of scattered stars (like the Batcave data walls)
-- **Cyan + gold palette** — mix cyan (#00d4ff) with the existing gold for that tech-luxury hybrid
-- **Ambient scan lines** — subtle horizontal scanlines overlay via CSS
+## Solution
+Replace the orbiting 3D `MetricRings` with a **fixed holographic HUD panel layout** — metrics arranged in a clean semicircular arc below the AI core, facing the camera (billboard), with subtle breathing animations but **no rotation**. Think Iron Man's Jarvis readouts: stationary, glowing, always readable.
 
-## Files to Change
+## Visual Design
 
-### 1. `src/components/admin/vessel/StarField.tsx` → Complete rewrite as `HUDGrid.tsx`
-Replace the random star scatter with:
-- A **wireframe grid floor** (PlaneGeometry with wireframe material) tilted at perspective, glowing cyan/gold
-- **Vertical data stream particles** — narrow columns of rising dots (like Matrix rain but subtle and gold/cyan)
-- **Floating hex particles** — small hex shapes drifting slowly
+```text
+              ╭── AI Core Orb ──╮
+              │    ◉ (sphere)    │
+              ╰─────────────────╯
+                                    
+    ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐
+    │ MEM │ │ VIS │ │ VIP │ │ RET │ │ CHR │
+    │ 245 │ │  38 │ │  12 │ │ 78% │ │   5 │
+    │ ═══ │ │ ═══ │ │ ═══ │ │ ═══ │ │ ═══ │
+    └─────┘ └─────┘ └─────┘ └─────┘ └─────┘
+                 ┌─────┐ ┌─────┐
+                 │NOIR │ │SASSO│
+                 │  22 │ │  16 │
+                 └─────┘ └─────┘
+```
 
-### 2. `src/components/admin/vessel/AICoreOrb.tsx` → Add HUD ring arcs
-Keep the core sphere but add:
-- 3-4 **flat arc segments** (partial torus geometries) at different radii, rotating at different speeds — the Jarvis circular HUD look
-- **Bracket markers** — small line segments at cardinal points on rings
-- Slightly more **cyan glow** mixed with gold
+Each metric panel:
+- A small **progress bar** (horizontal line) instead of a torus arc — much clearer at a glance
+- **Billboard text** (always faces camera) via drei's `<Billboard>` wrapper
+- Gentle **vertical float** (breathing) animation — no rotation
+- Additive blended glow backing for the holographic feel
+- Crisis mode turns all bars red with a pulse
 
-### 3. `src/components/admin/vessel/InterstellarScene.tsx` → Update lighting + add new components
-- Replace `StarField` import with new `HUDGrid`
-- Add **more directional lighting** with cyan tones
-- Add a **scanning sweep plane** — a thin rotating triangular slice that sweeps 360° like a radar
-- Update fog color to darker blue-black
+## File Changes
 
-### 4. `src/pages/AdminPanel.tsx` → Add CSS scanline overlay
-- Add a CSS-only horizontal scanline overlay (`repeating-linear-gradient`) over the entire viewport for that CRT/holographic monitor feel
-- Very subtle opacity (0.02-0.03) so it doesn't interfere with readability
+### 1. Rewrite `src/components/admin/vessel/MetricRings.tsx`
 
-### 5. New file: `src/components/admin/vessel/HUDGrid.tsx`
-The replacement for StarField — contains:
-- Wireframe grid floor
-- Rising data particles
-- Ambient floating elements
+**Remove**: Orbiting torus arcs, per-item rotation, circular layout at radius 4.
 
-### 6. New file: `src/components/admin/vessel/ScanSweep.tsx`
-A rotating radar sweep plane component
+**New layout**:
+- 7 metrics arranged in **two rows**: top row of 5, bottom row of 2, centered below the orb
+- Each metric is a `<Billboard>` group containing:
+  - A label (`<Text>` — small caps, muted color)
+  - A value (`<Text>` — larger, colored)
+  - A thin horizontal bar background (dark `<mesh>` plane)
+  - A filled bar foreground (colored `<mesh>` plane, width = percentage)
+- Positioned at y = -2 to -3 range (below the orb)
+- Subtle vertical sine-wave breathing per card (amplitude 0.05, no rotation)
+- The parent group does **not rotate**
+
+### 2. No other file changes needed
+`InterstellarScene.tsx` already renders `<MetricRings>` — the component signature stays the same (`metrics` array + `isCrisis`).
 
 ## Technical Details
 
-| Element | Implementation |
+| Aspect | Detail |
 |---|---|
-| Grid floor | `PlaneGeometry(40,40,40,40)` + `MeshBasicMaterial({ wireframe: true, color: "#00d4ff", opacity: 0.08 })` rotated -90° on X, positioned at y=-3 |
-| HUD arcs | `TorusGeometry` partial arcs (0.3-0.8 of full circle) at radii 1.8-3.5 with varying rotation speeds |
-| Data streams | `Points` with positions in narrow vertical columns, animated upward with modulo wrap |
-| Scan sweep | `PlaneGeometry` shaped as thin wedge, additive blended, rotating on Y axis at ~0.3 rad/s |
-| Scanlines CSS | `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.03) 2px, rgba(0,212,255,0.03) 4px)` |
-| Color shift | Gold `#C8A24A` stays for core, add cyan `#00d4ff` for grid/arcs/scan elements |
-
-All changes maintain 60fps — wireframe grids and points are GPU-cheap. No new dependencies needed.
+| Layout | 2 rows: 5 top + 2 bottom, evenly spaced horizontally |
+| Position | y = -2 (top row), y = -3 (bottom row), z = 0 |
+| Billboarding | `<Billboard>` from drei — always faces camera |
+| Bar size | 0.8 wide × 0.04 tall planes |
+| Animation | Gentle y-axis sine float (0.05 amplitude), no rotation |
+| Text | drei `<Text>` — label at 0.08 size, value at 0.14 size |
+| Crisis | All bar colors → `#ff4444`, value text pulses opacity |
+| Performance | Fewer draw calls than current (no torus geometries) |
 
