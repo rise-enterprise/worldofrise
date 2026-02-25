@@ -1,34 +1,35 @@
 
 
-# Add Day/Night Mode Toggle to NOIR AI HUD
+# Add Voice Input to AI Command Center
 
 ## Overview
 
-Add a theme toggle (day/night mode) to the HUD status bar so admins can switch between the dark "Private Viewing Room" aesthetic and the light "Crystal Daylight" mode. The light mode CSS variables already exist in `index.css` -- the HUD just lacks a toggle button.
+Add a microphone button to the AI Command Center input bar that uses the browser's native Web Speech API (`webkitSpeechRecognition` / `SpeechRecognition`) for hands-free voice commands. No external API keys or services required -- this works entirely client-side.
 
 ## What Changes
 
-### 1. Update `HUDStatusBar.tsx`
+### Single file: `src/components/admin/hud/AICommandCenter.tsx`
 
-Add the `ThemeToggle` component (already exists at `src/components/ui/theme-toggle.tsx`) into the status bar's right-side controls, positioned between the status indicators and the clock. This keeps all control in the HUD bar without adding traditional navigation.
-
-The toggle will use the existing Sun/Moon icon animation with smooth transitions.
-
-### 2. No other changes needed
-
-- The light mode CSS variables are already fully defined in `index.css` (lines 159-210+)
-- The `ThemeToggle` component already handles `localStorage` persistence and `document.documentElement` class toggling
-- All HUD components use theme-aware tokens (`bg-background`, `text-foreground`, `bg-card`, `text-primary`, `border-border`, `text-muted-foreground`) so they will adapt automatically
+1. **Add a `Mic` / `MicOff` icon** from lucide-react
+2. **Add voice state**: `isListening` boolean + `SpeechRecognition` instance ref
+3. **Add `toggleVoice` handler** that:
+   - Creates a `SpeechRecognition` instance (with `continuous: false`, `interimResults: true`, `lang: "en-US"`)
+   - On interim results: updates the textarea input live (user sees words appearing as they speak)
+   - On final result: auto-sends the command via `send()`
+   - On end/error: resets `isListening`
+4. **Render mic button** between the textarea and the Send button
+   - Idle: muted mic icon
+   - Listening: pulsing red/primary mic icon with a glow animation
+5. **Graceful fallback**: if `SpeechRecognition` is not supported (Firefox without flag), show a toast explaining browser compatibility
 
 ## Technical Details
 
-### File to modify
-
-| File | Change |
+| Aspect | Detail |
 |---|---|
-| `src/components/admin/hud/HUDStatusBar.tsx` | Import `ThemeToggle`, render it in the right-side controls area between the status badges and the clock |
-
-### Implementation
-
-Add the ThemeToggle between the "Connected" indicator and the clock, styled to match the HUD's compact aesthetic (`h-6 w-6` icon sizing, muted foreground color). One line import, one line JSX insertion.
+| API | Browser-native `webkitSpeechRecognition` (Chrome/Edge/Safari) |
+| Dependencies | None -- zero new packages |
+| Behavior | Tap to start listening, tap again to cancel. Final transcript auto-sends. Interim text shows live in textarea. |
+| Auto-send | When speech recognition returns a final result, it calls `send()` automatically so the experience is truly hands-free |
+| Visual feedback | Mic button pulses with `animate-pulse` + primary color glow while listening |
+| File modified | `src/components/admin/hud/AICommandCenter.tsx` only |
 
