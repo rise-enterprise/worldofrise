@@ -1,19 +1,17 @@
-import { Suspense } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useState, useCallback, lazy, Suspense } from "react";
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
-import HUDStatusBar from "@/components/admin/hud/HUDStatusBar";
-import HUDPanel from "@/components/admin/hud/HUDPanel";
-import HUDMetricGauge from "@/components/admin/hud/HUDMetricGauge";
-import LiveCounter from "@/components/admin/hud/LiveCounter";
-import AnomalyFeed from "@/components/admin/hud/AnomalyFeed";
-import AICommandCenter from "@/components/admin/hud/AICommandCenter";
-import { VisitsWaveform, TierDistributionBars, BrandHeatmap } from "@/components/admin/hud/HUDCharts";
+import SystemStatusBar from "@/components/admin/vessel/SystemStatusBar";
+import VesselCommandInterface from "@/components/admin/vessel/VesselCommandInterface";
+
+const InterstellarScene = lazy(() => import("@/components/admin/vessel/InterstellarScene"));
 
 export default function AdminPanel() {
-  const isMobile = useIsMobile();
   const { data: metrics } = useDashboardMetrics("all");
+  const [isListening, setIsListening] = useState(false);
+  const [pulseIntensity, setPulseIntensity] = useState(0);
+  const [isCrisis, setIsCrisis] = useState(false);
 
-  const m = metrics ?? {} as any;
+  const m = metrics ?? ({} as any);
   const totalMembers = m.totalMembers ?? 0;
   const activeMembers = m.activeMembers ?? 0;
   const visitsMonth = m.totalVisitsThisMonth ?? 0;
@@ -24,100 +22,67 @@ export default function AdminPanel() {
   const tierDist = m.tierDistribution ?? {};
 
   const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
-  const churnPct = totalMembers > 0 ? Math.round((churnRisk / totalMembers) * 100) : 0;
+
+  // Build 3D metric ring data
+  const metricRings = [
+    { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
+    { label: "Visits", value: visitsMonth, max: totalMembers || 1, color: "#4488ff" },
+    { label: "VIP", value: vipCount, max: totalMembers || 1, color: "#C8A24A" },
+    { label: "Retention", value: retentionRate, max: 100, color: "#22c55e" },
+    { label: "Churn", value: churnRisk, max: totalMembers || 1, color: "#ef4444" },
+    { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#C8A24A" },
+    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#3b82f6" },
+  ];
+
+  const handleCrisis = useCallback((crisis: boolean) => {
+    setIsCrisis(crisis);
+    // Auto-clear crisis after 30s
+    if (crisis) setTimeout(() => setIsCrisis(false), 30000);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Ambient grid */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--primary)/0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)/0.3) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
+    <div className="h-screen w-screen bg-[#07080A] overflow-hidden relative flex flex-col">
+      {/* 3D Background */}
+      <Suspense fallback={
+        <div className="absolute inset-0 bg-[#07080A]" />
+      }>
+        <InterstellarScene
+          isListening={isListening}
+          isCrisis={isCrisis}
+          pulseIntensity={pulseIntensity}
+          metrics={metricRings}
+        />
+      </Suspense>
+
+      {/* System status bar */}
+      <SystemStatusBar
+        isCrisis={isCrisis}
+        totalMembers={totalMembers}
+        activeMembers={activeMembers}
+        visitsMonth={visitsMonth}
+        vipCount={vipCount}
+        churnRisk={churnRisk}
       />
-      {/* Radial vignette */}
-      <div className="fixed inset-0 pointer-events-none" style={{
-        background: "radial-gradient(ellipse at 50% 0%, transparent 40%, hsl(var(--background)) 100%)"
-      }} />
 
-      <div className="relative z-10 flex flex-col h-screen">
-        <HUDStatusBar />
-
-        <div className={`flex-1 overflow-y-auto p-3 ${isMobile ? "space-y-3" : "grid grid-cols-12 gap-3"} min-h-0`}>
-          
-          {/* ═══ LEFT COLUMN: Metrics HUD ═══ */}
-          <div className={isMobile ? "" : "col-span-4 flex flex-col gap-3"}>
-            
-            {/* Live Counters */}
-            <HUDPanel className="p-4">
-              <div className="grid grid-cols-2 gap-4">
-                <LiveCounter value={totalMembers} label="Total Members" trend={2.4} />
-                <LiveCounter value={visitsMonth} label="Visits / Month" trend={-1.2} />
-                <LiveCounter value={vipCount} label="VIP Guests" prefix="★" />
-                <LiveCounter value={churnRisk} label="Churn Risk" trend={churnPct > 30 ? churnPct : undefined} />
-              </div>
-            </HUDPanel>
-
-            {/* Gauges */}
-            <HUDPanel className="p-4">
-              <div className="flex items-center justify-around flex-wrap gap-3">
-                <HUDMetricGauge value={retentionRate} max={100} label="Retention" unit="%" color="gold" />
-                <HUDMetricGauge value={churnPct} max={100} label="Churn Rate" unit="%" color="burgundy" />
-                <HUDMetricGauge value={vipCount} max={totalMembers || 1} label="VIP Ratio" color="teal" size="sm" />
-              </div>
-            </HUDPanel>
-
-            {/* Charts */}
-            <VisitsWaveform />
-            <TierDistributionBars distribution={tierDist} />
-            <BrandHeatmap noir={noir} sasso={sasso} />
-          </div>
-
-          {/* ═══ CENTER-RIGHT: AI Command Center ═══ */}
-          <div className={isMobile ? "" : "col-span-5 flex flex-col min-h-0"}>
-            <AICommandCenter />
-          </div>
-
-          {/* ═══ FAR RIGHT: Anomalies + Regional ═══ */}
-          <div className={isMobile ? "" : "col-span-3 flex flex-col gap-3"}>
-            <AnomalyFeed />
-
-            {/* Regional metrics */}
-            <HUDPanel label="Regional Presence" className="p-4 pt-7">
-              <div className="space-y-3">
-                <RegionRow label="Doha" value={m.visitsByCountry?.doha ?? 0} total={totalMembers} />
-                <RegionRow label="Riyadh" value={m.visitsByCountry?.riyadh ?? 0} total={totalMembers} />
-              </div>
-            </HUDPanel>
-
-            {/* Points gauge */}
-            <HUDPanel className="p-4">
-              <div className="flex items-center justify-around">
-                <HUDMetricGauge value={noir} max={noir + sasso || 1} label="NOIR Share" color="gold" size="sm" />
-                <HUDMetricGauge value={sasso} max={noir + sasso || 1} label="SASSO Share" color="sapphire" size="sm" />
-              </div>
-            </HUDPanel>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RegionRow({ label, value, total }: { label: string; value: number; total: number }) {
-  const pct = total > 0 ? (value / total) * 100 : 0;
-  return (
-    <div>
-      <div className="flex justify-between text-[10px] mb-1">
-        <span className="uppercase tracking-widest text-muted-foreground/60">{label}</span>
-        <span className="text-foreground/70 tabular-nums">{value.toLocaleString()}</span>
-      </div>
-      <div className="h-1.5 rounded-full bg-muted/20 overflow-hidden">
-        <div
-          className="h-full rounded-full bg-primary/60 transition-all duration-1000 ease-out"
-          style={{ width: `${pct}%`, boxShadow: "0 0 6px hsl(42, 50%, 54%, 0.3)" }}
+      {/* Command interface overlay */}
+      <div className="flex-1 min-h-0 relative z-10">
+        <VesselCommandInterface
+          onListeningChange={setIsListening}
+          onPulseIntensity={setPulseIntensity}
+          onCrisisChange={handleCrisis}
         />
       </div>
+
+      {/* Crisis mode vignette */}
+      {isCrisis && (
+        <div
+          className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"
+          style={{
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.08) 100%)",
+            boxShadow: "inset 0 0 120px rgba(200,30,30,0.06)",
+          }}
+        />
+      )}
     </div>
   );
 }
