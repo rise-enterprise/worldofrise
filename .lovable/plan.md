@@ -1,28 +1,46 @@
 
 
-# Add Futuristic Ripple Animation to Mic Button
+# Add Audio Waveform Bar Visualizer to Mic Button
 
 ## Overview
 
-Add concentric ripple rings that emanate outward from the mic button while listening, creating a cinematic "active voice" effect. This is a CSS-only approach using keyframe animations — no new dependencies.
+Add a 5-bar audio waveform visualizer that appears next to the mic button when listening. It uses the Web Audio API (`AudioContext` + `AnalyserNode`) to capture real microphone volume and drive bar heights in real-time via `requestAnimationFrame`. When not listening, the bars are hidden.
 
 ## What Changes
 
-### 1. `src/index.css` — Add ripple keyframes
+### 1. `src/components/admin/hud/AICommandCenter.tsx`
 
-Add a `@keyframes micRipple` animation that scales up and fades out concentric rings. Three rings at staggered delays create a sonar/pulse effect.
+**New state/refs:**
+- `analyserRef` — holds the `AnalyserNode` for frequency data
+- `animFrameRef` — holds the `requestAnimationFrame` ID for cleanup
+- `barsRef` — ref to the container div holding 5 bar `<span>` elements
+- `audioContextRef` / `streamRef` — for cleanup on stop
 
-### 2. `src/components/admin/hud/AICommandCenter.tsx` — Wrap mic button with ripple rings
+**In `toggleVoice`** (start path):
+- After creating `SpeechRecognition`, also call `navigator.mediaDevices.getUserMedia({ audio: true })` to get the mic stream
+- Create an `AudioContext`, connect the stream to an `AnalyserNode` (fftSize: 64)
+- Start a `requestAnimationFrame` loop that reads `getByteFrequencyData` and maps 5 frequency bins to CSS `scaleY` transforms on the bar spans
 
-When `isListening` is true, render 3 absolutely-positioned `<span>` elements behind the mic button icon. Each span is a ring (border-only circle) that scales outward and fades using the `micRipple` keyframe at staggered `animation-delay` values (0s, 0.4s, 0.8s). When not listening, the spans are not rendered.
+**In `toggleVoice`** (stop path) and `recognition.onend`:
+- Cancel the animation frame, close the audio context, stop the media stream tracks
+
+**New JSX — waveform bars:**
+- Render a small flex container with 5 thin vertical bars (`w-[2px] h-4 bg-primary/60 rounded-full`) to the left of the mic button, only when `isListening`
+- Each bar's `scaleY` is driven by the analyser data, with a CSS `transition: transform 80ms` for smoothness
+- Bars have staggered base heights for visual variety when idle
+
+### 2. No CSS changes needed
+Bar animations are driven by inline `transform` styles from the analyser data. The existing `micRipple` keyframe stays.
 
 ## Technical Details
 
 | Aspect | Detail |
 |---|---|
-| Animation | 3 concentric rings scale from 100% to 250% while fading from 0.6 to 0 opacity, 1.6s infinite loop |
-| Stagger | Ring 1: 0s delay, Ring 2: 0.4s, Ring 3: 0.8s — creates continuous sonar pulse |
-| Color | `border-primary/40` (gold tint) when listening, matching the HUD aesthetic |
-| Positioning | `absolute inset-0` inside the mic button wrapper with `overflow-visible` so rings extend beyond the button bounds |
-| Files modified | `src/index.css` (keyframe), `src/components/admin/hud/AICommandCenter.tsx` (3 span elements + relative wrapper) |
+| API | `navigator.mediaDevices.getUserMedia` + Web Audio API `AnalyserNode` |
+| Dependencies | None — all browser-native |
+| Performance | `fftSize: 64` keeps FFT tiny (32 bins), only reading 5 values per frame |
+| Cleanup | Audio context closed, media stream stopped, animation frame cancelled on stop |
+| Visual | 5 bars, each 2px wide, 16px tall max, `bg-primary/60`, `rounded-full`, 2px gap, smooth 80ms transitions |
+| Fallback | If `getUserMedia` fails (permission denied), voice still works — bars just won't animate |
+| File modified | `src/components/admin/hud/AICommandCenter.tsx` only |
 
