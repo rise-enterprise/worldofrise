@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Send, Sparkles, RotateCcw, Terminal, ChevronUp, ChevronDown } from "lucide-react";
+import { Send, Sparkles, RotateCcw, Terminal, ChevronUp, ChevronDown, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,14 +65,16 @@ async function streamChat({
   }
   onDone();
 }
-
 export default function AICommandCenter() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [expanded, setExpanded] = useState(true);
+  const [isListening, setIsListening] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -128,6 +130,50 @@ export default function AICommandCenter() {
       send(input);
     }
   };
+
+  const toggleVoice = useCallback(() => {
+    if (isListening) {
+      recognitionRef.current?.abort();
+      setIsListening(false);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) {
+      toast({ title: "Not supported", description: "Voice input requires Chrome, Edge, or Safari.", variant: "destructive" });
+      return;
+    }
+    const recognition = new SR();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognitionRef.current = recognition;
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      let finalText = "";
+      for (let i = 0; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalText += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      if (finalText) {
+        setInput("");
+        setIsListening(false);
+        send(finalText);
+      } else {
+        setInput(interim);
+      }
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    recognition.start();
+    setIsListening(true);
+  }, [isListening, send]);
 
   const isEmpty = messages.length === 0;
 
@@ -227,6 +273,19 @@ export default function AICommandCenter() {
                 )}
                 rows={1}
               />
+              <Button
+                onClick={toggleVoice}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "shrink-0 h-9 w-9 rounded-lg transition-all",
+                  isListening
+                    ? "text-destructive animate-pulse shadow-[0_0_12px_-2px_hsl(var(--destructive)/0.5)]"
+                    : "text-muted-foreground/50 hover:text-foreground"
+                )}
+              >
+                {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+              </Button>
               <Button
                 onClick={() => send(input)}
                 disabled={!input.trim() || isLoading}
