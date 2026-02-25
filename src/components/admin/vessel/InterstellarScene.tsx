@@ -1,9 +1,11 @@
-import { Suspense, useRef, useEffect, useState, useCallback } from "react";
+import { Suspense, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import StarField from "./StarField";
+import HUDGrid from "./HUDGrid";
 import AICoreOrb from "./AICoreOrb";
 import MetricRings from "./MetricRings";
+import ScanSweep from "./ScanSweep";
+import { useEffect } from "react";
 
 /* ── Cursor-driven camera ── */
 function CameraController() {
@@ -39,11 +41,11 @@ function AmbientFog({ isCrisis }: { isCrisis: boolean }) {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
       const crisisBlend = isCrisis ? 0.04 : 0;
-      mat.opacity = 0.15 + Math.sin(clock.getElapsedTime() * 0.5) * 0.02 + crisisBlend;
+      mat.opacity = 0.12 + Math.sin(clock.getElapsedTime() * 0.5) * 0.02 + crisisBlend;
       if (isCrisis) {
         mat.color.lerp(new THREE.Color("#220000"), 0.02);
       } else {
-        mat.color.lerp(new THREE.Color("#050508"), 0.02);
+        mat.color.lerp(new THREE.Color("#020610"), 0.02);
       }
     }
   });
@@ -51,7 +53,7 @@ function AmbientFog({ isCrisis }: { isCrisis: boolean }) {
   return (
     <mesh ref={ref} position={[0, 0, -20]}>
       <planeGeometry args={[100, 100]} />
-      <meshBasicMaterial color="#050508" transparent opacity={0.15} depthWrite={false} />
+      <meshBasicMaterial color="#020610" transparent opacity={0.12} depthWrite={false} />
     </mesh>
   );
 }
@@ -79,11 +81,16 @@ export default function InterstellarScene({
       >
         <Suspense fallback={null}>
           <CameraController />
-          <ambientLight intensity={0.15} />
+          <ambientLight intensity={0.1} />
+          {/* Primary core light */}
           <pointLight position={[0, 0, 0]} intensity={isCrisis ? 3 : 1.5} color={isCrisis ? "#ff4444" : "#C8A24A"} distance={20} decay={2} />
-          <pointLight position={[5, 3, -5]} intensity={0.3} color="#4488ff" distance={15} decay={2} />
+          {/* Cyan tech accent lights */}
+          <pointLight position={[5, 3, -5]} intensity={0.5} color="#00d4ff" distance={20} decay={2} />
+          <pointLight position={[-5, -2, 3]} intensity={0.3} color="#00d4ff" distance={15} decay={2} />
+          <directionalLight position={[0, 5, 0]} intensity={0.15} color="#00d4ff" />
           
-          <StarField count={1500} />
+          <HUDGrid />
+          <ScanSweep isCrisis={isCrisis} />
           <AICoreOrb isActive={isListening} isCrisis={isCrisis} pulseIntensity={pulseIntensity} />
           {metrics.length > 0 && <MetricRings metrics={metrics} isCrisis={isCrisis} />}
           <AmbientFog isCrisis={isCrisis} />

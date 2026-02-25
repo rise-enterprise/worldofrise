@@ -41,10 +41,10 @@ export default function AdminPanel() {
   }, []);
 
   return (
-    <div className="h-screen w-screen bg-[#07080A] overflow-hidden relative flex flex-col">
+    <div className="h-screen w-screen bg-[#020610] overflow-hidden relative flex flex-col">
       {/* 3D Background */}
       <Suspense fallback={
-        <div className="absolute inset-0 bg-[#07080A]" />
+        <div className="absolute inset-0 bg-[#020610]" />
       }>
         <InterstellarScene
           isListening={isListening}
@@ -53,6 +53,15 @@ export default function AdminPanel() {
           metrics={metricRings}
         />
       </Suspense>
+
+      {/* CRT / holographic scanlines overlay */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[1]"
+        style={{
+          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.02) 2px, rgba(0,212,255,0.02) 4px)",
+          mixBlendMode: "screen",
+        }}
+      />
 
       {/* System status bar */}
       <SystemStatusBar
