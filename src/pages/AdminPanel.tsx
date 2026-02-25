@@ -1,144 +1,123 @@
-import { useState, useCallback, useMemo, lazy, Suspense } from "react";
-import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { CrystalPageWrapper } from "@/components/effects/CrystalPageWrapper";
-import AdminSidebar from "@/components/admin/AdminSidebar";
-import AdminHeader from "@/components/admin/AdminHeader";
+import { Suspense } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
+import HUDStatusBar from "@/components/admin/hud/HUDStatusBar";
+import HUDPanel from "@/components/admin/hud/HUDPanel";
+import HUDMetricGauge from "@/components/admin/hud/HUDMetricGauge";
+import LiveCounter from "@/components/admin/hud/LiveCounter";
+import AnomalyFeed from "@/components/admin/hud/AnomalyFeed";
+import AICommandCenter from "@/components/admin/hud/AICommandCenter";
+import { VisitsWaveform, TierDistributionBars, BrandHeatmap } from "@/components/admin/hud/HUDCharts";
 
-import { NAV_SECTIONS } from "@/components/admin/adminNavConfig";
-
-// Loyalty components
-const LoyaltyDashboard = lazy(() => import("@/components/admin/loyalty/LoyaltyDashboard"));
-const LoyaltyMembers = lazy(() => import("@/components/admin/loyalty/LoyaltyMembers"));
-const LoyaltyPointsEngine = lazy(() => import("@/components/admin/loyalty/LoyaltyPointsEngine"));
-const LoyaltyRewards = lazy(() => import("@/components/admin/loyalty/LoyaltyRewards"));
-const LoyaltyTiers = lazy(() => import("@/components/admin/loyalty/LoyaltyTiers"));
-const LoyaltyCampaigns = lazy(() => import("@/components/admin/loyalty/LoyaltyCampaigns"));
-const LoyaltySegmentation = lazy(() => import("@/components/admin/loyalty/LoyaltySegmentation"));
-const LoyaltyAnalytics = lazy(() => import("@/components/admin/loyalty/LoyaltyAnalytics"));
-const LoyaltyDigitalCard = lazy(() => import("@/components/admin/loyalty/LoyaltyDigitalCard"));
-const LoyaltyMultiBrand = lazy(() => import("@/components/admin/loyalty/LoyaltyMultiBrand"));
-const LoyaltyGlobalSettings = lazy(() => import("@/components/admin/loyalty/LoyaltyGlobalSettings"));
-const AdminUsers = lazy(() => import("@/components/dashboard/AdminsView").then(m => ({ default: m.AdminsView })));
-const InvitationRequestsView = lazy(() => import("@/components/admin/invitations").then(m => ({ default: m.InvitationRequestsView })));
-
-// CRM components
-const ContactsView = lazy(() => import("@/components/admin/contacts/ContactsView"));
-const ContactsImportView = lazy(() => import("@/components/admin/contacts/ContactsImportView"));
-
-// AI Intelligence components
-const AIIntelligenceOverview = lazy(() => import("@/components/admin/intelligence/AIIntelligenceOverview"));
-
-// AI Copilot
-const AICopilotView = lazy(() => import("@/components/admin/copilot/AICopilotView"));
-
-const ALL_VIEWS: Record<string, React.LazyExoticComponent<() => JSX.Element>> = {
-  "ai-copilot": AICopilotView,
-  "loyalty-dashboard": LoyaltyDashboard,
-  "loyalty-members": LoyaltyMembers,
-  "loyalty-points": LoyaltyPointsEngine,
-  "loyalty-rewards": LoyaltyRewards,
-  "loyalty-tiers": LoyaltyTiers,
-  "loyalty-campaigns": LoyaltyCampaigns,
-  "loyalty-segmentation": LoyaltySegmentation,
-  "loyalty-analytics": LoyaltyAnalytics,
-  "loyalty-digital-card": LoyaltyDigitalCard,
-  "loyalty-multi-brand": LoyaltyMultiBrand,
-  "loyalty-settings": LoyaltyGlobalSettings,
-  "admin-users": AdminUsers as any,
-  "admin-invitations": InvitationRequestsView,
-  "crm-contacts": ContactsView,
-  "crm-import": ContactsImportView,
-  // AI Intelligence
-  "ai-overview": AIIntelligenceOverview,
-  "ai-churn": AIIntelligenceOverview, // TODO: dedicated churn view
-  "ai-ltv": AIIntelligenceOverview, // TODO: dedicated LTV view
-  "ai-segments": AIIntelligenceOverview, // TODO: dedicated segments view
-  "ai-reward-optimizer": AIIntelligenceOverview, // TODO: dedicated reward optimizer
-  "ai-branch-intel": AIIntelligenceOverview, // TODO: dedicated branch intel
-};
 export default function AdminPanel() {
   const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
-  const { isRTL } = useLanguage();
-  const useDrawer = isMobile || isTablet;
+  const { data: metrics } = useDashboardMetrics("all");
 
-  const [activeView, setActiveView] = useState("ai-copilot");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ copilot: true, loyalty: true, administration: true });
+  const m = metrics ?? {} as any;
+  const totalMembers = m.totalMembers ?? 0;
+  const activeMembers = m.activeMembers ?? 0;
+  const visitsMonth = m.totalVisitsThisMonth ?? 0;
+  const vipCount = m.vipGuestsCount ?? 0;
+  const churnRisk = m.churnRiskCount ?? 0;
+  const noir = m.visitsByBrand?.noir ?? 0;
+  const sasso = m.visitsByBrand?.sasso ?? 0;
+  const tierDist = m.tierDistribution ?? {};
 
-  const toggleSection = useCallback((id: string) => {
-    setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
-
-  const handleNavigate = useCallback((id: string) => {
-    setActiveView(id);
-    if (useDrawer) setDrawerOpen(false);
-
-    // Auto-expand parent section
-    const parent = NAV_SECTIONS.find((s) => s.items.some((i) => i.id === id));
-    if (parent) {
-      setOpenSections((prev) => ({ ...prev, [parent.id]: true }));
-    }
-  }, [useDrawer]);
-
-  const sidebarContent = (
-    <AdminSidebar
-      activeView={activeView}
-      onNavigate={handleNavigate}
-      searchQuery={searchQuery}
-      openSections={openSections}
-      onToggleSection={toggleSection}
-    />
-  );
+  const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
+  const churnPct = totalMembers > 0 ? Math.round((churnRisk / totalMembers) * 100) : 0;
 
   return (
-    <CrystalPageWrapper variant="ambient" showSparkles={false} className="min-h-screen">
-      <div className={`flex min-h-screen ${isRTL ? "flex-row-reverse" : ""}`}>
-        {/* Desktop sidebar */}
-        {!useDrawer && (
-          <aside className="w-72 shrink-0 border-r border-border/40 bg-card/70 backdrop-blur-sm">
-            <div className="sticky top-0 h-screen">{sidebarContent}</div>
-          </aside>
-        )}
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Ambient grid */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(hsl(var(--primary)/0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)/0.3) 1px, transparent 1px)`,
+          backgroundSize: "60px 60px",
+        }}
+      />
+      {/* Radial vignette */}
+      <div className="fixed inset-0 pointer-events-none" style={{
+        background: "radial-gradient(ellipse at 50% 0%, transparent 40%, hsl(var(--background)) 100%)"
+      }} />
 
-        {/* Mobile / Tablet drawer */}
-        {useDrawer && (
-          <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-            <SheetContent
-              side={isRTL ? "right" : "left"}
-              className="w-72 p-0 bg-card/95 backdrop-blur-md border-border/40"
-            >
-              <SheetTitle className="sr-only">Navigation</SheetTitle>
-              {sidebarContent}
-            </SheetContent>
-          </Sheet>
-        )}
+      <div className="relative z-10 flex flex-col h-screen">
+        <HUDStatusBar />
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <AdminHeader
-            onMenuToggle={() => setDrawerOpen((p) => !p)}
-            showMenu={useDrawer}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
-
-          <main className="flex-1 overflow-y-auto">
-            {ALL_VIEWS[activeView] ? (
-              <Suspense fallback={<div className="flex items-center justify-center h-64 text-muted-foreground">Loading...</div>}>
-                {(() => { const C = ALL_VIEWS[activeView]; return <C />; })()}
-              </Suspense>
-            ) : (
-              <div className="flex items-center justify-center h-64 text-muted-foreground">
-                Select a section from the sidebar
+        <div className={`flex-1 overflow-y-auto p-3 ${isMobile ? "space-y-3" : "grid grid-cols-12 gap-3"} min-h-0`}>
+          
+          {/* ═══ LEFT COLUMN: Metrics HUD ═══ */}
+          <div className={isMobile ? "" : "col-span-4 flex flex-col gap-3"}>
+            
+            {/* Live Counters */}
+            <HUDPanel className="p-4">
+              <div className="grid grid-cols-2 gap-4">
+                <LiveCounter value={totalMembers} label="Total Members" trend={2.4} />
+                <LiveCounter value={visitsMonth} label="Visits / Month" trend={-1.2} />
+                <LiveCounter value={vipCount} label="VIP Guests" prefix="★" />
+                <LiveCounter value={churnRisk} label="Churn Risk" trend={churnPct > 30 ? churnPct : undefined} />
               </div>
-            )}
-          </main>
+            </HUDPanel>
+
+            {/* Gauges */}
+            <HUDPanel className="p-4">
+              <div className="flex items-center justify-around flex-wrap gap-3">
+                <HUDMetricGauge value={retentionRate} max={100} label="Retention" unit="%" color="gold" />
+                <HUDMetricGauge value={churnPct} max={100} label="Churn Rate" unit="%" color="burgundy" />
+                <HUDMetricGauge value={vipCount} max={totalMembers || 1} label="VIP Ratio" color="teal" size="sm" />
+              </div>
+            </HUDPanel>
+
+            {/* Charts */}
+            <VisitsWaveform />
+            <TierDistributionBars distribution={tierDist} />
+            <BrandHeatmap noir={noir} sasso={sasso} />
+          </div>
+
+          {/* ═══ CENTER-RIGHT: AI Command Center ═══ */}
+          <div className={isMobile ? "" : "col-span-5 flex flex-col min-h-0"}>
+            <AICommandCenter />
+          </div>
+
+          {/* ═══ FAR RIGHT: Anomalies + Regional ═══ */}
+          <div className={isMobile ? "" : "col-span-3 flex flex-col gap-3"}>
+            <AnomalyFeed />
+
+            {/* Regional metrics */}
+            <HUDPanel label="Regional Presence" className="p-4 pt-7">
+              <div className="space-y-3">
+                <RegionRow label="Doha" value={m.visitsByCountry?.doha ?? 0} total={totalMembers} />
+                <RegionRow label="Riyadh" value={m.visitsByCountry?.riyadh ?? 0} total={totalMembers} />
+              </div>
+            </HUDPanel>
+
+            {/* Points gauge */}
+            <HUDPanel className="p-4">
+              <div className="flex items-center justify-around">
+                <HUDMetricGauge value={noir} max={noir + sasso || 1} label="NOIR Share" color="gold" size="sm" />
+                <HUDMetricGauge value={sasso} max={noir + sasso || 1} label="SASSO Share" color="sapphire" size="sm" />
+              </div>
+            </HUDPanel>
+          </div>
         </div>
       </div>
-    </CrystalPageWrapper>
+    </div>
+  );
+}
+
+function RegionRow({ label, value, total }: { label: string; value: number; total: number }) {
+  const pct = total > 0 ? (value / total) * 100 : 0;
+  return (
+    <div>
+      <div className="flex justify-between text-[10px] mb-1">
+        <span className="uppercase tracking-widest text-muted-foreground/60">{label}</span>
+        <span className="text-foreground/70 tabular-nums">{value.toLocaleString()}</span>
+      </div>
+      <div className="h-1.5 rounded-full bg-muted/20 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-primary/60 transition-all duration-1000 ease-out"
+          style={{ width: `${pct}%`, boxShadow: "0 0 6px hsl(42, 50%, 54%, 0.3)" }}
+        />
+      </div>
+    </div>
   );
 }
