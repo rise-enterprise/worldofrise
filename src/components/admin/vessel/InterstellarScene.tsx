@@ -5,6 +5,7 @@ import HUDGrid from "./HUDGrid";
 import AICoreOrb from "./AICoreOrb";
 import MetricRings from "./MetricRings";
 import ScanSweep from "./ScanSweep";
+import AIResponseMetrics from "./AIResponseMetrics";
 import { useEffect } from "react";
 
 /* ── Cursor-driven camera ── */
@@ -63,6 +64,7 @@ interface InterstellarSceneProps {
   isCrisis?: boolean;
   pulseIntensity?: number;
   metrics?: { label: string; value: number; max: number; color: string }[];
+  aiMetrics?: { label: string; value: number }[];
 }
 
 export default function InterstellarScene({
@@ -70,6 +72,7 @@ export default function InterstellarScene({
   isCrisis = false,
   pulseIntensity = 0,
   metrics = [],
+  aiMetrics = [],
 }: InterstellarSceneProps) {
   return (
     <div className="absolute inset-0 z-0">
@@ -93,6 +96,7 @@ export default function InterstellarScene({
           <ScanSweep isCrisis={isCrisis} />
           <AICoreOrb isActive={isListening} isCrisis={isCrisis} pulseIntensity={pulseIntensity} />
           {metrics.length > 0 && <MetricRings metrics={metrics} isCrisis={isCrisis} />}
+          {aiMetrics.length > 0 && <AIResponseMetrics metrics={aiMetrics} />}
           <AmbientFog isCrisis={isCrisis} />
         </Suspense>
       </Canvas>
