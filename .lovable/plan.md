@@ -1,53 +1,63 @@
 
 
-# Integrate ElevenLabs TTS into the Command Vessel
+# Batman / Iron Man HUD Dashboard Background
 
-## Overview
+## Current State
+The 3D background is a cosmic starfield with a central gold orb and orbiting metric rings — feels like deep space. The user wants a tactical tech-HUD aesthetic like the Batcave computer or Jarvis/F.R.I.D.A.Y. interface from Iron Man.
 
-Replace the browser-native `SpeechSynthesis` TTS with ElevenLabs premium neural voice. The ElevenLabs connector is now linked — `ELEVENLABS_API_KEY` is available as an edge function secret.
+## Visual Direction
+Shift from "deep space observatory" to "tactical command HUD":
+- **Holographic grid floor** — a glowing wireframe grid plane receding into depth (Iron Man war room feel)
+- **HUD ring arcs** — concentric rotating arc segments around the AI core (like Jarvis's circular HUD)
+- **Hex grid backdrop** — subtle hexagonal pattern behind the scene
+- **Scanning sweepline** — a rotating radar-style scan line
+- **Data stream particles** — vertical rising data particles instead of scattered stars (like the Batcave data walls)
+- **Cyan + gold palette** — mix cyan (#00d4ff) with the existing gold for that tech-luxury hybrid
+- **Ambient scan lines** — subtle horizontal scanlines overlay via CSS
 
-## What Changes
+## Files to Change
 
-### 1. New Edge Function: `supabase/functions/elevenlabs-tts/index.ts`
+### 1. `src/components/admin/vessel/StarField.tsx` → Complete rewrite as `HUDGrid.tsx`
+Replace the random star scatter with:
+- A **wireframe grid floor** (PlaneGeometry with wireframe material) tilted at perspective, glowing cyan/gold
+- **Vertical data stream particles** — narrow columns of rising dots (like Matrix rain but subtle and gold/cyan)
+- **Floating hex particles** — small hex shapes drifting slowly
 
-A simple proxy that accepts `{ text }`, calls the ElevenLabs TTS API with a deep, executive male voice (George — `JBFqnCBsd6RMkjVDRZzb`), and returns raw MP3 audio bytes. Uses `eleven_turbo_v2_5` model for low-latency streaming playback.
+### 2. `src/components/admin/vessel/AICoreOrb.tsx` → Add HUD ring arcs
+Keep the core sphere but add:
+- 3-4 **flat arc segments** (partial torus geometries) at different radii, rotating at different speeds — the Jarvis circular HUD look
+- **Bracket markers** — small line segments at cardinal points on rings
+- Slightly more **cyan glow** mixed with gold
 
-- Requires auth (Bearer token from the admin session)
-- Verifies admin status before generating audio
-- Returns binary `audio/mpeg` response
-- Strips markdown from text server-side for cleaner speech
+### 3. `src/components/admin/vessel/InterstellarScene.tsx` → Update lighting + add new components
+- Replace `StarField` import with new `HUDGrid`
+- Add **more directional lighting** with cyan tones
+- Add a **scanning sweep plane** — a thin rotating triangular slice that sweeps 360° like a radar
+- Update fog color to darker blue-black
 
-### 2. Update `src/components/admin/vessel/VesselCommandInterface.tsx`
+### 4. `src/pages/AdminPanel.tsx` → Add CSS scanline overlay
+- Add a CSS-only horizontal scanline overlay (`repeating-linear-gradient`) over the entire viewport for that CRT/holographic monitor feel
+- Very subtle opacity (0.02-0.03) so it doesn't interfere with readability
 
-Replace the `speak()` function:
+### 5. New file: `src/components/admin/vessel/HUDGrid.tsx`
+The replacement for StarField — contains:
+- Wireframe grid floor
+- Rising data particles
+- Ambient floating elements
 
-**Current**: Uses `window.speechSynthesis` with `SpeechSynthesisUtterance`
-
-**New**: Calls the `elevenlabs-tts` edge function via `fetch()` with `.blob()`, creates an `Audio` object, and plays it. Includes:
-
-- `speakElevenLabs(text)` — fetches TTS audio from edge function, plays via `new Audio(URL.createObjectURL(blob))`
-- Tracks `audioRef` to allow stopping playback when TTS toggle is turned off or a new response arrives
-- Falls back silently if the TTS call fails (no toast spam — just logs)
-- Cancels any in-flight TTS request when a new command is sent (`AbortController`)
-- Cleans up object URLs on unmount
-
-**Remove**: All `window.speechSynthesis` references, voice selection logic, `SpeechSynthesisUtterance` code.
-
-### 3. Voice Selection
-
-Using **George** (`JBFqnCBsd6RMkjVDRZzb`) — a deep, calm, executive male voice that fits the luxury interstellar command aesthetic. The voice ID is hardcoded in the edge function but easy to swap later.
+### 6. New file: `src/components/admin/vessel/ScanSweep.tsx`
+A rotating radar sweep plane component
 
 ## Technical Details
 
-| Aspect | Detail |
+| Element | Implementation |
 |---|---|
-| Edge function | `elevenlabs-tts` — POST `{ text }`, returns `audio/mpeg` binary |
-| ElevenLabs model | `eleven_turbo_v2_5` (low latency, high quality) |
-| Voice | George (`JBFqnCBsd6RMkjVDRZzb`) — deep executive tone |
-| Output format | `mp3_44100_128` (high quality) |
-| Client playback | `fetch()` → `.blob()` → `URL.createObjectURL()` → `new Audio()` |
-| Text limit | First 500 chars of cleaned (markdown-stripped) text |
-| Auth | Admin-only, verified via session token |
-| Cleanup | AbortController for in-flight requests, `URL.revokeObjectURL` on unmount |
-| Files | 1 new edge function, 1 component edit |
+| Grid floor | `PlaneGeometry(40,40,40,40)` + `MeshBasicMaterial({ wireframe: true, color: "#00d4ff", opacity: 0.08 })` rotated -90° on X, positioned at y=-3 |
+| HUD arcs | `TorusGeometry` partial arcs (0.3-0.8 of full circle) at radii 1.8-3.5 with varying rotation speeds |
+| Data streams | `Points` with positions in narrow vertical columns, animated upward with modulo wrap |
+| Scan sweep | `PlaneGeometry` shaped as thin wedge, additive blended, rotating on Y axis at ~0.3 rad/s |
+| Scanlines CSS | `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.03) 2px, rgba(0,212,255,0.03) 4px)` |
+| Color shift | Gold `#C8A24A` stays for core, add cyan `#00d4ff` for grid/arcs/scan elements |
+
+All changes maintain 60fps — wireframe grids and points are GPU-cheap. No new dependencies needed.
 
