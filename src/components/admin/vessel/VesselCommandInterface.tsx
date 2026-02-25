@@ -92,6 +92,9 @@ export default function VesselCommandInterface({
   const animFrameRef = useRef<number>(0);
   const barsRef = useRef<HTMLDivElement>(null);
   const lastSpokenRef = useRef<string>("");
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
+  const ttsAbortRef = useRef<AbortController | null>(null);
+  const ttsObjectUrlRef = useRef<string | null>(null);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -101,28 +104,74 @@ export default function VesselCommandInterface({
 
   useEffect(scrollToBottom, [messages, scrollToBottom]);
 
-  // Browser TTS
-  const speak = useCallback((text: string) => {
-    if (!ttsEnabled || !window.speechSynthesis) return;
-    // Strip markdown
+  // Cleanup TTS on unmount
+  useEffect(() => {
+    return () => {
+      ttsAbortRef.current?.abort();
+      ttsAudioRef.current?.pause();
+      if (ttsObjectUrlRef.current) URL.revokeObjectURL(ttsObjectUrlRef.current);
+    };
+  }, []);
+
+  // Stop current TTS playback
+  const stopTts = useCallback(() => {
+    ttsAbortRef.current?.abort();
+    ttsAudioRef.current?.pause();
+    ttsAudioRef.current = null;
+    if (ttsObjectUrlRef.current) {
+      URL.revokeObjectURL(ttsObjectUrlRef.current);
+      ttsObjectUrlRef.current = null;
+    }
+  }, []);
+
+  // ElevenLabs TTS
+  const speak = useCallback(async (text: string) => {
+    if (!ttsEnabled) return;
     const clean = text.replace(/[#*_`>~\[\]()]/g, "").replace(/\n+/g, ". ").trim();
     if (!clean || clean === lastSpokenRef.current) return;
     lastSpokenRef.current = clean;
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(clean.slice(0, 500));
-    utterance.rate = 0.95;
-    utterance.pitch = 0.85;
-    utterance.volume = 0.8;
-    // Try to pick a good voice
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v => v.name.includes("Google UK English Male")) 
-      || voices.find(v => v.name.includes("Daniel"))
-      || voices.find(v => v.lang === "en-GB" && v.name.includes("Male"))
-      || voices.find(v => v.lang.startsWith("en"));
-    if (preferred) utterance.voice = preferred;
-    window.speechSynthesis.speak(utterance);
-  }, [ttsEnabled]);
+    stopTts();
+
+    const controller = new AbortController();
+    ttsAbortRef.current = controller;
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ text: clean }),
+          signal: controller.signal,
+        }
+      );
+
+      if (!resp.ok) {
+        console.warn("ElevenLabs TTS failed:", resp.status);
+        return;
+      }
+
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      ttsObjectUrlRef.current = url;
+
+      const audio = new Audio(url);
+      ttsAudioRef.current = audio;
+      audio.volume = 0.8;
+      await audio.play();
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === "AbortError") return;
+      console.warn("ElevenLabs TTS error:", err);
+    }
+  }, [ttsEnabled, stopTts]);
 
   // Detect crisis keywords in AI response
   const detectCrisis = useCallback((content: string) => {
@@ -138,6 +187,7 @@ export default function VesselCommandInterface({
     setInput("");
     setIsLoading(true);
     lastSpokenRef.current = "";
+    stopTts();
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
@@ -175,7 +225,7 @@ export default function VesselCommandInterface({
         setIsLoading(false);
       },
     });
-  }, [isLoading, messages, speak, detectCrisis]);
+  }, [isLoading, messages, speak, detectCrisis, stopTts]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -365,7 +415,7 @@ export default function VesselCommandInterface({
         <div className="flex items-end gap-2 rounded-2xl bg-card/20 backdrop-blur-xl border border-primary/10 px-4 py-3 shadow-[0_0_40px_-10px_hsl(42,50%,54%,0.15)]">
           {/* TTS toggle */}
           <Button
-            onClick={() => { setTtsEnabled(p => !p); window.speechSynthesis?.cancel(); }}
+            onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
             variant="ghost"
             size="icon"
             className={cn(
