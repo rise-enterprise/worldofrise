@@ -1,0 +1,135 @@
+import { useRef, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+
+interface AICoreOrbProps {
+  isActive?: boolean;
+  isCrisis?: boolean;
+  pulseIntensity?: number; // 0-1 for voice/activity
+}
+
+export default function AICoreOrb({ isActive = false, isCrisis = false, pulseIntensity = 0 }: AICoreOrbProps) {
+  const coreRef = useRef<THREE.Mesh>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
+  const ringRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const particlesRef = useRef<THREE.Points>(null);
+
+  const baseColor = isCrisis ? new THREE.Color("#ff3333") : new THREE.Color("#C8A24A");
+  const activeColor = new THREE.Color("#f0d878");
+
+  // Particle positions for micro field
+  const particlePositions = useMemo(() => {
+    const count = 200;
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = 1.2 + Math.random() * 1.5;
+      arr[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      arr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      arr[i * 3 + 2] = r * Math.cos(phi);
+    }
+    return arr;
+  }, []);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    const pulse = 1 + Math.sin(t * 2) * 0.05 + pulseIntensity * 0.15;
+
+    if (coreRef.current) {
+      coreRef.current.scale.setScalar(pulse);
+      const mat = coreRef.current.material as THREE.MeshStandardMaterial;
+      mat.emissiveIntensity = 0.8 + pulseIntensity * 1.5 + Math.sin(t * 3) * 0.2;
+      mat.emissive.lerpColors(baseColor, activeColor, isActive ? 0.6 : 0);
+    }
+
+    if (glowRef.current) {
+      glowRef.current.scale.setScalar(pulse * 1.8);
+      const mat = glowRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.08 + pulseIntensity * 0.12 + Math.sin(t * 2.5) * 0.03;
+    }
+
+    // Rotate orbital rings
+    ringRefs.current.forEach((ring, i) => {
+      if (ring) {
+        ring.rotation.x = t * (0.15 + i * 0.08);
+        ring.rotation.y = t * (0.1 + i * 0.05);
+        ring.rotation.z = i * Math.PI / 3;
+      }
+    });
+
+    // Rotate particle field
+    if (particlesRef.current) {
+      particlesRef.current.rotation.y = t * 0.05;
+      particlesRef.current.rotation.x = Math.sin(t * 0.3) * 0.1;
+    }
+  });
+
+  return (
+    <group>
+      {/* Core sphere */}
+      <mesh ref={coreRef}>
+        <sphereGeometry args={[0.6, 64, 64]} />
+        <meshStandardMaterial
+          color={baseColor}
+          emissive={baseColor}
+          emissiveIntensity={0.8}
+          metalness={0.9}
+          roughness={0.1}
+          transparent
+          opacity={0.95}
+        />
+      </mesh>
+
+      {/* Inner glow */}
+      <mesh ref={glowRef}>
+        <sphereGeometry args={[0.8, 32, 32]} />
+        <meshBasicMaterial
+          color={baseColor}
+          transparent
+          opacity={0.1}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Orbital rings */}
+      {[1.2, 1.6, 2.1].map((radius, i) => (
+        <mesh
+          key={i}
+          ref={(el) => { ringRefs.current[i] = el; }}
+        >
+          <torusGeometry args={[radius, 0.008, 8, 128]} />
+          <meshBasicMaterial
+            color={isCrisis ? "#ff4444" : "#C8A24A"}
+            transparent
+            opacity={0.25 - i * 0.05}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+      ))}
+
+      {/* Micro particle field */}
+      <points ref={particlesRef}>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={200}
+            array={particlePositions}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.025}
+          color={isCrisis ? "#ff6644" : "#C8A24A"}
+          transparent
+          opacity={0.4}
+          sizeAttenuation
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+    </group>
+  );
+}
