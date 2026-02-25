@@ -75,6 +75,11 @@ export default function AICommandCenter() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const animFrameRef = useRef<number>(0);
+  const barsRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -131,9 +136,53 @@ export default function AICommandCenter() {
     }
   };
 
+  const stopAudio = useCallback(() => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    animFrameRef.current = 0;
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    streamRef.current = null;
+    audioContextRef.current?.close().catch(() => {});
+    audioContextRef.current = null;
+    analyserRef.current = null;
+  }, []);
+
+  const startAudioVisualizer = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const ctx = new AudioContext();
+      audioContextRef.current = ctx;
+      const source = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      const bins = [2, 5, 8, 12, 16]; // pick 5 spread-out bins
+
+      const tick = () => {
+        analyser.getByteFrequencyData(data);
+        const bars = barsRef.current?.children;
+        if (bars) {
+          for (let i = 0; i < bins.length; i++) {
+            const v = data[bins[i]] ?? 0;
+            const scale = 0.15 + (v / 255) * 0.85;
+            (bars[i] as HTMLElement).style.transform = `scaleY(${scale})`;
+          }
+        }
+        animFrameRef.current = requestAnimationFrame(tick);
+      };
+      animFrameRef.current = requestAnimationFrame(tick);
+    } catch {
+      // getUserMedia failed — voice still works, bars just won't animate
+    }
+  }, []);
+
   const toggleVoice = useCallback(() => {
     if (isListening) {
       recognitionRef.current?.abort();
+      stopAudio();
       setIsListening(false);
       return;
     }
@@ -163,17 +212,19 @@ export default function AICommandCenter() {
       }
       if (finalText) {
         setInput("");
+        stopAudio();
         setIsListening(false);
         send(finalText);
       } else {
         setInput(interim);
       }
     };
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => { stopAudio(); setIsListening(false); };
+    recognition.onend = () => { stopAudio(); setIsListening(false); };
     recognition.start();
+    startAudioVisualizer();
     setIsListening(true);
-  }, [isListening, send]);
+  }, [isListening, send, stopAudio, startAudioVisualizer]);
 
   const isEmpty = messages.length === 0;
 
@@ -273,6 +324,20 @@ export default function AICommandCenter() {
                 )}
                 rows={1}
               />
+              {isListening && (
+                <div ref={barsRef} className="flex items-center gap-[2px] h-9 px-1">
+                  {[0.6, 0.8, 1, 0.8, 0.6].map((base, i) => (
+                    <span
+                      key={i}
+                      className="w-[2px] h-4 rounded-full bg-primary/60 origin-center"
+                      style={{
+                        transform: `scaleY(${base * 0.2})`,
+                        transition: "transform 80ms ease-out",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
               <div className="relative shrink-0">
                 {isListening && (
                   <>
