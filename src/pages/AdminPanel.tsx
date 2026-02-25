@@ -10,6 +10,7 @@ export default function AdminPanel() {
   const [isListening, setIsListening] = useState(false);
   const [pulseIntensity, setPulseIntensity] = useState(0);
   const [isCrisis, setIsCrisis] = useState(false);
+  const [aiMetrics, setAiMetrics] = useState<{ label: string; value: number }[]>([]);
 
   const m = metrics ?? ({} as any);
   const totalMembers = m.totalMembers ?? 0;
@@ -51,6 +52,7 @@ export default function AdminPanel() {
           isCrisis={isCrisis}
           pulseIntensity={pulseIntensity}
           metrics={metricRings}
+          aiMetrics={aiMetrics}
         />
       </Suspense>
 
@@ -79,6 +81,7 @@ export default function AdminPanel() {
           onListeningChange={setIsListening}
           onPulseIntensity={setPulseIntensity}
           onCrisisChange={handleCrisis}
+          onAIMetrics={setAiMetrics}
         />
       </div>
 

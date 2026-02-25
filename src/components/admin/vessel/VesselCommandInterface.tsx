@@ -66,16 +66,51 @@ async function streamChat({
   onDone();
 }
 
+/* ── Extract numeric metrics from AI text ── */
+function extractMetrics(text: string): { label: string; value: number }[] {
+  const metrics: { label: string; value: number }[] = [];
+  const seen = new Set<string>();
+
+  const parseNum = (s: string) => Number(s.replace(/,/g, "").replace(/%$/, ""));
+
+  // Pattern 1: **number** label  (bold markdown numbers)
+  const p1 = /\*\*([0-9,]+(?:\.[0-9]+)?%?)\*\*\s+([a-zA-Z][a-zA-Z\s]{1,25})/g;
+  // Pattern 2: number + keyword label
+  const p2 = /(?:^|\s)([0-9,]+(?:\.[0-9]+)?%?)\s+((?:total|active|vip|new|dormant|at.risk|high.risk|churn|members?|guests?|visits?|points?|rewards?|campaigns?|retention)[a-zA-Z\s]{0,20})/gi;
+  // Pattern 3: label: number
+  const p3 = /([\w\s]{2,20}):\s*\*?\*?([0-9,]+(?:\.[0-9]+)?%?)\*?\*?/g;
+
+  const add = (label: string, raw: string) => {
+    const v = parseNum(raw);
+    if (isNaN(v) || v === 0) return;
+    const key = label.trim().toLowerCase().replace(/\s+/g, " ");
+    if (key.length < 2 || key.length > 25 || seen.has(key)) return;
+    // Skip pure noise words
+    if (/^(the|and|or|is|are|was|were|has|have|a|an|in|on|of|to|for|with|that|this)$/i.test(key)) return;
+    seen.add(key);
+    metrics.push({ label: label.trim(), value: v });
+  };
+
+  let m: RegExpExecArray | null;
+  while ((m = p1.exec(text)) !== null) add(m[2], m[1]);
+  while ((m = p2.exec(text)) !== null) add(m[2], m[1]);
+  while ((m = p3.exec(text)) !== null) add(m[1], m[2]);
+
+  return metrics.slice(0, 6);
+}
+
 interface VesselCommandInterfaceProps {
   onListeningChange?: (listening: boolean) => void;
   onPulseIntensity?: (intensity: number) => void;
   onCrisisChange?: (crisis: boolean) => void;
+  onAIMetrics?: (metrics: { label: string; value: number }[]) => void;
 }
 
 export default function VesselCommandInterface({
   onListeningChange,
   onPulseIntensity,
   onCrisisChange,
+  onAIMetrics,
 }: VesselCommandInterfaceProps) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -218,6 +253,8 @@ export default function VesselCommandInterface({
         if (assistantSoFar) {
           speak(assistantSoFar);
           detectCrisis(assistantSoFar);
+          const extracted = extractMetrics(assistantSoFar);
+          if (extracted.length > 0) onAIMetrics?.(extracted);
         }
       },
       onError: (err) => {
