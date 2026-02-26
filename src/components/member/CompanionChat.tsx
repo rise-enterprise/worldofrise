@@ -112,7 +112,6 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
   const [hasGreeted, setHasGreeted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const ttsFiredRef = useRef(false);
 
   // Auto-scroll
   useEffect(() => {
@@ -197,7 +196,6 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     setIsStreaming(true);
 
     let assistantContent = "";
-    ttsFiredRef.current = false;
 
     const upsertAssistant = (chunk: string) => {
       assistantContent += chunk;
@@ -215,15 +213,6 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
           timestamp: new Date(),
         }];
       });
-
-      // Fire TTS on first complete sentence for faster voice activation
-      if (!ttsFiredRef.current && voiceEnabled && assistantContent.length >= 20) {
-        const sentenceMatch = assistantContent.match(/^([\s\S]*?[.!?])(?:\s|$)/);
-        if (sentenceMatch) {
-          ttsFiredRef.current = true;
-          speakText(sentenceMatch[1]);
-        }
-      }
     };
 
     try {
@@ -242,7 +231,10 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
           setMessages(prev => prev.map(m => 
             m.id.startsWith('streaming-') ? { ...m, id: 'final-' + Date.now() } : m
           ));
-          // TTS already fired on first sentence — no need here
+          // Voice response
+          if (assistantContent && voiceEnabled) {
+            speakText(assistantContent);
+          }
         },
       });
     } catch (e: any) {
