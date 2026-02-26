@@ -412,9 +412,17 @@ export default function VesselCommandInterface({
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground/50 max-w-md mb-6">
+            <p className="text-xs text-muted-foreground/50 max-w-md mb-4">
               Speak or type commands. The AI manages all operations — campaigns, analytics, member management, rewards, and predictive intelligence.
             </p>
+
+            <a
+              href="/admin/operator"
+              className="inline-flex items-center gap-2 text-[10px] px-4 py-2 rounded-lg border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 transition-all mb-6 uppercase tracking-widest"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              AI Operator Console — Full System Control
+            </a>
 
             <div className="flex flex-wrap gap-2 justify-center max-w-lg">
               {EXAMPLE_COMMANDS.slice(0, 6).map((cmd) => (

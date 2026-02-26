@@ -55,11 +55,65 @@ export const CONTACT_COLUMNS: ContactColumn[] = [
   { header: "Sasso - west walk marketing opt-in", dbField: "sasso_west_walk_opt_in", type: "boolean", width: "250px" },
 ];
 
-// Map of lowercase header -> dbField for auto-mapping
+// Map of lowercase header -> dbField for auto-mapping (includes aliases)
 export const HEADER_TO_DB_MAP: Record<string, string> = {};
 CONTACT_COLUMNS.forEach((col) => {
   HEADER_TO_DB_MAP[col.header.toLowerCase().trim()] = col.dbField;
 });
+
+// Extended alias mapping for common CSV variations
+const HEADER_ALIASES: Record<string, string> = {
+  // Name fields
+  "first name": "first_name", "firstname": "first_name", "given name": "first_name", "fname": "first_name",
+  "last name": "last_name", "lastname": "last_name", "surname": "last_name", "family name": "last_name", "lname": "last_name",
+  "client first name": "first_name", "client last name": "last_name",
+  "full name": "first_name", "name": "first_name", "guest name": "first_name", "customer name": "first_name",
+  // Contact
+  "mobile": "phone", "mobile phone": "phone", "cell": "phone", "telephone": "phone", "tel": "phone", "contact number": "phone",
+  "phone number": "phone", "mobile number": "phone", "primary phone": "phone",
+  "email address": "email", "e-mail": "email", "primary email": "email", "e mail": "email",
+  "secondary email": "alt_email", "alternate email": "alt_email", "other email": "alt_email",
+  "office phone": "work_phone", "business phone": "work_phone",
+  // Spend / metrics
+  "total revenue": "total_spend", "revenue": "total_spend", "lifetime spend": "total_spend", "ltv": "total_spend",
+  "spend": "total_spend", "lifetime value": "total_spend", "total amount": "total_spend",
+  "avg spend": "spend_per_visit", "average spend": "spend_per_visit", "avg. spend / visit": "spend_per_visit",
+  "spend per cover": "spend_per_cover", "avg. spend / cover": "spend_per_cover", "cover spend": "spend_per_cover",
+  "rating": "avg_rating", "average rating": "avg_rating", "avg rating": "avg_rating",
+  "visit count": "visits", "total visits": "visits", "num visits": "visits", "number of visits": "visits",
+  "order count": "orders", "total orders": "orders",
+  "cancel count": "cancels", "cancellations": "cancels", "cancelled": "cancels",
+  "no shows": "no_show", "noshow": "no_show", "no-show": "no_show", "no show count": "no_show",
+  // Dates
+  "date of birth": "birthday", "dob": "birthday", "birth date": "birthday", "birthdate": "birthday",
+  "wedding anniversary": "anniversary", "anniversary date": "anniversary",
+  "last visited": "last_visit", "last visit date": "last_visit", "most recent visit": "last_visit",
+  "created at": "created_date", "create date": "created_date", "date created": "created_date", "registration date": "created_date", "signup date": "created_date",
+  // Location
+  "branch": "last_location", "location": "last_location", "venue": "last_location", "restaurant": "last_location",
+  "last branch": "last_location", "last venue": "last_location", "preferred location": "last_location",
+  "zip code": "postal_code", "zip": "postal_code", "postcode": "postal_code",
+  "region": "state", "province": "state",
+  // Loyalty
+  "loyalty id": "loyalty_id", "member id": "loyalty_id", "customer id": "loyalty_id", "guest id": "loyalty_id",
+  "card number": "loyalty_id", "membership number": "loyalty_id", "membership id": "loyalty_id",
+  "tier": "loyalty_tier", "loyalty level": "loyalty_tier", "member tier": "loyalty_tier", "status tier": "loyalty_tier",
+  "rank": "loyalty_rank", "loyalty ranking": "loyalty_rank",
+  // Other
+  "vip status": "vip", "is vip": "vip", "vip flag": "vip",
+  "sex": "gender", "mr/mrs": "salutation", "prefix": "salutation",
+  "job title": "title", "position": "title", "role": "title",
+  "organization": "company", "employer": "company", "firm": "company", "business": "company",
+  "comment": "notes", "remarks": "notes", "note": "notes", "memo": "notes",
+  "label": "tags", "category": "tags", "group": "tags",
+};
+
+// Merge aliases into the map
+for (const [alias, dbField] of Object.entries(HEADER_ALIASES)) {
+  if (!HEADER_TO_DB_MAP[alias]) {
+    HEADER_TO_DB_MAP[alias] = dbField;
+  }
+}
 
 export const DB_FIELDS = CONTACT_COLUMNS.map((c) => c.dbField);
 
