@@ -54,6 +54,16 @@ serve(async (req) => {
 
     const { messages } = await req.json();
 
+    // Compute Gulf time mood (UTC+3)
+    const gulfHour = (new Date().getUTCHours() + 3) % 24;
+    const mood = gulfHour >= 6 && gulfHour < 12
+      ? "morning — energetic, fresh start energy. Reference breakfast/coffee at NOIR, lunch prep at SASSO."
+      : gulfHour >= 12 && gulfHour < 17
+      ? "afternoon — balanced, productive tone. Lunch at SASSO, afternoon coffee at NOIR."
+      : gulfHour >= 17 && gulfHour < 22
+      ? "evening — warm, refined tone. Dinner at SASSO, evening atmosphere at NOIR."
+      : "night — calm, intimate tone. Late-night exclusivity, quieter language.";
+
     // Fetch context data in parallel
     const [metricsResult, insightsResult] = await Promise.all([
       serviceClient.rpc("get_dashboard_metrics"),
@@ -80,6 +90,7 @@ Tiers: ${JSON.stringify((metrics as any)?.tierDistribution ?? {})}${insightsCont
 
 Tiers: Initiation → Connoisseur → Elite → Inner Circle → RISE Black. Cities: Doha, Riyadh.
 Be concise, data-driven, actionable. Use bold numbers, tables, bullets. Reference admin sections by name. Under 200 words unless detail requested.
+MOOD: It's currently ${mood} Adapt your energy, greetings, and suggestions accordingly.
 LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic (RTL). If English, respond in English. Match their language naturally. Brand names (NOIR, SASSO, RISE) stay in English.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

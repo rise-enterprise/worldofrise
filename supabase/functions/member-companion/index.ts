@@ -124,6 +124,16 @@ serve(async (req) => {
     // Affordable rewards
     const affordableRewards = availableRewards.filter((r: any) => r.points_cost <= (member?.total_points || 0));
 
+    // Compute Gulf time mood (UTC+3)
+    const gulfHour = (new Date().getUTCHours() + 3) % 24;
+    const mood = gulfHour >= 6 && gulfHour < 12
+      ? "morning — energetic, fresh start. Suggest coffee at NOIR, breakfast vibes."
+      : gulfHour >= 12 && gulfHour < 17
+      ? "afternoon — balanced, warm. Suggest lunch at SASSO, afternoon coffee at NOIR."
+      : gulfHour >= 17 && gulfHour < 22
+      ? "evening — refined, intimate. Suggest dinner at SASSO, evening ambiance at NOIR."
+      : "night — calm, exclusive. Late-night warmth, quieter tone.";
+
     const systemPrompt = `You are the RISE Personal Companion — an exclusive AI concierge assigned personally to ${member?.full_name || "this member"}. You serve the RISE Holding luxury loyalty ecosystem (NOIR Café and SASSO Italian Fine Dining).
 
 YOUR PERSONALITY:
@@ -168,8 +178,10 @@ ${daysSinceLastVisit !== null && daysSinceLastVisit > 14 ? `- INACTIVE for ${day
 ${last30DayVisits >= 4 ? "- HIGH ENGAGEMENT — celebrate their dedication" : ""}
 ${last30DayVisits === 0 ? "- No visits this month — softly encourage a return" : ""}
 
+MOOD: It's currently ${mood} Adapt your greeting, tone, and suggestions accordingly.
+
 GUIDELINES:
-- Always greet warmly by first name on first message
+- Always greet warmly by first name on first message with a time-appropriate greeting (Good morning/afternoon/evening)
 - Reference their actual visit data — never fabricate visits
 - When they ask about points/tier, give exact numbers
 - Suggest visits at their preferred location and day when relevant
