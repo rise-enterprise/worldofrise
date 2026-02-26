@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Menu, Search, Rocket, ScrollText, X, BrainCircuit } from "lucide-react";
+import { Menu, Search, Rocket, ScrollText, X } from "lucide-react";
+import riseLogo from "@/assets/rise-holding-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -30,10 +31,10 @@ export default function AdminHeader({ onMenuToggle, showMenu, searchQuery, onSea
           </Button>
         )}
 
-        <h1 className="text-base font-serif font-semibold text-foreground whitespace-nowrap hidden sm:block flex items-center gap-2">
-          <BrainCircuit className="h-5 w-5 text-primary" />
-          RISE AI Panel
-        </h1>
+        <div className="hidden sm:flex items-center gap-2 shrink-0">
+          <img src={riseLogo} alt="Rise Holding" className="h-6 w-auto" />
+          <span className="text-base font-serif font-semibold text-foreground">RISE AI Panel</span>
+        </div>
 
         {/* Search */}
         <div className="relative flex-1 max-w-md mx-auto">

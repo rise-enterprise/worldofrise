@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CrystalPageWrapper } from "@/components/effects/CrystalPageWrapper";
 import { BrainCircuit, LogIn, Loader2 } from "lucide-react";
+import riseLogo from "@/assets/rise-holding-logo.png";
 import { toast } from "@/hooks/use-toast";
 
 export default function AdminLogin() {
@@ -68,8 +69,8 @@ export default function AdminLogin() {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md bg-card/80 backdrop-blur-md border-border/40">
           <CardHeader className="text-center space-y-3">
-            <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-              <BrainCircuit className="w-7 h-7 text-primary" />
+            <div className="mx-auto w-20 h-20 flex items-center justify-center">
+              <img src={riseLogo} alt="Rise Holding" className="w-full h-full object-contain" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">
               RISE AI Panel
