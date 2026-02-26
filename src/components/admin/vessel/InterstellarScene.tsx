@@ -6,6 +6,7 @@ import RISECoreEmblem from "./RISECoreEmblem";
 import MetricRings from "./MetricRings";
 import ScanSweep from "./ScanSweep";
 import AIResponseMetrics from "./AIResponseMetrics";
+import GlobalCommandMap from "./GlobalCommandMap";
 import { useEffect } from "react";
 
 /* ── Cursor-driven camera with micro-zoom ── */
@@ -256,6 +257,9 @@ export default function InterstellarScene({
           {/* Data panels */}
           {metrics.length > 0 && <MetricRings metrics={metrics} isCrisis={isCrisis} />}
           {aiMetrics.length > 0 && <AIResponseMetrics metrics={aiMetrics} />}
+
+          {/* Global Command Map */}
+          <GlobalCommandMap isDay={isDay} />
         </Suspense>
       </Canvas>
     </div>
