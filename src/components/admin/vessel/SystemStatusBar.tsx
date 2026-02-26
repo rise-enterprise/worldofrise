@@ -33,7 +33,7 @@ export default function SystemStatusBar({
           isCrisis ? "bg-destructive" : "bg-emerald-500"
         )} />
         <span className="text-[10px] uppercase tracking-[0.25em] text-primary/70 font-semibold">
-          {isCrisis ? "⚠ INSTABILITY DETECTED" : "NOIR COMMAND VESSEL"}
+          {isCrisis ? "⚠ INSTABILITY DETECTED" : "RISE INTELLIGENCE CHAMBER"}
         </span>
       </div>
 

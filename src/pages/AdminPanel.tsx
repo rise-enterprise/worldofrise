@@ -10,6 +10,8 @@ export default function AdminPanel() {
   const [isListening, setIsListening] = useState(false);
   const [pulseIntensity, setPulseIntensity] = useState(0);
   const [isCrisis, setIsCrisis] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [aiMetrics, setAiMetrics] = useState<{ label: string; value: number }[]>([]);
 
   const m = metrics ?? ({} as any);
@@ -20,11 +22,9 @@ export default function AdminPanel() {
   const churnRisk = m.churnRiskCount ?? 0;
   const noir = m.visitsByBrand?.noir ?? 0;
   const sasso = m.visitsByBrand?.sasso ?? 0;
-  const tierDist = m.tierDistribution ?? {};
 
   const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
 
-  // Build 3D metric ring data
   const metricRings = [
     { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
     { label: "Visits", value: visitsMonth, max: totalMembers || 1, color: "#4488ff" },
@@ -37,30 +37,29 @@ export default function AdminPanel() {
 
   const handleCrisis = useCallback((crisis: boolean) => {
     setIsCrisis(crisis);
-    // Auto-clear crisis after 30s
     if (crisis) setTimeout(() => setIsCrisis(false), 30000);
   }, []);
 
   return (
     <div className="h-screen w-screen bg-[#020610] overflow-hidden relative flex flex-col">
       {/* 3D Background */}
-      <Suspense fallback={
-        <div className="absolute inset-0 bg-[#020610]" />
-      }>
+      <Suspense fallback={<div className="absolute inset-0 bg-[#020610]" />}>
         <InterstellarScene
           isListening={isListening}
           isCrisis={isCrisis}
           pulseIntensity={pulseIntensity}
+          isProcessing={isProcessing}
+          isSpeaking={isSpeaking}
           metrics={metricRings}
           aiMetrics={aiMetrics}
         />
       </Suspense>
 
-      {/* CRT / holographic scanlines overlay */}
+      {/* CRT scanlines */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.02) 2px, rgba(0,212,255,0.02) 4px)",
+          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px)",
           mixBlendMode: "screen",
         }}
       />
@@ -75,17 +74,19 @@ export default function AdminPanel() {
         churnRisk={churnRisk}
       />
 
-      {/* Command interface overlay */}
+      {/* Command interface */}
       <div className="flex-1 min-h-0 relative z-10">
         <VesselCommandInterface
           onListeningChange={setIsListening}
           onPulseIntensity={setPulseIntensity}
           onCrisisChange={handleCrisis}
           onAIMetrics={setAiMetrics}
+          onProcessingChange={setIsProcessing}
+          onSpeakingChange={setIsSpeaking}
         />
       </div>
 
-      {/* Crisis mode vignette */}
+      {/* Crisis vignette */}
       {isCrisis && (
         <div
           className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"

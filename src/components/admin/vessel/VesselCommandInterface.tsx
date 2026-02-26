@@ -104,6 +104,8 @@ interface VesselCommandInterfaceProps {
   onPulseIntensity?: (intensity: number) => void;
   onCrisisChange?: (crisis: boolean) => void;
   onAIMetrics?: (metrics: { label: string; value: number }[]) => void;
+  onProcessingChange?: (processing: boolean) => void;
+  onSpeakingChange?: (speaking: boolean) => void;
 }
 
 export default function VesselCommandInterface({
@@ -111,6 +113,8 @@ export default function VesselCommandInterface({
   onPulseIntensity,
   onCrisisChange,
   onAIMetrics,
+  onProcessingChange,
+  onSpeakingChange,
 }: VesselCommandInterfaceProps) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -201,8 +205,11 @@ export default function VesselCommandInterface({
       const audio = new Audio(url);
       ttsAudioRef.current = audio;
       audio.volume = 0.8;
+      onSpeakingChange?.(true);
+      audio.onended = () => onSpeakingChange?.(false);
       await audio.play();
     } catch (err: unknown) {
+      onSpeakingChange?.(false);
       if (err instanceof Error && err.name === "AbortError") return;
       console.warn("ElevenLabs TTS error:", err);
     }
@@ -221,6 +228,7 @@ export default function VesselCommandInterface({
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+    onProcessingChange?.(true);
     lastSpokenRef.current = "";
     stopTts();
 
@@ -250,6 +258,7 @@ export default function VesselCommandInterface({
       onDelta: upsert,
       onDone: () => {
         setIsLoading(false);
+        onProcessingChange?.(false);
         if (assistantSoFar) {
           speak(assistantSoFar);
           detectCrisis(assistantSoFar);
@@ -260,9 +269,10 @@ export default function VesselCommandInterface({
       onError: (err) => {
         toast({ title: "AI Error", description: err, variant: "destructive" });
         setIsLoading(false);
+        onProcessingChange?.(false);
       },
     });
-  }, [isLoading, messages, speak, detectCrisis, stopTts]);
+  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -379,8 +389,8 @@ export default function VesselCommandInterface({
           <div className="flex flex-col items-center justify-center h-full text-center py-12 px-4">
             {/* AI Identity */}
             <div className="mb-6">
-              <div className="text-xs uppercase tracking-[0.3em] text-primary/60 mb-1">NOIR Intelligence</div>
-              <div className="text-2xl font-serif text-primary tracking-widest">COMMAND VESSEL</div>
+              <div className="text-xs uppercase tracking-[0.3em] text-primary/60 mb-1">RISE Intelligence</div>
+              <div className="text-2xl font-serif text-primary tracking-widest">COMMAND CHAMBER</div>
               <div className="text-[10px] text-muted-foreground/40 mt-2 tracking-wider">
                 Voice-first · AI-only control · All systems operational
               </div>
