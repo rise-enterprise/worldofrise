@@ -3,6 +3,7 @@ import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 import SystemStatusBar from "@/components/admin/vessel/SystemStatusBar";
 import VesselCommandInterface from "@/components/admin/vessel/VesselCommandInterface";
 import { VesselThemeProvider, useVesselTheme } from "@/contexts/VesselThemeContext";
+import { AIPersonalityProvider } from "@/contexts/AIPersonalityContext";
 
 const InterstellarScene = lazy(() => import("@/components/admin/vessel/InterstellarScene"));
 
@@ -111,7 +112,9 @@ function AdminPanelInner() {
 export default function AdminPanel() {
   return (
     <VesselThemeProvider>
-      <AdminPanelInner />
+      <AIPersonalityProvider>
+        <AdminPanelInner />
+      </AIPersonalityProvider>
     </VesselThemeProvider>
   );
 }
