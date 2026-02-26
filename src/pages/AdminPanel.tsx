@@ -3,13 +3,14 @@ import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 import SystemStatusBar from "@/components/admin/vessel/SystemStatusBar";
 import VesselCommandInterface from "@/components/admin/vessel/VesselCommandInterface";
 import { VesselThemeProvider, useVesselTheme } from "@/contexts/VesselThemeContext";
-import { AIPersonalityProvider } from "@/contexts/AIPersonalityContext";
+import { AIPersonalityProvider, useAIPersonality } from "@/contexts/AIPersonalityContext";
 
 const InterstellarScene = lazy(() => import("@/components/admin/vessel/InterstellarScene"));
 
 function AdminPanelInner() {
   const { data: metrics } = useDashboardMetrics("all");
   const { isDay, colors } = useVesselTheme();
+  const { config: personality } = useAIPersonality();
   const [isListening, setIsListening] = useState(false);
   const [pulseIntensity, setPulseIntensity] = useState(0);
   const [isCrisis, setIsCrisis] = useState(false);
@@ -62,14 +63,31 @@ function AdminPanelInner() {
         />
       </Suspense>
 
-      {/* CRT scanlines — subtle in day, stronger at night */}
+      {/* CRT scanlines */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
           background: isDay
-            ? "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,162,74,0.008) 2px, rgba(200,162,74,0.008) 4px)"
-            : "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px)",
+            ? "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,162,74,0.006) 2px, rgba(200,162,74,0.006) 4px)"
+            : "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px)",
           mixBlendMode: "screen",
+        }}
+      />
+
+      {/* Personality accent vignette — subtle colored edge glow */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[2] transition-all duration-1000"
+        style={{
+          background: `radial-gradient(ellipse at center, transparent 60%, ${personality.accentHex}08 100%)`,
+          boxShadow: `inset 0 0 200px -60px ${personality.accentHex}06`,
+        }}
+      />
+
+      {/* Top edge light sweep */}
+      <div
+        className="fixed top-0 left-0 right-0 h-px pointer-events-none z-[3]"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${personality.accentHex}30, transparent)`,
         }}
       />
 
@@ -100,11 +118,19 @@ function AdminPanelInner() {
         <div
           className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"
           style={{
-            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.08) 100%)",
-            boxShadow: "inset 0 0 120px rgba(200,30,30,0.06)",
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.1) 100%)",
+            boxShadow: "inset 0 0 150px rgba(200,30,30,0.08)",
           }}
         />
       )}
+
+      {/* Bottom edge accent line */}
+      <div
+        className="fixed bottom-0 left-0 right-0 h-px pointer-events-none z-[3]"
+        style={{
+          background: `linear-gradient(90deg, transparent 10%, ${personality.accentHex}20, transparent 90%)`,
+        }}
+      />
     </div>
   );
 }
