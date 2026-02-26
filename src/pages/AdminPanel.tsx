@@ -2,11 +2,13 @@ import { useState, useCallback, lazy, Suspense } from "react";
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 import SystemStatusBar from "@/components/admin/vessel/SystemStatusBar";
 import VesselCommandInterface from "@/components/admin/vessel/VesselCommandInterface";
+import { VesselThemeProvider, useVesselTheme } from "@/contexts/VesselThemeContext";
 
 const InterstellarScene = lazy(() => import("@/components/admin/vessel/InterstellarScene"));
 
-export default function AdminPanel() {
+function AdminPanelInner() {
   const { data: metrics } = useDashboardMetrics("all");
+  const { isDay, colors } = useVesselTheme();
   const [isListening, setIsListening] = useState(false);
   const [pulseIntensity, setPulseIntensity] = useState(0);
   const [isCrisis, setIsCrisis] = useState(false);
@@ -27,12 +29,12 @@ export default function AdminPanel() {
 
   const metricRings = [
     { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
-    { label: "Visits", value: visitsMonth, max: totalMembers || 1, color: "#4488ff" },
+    { label: "Visits", value: visitsMonth, max: totalMembers || 1, color: isDay ? "#8a7d6a" : "#4488ff" },
     { label: "VIP", value: vipCount, max: totalMembers || 1, color: "#C8A24A" },
     { label: "Retention", value: retentionRate, max: 100, color: "#22c55e" },
     { label: "Churn", value: churnRisk, max: totalMembers || 1, color: "#ef4444" },
     { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#C8A24A" },
-    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#3b82f6" },
+    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: isDay ? "#6b7280" : "#3b82f6" },
   ];
 
   const handleCrisis = useCallback((crisis: boolean) => {
@@ -41,9 +43,12 @@ export default function AdminPanel() {
   }, []);
 
   return (
-    <div className="h-screen w-screen bg-[#020610] overflow-hidden relative flex flex-col pt-safe">
+    <div
+      className="h-screen w-screen overflow-hidden relative flex flex-col pt-safe transition-colors duration-1000"
+      style={{ backgroundColor: colors.bg }}
+    >
       {/* 3D Background */}
-      <Suspense fallback={<div className="absolute inset-0 bg-[#020610]" />}>
+      <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: colors.bg }} />}>
         <InterstellarScene
           isListening={isListening}
           isCrisis={isCrisis}
@@ -52,14 +57,17 @@ export default function AdminPanel() {
           isSpeaking={isSpeaking}
           metrics={metricRings}
           aiMetrics={aiMetrics}
+          isDay={isDay}
         />
       </Suspense>
 
-      {/* CRT scanlines */}
+      {/* CRT scanlines — subtle in day, stronger at night */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px)",
+          background: isDay
+            ? "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,162,74,0.008) 2px, rgba(200,162,74,0.008) 4px)"
+            : "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.015) 2px, rgba(0,212,255,0.015) 4px)",
           mixBlendMode: "screen",
         }}
       />
@@ -97,5 +105,13 @@ export default function AdminPanel() {
         />
       )}
     </div>
+  );
+}
+
+export default function AdminPanel() {
+  return (
+    <VesselThemeProvider>
+      <AdminPanelInner />
+    </VesselThemeProvider>
   );
 }

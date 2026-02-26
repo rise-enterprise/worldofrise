@@ -29,12 +29,9 @@ function CameraController({ isProcessing }: { isProcessing?: boolean }) {
     target.current.y += (-mouse.current.y * 0.3 - target.current.y) * 0.03;
     camera.position.x = target.current.x;
     camera.position.y = target.current.y + 1;
-
-    // Micro-zoom when processing
     const zt = isProcessing ? 7.2 : 8;
     zoomTarget.current += (zt - zoomTarget.current) * 0.02;
     camera.position.z = zoomTarget.current;
-
     camera.lookAt(0, 0.3, 0);
   });
 
@@ -42,18 +39,18 @@ function CameraController({ isProcessing }: { isProcessing?: boolean }) {
 }
 
 /* ── Deep ambient fog layer ── */
-function AmbientFog({ isCrisis }: { isCrisis: boolean }) {
+function AmbientFog({ isCrisis, isDay }: { isCrisis: boolean; isDay: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
       const crisisBlend = isCrisis ? 0.04 : 0;
-      mat.opacity = 0.15 + Math.sin(clock.getElapsedTime() * 0.4) * 0.03 + crisisBlend;
+      mat.opacity = (isDay ? 0.25 : 0.15) + Math.sin(clock.getElapsedTime() * 0.4) * 0.03 + crisisBlend;
       if (isCrisis) {
         mat.color.lerp(new THREE.Color("#220000"), 0.02);
       } else {
-        mat.color.lerp(new THREE.Color("#020610"), 0.02);
+        mat.color.lerp(new THREE.Color(isDay ? "#ede5d5" : "#020610"), 0.02);
       }
     }
   });
@@ -61,19 +58,19 @@ function AmbientFog({ isCrisis }: { isCrisis: boolean }) {
   return (
     <mesh ref={ref} position={[0, 0, -25]}>
       <planeGeometry args={[120, 120]} />
-      <meshBasicMaterial color="#020610" transparent opacity={0.15} depthWrite={false} />
+      <meshBasicMaterial color={isDay ? "#ede5d5" : "#020610"} transparent opacity={0.15} depthWrite={false} />
     </mesh>
   );
 }
 
 /* ── Volumetric spotlight behind emblem ── */
-function CoreSpotlight({ isCrisis }: { isCrisis: boolean }) {
+function CoreSpotlight({ isCrisis, isDay }: { isCrisis: boolean; isDay: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.04 + Math.sin(clock.getElapsedTime() * 0.6) * 0.015;
+      mat.opacity = (isDay ? 0.06 : 0.04) + Math.sin(clock.getElapsedTime() * 0.6) * 0.015;
     }
   });
 
@@ -81,7 +78,7 @@ function CoreSpotlight({ isCrisis }: { isCrisis: boolean }) {
     <mesh ref={ref} position={[0, 0.3, -3]}>
       <circleGeometry args={[6, 64]} />
       <meshBasicMaterial
-        color={isCrisis ? "#331111" : "#1a1508"}
+        color={isCrisis ? "#331111" : isDay ? "#d4c088" : "#1a1508"}
         transparent
         opacity={0.04}
         blending={THREE.AdditiveBlending}
@@ -92,7 +89,7 @@ function CoreSpotlight({ isCrisis }: { isCrisis: boolean }) {
 }
 
 /* ── Ambient dust particles ── */
-function DustParticles() {
+function DustParticles({ isDay }: { isDay: boolean }) {
   const ref = useRef<THREE.Points>(null);
   const count = 400;
 
@@ -125,9 +122,49 @@ function DustParticles() {
       </bufferGeometry>
       <pointsMaterial
         size={0.015}
-        color="#C8A24A"
+        color={isDay ? "#C8A24A" : "#C8A24A"}
         transparent
-        opacity={0.15}
+        opacity={isDay ? 0.1 : 0.15}
+        sizeAttenuation
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </points>
+  );
+}
+
+/* ── Galaxy particles (night only) ── */
+function GalaxyParticles() {
+  const ref = useRef<THREE.Points>(null);
+  const count = 1500;
+
+  const positions = useMemo(() => {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 80;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 60;
+      arr[i * 3 + 2] = -10 - Math.random() * 50;
+    }
+    return arr;
+  }, []);
+
+  useFrame((_, delta) => {
+    if (ref.current) {
+      ref.current.rotation.y += delta * 0.005;
+      ref.current.rotation.x += delta * 0.002;
+    }
+  });
+
+  return (
+    <points ref={ref}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.04}
+        color="#ffffff"
+        transparent
+        opacity={0.4}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -144,6 +181,7 @@ interface InterstellarSceneProps {
   isSpeaking?: boolean;
   metrics?: { label: string; value: number; max: number; color: string }[];
   aiMetrics?: { label: string; value: number }[];
+  isDay?: boolean;
 }
 
 export default function InterstellarScene({
@@ -154,6 +192,7 @@ export default function InterstellarScene({
   isSpeaking = false,
   metrics = [],
   aiMetrics = [],
+  isDay = false,
 }: InterstellarSceneProps) {
   return (
     <div className="absolute inset-0 z-0">
@@ -165,32 +204,47 @@ export default function InterstellarScene({
       >
         <Suspense fallback={null}>
           <CameraController isProcessing={isProcessing} />
-          <ambientLight intensity={0.08} />
+          <ambientLight intensity={isDay ? 0.25 : 0.08} />
 
           {/* Primary core spotlight */}
           <pointLight
             position={[0, 0.3, 0]}
-            intensity={isCrisis ? 3.5 : 2}
+            intensity={isCrisis ? 3.5 : isDay ? 1.5 : 2}
             color={isCrisis ? "#ff4444" : "#C8A24A"}
             distance={25}
             decay={2}
           />
           {/* Backlight for depth */}
-          <pointLight position={[0, 2, -5]} intensity={0.6} color="#C8A24A" distance={20} decay={2} />
-          {/* Cyan accent lights */}
-          <pointLight position={[6, 3, -6]} intensity={0.4} color="#00d4ff" distance={25} decay={2} />
-          <pointLight position={[-6, -2, 4]} intensity={0.25} color="#00d4ff" distance={18} decay={2} />
-          {/* Cool white fill from above */}
-          <directionalLight position={[0, 8, 0]} intensity={0.08} color="#eeeeff" />
+          <pointLight position={[0, 2, -5]} intensity={isDay ? 0.4 : 0.6} color="#C8A24A" distance={20} decay={2} />
+
+          {isDay ? (
+            <>
+              {/* Day mode: warm champagne lighting */}
+              <pointLight position={[6, 5, -4]} intensity={0.5} color="#d4c088" distance={25} decay={2} />
+              <pointLight position={[-4, 3, 4]} intensity={0.3} color="#C8A24A" distance={18} decay={2} />
+              <directionalLight position={[0, 10, 5]} intensity={0.2} color="#fff8e8" />
+            </>
+          ) : (
+            <>
+              {/* Night mode: cyan + emerald accents */}
+              <pointLight position={[6, 3, -6]} intensity={0.4} color="#00d4ff" distance={25} decay={2} />
+              <pointLight position={[-6, -2, 4]} intensity={0.25} color="#00d4ff" distance={18} decay={2} />
+              <pointLight position={[-3, 4, -3]} intensity={0.15} color="#10b981" distance={15} decay={2} />
+              <directionalLight position={[0, 8, 0]} intensity={0.08} color="#eeeeff" />
+            </>
+          )}
 
           {/* Environment */}
-          <CoreSpotlight isCrisis={isCrisis} />
-          <HUDGrid />
-          <ScanSweep isCrisis={isCrisis} />
-          <DustParticles />
-          <AmbientFog isCrisis={isCrisis} />
+          <CoreSpotlight isCrisis={isCrisis} isDay={isDay} />
+          <HUDGrid isDay={isDay} />
+          <ScanSweep isCrisis={isCrisis} isDay={isDay} />
+          <DustParticles isDay={isDay} />
+          <AmbientFog isCrisis={isCrisis} isDay={isDay} />
 
-          {/* RISE Intelligence Core */}
+          {/* Galaxy stars — night only */}
+          {!isDay && <GalaxyParticles />}
+
+          {/* RISE Quantum Core */}
           <RISECoreEmblem
             isActive={isListening}
             isCrisis={isCrisis}

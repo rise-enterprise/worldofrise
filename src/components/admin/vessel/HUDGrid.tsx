@@ -3,13 +3,13 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 /* ── Wireframe grid floor ── */
-function GridFloor() {
+function GridFloor({ isDay }: { isDay: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.06 + Math.sin(clock.getElapsedTime() * 0.4) * 0.015;
+      mat.opacity = (isDay ? 0.04 : 0.07) + Math.sin(clock.getElapsedTime() * 0.4) * 0.015;
     }
   });
 
@@ -17,10 +17,10 @@ function GridFloor() {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
       <planeGeometry args={[60, 60, 60, 60]} />
       <meshBasicMaterial
-        color="#00d4ff"
+        color={isDay ? "#C8A24A" : "#00d4ff"}
         wireframe
         transparent
-        opacity={0.07}
+        opacity={isDay ? 0.04 : 0.07}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -29,7 +29,7 @@ function GridFloor() {
 }
 
 /* ── Second grid (gold, slightly offset) ── */
-function GridFloorGold() {
+function GridFloorGold({ isDay }: { isDay: boolean }) {
   return (
     <mesh rotation={[-Math.PI / 2, 0, Math.PI / 4]} position={[0, -3.05, 0]}>
       <planeGeometry args={[50, 50, 25, 25]} />
@@ -37,7 +37,7 @@ function GridFloorGold() {
         color="#C8A24A"
         wireframe
         transparent
-        opacity={0.03}
+        opacity={isDay ? 0.02 : 0.03}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -46,13 +46,12 @@ function GridFloorGold() {
 }
 
 /* ── Vertical data stream particles ── */
-function DataStreams({ count = 600 }: { count?: number }) {
+function DataStreams({ count = 600, isDay }: { count?: number; isDay: boolean }) {
   const ref = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      // Arrange in narrow vertical columns spread around the scene
       const col = Math.floor(Math.random() * 20);
       const angle = (col / 20) * Math.PI * 2;
       const radius = 8 + Math.random() * 25;
@@ -78,18 +77,13 @@ function DataStreams({ count = 600 }: { count?: number }) {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={positions}
-          itemSize={3}
-        />
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
         size={0.04}
-        color="#00d4ff"
+        color={isDay ? "#C8A24A" : "#00d4ff"}
         transparent
-        opacity={0.35}
+        opacity={isDay ? 0.2 : 0.35}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -98,8 +92,8 @@ function DataStreams({ count = 600 }: { count?: number }) {
   );
 }
 
-/* ── Gold ambient particles (sparse) ── */
-function AmbientParticles({ count = 200 }: { count?: number }) {
+/* ── Gold ambient particles ── */
+function AmbientParticles({ count = 200, isDay }: { count?: number; isDay: boolean }) {
   const ref = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
@@ -121,18 +115,13 @@ function AmbientParticles({ count = 200 }: { count?: number }) {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={positions}
-          itemSize={3}
-        />
+        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
         size={0.05}
         color="#C8A24A"
         transparent
-        opacity={0.25}
+        opacity={isDay ? 0.15 : 0.25}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -142,13 +131,13 @@ function AmbientParticles({ count = 200 }: { count?: number }) {
 }
 
 /* ── Main export ── */
-export default function HUDGrid() {
+export default function HUDGrid({ isDay = false }: { isDay?: boolean }) {
   return (
     <group>
-      <GridFloor />
-      <GridFloorGold />
-      <DataStreams count={500} />
-      <AmbientParticles count={150} />
+      <GridFloor isDay={isDay} />
+      <GridFloorGold isDay={isDay} />
+      <DataStreams count={500} isDay={isDay} />
+      <AmbientParticles count={150} isDay={isDay} />
     </group>
   );
 }
