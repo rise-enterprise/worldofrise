@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Bell, Search, Plus, Upload, Menu, ShieldCheck } from 'lucide-react';
+import { Bell, Search, Plus, Upload, Menu, BrainCircuit } from 'lucide-react';
 import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -161,9 +161,9 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
           size="icon"
           className="relative h-9 w-9 md:h-10 md:w-10 text-primary/70 hover:text-primary hover:bg-primary/5"
           onClick={() => navigate('/admin')}
-          title="Master Control"
+          title="RISE AI Panel"
         >
-          <ShieldCheck className="h-4 w-4" />
+          <BrainCircuit className="h-4 w-4" />
         </Button>
 
         {/* Theme Toggle */}

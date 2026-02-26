@@ -12,6 +12,7 @@ import {
   Gift,
   Settings,
   Crown,
+  BrainCircuit,
   Coffee,
   UtensilsCrossed,
   Sparkles,
@@ -215,8 +216,8 @@ function SidebarContent({
                   "text-primary/80 hover:text-primary hover:bg-primary/5 border border-primary/15 hover:border-primary/30 mt-2",
                 )}
               >
-                <Crown className="h-4 w-4" />
-                <span className="tracking-refined font-medium">{t("nav.RISE Intelligent", "Master Control")}</span>
+                <BrainCircuit className="h-4 w-4" />
+                <span className="tracking-refined font-medium">{t("nav.RISE Intelligent", "RISE AI Panel")}</span>
               </button>
             </div>
           </>
