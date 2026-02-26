@@ -373,7 +373,7 @@ You operate with full authority within the RISE platform. Execute commands decis
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5",
+        model: "google/gemini-3-flash-preview",
         messages: [{ role: "system", content: systemPrompt }, ...messages],
         tools: TOOLS,
         tool_choice: "auto",
@@ -442,7 +442,7 @@ You operate with full authority within the RISE platform. Execute commands decis
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "openai/gpt-5",
+          model: "google/gemini-3-flash-preview",
           messages: [
             { role: "system", content: systemPrompt },
             ...messages,
@@ -472,7 +472,7 @@ You operate with full authority within the RISE platform. Execute commands decis
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5",
+        model: "google/gemini-3-flash-preview",
         messages: [{ role: "system", content: systemPrompt }, ...messages],
         stream: true,
       }),
