@@ -1,32 +1,35 @@
 
 
-## Auto-Detect Language (Arabic/English) in All AI Functions
+## Add Day/Night Mood Awareness to All AI Functions
 
-Add a language detection instruction to the system prompts of all 3 AI edge functions so the AI automatically responds in the same language the user writes in.
+Make the AI adapt its tone, greetings, and suggestions based on the time of day — using the server's UTC time mapped to the user's likely timezone (Middle East / Gulf, UTC+3).
+
+### Approach
+
+The edge functions already run server-side, so we can compute the current hour in Gulf time (UTC+3) and inject a `MOOD` context line into each system prompt. No frontend changes needed — the AI will automatically adjust its personality.
+
+**Time Bands:**
+- **Morning (6am–12pm):** Energetic, fresh start tone. Coffee/breakfast suggestions for NOIR, lunch prep for SASSO.
+- **Afternoon (12pm–5pm):** Balanced, productive tone. Lunch at SASSO, afternoon coffee at NOIR.
+- **Evening (5pm–10pm):** Warm, refined tone. Dinner at SASSO, evening atmosphere at NOIR.
+- **Night (10pm–6am):** Calm, intimate tone. Late-night exclusivity, quieter language.
 
 ### Changes
 
-#### 1. `supabase/functions/ai-copilot/index.ts` (line ~82)
-Add to end of system prompt:
-```
-LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic (RTL). If English, respond in English. Match their language naturally.
-```
+#### 1. `supabase/functions/ai-copilot/index.ts`
+- Compute Gulf hour from `new Date()` with UTC+3 offset
+- Add a `MOOD` line to the system prompt like: `MOOD: It's currently [morning/afternoon/evening/night] in the Gulf. Adapt your energy and references accordingly.`
 
-#### 2. `supabase/functions/ai-operator/index.ts` (line ~366)
-Add to end of system prompt before the closing backtick:
-```
-LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic. If English, respond in English. Match their language naturally. Tool names and technical terms can remain in English.
-```
+#### 2. `supabase/functions/ai-operator/index.ts`
+- Same time computation
+- Add `MOOD` context so the operator references time-relevant data (e.g., "end of day summary" in evening, "morning briefing" in AM)
 
-#### 3. `supabase/functions/member-companion/index.ts` (line ~189)
-Add to GUIDELINES section:
-```
-- Detect the member's language automatically. If they write in Arabic, respond entirely in elegant Arabic. If English, respond in English. Brand names (NOIR, SASSO, RISE) stay in English regardless of language.
-```
+#### 3. `supabase/functions/member-companion/index.ts`
+- Same time computation
+- Add mood-aware guideline so the companion greets with time-appropriate warmth ("Good morning, Ahmed" vs "Good evening") and suggests relevant experiences (coffee in morning, dinner in evening)
 
 ### Technical Details
-- No database or frontend changes needed
-- All 3 edge functions will be redeployed
-- GPT-5.2 handles Arabic fluently — no additional configuration required
-- Brand names remain in English in both languages for consistency
+- Time is computed server-side using `new Date()` with a +3 hour UTC offset for Gulf timezone
+- Only system prompt changes in 3 edge functions — no database, no frontend modifications
+- All 3 edge functions will be redeployed automatically
 
