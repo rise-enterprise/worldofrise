@@ -386,52 +386,52 @@ export default function VesselCommandInterface({
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-12 px-4">
+          <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-12 px-3 sm:px-4">
             {/* AI Identity */}
-            <div className="mb-6">
-              <div className="text-xs uppercase tracking-[0.3em] text-primary/60 mb-1">RISE Intelligence</div>
-              <div className="text-2xl font-serif text-primary tracking-widest">COMMAND CHAMBER</div>
-              <div className="text-[10px] text-muted-foreground/40 mt-2 tracking-wider">
+            <div className="mb-4 sm:mb-6">
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-primary/60 mb-1">RISE Intelligence</div>
+              <div className="text-xl sm:text-2xl font-serif text-primary tracking-widest">COMMAND CHAMBER</div>
+              <div className="text-[9px] sm:text-[10px] text-muted-foreground/40 mt-2 tracking-wider">
                 Voice-first · AI-only control · All systems operational
               </div>
             </div>
             
             {/* Status indicators */}
-            <div className="flex items-center gap-6 mb-8 text-[10px] uppercase tracking-widest">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-6 sm:mb-8 text-[9px] sm:text-[10px] uppercase tracking-widest">
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-muted-foreground/50">AI Core Online</span>
+                <span className="text-muted-foreground/50">AI Core</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-muted-foreground/50">Metrics Synced</span>
+                <span className="text-muted-foreground/50">Synced</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-                <span className="text-muted-foreground/50">Threat Clear</span>
+                <span className="text-muted-foreground/50">Clear</span>
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground/50 max-w-md mb-4">
+            <p className="text-[11px] sm:text-xs text-muted-foreground/50 max-w-md mb-4">
               Speak or type commands. The AI manages all operations — campaigns, analytics, member management, rewards, and predictive intelligence.
             </p>
 
             <a
               href="/admin/operator"
-              className="inline-flex items-center gap-2 text-[10px] px-4 py-2 rounded-lg border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 transition-all mb-6 uppercase tracking-widest"
+              className="inline-flex items-center gap-2 text-[9px] sm:text-[10px] px-3 sm:px-4 py-2 rounded-lg border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 transition-all mb-4 sm:mb-6 uppercase tracking-widest"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              AI Operator Console — Full System Control
+              AI Operator Console
             </a>
 
-            <div className="flex flex-wrap gap-2 justify-center max-w-lg">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center max-w-lg">
               {EXAMPLE_COMMANDS.slice(0, 6).map((cmd) => (
                 <button
                   key={cmd}
                   onClick={() => send(cmd)}
-                  className="text-[10px] px-3 py-2 rounded-full border border-primary/15 bg-primary/5 text-muted-foreground/60 hover:text-primary hover:border-primary/30 hover:bg-primary/10 transition-all backdrop-blur-sm"
+                  className="text-[9px] sm:text-[10px] px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full border border-primary/15 bg-primary/5 text-muted-foreground/60 hover:text-primary hover:border-primary/30 hover:bg-primary/10 transition-all backdrop-blur-sm"
                 >
-                  {cmd.length > 45 ? cmd.slice(0, 45) + "…" : cmd}
+                  {cmd.length > 35 ? cmd.slice(0, 35) + "…" : cmd}
                 </button>
               ))}
             </div>
@@ -466,7 +466,7 @@ export default function VesselCommandInterface({
       )}
 
       {/* Input bar */}
-      <div className="px-4 pb-4 pt-2">
+      <div className="px-3 sm:px-4 pb-safe pb-4 pt-2">
         <div className="flex items-end gap-2 rounded-2xl bg-card/20 backdrop-blur-xl border border-primary/10 px-4 py-3 shadow-[0_0_40px_-10px_hsl(42,50%,54%,0.15)]">
           {/* TTS toggle */}
           <Button
