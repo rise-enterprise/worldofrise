@@ -15,84 +15,67 @@ interface MetricRingsProps {
   isCrisis?: boolean;
 }
 
-const BAR_WIDTH = 1.1;
-const BAR_HEIGHT = 0.055;
+const ORBIT_RADIUS = 3.2;
+const ORBIT_Y = 0.3; // centered on the core
+const ORBIT_SPEED = 0.08;
 
-function MetricPanel({
+function OrbitalMetricSatellite({
   metric,
-  position,
   index,
+  total,
   isCrisis,
 }: {
   metric: MetricData;
-  position: [number, number, number];
   index: number;
+  total: number;
   isCrisis?: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const barRef = useRef<THREE.Mesh>(null);
-  const outerGlowRef = useRef<THREE.LineSegments>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
+  const trailRef = useRef<THREE.Mesh>(null);
 
   const pct = metric.max > 0 ? Math.min(metric.value / metric.max, 1) : 0;
   const color = isCrisis ? "#ff4444" : metric.color;
+  const angleOffset = (index / total) * Math.PI * 2;
 
-  const innerEdges = useMemo(() => {
-    const plane = new THREE.PlaneGeometry(1.3, 0.85);
-    return new THREE.EdgesGeometry(plane);
-  }, []);
-
-  const outerEdges = useMemo(() => {
-    const plane = new THREE.PlaneGeometry(1.4, 0.95);
-    return new THREE.EdgesGeometry(plane);
-  }, []);
+  const innerEdges = useMemo(
+    () => new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.1, 0.75)),
+    []
+  );
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
+    const angle = angleOffset + t * ORBIT_SPEED;
+
     if (groupRef.current) {
+      // Elliptical orbit path
+      groupRef.current.position.x = Math.cos(angle) * ORBIT_RADIUS;
+      groupRef.current.position.z = Math.sin(angle) * (ORBIT_RADIUS * 0.4);
       groupRef.current.position.y =
-        position[1] + Math.sin(t * 0.6 + index * 0.9) * 0.05;
+        ORBIT_Y + Math.sin(t * 0.5 + index * 1.3) * 0.15;
     }
-    if (barRef.current) {
-      const mat = barRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = isCrisis ? 0.7 + Math.sin(t * 4) * 0.3 : 0.85;
-    }
-    if (outerGlowRef.current) {
-      const mat = outerGlowRef.current.material as THREE.LineBasicMaterial;
+
+    if (glowRef.current) {
+      const mat = glowRef.current.material as THREE.MeshBasicMaterial;
       mat.opacity = isCrisis
-        ? 0.06 + Math.sin(t * 3) * 0.06
-        : 0.06 + Math.sin(t * 1.2 + index) * 0.04;
+        ? 0.08 + Math.sin(t * 4) * 0.05
+        : 0.04 + Math.sin(t * 0.8 + index) * 0.02;
+    }
+
+    if (trailRef.current) {
+      const mat = trailRef.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.15 + Math.sin(t * 1.2 + index * 0.5) * 0.1;
     }
   });
 
-  const filledWidth = BAR_WIDTH * pct;
+  const filledWidth = 0.85 * pct;
 
   return (
-    <group ref={groupRef} position={position}>
+    <group ref={groupRef}>
       <Billboard follow lockX={false} lockY={false} lockZ={false}>
-        {/* Outer glow border */}
-        <lineSegments ref={outerGlowRef} geometry={outerEdges} position={[0, 0, -0.008]}>
-          <lineBasicMaterial
-            color={color}
-            transparent
-            opacity={0.08}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-          />
-        </lineSegments>
-
-        {/* Inner border */}
-        <lineSegments geometry={innerEdges} position={[0, 0, -0.005]}>
-          <lineBasicMaterial
-            color={color}
-            transparent
-            opacity={0.25}
-            depthWrite={false}
-          />
-        </lineSegments>
-
-        {/* Glow backdrop */}
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[1.4, 0.9]} />
+        {/* Hexagonal glow backdrop */}
+        <mesh ref={glowRef} position={[0, 0, -0.02]}>
+          <circleGeometry args={[0.65, 6]} />
           <meshBasicMaterial
             color={color}
             transparent
@@ -102,15 +85,37 @@ function MetricPanel({
           />
         </mesh>
 
+        {/* Inner border frame */}
+        <lineSegments geometry={innerEdges} position={[0, 0, -0.005]}>
+          <lineBasicMaterial
+            color={color}
+            transparent
+            opacity={0.3}
+            depthWrite={false}
+          />
+        </lineSegments>
+
+        {/* Panel background */}
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[1.1, 0.75]} />
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={0.03}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+
         {/* Label */}
         <Text
-          position={[0, 0.24, 0]}
-          fontSize={0.09}
-          color="#667"
+          position={[0, 0.22, 0]}
+          fontSize={0.07}
+          color="#889"
           anchorX="center"
           anchorY="middle"
           font={undefined}
-          letterSpacing={0.12}
+          letterSpacing={0.14}
         >
           {metric.label.toUpperCase()}
         </Text>
@@ -118,7 +123,7 @@ function MetricPanel({
         {/* Value */}
         <Text
           position={[0, 0.02, 0]}
-          fontSize={0.22}
+          fontSize={0.2}
           color={color}
           anchorX="center"
           anchorY="middle"
@@ -129,18 +134,18 @@ function MetricPanel({
             : String(metric.value)}
         </Text>
 
-        {/* Bar background */}
-        <mesh position={[0, -0.2, 0]}>
-          <planeGeometry args={[BAR_WIDTH, BAR_HEIGHT]} />
+        {/* Progress bar background */}
+        <mesh position={[0, -0.18, 0]}>
+          <planeGeometry args={[0.85, 0.04]} />
           <meshBasicMaterial color="#222" transparent opacity={0.5} />
         </mesh>
 
-        {/* Bar fill */}
+        {/* Progress bar fill */}
         <mesh
-          ref={barRef}
-          position={[-(BAR_WIDTH - filledWidth) / 2, -0.2, 0.001]}
+          ref={trailRef}
+          position={[-(0.85 - filledWidth) / 2, -0.18, 0.001]}
         >
-          <planeGeometry args={[filledWidth || 0.001, BAR_HEIGHT]} />
+          <planeGeometry args={[filledWidth || 0.001, 0.04]} />
           <meshBasicMaterial
             color={color}
             transparent
@@ -148,41 +153,69 @@ function MetricPanel({
             blending={THREE.AdditiveBlending}
           />
         </mesh>
+
+        {/* Percentage indicator */}
+        <Text
+          position={[0.48, -0.18, 0]}
+          fontSize={0.045}
+          color={color}
+          anchorX="right"
+          anchorY="middle"
+          font={undefined}
+        >
+          {Math.round(pct * 100) + "%"}
+        </Text>
       </Billboard>
     </group>
   );
 }
 
+/* Orbital ring visual (the path the satellites follow) */
+function OrbitPath({ isCrisis }: { isCrisis?: boolean }) {
+  const lineObj = useMemo(() => {
+    const pts: THREE.Vector3[] = [];
+    for (let i = 0; i <= 128; i++) {
+      const angle = (i / 128) * Math.PI * 2;
+      pts.push(
+        new THREE.Vector3(
+          Math.cos(angle) * ORBIT_RADIUS,
+          ORBIT_Y,
+          Math.sin(angle) * (ORBIT_RADIUS * 0.4)
+        )
+      );
+    }
+    const geom = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineBasicMaterial({
+      color: isCrisis ? "#ff4444" : "#C8A24A",
+      transparent: true,
+      opacity: 0.08,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    return new THREE.Line(geom, mat);
+  }, [isCrisis]);
+
+  useFrame(({ clock }) => {
+    const mat = lineObj.material as THREE.LineBasicMaterial;
+    mat.opacity = 0.08 + Math.sin(clock.getElapsedTime() * 0.5) * 0.03;
+  });
+
+  return <primitive object={lineObj} />;
+}
+
 export default function MetricRings({ metrics, isCrisis }: MetricRingsProps) {
-  const topRow = metrics.slice(0, Math.min(5, metrics.length));
-  const bottomRow = metrics.slice(5);
-
-  const topSpacing = 1.9;
-  const topY = -2;
-  const bottomY = -3;
-  const bottomSpacing = 1.9;
-
-  const topStartX = -((topRow.length - 1) * topSpacing) / 2;
-  const bottomStartX = -((bottomRow.length - 1) * bottomSpacing) / 2;
+  const total = metrics.length;
 
   return (
     <group>
-      {topRow.map((m, i) => (
-        <MetricPanel
+      <OrbitPath isCrisis={isCrisis} />
+      {metrics.map((m, i) => (
+        <OrbitalMetricSatellite
           key={m.label}
           metric={m}
           index={i}
+          total={total}
           isCrisis={isCrisis}
-          position={[topStartX + i * topSpacing, topY, 0]}
-        />
-      ))}
-      {bottomRow.map((m, i) => (
-        <MetricPanel
-          key={m.label}
-          metric={m}
-          index={i + topRow.length}
-          isCrisis={isCrisis}
-          position={[bottomStartX + i * bottomSpacing, bottomY, 0]}
         />
       ))}
     </group>
