@@ -1,8 +1,6 @@
 import { useRef, useMemo } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
-import { Text3D, Center } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import riseLogo from "@/assets/rise-holding-logo.png";
 
 interface RISECoreEmblemProps {
   isActive?: boolean;
@@ -299,7 +297,7 @@ export default function RISECoreEmblem({
   const monogramRef = useRef<THREE.Group>(null);
   const glowSphereRef = useRef<THREE.Mesh>(null);
   const innerGlowRef = useRef<THREE.Mesh>(null);
-  const logoTexture = useLoader(THREE.TextureLoader, riseLogo);
+  
 
   const goldColor = "#C8A24A";
   const crisisColor = "#ff3333";
@@ -350,26 +348,13 @@ export default function RISECoreEmblem({
     <group ref={groupRef}>
       {/* ── 3D "RISE" Monogram ── */}
       <group ref={monogramRef}>
-        {/* Logo plane */}
+        {/* Golden pulse core */}
         <mesh>
-          <planeGeometry args={[1.6, 1.6]} />
-          <meshBasicMaterial
-            map={logoTexture}
-            transparent
-            opacity={0.95}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-
-        {/* Emissive glow behind logo */}
-        <mesh position={[0, 0, -0.02]}>
-          <planeGeometry args={[1.8, 1.8]} />
+          <sphereGeometry args={[0.3, 32, 32]} />
           <meshBasicMaterial
             color={baseCol}
             transparent
-            opacity={0.08 + pulseIntensity * 0.15}
+            opacity={0.6 + pulseIntensity * 0.3}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
           />
