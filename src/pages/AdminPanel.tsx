@@ -41,7 +41,7 @@ export default function AdminPanel() {
   }, []);
 
   return (
-    <div className="h-screen w-screen bg-[#020610] overflow-hidden relative flex flex-col">
+    <div className="h-screen w-screen bg-[#020610] overflow-hidden relative flex flex-col pt-safe">
       {/* 3D Background */}
       <Suspense fallback={<div className="absolute inset-0 bg-[#020610]" />}>
         <InterstellarScene
