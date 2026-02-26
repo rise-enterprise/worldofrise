@@ -9,7 +9,7 @@ import AIResponseMetrics from "./AIResponseMetrics";
 import GlobalCommandMap from "./GlobalCommandMap";
 import { useEffect } from "react";
 
-/* ── Cursor-driven camera with micro-zoom ── */
+/* ── Cursor-driven camera with parallax depth ── */
 function CameraController({ isProcessing }: { isProcessing?: boolean }) {
   const { camera } = useThree();
   const mouse = useRef({ x: 0, y: 0 });
@@ -21,17 +21,18 @@ function CameraController({ isProcessing }: { isProcessing?: boolean }) {
       mouse.current.x = (e.clientX / window.innerWidth - 0.5) * 2;
       mouse.current.y = (e.clientY / window.innerHeight - 0.5) * 2;
     };
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
   useFrame(() => {
-    target.current.x += (mouse.current.x * 0.4 - target.current.x) * 0.03;
-    target.current.y += (-mouse.current.y * 0.3 - target.current.y) * 0.03;
+    // Smooth parallax with eased interpolation
+    target.current.x += (mouse.current.x * 0.5 - target.current.x) * 0.025;
+    target.current.y += (-mouse.current.y * 0.35 - target.current.y) * 0.025;
     camera.position.x = target.current.x;
     camera.position.y = target.current.y + 1;
-    const zt = isProcessing ? 7.2 : 8;
-    zoomTarget.current += (zt - zoomTarget.current) * 0.02;
+    const zt = isProcessing ? 7 : 8;
+    zoomTarget.current += (zt - zoomTarget.current) * 0.015;
     camera.position.z = zoomTarget.current;
     camera.lookAt(0, 0.3, 0);
   });
@@ -92,7 +93,7 @@ function CoreSpotlight({ isCrisis, isDay }: { isCrisis: boolean; isDay: boolean 
 /* ── Ambient dust particles ── */
 function DustParticles({ isDay }: { isDay: boolean }) {
   const ref = useRef<THREE.Points>(null);
-  const count = 400;
+  const count = 300; // Optimized for 60fps
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
@@ -137,7 +138,7 @@ function DustParticles({ isDay }: { isDay: boolean }) {
 /* ── Galaxy particles (night only) ── */
 function GalaxyParticles() {
   const ref = useRef<THREE.Points>(null);
-  const count = 1500;
+  const count = 1200; // Optimized for 60fps
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
