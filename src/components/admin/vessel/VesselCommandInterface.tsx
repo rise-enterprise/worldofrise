@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import CopilotMessage from "../copilot/CopilotMessage";
 import { cn } from "@/lib/utils";
 import { useAIPersonality } from "@/contexts/AIPersonalityContext";
+import riseLogo from "@/assets/rise-holding-logo.png";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -391,8 +392,8 @@ export default function VesselCommandInterface({
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-12 px-3 sm:px-4">
             {/* AI Identity */}
-            <div className="mb-4 sm:mb-6">
-              <div className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-primary/60 mb-1">RISE Intelligence</div>
+            <div className="mb-4 sm:mb-6 flex flex-col items-center">
+              <img src={riseLogo} alt="Rise Holding" className="h-12 sm:h-16 w-auto mb-3 opacity-80" />
               <div className="text-xl sm:text-2xl font-serif text-primary tracking-widest">COMMAND CHAMBER</div>
               <div className="text-[9px] sm:text-[10px] text-muted-foreground/40 mt-2 tracking-wider">
                 Voice-first · AI-only control · All systems operational
