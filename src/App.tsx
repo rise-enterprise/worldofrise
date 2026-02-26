@@ -21,6 +21,7 @@ const MemberProfileEdit = lazy(() => import("./pages/MemberProfileEdit"));
 const MemberRewards = lazy(() => import("./pages/MemberRewards"));
 const MemberExperiences = lazy(() => import("./pages/MemberExperiences"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
+const AIOperatorPage = lazy(() => import("./pages/AIOperator"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminAuthGuard = lazy(() => import("./components/admin/AdminAuthGuard"));
 const MemberAuthGuard = lazy(() => import("./components/member/MemberAuthGuard"));
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
               <Route path="/admin" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
+              <Route path="/admin/operator" element={<AdminAuthGuard><AIOperatorPage /></AdminAuthGuard>} />
               
               {/* Member Routes - Require Login */}
               <Route path="/member/welcome" element={<MemberAuthGuard><MemberWelcome /></MemberAuthGuard>} />

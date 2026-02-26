@@ -26,3 +26,15 @@ verify_jwt = false
 
 [functions.elevenlabs-tts]
 verify_jwt = false
+
+[functions.ai-copilot]
+verify_jwt = false
+
+[functions.member-companion]
+verify_jwt = false
+
+[functions.classify-contacts]
+verify_jwt = false
+
+[functions.ai-operator]
+verify_jwt = false

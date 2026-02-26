@@ -126,6 +126,68 @@ export type Database = {
           },
         ]
       }
+      ai_operator_logs: {
+        Row: {
+          action_type: string
+          admin_id: string | null
+          after_state: Json | null
+          ai_rationale: string | null
+          before_state: Json | null
+          confirmed_at: string | null
+          created_at: string | null
+          execution_time_ms: number | null
+          id: string
+          input_params: Json | null
+          intent: string
+          output_result: Json | null
+          plan: Json | null
+          requires_confirmation: boolean | null
+          status: string
+        }
+        Insert: {
+          action_type: string
+          admin_id?: string | null
+          after_state?: Json | null
+          ai_rationale?: string | null
+          before_state?: Json | null
+          confirmed_at?: string | null
+          created_at?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          input_params?: Json | null
+          intent: string
+          output_result?: Json | null
+          plan?: Json | null
+          requires_confirmation?: boolean | null
+          status?: string
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string | null
+          after_state?: Json | null
+          ai_rationale?: string | null
+          before_state?: Json | null
+          confirmed_at?: string | null
+          created_at?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          input_params?: Json | null
+          intent?: string
+          output_result?: Json | null
+          plan?: Json | null
+          requires_confirmation?: boolean | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_operator_logs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_predictions: {
         Row: {
           confidence: number | null
@@ -584,6 +646,122 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      guest_segments: {
+        Row: {
+          computed_at: string | null
+          contact_id: string | null
+          expires_at: string | null
+          id: string
+          member_id: string | null
+          metadata_json: Json | null
+          score: number | null
+          segment_label: string
+          segment_type: string
+        }
+        Insert: {
+          computed_at?: string | null
+          contact_id?: string | null
+          expires_at?: string | null
+          id?: string
+          member_id?: string | null
+          metadata_json?: Json | null
+          score?: number | null
+          segment_label: string
+          segment_type: string
+        }
+        Update: {
+          computed_at?: string | null
+          contact_id?: string | null
+          expires_at?: string | null
+          id?: string
+          member_id?: string | null
+          metadata_json?: Json | null
+          score?: number | null
+          segment_label?: string
+          segment_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_segments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_segments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_runs: {
+        Row: {
+          admin_id: string | null
+          anomalies: Json | null
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          file_name: string
+          file_size_bytes: number | null
+          id: string
+          mapping_decisions: Json | null
+          rows_deduplicated: number | null
+          rows_imported: number | null
+          rows_rejected: number | null
+          started_at: string | null
+          status: string
+          total_rows: number | null
+          validation_report: Json | null
+        }
+        Insert: {
+          admin_id?: string | null
+          anomalies?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_name: string
+          file_size_bytes?: number | null
+          id?: string
+          mapping_decisions?: Json | null
+          rows_deduplicated?: number | null
+          rows_imported?: number | null
+          rows_rejected?: number | null
+          started_at?: string | null
+          status?: string
+          total_rows?: number | null
+          validation_report?: Json | null
+        }
+        Update: {
+          admin_id?: string | null
+          anomalies?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          file_name?: string
+          file_size_bytes?: number | null
+          id?: string
+          mapping_decisions?: Json | null
+          rows_deduplicated?: number | null
+          rows_imported?: number | null
+          rows_rejected?: number | null
+          started_at?: string | null
+          status?: string
+          total_rows?: number | null
+          validation_report?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_runs_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invitation_requests: {
         Row: {
@@ -1419,6 +1597,59 @@ export type Database = {
             columns: ["triggered_by"]
             isOneToOne: false
             referencedRelation: "admins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staging_contacts: {
+        Row: {
+          created_at: string | null
+          dedup_key: string | null
+          duplicate_of: string | null
+          id: string
+          import_run_id: string
+          is_duplicate: boolean | null
+          mapped_data: Json
+          raw_data: Json
+          row_number: number
+          validation_errors: Json | null
+          validation_status: string
+          validation_warnings: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          dedup_key?: string | null
+          duplicate_of?: string | null
+          id?: string
+          import_run_id: string
+          is_duplicate?: boolean | null
+          mapped_data?: Json
+          raw_data?: Json
+          row_number: number
+          validation_errors?: Json | null
+          validation_status?: string
+          validation_warnings?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          dedup_key?: string | null
+          duplicate_of?: string | null
+          id?: string
+          import_run_id?: string
+          is_duplicate?: boolean | null
+          mapped_data?: Json
+          raw_data?: Json
+          row_number?: number
+          validation_errors?: Json | null
+          validation_status?: string
+          validation_warnings?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staging_contacts_import_run_id_fkey"
+            columns: ["import_run_id"]
+            isOneToOne: false
+            referencedRelation: "import_runs"
             referencedColumns: ["id"]
           },
         ]
