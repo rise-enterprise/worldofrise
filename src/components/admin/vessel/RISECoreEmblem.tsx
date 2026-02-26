@@ -1,7 +1,8 @@
 import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import { Text3D, Center } from "@react-three/drei";
 import * as THREE from "three";
+import riseLogo from "@/assets/rise-holding-logo.png";
 
 interface RISECoreEmblemProps {
   isActive?: boolean;
@@ -298,6 +299,7 @@ export default function RISECoreEmblem({
   const monogramRef = useRef<THREE.Group>(null);
   const glowSphereRef = useRef<THREE.Mesh>(null);
   const innerGlowRef = useRef<THREE.Mesh>(null);
+  const logoTexture = useLoader(THREE.TextureLoader, riseLogo);
 
   const goldColor = "#C8A24A";
   const crisisColor = "#ff3333";
@@ -348,54 +350,30 @@ export default function RISECoreEmblem({
     <group ref={groupRef}>
       {/* ── 3D "RISE" Monogram ── */}
       <group ref={monogramRef}>
-        <Center>
-          <Text3D
-            font="/fonts/helvetiker_bold.typeface.json"
-            size={0.55}
-            height={0.15}
-            bevelEnabled
-            bevelThickness={0.02}
-            bevelSize={0.01}
-            bevelOffset={0}
-            bevelSegments={8}
-            curveSegments={32}
-          >
-            RISE
-            <meshStandardMaterial
-              color={baseCol}
-              emissive={baseCol}
-              emissiveIntensity={1.5 + pulseIntensity * 2}
-              metalness={0.98}
-              roughness={0.05}
-              envMapIntensity={2}
-            />
-          </Text3D>
-        </Center>
+        {/* Logo plane */}
+        <mesh>
+          <planeGeometry args={[1.6, 1.6]} />
+          <meshBasicMaterial
+            map={logoTexture}
+            transparent
+            opacity={0.95}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
 
-        {/* White edge highlights */}
-        <Center>
-          <Text3D
-            font="/fonts/helvetiker_bold.typeface.json"
-            size={0.55}
-            height={0.16}
-            bevelEnabled
-            bevelThickness={0.025}
-            bevelSize={0.015}
-            bevelOffset={0}
-            bevelSegments={4}
-            curveSegments={32}
-          >
-            RISE
-            <meshBasicMaterial
-              color="#ffffff"
-              transparent
-              opacity={0.06}
-              blending={THREE.AdditiveBlending}
-              depthWrite={false}
-              wireframe
-            />
-          </Text3D>
-        </Center>
+        {/* Emissive glow behind logo */}
+        <mesh position={[0, 0, -0.02]}>
+          <planeGeometry args={[1.8, 1.8]} />
+          <meshBasicMaterial
+            color={baseCol}
+            transparent
+            opacity={0.08 + pulseIntensity * 0.15}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
       </group>
 
       {/* ── Inner core glow ── */}
