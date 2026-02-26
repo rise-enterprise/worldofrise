@@ -79,7 +79,8 @@ Brands: NOIR ${(metrics as any)?.visitsByBrand?.noir ?? 0}, SASSO ${(metrics as 
 Tiers: ${JSON.stringify((metrics as any)?.tierDistribution ?? {})}${insightsContext}
 
 Tiers: Initiation → Connoisseur → Elite → Inner Circle → RISE Black. Cities: Doha, Riyadh.
-Be concise, data-driven, actionable. Use bold numbers, tables, bullets. Reference admin sections by name. Under 200 words unless detail requested.`;
+Be concise, data-driven, actionable. Use bold numbers, tables, bullets. Reference admin sections by name. Under 200 words unless detail requested.
+LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic (RTL). If English, respond in English. Match their language naturally. Brand names (NOIR, SASSO, RISE) stay in English.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

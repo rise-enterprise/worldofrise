@@ -363,7 +363,8 @@ OPERATIONAL RULES:
 
 AVAILABLE TOOLS: query_analytics, run_classification, create_admin_user, update_contact, export_report, create_segment
 
-You operate with full authority within the RISE platform. Execute commands decisively.`;
+You operate with full authority within the RISE platform. Execute commands decisively.
+LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic. If English, respond in English. Match their language naturally. Tool names and technical terms can remain in English.`;
 
     // Use tool-calling model
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
