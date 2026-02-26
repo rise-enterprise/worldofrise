@@ -134,6 +134,7 @@ export default function VesselCommandInterface({
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const ttsAbortRef = useRef<AbortController | null>(null);
   const ttsObjectUrlRef = useRef<string | null>(null);
+  const ttsFiredRef = useRef(false);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -240,6 +241,7 @@ export default function VesselCommandInterface({
     }
 
     let assistantSoFar = "";
+    ttsFiredRef.current = false;
     const allMessages = [...messages, userMsg];
     const upsert = (chunk: string) => {
       assistantSoFar += chunk;
@@ -250,6 +252,15 @@ export default function VesselCommandInterface({
         }
         return [...prev, { role: "assistant", content: assistantSoFar }];
       });
+
+      // Fire TTS on first complete sentence for faster voice activation
+      if (!ttsFiredRef.current && ttsEnabled && assistantSoFar.length >= 20) {
+        const sentenceMatch = assistantSoFar.match(/^([\s\S]*?[.!?])(?:\s|$)/);
+        if (sentenceMatch) {
+          ttsFiredRef.current = true;
+          speak(sentenceMatch[1]);
+        }
+      }
     };
 
     await streamChat({
@@ -260,7 +271,7 @@ export default function VesselCommandInterface({
         setIsLoading(false);
         onProcessingChange?.(false);
         if (assistantSoFar) {
-          speak(assistantSoFar);
+          // TTS already fired on first sentence — skip here
           detectCrisis(assistantSoFar);
           const extracted = extractMetrics(assistantSoFar);
           if (extracted.length > 0) onAIMetrics?.(extracted);
