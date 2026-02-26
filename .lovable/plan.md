@@ -1,15 +1,17 @@
 
 
-## Reset Password for ibrahim@rise.qa
+## Update Member Name
 
-The account exists in the database but the password doesn't match. I'll reset it to `Admin1234` using a database update.
+The admin account `ibrahim@rise.qa` is linked to member record `f1d3caa7-2d69-4939-bbe4-02e255ee9576` which currently has `full_name = "Mr. Hamad / Alssada"`.
 
-### What Changes
+I need the user's real name to proceed. Once provided, I will run a single SQL update:
 
-- Run a single SQL command to update the password for `ibrahim@rise.qa` in the authentication system to `Admin1234`
+```sql
+UPDATE members SET full_name = '<new name>' WHERE id = 'f1d3caa7-2d69-4939-bbe4-02e255ee9576';
+```
 
-### Technical Details
+No code changes required -- this is a data-only update.
 
-- Use the authentication admin API to update the user's password hash directly
-- No code files are modified
+### Waiting for input
+Please reply with the name you'd like displayed (e.g. "Ibrahim Al-Rashid").
 
