@@ -91,11 +91,11 @@ export default function SystemStatusBar({
       </div>
 
       {/* Right — Mode toggle + Time */}
-      <div className="hidden sm:flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <button
           onClick={toggleMode}
           className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] uppercase tracking-wider transition-all duration-500 border",
+            "flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[8px] sm:text-[9px] uppercase tracking-wider transition-all duration-500 border",
             isDay
               ? "border-[#C8A24A]/20 bg-[#C8A24A]/10 text-[#C8A24A] hover:bg-[#C8A24A]/20"
               : "border-[#00d4ff]/20 bg-[#00d4ff]/10 text-[#00d4ff] hover:bg-[#00d4ff]/20"
@@ -105,7 +105,7 @@ export default function SystemStatusBar({
           {isDay ? "Night" : "Day"}
         </button>
         <span
-          className="text-[10px] tabular-nums tracking-wider"
+          className="hidden sm:inline text-[10px] tabular-nums tracking-wider"
           style={{ color: colors.textMuted }}
         >
           {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
