@@ -2,16 +2,10 @@
 
 ## Update Member Name
 
-The admin account `ibrahim@rise.qa` is linked to member record `f1d3caa7-2d69-4939-bbe4-02e255ee9576` which currently has `full_name = "Mr. Hamad / Alssada"`.
+Update the `full_name` field for member `f1d3caa7-2d69-4939-bbe4-02e255ee9576` from "Mr. Hamad / Alssada" to "Ibrahim Al Husseini".
 
-I need the user's real name to proceed. Once provided, I will run a single SQL update:
+### What Changes
 
-```sql
-UPDATE members SET full_name = '<new name>' WHERE id = 'f1d3caa7-2d69-4939-bbe4-02e255ee9576';
-```
-
-No code changes required -- this is a data-only update.
-
-### Waiting for input
-Please reply with the name you'd like displayed (e.g. "Ibrahim Al-Rashid").
+- Single data update: `UPDATE members SET full_name = 'Ibrahim Al Husseini' WHERE id = 'f1d3caa7-2d69-4939-bbe4-02e255ee9576'`
+- No code changes required
 
