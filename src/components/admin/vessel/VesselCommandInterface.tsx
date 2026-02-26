@@ -5,6 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import CopilotMessage from "../copilot/CopilotMessage";
 import { cn } from "@/lib/utils";
+import { useAIPersonality } from "@/contexts/AIPersonalityContext";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -118,6 +119,7 @@ export default function VesselCommandInterface({
 }: VesselCommandInterfaceProps) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
+  const { config: personalityConfig } = useAIPersonality();
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(true);
@@ -239,8 +241,9 @@ export default function VesselCommandInterface({
       return;
     }
 
+    const systemMsg: Msg = { role: "user", content: `[SYSTEM MODE: ${personalityConfig.label.toUpperCase()}] ${personalityConfig.systemPromptPrefix}` };
+    const allMessages = [systemMsg, ...messages, userMsg];
     let assistantSoFar = "";
-    const allMessages = [...messages, userMsg];
     const upsert = (chunk: string) => {
       assistantSoFar += chunk;
       setMessages(prev => {
@@ -272,7 +275,7 @@ export default function VesselCommandInterface({
         onProcessingChange?.(false);
       },
     });
-  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange]);
+  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, personalityConfig]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
