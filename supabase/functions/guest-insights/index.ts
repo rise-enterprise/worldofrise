@@ -267,7 +267,7 @@ Generate ONLY the message body, no subject line or greeting.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'openai/gpt-5.2',
         messages: [
           { role: 'system', content: 'You are a luxury hospitality concierge crafting personalized messages for distinguished guests. Your tone is elegant, refined, and never promotional.' },
           { role: 'user', content: prompt }

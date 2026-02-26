@@ -88,7 +88,7 @@ Be concise, data-driven, actionable. Use bold numbers, tables, bullets. Referenc
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "openai/gpt-5.2",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
