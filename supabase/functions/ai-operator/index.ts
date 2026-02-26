@@ -341,6 +341,16 @@ Deno.serve(async (req) => {
       segCounts[t][l] = (segCounts[t][l] ?? 0) + 1;
     }
 
+    // Compute Gulf time mood (UTC+3)
+    const gulfHour = (new Date().getUTCHours() + 3) % 24;
+    const mood = gulfHour >= 6 && gulfHour < 12
+      ? "morning — deliver morning briefings, fresh data summaries."
+      : gulfHour >= 12 && gulfHour < 17
+      ? "afternoon — mid-day operational focus, progress updates."
+      : gulfHour >= 17 && gulfHour < 22
+      ? "evening — end-of-day summaries, wrap-up tone."
+      : "night — minimal, concise, late-night ops mode.";
+
     const systemPrompt = `You are the RISE AI Operator — an executive intelligence system with FULL operational control over the RISE Holding loyalty platform.
 
 You can EXECUTE actions, not just describe them. You have tools to query data, run classification, create admins, update contacts, generate reports, and create segments.
@@ -364,6 +374,7 @@ OPERATIONAL RULES:
 AVAILABLE TOOLS: query_analytics, run_classification, create_admin_user, update_contact, export_report, create_segment
 
 You operate with full authority within the RISE platform. Execute commands decisively.
+MOOD: It's currently ${mood} Adapt your greeting and report style accordingly.
 LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic. If English, respond in English. Match their language naturally. Tool names and technical terms can remain in English.`;
 
     // Use tool-calling model
