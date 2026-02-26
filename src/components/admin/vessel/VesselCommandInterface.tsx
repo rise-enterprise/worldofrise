@@ -465,63 +465,102 @@ export default function VesselCommandInterface({
         </div>
       )}
 
-      {/* Input bar */}
-      <div className="px-3 sm:px-4 pb-safe pb-4 pt-2">
-        <div className="flex items-end gap-2 rounded-2xl bg-card/20 backdrop-blur-xl border border-primary/10 px-4 py-3 shadow-[0_0_40px_-10px_hsl(42,50%,54%,0.15)]">
+      {/* ── Neural Command Strip ── */}
+      <div className="px-3 sm:px-6 pb-safe pb-5 pt-2 relative">
+        {/* Light beam from input to core (when active) */}
+        {(isListening || isLoading) && (
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-[2px] pointer-events-none"
+            style={{
+              height: "40vh",
+              background: `linear-gradient(to top, ${isListening ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.6)"}, transparent)`,
+              opacity: isListening ? 0.5 : 0.25,
+              animation: "neuralBeamPulse 2s ease-in-out infinite",
+            }}
+          />
+        )}
+
+        {/* Glass command bar */}
+        <div
+          className={cn(
+            "relative flex items-end gap-2 sm:gap-3 rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 transition-all duration-500",
+            "bg-background/10 backdrop-blur-2xl",
+            "border shadow-lg",
+            isListening
+              ? "border-primary/40 shadow-[0_0_60px_-10px_hsl(var(--primary)/0.3),inset_0_1px_0_0_hsl(var(--primary)/0.1)]"
+              : isLoading
+                ? "border-primary/20 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.15)]"
+                : "border-primary/8 shadow-[0_0_30px_-10px_hsl(var(--primary)/0.08)]"
+          )}
+        >
+          {/* Subtle gradient border overlay */}
+          <div
+            className="absolute inset-0 rounded-2xl pointer-events-none"
+            style={{
+              background: isListening
+                ? "linear-gradient(135deg, hsl(var(--primary) / 0.06), transparent 50%, hsl(var(--primary) / 0.03))"
+                : "linear-gradient(135deg, hsl(var(--primary) / 0.02), transparent 60%)",
+            }}
+          />
+
           {/* TTS toggle */}
           <Button
             onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
             variant="ghost"
             size="icon"
             className={cn(
-              "shrink-0 h-9 w-9 rounded-lg transition-all",
-              ttsEnabled ? "text-primary/60" : "text-muted-foreground/30"
+              "shrink-0 h-9 w-9 rounded-xl transition-all relative z-10",
+              ttsEnabled
+                ? "text-primary/70 hover:text-primary hover:bg-primary/10"
+                : "text-muted-foreground/25 hover:text-muted-foreground/50"
             )}
             title={ttsEnabled ? "Mute AI voice" : "Enable AI voice"}
           >
             {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </Button>
 
+          {/* Input field */}
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? "Listening…" : "Command the vessel…"}
+            placeholder={isListening ? "Neural link active — speak your command…" : "Command the intelligence…"}
             className={cn(
-              "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2",
-              "bg-transparent text-sm text-foreground placeholder:text-muted-foreground/30",
-              "focus:outline-none",
-              "transition-all duration-200"
+              "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2 relative z-10",
+              "bg-transparent text-sm text-foreground/90 placeholder:text-muted-foreground/25",
+              "focus:outline-none focus:placeholder:text-muted-foreground/40",
+              "transition-all duration-300"
             )}
             rows={1}
           />
 
-          {/* Waveform bars */}
+          {/* Enhanced waveform visualizer */}
           {isListening && (
-            <div ref={barsRef} className="flex items-center gap-[2px] h-9 px-1">
-              {[0.6, 0.8, 1, 0.8, 0.6].map((base, i) => (
+            <div ref={barsRef} className="flex items-center gap-[3px] h-9 px-2 relative z-10">
+              {[0.5, 0.65, 0.8, 1, 0.8, 0.65, 0.5].map((base, i) => (
                 <span
                   key={i}
-                  className="w-[2px] h-4 rounded-full bg-primary/60 origin-center"
+                  className="w-[2.5px] h-5 rounded-full origin-center"
                   style={{
-                    transform: `scaleY(${base * 0.2})`,
-                    transition: "transform 80ms ease-out",
+                    background: `linear-gradient(to top, hsl(var(--primary)), hsl(var(--primary) / 0.4))`,
+                    transform: `scaleY(${base * 0.15})`,
+                    transition: "transform 60ms ease-out",
+                    boxShadow: "0 0 6px hsl(var(--primary) / 0.3)",
                   }}
                 />
               ))}
             </div>
           )}
 
-          {/* Mic button with ripple */}
-          <div className="relative shrink-0">
+          {/* Mic button */}
+          <div className="relative shrink-0 z-10">
             {isListening && (
               <>
-                {[0, 0.4, 0.8].map((delay) => (
+                {[0, 0.5, 1].map((delay) => (
                   <span
                     key={delay}
-                    className="absolute inset-0 rounded-lg border border-primary/40 pointer-events-none"
-                    style={{ animation: `micRipple 1.6s ease-out ${delay}s infinite` }}
+                    className="absolute inset-[-4px] rounded-xl border border-primary/30 pointer-events-none"
+                    style={{ animation: `micRipple 2s ease-out ${delay}s infinite` }}
                   />
                 ))}
               </>
@@ -531,25 +570,37 @@ export default function VesselCommandInterface({
               variant="ghost"
               size="icon"
               className={cn(
-                "relative h-9 w-9 rounded-lg transition-all overflow-visible",
+                "relative h-9 w-9 rounded-xl transition-all overflow-visible",
                 isListening
-                  ? "text-destructive shadow-[0_0_12px_-2px_hsl(var(--destructive)/0.5)]"
-                  : "text-muted-foreground/40 hover:text-primary"
+                  ? "text-primary bg-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.5)]"
+                  : "text-muted-foreground/35 hover:text-primary hover:bg-primary/10"
               )}
             >
-              {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
           </div>
 
-          {/* Send */}
+          {/* Send button */}
           <Button
             onClick={() => send(input)}
             disabled={!input.trim() || isLoading}
             size="icon"
-            className="shrink-0 h-9 w-9 rounded-lg bg-primary/80 hover:bg-primary text-primary-foreground shadow-[0_0_20px_-5px_hsl(42,50%,54%,0.4)]"
+            className={cn(
+              "shrink-0 h-9 w-9 rounded-xl transition-all relative z-10",
+              "bg-primary/80 hover:bg-primary text-primary-foreground",
+              "shadow-[0_0_25px_-5px_hsl(var(--primary)/0.4)]",
+              "disabled:opacity-20 disabled:shadow-none"
+            )}
           >
             <Send className="w-3.5 h-3.5" />
           </Button>
+        </div>
+
+        {/* Subtle label under the bar */}
+        <div className="flex justify-center mt-2">
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.35em] text-muted-foreground/20">
+            {isListening ? "◉ NEURAL LINK ACTIVE" : isLoading ? "◎ PROCESSING COMMAND" : "RISE NEURAL COMMAND"}
+          </span>
         </div>
       </div>
     </div>
