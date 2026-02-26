@@ -880,6 +880,17 @@ select:focus {
   }
 }
 
+@keyframes neuralBeamPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translateX(-50%) scaleY(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(-50%) scaleY(1.05);
+  }
+}
+
 ::selection {
   background: hsl(var(--gold) / 0.3);
   color: hsl(220 20% 93%);
