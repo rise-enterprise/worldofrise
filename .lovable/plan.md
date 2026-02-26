@@ -1,30 +1,33 @@
 
 
-## Switch All AI Models to GPT-5.2
+## Rename "Master Control" to "RISE AI Panel" with AI Logo
 
-The best and highest version of GPT-5 available is `openai/gpt-5.2` -- OpenAI's latest model with enhanced reasoning capabilities. I will switch all AI functions to use this model.
+I'll update all 6 files where "Master Control" appears, replacing the text with "RISE AI Panel" and swapping the shield/crown icons for the `BrainCircuit` icon from Lucide (which represents AI).
 
 ### Changes
 
-#### 1. AI Operator (`supabase/functions/ai-operator/index.ts`)
-- Change `google/gemini-3-flash-preview` to `openai/gpt-5.2` in **3 places** (lines 376, 445, 475)
+#### 1. `src/components/admin/AdminHeader.tsx`
+- Change heading text from "Master Control" to "RISE AI Panel"
+- Add `BrainCircuit` icon next to the title
 
-#### 2. AI Copilot (`supabase/functions/ai-copilot/index.ts`)
-- Change `google/gemini-2.5-flash-lite` to `openai/gpt-5.2` (line 91)
+#### 2. `src/components/admin/AdminSidebar.tsx`
+- Change subtitle from "Master Control" to "RISE AI Panel"
 
-#### 3. Member Companion (`supabase/functions/member-companion/index.ts`)
-- Change `google/gemini-2.5-flash` to `openai/gpt-5.2` (line 198)
+#### 3. `src/pages/AdminLogin.tsx`
+- Change login card title from "Master Control" to "RISE AI Panel"
 
-#### 4. Guest Insights (`supabase/functions/guest-insights/index.ts`)
-- Change `google/gemini-2.5-flash` to `openai/gpt-5.2` (line 270)
+#### 4. `src/components/auth/UnifiedLoginForm.tsx`
+- Change button text from "Master Control Panel" to "RISE AI Panel"
+- Replace `Shield` icon with `BrainCircuit`
 
-#### 5. AI Predictions (`supabase/functions/ai-predictions/index.ts`)
-- Change `google/gemini-2.5-flash` to `openai/gpt-5.2` (line 418)
+#### 5. `src/components/dashboard/DashboardHeader.tsx`
+- Change tooltip/title from "Master Control" to "RISE AI Panel"
+- Replace `ShieldCheck` icon with `BrainCircuit`
 
-### Technical Details
+#### 6. `src/components/dashboard/Sidebar.tsx`
+- Change sidebar link text from "Master Control" to "RISE AI Panel"
+- Replace `Crown` icon with `BrainCircuit`
 
-- `openai/gpt-5.2` is the most powerful model available -- best reasoning, best accuracy, but also the most expensive and slowest
-- Responses will be higher quality but will take longer than the Gemini models previously configured
-- All 5 edge functions will be redeployed
-- No database or frontend changes needed
+### Icon Choice
+Using Lucide's `BrainCircuit` icon — a brain with circuit lines that clearly communicates "AI".
 
