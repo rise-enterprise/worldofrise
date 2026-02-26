@@ -37,7 +37,7 @@ export default function AdminSidebar({
         {/* Logo / Brand */}
         <div className="px-3 pb-4 mb-2 border-b border-border/30">
           <span className="text-lg font-serif font-bold tracking-widest text-primary">RISE</span>
-          <p className="text-[10px] text-muted-foreground tracking-wider uppercase mt-0.5">Master Control</p>
+          <p className="text-[10px] text-muted-foreground tracking-wider uppercase mt-0.5">AI Panel</p>
         </div>
 
         {filtered.map((section) => {

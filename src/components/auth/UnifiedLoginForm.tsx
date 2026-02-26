@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, LogIn, ArrowLeft, Shield, Crown } from "lucide-react";
+import { Loader2, LogIn, ArrowLeft, BrainCircuit, Crown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
@@ -124,8 +124,8 @@ export default function UnifiedLoginForm({ onBack }: { onBack: () => void }) {
                 className="w-full py-6 gap-3 text-base tracking-refined border-primary/30 hover:border-primary/60 hover:bg-primary/5"
                 onClick={() => navigate("/admin")}
               >
-                <Shield className="w-5 h-5 text-primary" />
-                Master Control Panel
+                <BrainCircuit className="w-5 h-5 text-primary" />
+                RISE AI Panel
               </Button>
               <Button
                 variant="vip-gold"

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, Rocket, ScrollText, X } from "lucide-react";
+import { Menu, Search, Rocket, ScrollText, X, BrainCircuit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -30,8 +30,9 @@ export default function AdminHeader({ onMenuToggle, showMenu, searchQuery, onSea
           </Button>
         )}
 
-        <h1 className="text-base font-serif font-semibold text-foreground whitespace-nowrap hidden sm:block">
-          Master Control
+        <h1 className="text-base font-serif font-semibold text-foreground whitespace-nowrap hidden sm:block flex items-center gap-2">
+          <BrainCircuit className="h-5 w-5 text-primary" />
+          RISE AI Panel
         </h1>
 
         {/* Search */}
