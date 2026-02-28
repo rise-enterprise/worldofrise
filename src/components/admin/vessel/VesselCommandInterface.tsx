@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Send, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { Send, Mic, MicOff, Volume2, VolumeX, Paperclip, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,13 @@ import { cn } from "@/lib/utils";
 import { useAIPersonality } from "@/contexts/AIPersonalityContext";
 import riseLogo from "@/assets/rise-holding-logo.png";
 
-type Msg = { role: "user" | "assistant"; content: string };
+interface Attachment {
+  url: string;
+  type: string;
+  name: string;
+}
+
+type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-copilot`;
 
@@ -17,22 +23,23 @@ const EXAMPLE_COMMANDS = [
   "Find members at high churn risk and suggest re-engagement strategies",
   "Compare NOIR vs SASSO performance this month",
   "Draft a reactivation campaign for dormant VIPs",
-  "Predict next month loyalty revenue",
+  "Generate a luxury loyalty card design for RISE Black tier",
   "Explain retention drop",
   "Generate executive summary",
   "Deploy double points for 5 days in Doha",
 ];
 
 async function streamChat({
-  messages, token, onDelta, onDone, onError,
+  messages, token, attachments, onDelta, onDone, onError,
 }: {
-  messages: Msg[]; token: string;
+  messages: Msg[]; token: string; attachments?: Attachment[];
   onDelta: (t: string) => void; onDone: () => void; onError: (err: string) => void;
 }) {
+  const cleanMessages = messages.map(m => ({ role: m.role, content: m.content }));
   const resp = await fetch(CHAT_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify({ messages: cleanMessages, attachments }),
   });
   if (!resp.ok) {
     const body = await resp.json().catch(() => ({}));
@@ -114,8 +121,11 @@ export default function VesselCommandInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [pendingAttachments, setPendingAttachments] = useState<Attachment[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -199,11 +209,56 @@ export default function VesselCommandInterface({
     onCrisisChange?.(isCrisis);
   }, [onCrisisChange]);
 
+  // File upload handler
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setIsUploading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast({ title: "Session expired", variant: "destructive" });
+      setIsUploading(false);
+      return;
+    }
+
+    const newAttachments: Attachment[] = [];
+    for (const file of Array.from(files)) {
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: "File too large", description: `${file.name} exceeds 10MB limit`, variant: "destructive" });
+        continue;
+      }
+      const ext = file.name.split('.').pop() || 'bin';
+      const path = `uploads/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("chat-attachments").upload(path, file, { contentType: file.type });
+      if (error) {
+        toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+        continue;
+      }
+      const { data: urlData } = supabase.storage.from("chat-attachments").getPublicUrl(path);
+      newAttachments.push({ url: urlData.publicUrl, type: file.type, name: file.name });
+    }
+    setPendingAttachments(prev => [...prev, ...newAttachments]);
+    setIsUploading(false);
+    // Reset file input
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, []);
+
+  const removeAttachment = useCallback((index: number) => {
+    setPendingAttachments(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
   const send = useCallback(async (text: string) => {
-    if (!text.trim() || isLoading) return;
-    const userMsg: Msg = { role: "user", content: text.trim() };
+    if ((!text.trim() && pendingAttachments.length === 0) || isLoading) return;
+    const userMsg: Msg = {
+      role: "user",
+      content: text.trim() || (pendingAttachments.length > 0 ? "Analyze the attached file(s)" : ""),
+      attachments: pendingAttachments.length > 0 ? [...pendingAttachments] : undefined,
+    };
+    const currentAttachments = [...pendingAttachments];
     setMessages(prev => [...prev, userMsg]);
     setInput("");
+    setPendingAttachments([]);
     setIsLoading(true);
     onProcessingChange?.(true);
     lastSpokenRef.current = "";
@@ -230,27 +285,51 @@ export default function VesselCommandInterface({
       });
     };
 
-    await streamChat({
-      messages: allMessages,
-      token: session.access_token,
-      onDelta: upsert,
-      onDone: () => {
-        setIsLoading(false);
-        onProcessingChange?.(false);
-        if (assistantSoFar) {
-          speak(assistantSoFar);
-          detectCrisis(assistantSoFar);
-          const extracted = extractMetrics(assistantSoFar);
-          if (extracted.length > 0) onAIMetrics?.(extracted);
+    const doStream = async (retry = false) => {
+      try {
+        await streamChat({
+          messages: allMessages,
+          token: session.access_token,
+          attachments: currentAttachments.length > 0 ? currentAttachments : undefined,
+          onDelta: upsert,
+          onDone: () => {
+            setIsLoading(false);
+            onProcessingChange?.(false);
+            if (assistantSoFar) {
+              speak(assistantSoFar);
+              detectCrisis(assistantSoFar);
+              const extracted = extractMetrics(assistantSoFar);
+              if (extracted.length > 0) onAIMetrics?.(extracted);
+            }
+          },
+          onError: async (err) => {
+            if (!retry && (err.includes("500") || err.includes("unavailable"))) {
+              // Self-healing: retry once after 2s
+              await new Promise(r => setTimeout(r, 2000));
+              assistantSoFar = "";
+              await doStream(true);
+            } else {
+              toast({ title: "AI Error", description: err, variant: "destructive" });
+              setIsLoading(false);
+              onProcessingChange?.(false);
+            }
+          },
+        });
+      } catch {
+        if (!retry) {
+          await new Promise(r => setTimeout(r, 2000));
+          assistantSoFar = "";
+          await doStream(true);
+        } else {
+          toast({ title: "AI Error", description: "Failed after retry. Please try again.", variant: "destructive" });
+          setIsLoading(false);
+          onProcessingChange?.(false);
         }
-      },
-      onError: (err) => {
-        toast({ title: "AI Error", description: err, variant: "destructive" });
-        setIsLoading(false);
-        onProcessingChange?.(false);
-      },
-    });
-  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, personalityConfig, onAIMetrics]);
+      }
+    };
+
+    await doStream();
+  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, personalityConfig, onAIMetrics, pendingAttachments]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -352,22 +431,30 @@ export default function VesselCommandInterface({
 
   return (
     <div className="relative z-20 flex flex-col h-full max-w-3xl mx-auto w-full">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        className="hidden"
+        accept="image/jpeg,image/png,image/webp,application/pdf,.csv,.xlsx"
+        multiple
+        onChange={handleFileSelect}
+      />
+
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
-            {/* RISE Identity — minimal */}
             <div className="mb-6 flex flex-col items-center">
               <img src={riseLogo} alt="Rise" className="h-10 sm:h-12 w-auto mb-4 opacity-60" />
               <div className="text-lg sm:text-xl font-serif tracking-[0.25em] text-[#C8A24A]/80">
                 RISE TACTICAL
               </div>
               <div className="text-[9px] text-[#4a4a54] mt-2 tracking-[0.2em] uppercase">
-                Intelligence · Strategy · Expansion
+                Intelligence · Strategy · Expansion · Full Authority
               </div>
             </div>
 
-            {/* Status indicators */}
             <div className="flex items-center gap-6 mb-8 text-[9px] uppercase tracking-[0.2em]">
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#5a8a6a]" />
@@ -375,21 +462,17 @@ export default function VesselCommandInterface({
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#C8A24A]" />
-                <span className="text-[#4a4a54]">AI Ready</span>
+                <span className="text-[#4a4a54]">Tools Active</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#6a8aba]" />
+                <span className="text-[#4a4a54]">Image Gen</span>
               </div>
             </div>
 
             <p className="text-[11px] text-[#4a4a54] max-w-md mb-5 leading-relaxed">
-              Speak or type commands. The AI manages campaigns, analytics, member operations, rewards, and predictive intelligence.
+              Full operational authority. Execute commands, query data, generate images, analyze attachments, manage campaigns & members.
             </p>
-
-            <a
-              href="/admin/operator"
-              className="inline-flex items-center gap-2 text-[9px] px-4 py-2 rounded border border-[#C8A24A]/12 bg-[#C8A24A]/04 text-[#C8A24A]/60 hover:text-[#C8A24A]/90 hover:bg-[#C8A24A]/08 transition-all mb-6 uppercase tracking-[0.2em]"
-            >
-              <span className="w-1 h-1 rounded-full bg-[#C8A24A]" />
-              AI Operator Console
-            </a>
 
             <div className="flex flex-wrap gap-1.5 justify-center max-w-lg">
               {EXAMPLE_COMMANDS.slice(0, 6).map((cmd) => (
@@ -410,6 +493,7 @@ export default function VesselCommandInterface({
                 key={i}
                 role={msg.role}
                 content={msg.content}
+                attachments={msg.attachments}
                 isStreaming={isLoading && i === messages.length - 1 && msg.role === "assistant"}
               />
             ))}
@@ -432,9 +516,31 @@ export default function VesselCommandInterface({
         </div>
       )}
 
+      {/* Pending attachments preview */}
+      {pendingAttachments.length > 0 && (
+        <div className="flex gap-2 px-4 py-2 overflow-x-auto scrollbar-hide">
+          {pendingAttachments.map((att, i) => (
+            <div key={i} className="relative shrink-0 group">
+              {att.type.startsWith("image/") ? (
+                <img src={att.url} alt={att.name} className="w-16 h-16 object-cover rounded-lg border border-[rgba(200,162,74,0.2)]" />
+              ) : (
+                <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-[rgba(200,162,74,0.1)] bg-[rgba(200,162,74,0.04)] text-[10px] text-[#5a5a64]">
+                  📎 {att.name.length > 15 ? att.name.slice(0, 15) + "…" : att.name}
+                </div>
+              )}
+              <button
+                onClick={() => removeAttachment(i)}
+                className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="w-2.5 h-2.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ── Tactical Command Strip ── */}
       <div className="px-4 sm:px-6 pb-safe pb-5 pt-2 relative">
-        {/* Beam from input to core */}
         {(isListening || isLoading) && (
           <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-[1px] pointer-events-none"
             style={{
@@ -445,7 +551,6 @@ export default function VesselCommandInterface({
           />
         )}
 
-        {/* Command bar */}
         <div
           className={cn(
             "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-500",
@@ -477,13 +582,35 @@ export default function VesselCommandInterface({
             {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </Button>
 
+          {/* Attachment button */}
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            variant="ghost"
+            size="icon"
+            disabled={isUploading}
+            className={cn(
+              "shrink-0 h-9 w-9 rounded-lg transition-all relative z-10",
+              pendingAttachments.length > 0
+                ? "text-[#C8A24A]/70 hover:text-[#C8A24A] hover:bg-[#C8A24A]/08"
+                : "text-[#4a4a54]/40 hover:text-[#C8A24A]/60 hover:bg-[#C8A24A]/06"
+            )}
+            title="Attach files"
+          >
+            <Paperclip className="w-3.5 h-3.5" />
+            {pendingAttachments.length > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#C8A24A] text-[7px] text-[#0a0a0c] font-bold flex items-center justify-center">
+                {pendingAttachments.length}
+              </span>
+            )}
+          </Button>
+
           {/* Input */}
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? "Listening…" : "Command…"}
+            placeholder={isUploading ? "Uploading…" : isListening ? "Listening…" : "Command…"}
             className={cn(
               "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2 relative z-10",
               "bg-transparent text-sm text-[rgba(220,218,214,0.8)] placeholder:text-[#4a4a54]/40",
@@ -541,7 +668,7 @@ export default function VesselCommandInterface({
           {/* Send */}
           <Button
             onClick={() => send(input)}
-            disabled={!input.trim() || isLoading}
+            disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
             size="icon"
             className={cn(
               "shrink-0 h-9 w-9 rounded-lg transition-all relative z-10",
@@ -553,10 +680,9 @@ export default function VesselCommandInterface({
           </Button>
         </div>
 
-        {/* Label */}
         <div className="flex justify-center mt-2">
           <span className="text-[8px] uppercase tracking-[0.3em] text-[#4a4a54]/30">
-            {isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE TACTICAL COMMAND"}
+            {isUploading ? "◎ UPLOADING" : isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE TACTICAL COMMAND · FULL AUTHORITY"}
           </span>
         </div>
       </div>
