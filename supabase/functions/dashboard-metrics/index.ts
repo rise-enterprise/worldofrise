@@ -32,18 +32,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify the user is authenticated
+    // Verify the user is authenticated using fast local JWT validation
     const anonClient = createClient(supabaseUrl, anonKey, {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: userError } = await anonClient.auth.getUser();
-    if (userError || !user) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await anonClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const userId = claimsData.claims.sub;
 
     // Verify admin access
     const serviceClient = createClient(supabaseUrl, serviceRoleKey);
@@ -51,7 +54,7 @@ Deno.serve(async (req) => {
     const { data: adminRow, error: adminErr } = await serviceClient
       .from("admins")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .maybeSingle();
 
     if (adminErr || !adminRow) {
