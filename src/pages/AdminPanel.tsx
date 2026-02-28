@@ -34,7 +34,7 @@ function AdminPanelInner() {
     { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#00d4ff" },
     { label: "VIP", value: vipCount, max: totalMembers || 1, color: "#C8A24A" },
     { label: "Retention", value: retentionRate, max: 100, color: "#10b981" },
-    { label: "Threat", value: churnRisk, max: totalMembers || 1, color: "#ef4444" },
+    { label: "Risk", value: churnRisk, max: totalMembers || 1, color: "#ef4444" },
     { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#C8A24A" },
     { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#3b82f6" },
   ];
@@ -49,7 +49,7 @@ function AdminPanelInner() {
       className="h-screen w-screen overflow-hidden relative flex flex-col pt-safe transition-colors duration-1000"
       style={{ backgroundColor: colors.bg }}
     >
-      {/* 3D Galactic Background */}
+      {/* 3D Neural Intelligence Environment */}
       <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: colors.bg }} />}>
         <InterstellarScene
           isListening={isListening}
@@ -62,12 +62,12 @@ function AdminPanelInner() {
         />
       </Suspense>
 
-      {/* Scanline overlay */}
+      {/* Subtle stone texture overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.008) 2px, rgba(0,212,255,0.008) 4px)",
-          mixBlendMode: "screen",
+          background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(200,162,74,0.004) 3px, rgba(200,162,74,0.004) 6px)",
+          mixBlendMode: "overlay",
         }}
       />
 
@@ -75,16 +75,16 @@ function AdminPanelInner() {
       <div
         className="fixed inset-0 pointer-events-none z-[2] transition-all duration-1000"
         style={{
-          background: `radial-gradient(ellipse at center, transparent 55%, ${personality.accentHex}0a 100%)`,
-          boxShadow: `inset 0 0 250px -60px ${personality.accentHex}08`,
+          background: `radial-gradient(ellipse at center, transparent 50%, ${personality.accentHex}08 100%)`,
+          boxShadow: `inset 0 0 300px -80px ${personality.accentHex}06`,
         }}
       />
 
-      {/* Top edge accent */}
+      {/* Top edge accent — gold executive line */}
       <div
         className="fixed top-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent, ${personality.accentHex}40, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${personality.accentHex}30, transparent)`,
         }}
       />
 
@@ -115,8 +115,8 @@ function AdminPanelInner() {
         <div
           className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"
           style={{
-            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.12) 100%)",
-            boxShadow: "inset 0 0 200px rgba(200,30,30,0.1)",
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.1) 100%)",
+            boxShadow: "inset 0 0 200px rgba(200,30,30,0.08)",
           }}
         />
       )}
@@ -125,7 +125,7 @@ function AdminPanelInner() {
       <div
         className="fixed bottom-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent 10%, ${personality.accentHex}25, transparent 90%)`,
+          background: `linear-gradient(90deg, transparent 10%, ${personality.accentHex}18, transparent 90%)`,
         }}
       />
     </div>

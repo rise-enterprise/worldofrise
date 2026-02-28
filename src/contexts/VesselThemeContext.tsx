@@ -21,16 +21,16 @@ interface VesselThemeContextValue {
   };
 }
 
-const GALACTIC_COLORS = {
-  bg: "#030810",
-  accent: "#00d4ff",
-  grid: "#00d4ff",
-  glow: "#00d4ff",
+const NIGHT_COLORS = {
+  bg: "#08060a",
+  accent: "#C8A24A",
+  grid: "#C8A24A",
+  glow: "#C8A24A",
   particle: "#C8A24A",
-  fog: "#030810",
+  fog: "#08060a",
   text: "#e8e4dc",
-  textMuted: "#5a6878",
-  border: "rgba(0,212,255,0.08)",
+  textMuted: "#6a6058",
+  border: "rgba(200,162,74,0.08)",
   corePrimary: "#C8A24A",
   coreSecondary: "#00d4ff",
 };
@@ -59,7 +59,7 @@ export function VesselThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const isDay = mode === "day";
-  const colors = isDay ? DAY_COLORS : GALACTIC_COLORS;
+  const colors = isDay ? DAY_COLORS : NIGHT_COLORS;
 
   return (
     <VesselThemeContext.Provider value={{ mode, toggleMode, isDay, colors }}>

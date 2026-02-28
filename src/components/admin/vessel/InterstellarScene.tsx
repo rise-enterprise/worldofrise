@@ -25,12 +25,12 @@ function CameraController({ isProcessing }: { isProcessing?: boolean }) {
   }, []);
 
   useFrame(() => {
-    target.current.x += (mouse.current.x * 0.6 - target.current.x) * 0.02;
-    target.current.y += (-mouse.current.y * 0.4 - target.current.y) * 0.02;
+    target.current.x += (mouse.current.x * 0.5 - target.current.x) * 0.015;
+    target.current.y += (-mouse.current.y * 0.3 - target.current.y) * 0.015;
     camera.position.x = target.current.x;
     camera.position.y = target.current.y + 1;
     const zt = isProcessing ? 6.5 : 8;
-    zoomTarget.current += (zt - zoomTarget.current) * 0.012;
+    zoomTarget.current += (zt - zoomTarget.current) * 0.01;
     camera.position.z = zoomTarget.current;
     camera.lookAt(0, 0.3, 0);
   });
@@ -38,73 +38,143 @@ function CameraController({ isProcessing }: { isProcessing?: boolean }) {
   return null;
 }
 
-/* ── Deep space nebula layer ── */
-function NebulaLayer() {
-  const ref = useRef<THREE.Mesh>(null);
+/* ── Neural Network Nodes — Living intelligence connections ── */
+function NeuralNetwork() {
+  const groupRef = useRef<THREE.Group>(null);
+  const nodesRef = useRef<THREE.Points>(null);
+  const linesRef = useRef<THREE.LineSegments>(null);
+  const nodeCount = 120;
+  const connectionCount = 80;
+
+  const { positions, connections, linePositions } = useMemo(() => {
+    const pos = new Float32Array(nodeCount * 3);
+    for (let i = 0; i < nodeCount; i++) {
+      // Distribute in a rough sphere with bias toward center
+      const r = 3 + Math.random() * 18;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      pos[i * 3 + 1] = (r * Math.cos(phi)) * 0.5 - 2; // flatten vertically
+      pos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta) - 15;
+    }
+
+    // Create connections between nearby nodes
+    const conns: [number, number][] = [];
+    for (let i = 0; i < connectionCount; i++) {
+      const a = Math.floor(Math.random() * nodeCount);
+      let b = Math.floor(Math.random() * nodeCount);
+      if (a === b) b = (a + 1) % nodeCount;
+      conns.push([a, b]);
+    }
+
+    const lp = new Float32Array(conns.length * 6);
+    for (let i = 0; i < conns.length; i++) {
+      const [a, b] = conns[i];
+      lp[i * 6] = pos[a * 3];
+      lp[i * 6 + 1] = pos[a * 3 + 1];
+      lp[i * 6 + 2] = pos[a * 3 + 2];
+      lp[i * 6 + 3] = pos[b * 3];
+      lp[i * 6 + 4] = pos[b * 3 + 1];
+      lp[i * 6 + 5] = pos[b * 3 + 2];
+    }
+
+    return { positions: pos, connections: conns, linePositions: lp };
+  }, []);
 
   useFrame(({ clock }) => {
-    if (ref.current) {
-      const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.08 + Math.sin(clock.getElapsedTime() * 0.15) * 0.03;
+    if (!groupRef.current) return;
+    groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.02) * 0.05;
+
+    // Pulse node opacity
+    if (nodesRef.current) {
+      const mat = nodesRef.current.material as THREE.PointsMaterial;
+      mat.opacity = 0.15 + Math.sin(clock.getElapsedTime() * 0.4) * 0.05;
+    }
+
+    // Pulse connection opacity
+    if (linesRef.current) {
+      const mat = linesRef.current.material as THREE.LineBasicMaterial;
+      mat.opacity = 0.04 + Math.sin(clock.getElapsedTime() * 0.3) * 0.02;
     }
   });
 
   return (
-    <mesh ref={ref} position={[0, 2, -40]}>
-      <planeGeometry args={[120, 80]} />
-      <meshBasicMaterial
-        color="#0a1628"
-        transparent
-        opacity={0.08}
-        depthWrite={false}
-      />
-    </mesh>
+    <group ref={groupRef}>
+      {/* Neural nodes */}
+      <points ref={nodesRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={nodeCount} array={positions} itemSize={3} />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.06}
+          color="#C8A24A"
+          transparent
+          opacity={0.18}
+          sizeAttenuation
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </points>
+
+      {/* Neural connections */}
+      <lineSegments ref={linesRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={connections.length * 2} array={linePositions} itemSize={3} />
+        </bufferGeometry>
+        <lineBasicMaterial
+          color="#C8A24A"
+          transparent
+          opacity={0.05}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
+      </lineSegments>
+    </group>
   );
 }
 
-/* ── Deep ambient fog ── */
-function AmbientFog({ isCrisis }: { isCrisis: boolean }) {
+/* ── Executive marble/stone ambient layer ── */
+function ExecutiveAmbience({ isCrisis }: { isCrisis: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      const crisisBlend = isCrisis ? 0.04 : 0;
-      mat.opacity = 0.12 + Math.sin(clock.getElapsedTime() * 0.4) * 0.03 + crisisBlend;
+      mat.opacity = 0.08 + Math.sin(clock.getElapsedTime() * 0.2) * 0.02;
       if (isCrisis) {
-        mat.color.lerp(new THREE.Color("#220000"), 0.02);
+        mat.color.lerp(new THREE.Color("#1a0808"), 0.02);
       } else {
-        mat.color.lerp(new THREE.Color("#030810"), 0.02);
+        mat.color.lerp(new THREE.Color("#0a0810"), 0.02);
       }
     }
   });
 
   return (
-    <mesh ref={ref} position={[0, 0, -25]}>
-      <planeGeometry args={[120, 120]} />
-      <meshBasicMaterial color="#030810" transparent opacity={0.12} depthWrite={false} />
+    <mesh ref={ref} position={[0, 0, -30]}>
+      <planeGeometry args={[120, 80]} />
+      <meshBasicMaterial color="#0a0810" transparent opacity={0.08} depthWrite={false} />
     </mesh>
   );
 }
 
-/* ── Volumetric core spotlight ── */
+/* ── Volumetric core spotlight — top-down executive lighting ── */
 function CoreSpotlight({ isCrisis }: { isCrisis: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.05 + Math.sin(clock.getElapsedTime() * 0.6) * 0.02;
+      mat.opacity = 0.04 + Math.sin(clock.getElapsedTime() * 0.5) * 0.015;
     }
   });
 
   return (
     <mesh ref={ref} position={[0, 0.3, -3]}>
-      <circleGeometry args={[8, 64]} />
+      <circleGeometry args={[6, 64]} />
       <meshBasicMaterial
-        color={isCrisis ? "#331111" : "#0a1520"}
+        color={isCrisis ? "#2a0a0a" : "#0c0a06"}
         transparent
-        opacity={0.05}
+        opacity={0.04}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -112,17 +182,17 @@ function CoreSpotlight({ isCrisis }: { isCrisis: boolean }) {
   );
 }
 
-/* ── Cosmic dust particles ── */
-function CosmicDust() {
+/* ── Subtle gold dust particles ── */
+function GoldDust() {
   const ref = useRef<THREE.Points>(null);
-  const count = 400;
+  const count = 300;
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 50;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 25;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 40;
+      arr[i * 3] = (Math.random() - 0.5) * 40;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 30;
     }
     return arr;
   }, []);
@@ -132,11 +202,11 @@ function CosmicDust() {
     const pos = ref.current.geometry.attributes.position;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < count; i++) {
-      arr[i * 3 + 1] += delta * 0.04;
-      if (arr[i * 3 + 1] > 12) arr[i * 3 + 1] = -12;
+      arr[i * 3 + 1] += delta * 0.03;
+      if (arr[i * 3 + 1] > 10) arr[i * 3 + 1] = -10;
     }
     pos.needsUpdate = true;
-    ref.current.rotation.y += delta * 0.002;
+    ref.current.rotation.y += delta * 0.001;
   });
 
   return (
@@ -145,10 +215,10 @@ function CosmicDust() {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.012}
+        size={0.01}
         color="#C8A24A"
         transparent
-        opacity={0.12}
+        opacity={0.1}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -157,25 +227,24 @@ function CosmicDust() {
   );
 }
 
-/* ── Deep starfield ── */
-function DeepStarfield() {
+/* ── Minimal starfield — far background ── */
+function SubtleStarfield() {
   const ref = useRef<THREE.Points>(null);
-  const count = 2500;
+  const count = 800;
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       arr[i * 3] = (Math.random() - 0.5) * 100;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 80;
-      arr[i * 3 + 2] = -10 - Math.random() * 60;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 60;
+      arr[i * 3 + 2] = -20 - Math.random() * 50;
     }
     return arr;
   }, []);
 
   useFrame((_, delta) => {
     if (ref.current) {
-      ref.current.rotation.y += delta * 0.004;
-      ref.current.rotation.x += delta * 0.001;
+      ref.current.rotation.y += delta * 0.002;
     }
   });
 
@@ -185,10 +254,10 @@ function DeepStarfield() {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.035}
+        size={0.025}
         color="#ffffff"
         transparent
-        opacity={0.5}
+        opacity={0.2}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -197,14 +266,14 @@ function DeepStarfield() {
   );
 }
 
-/* ── Volumetric light beams ── */
-function VolumetricBeams() {
+/* ── Soft gold volumetric beams — executive top-down light ── */
+function ExecutiveBeams() {
   const refs = useRef<(THREE.Mesh | null)[]>([]);
 
   const beams = useMemo(() => [
-    { x: -8, angle: 0.15, width: 0.8, height: 25, opacity: 0.015 },
-    { x: 6, angle: -0.1, width: 0.5, height: 30, opacity: 0.01 },
-    { x: 0, angle: 0, width: 1.2, height: 35, opacity: 0.008 },
+    { x: -6, angle: 0.1, width: 0.6, height: 25, opacity: 0.012 },
+    { x: 0, angle: 0, width: 1, height: 30, opacity: 0.008 },
+    { x: 5, angle: -0.08, width: 0.5, height: 25, opacity: 0.01 },
   ], []);
 
   useFrame(({ clock }) => {
@@ -212,7 +281,7 @@ function VolumetricBeams() {
     refs.current.forEach((mesh, i) => {
       if (!mesh) return;
       const mat = mesh.material as THREE.MeshBasicMaterial;
-      mat.opacity = beams[i].opacity + Math.sin(t * 0.3 + i * 1.5) * 0.005;
+      mat.opacity = beams[i].opacity + Math.sin(t * 0.25 + i * 1.2) * 0.004;
     });
   });
 
@@ -222,7 +291,7 @@ function VolumetricBeams() {
         <mesh
           key={i}
           ref={(el) => { refs.current[i] = el; }}
-          position={[beam.x, beam.height / 2 - 5, -15]}
+          position={[beam.x, beam.height / 2 - 5, -12]}
           rotation={[0, 0, beam.angle]}
         >
           <planeGeometry args={[beam.width, beam.height]} />
@@ -270,38 +339,38 @@ export default function InterstellarScene({
       >
         <Suspense fallback={null}>
           <CameraController isProcessing={isProcessing} />
-          <ambientLight intensity={0.06} />
+          <ambientLight intensity={0.04} />
 
-          {/* Primary core spotlight */}
+          {/* Executive top-down spotlight */}
           <pointLight
-            position={[0, 0.3, 0]}
-            intensity={isCrisis ? 4 : 2.5}
+            position={[0, 6, 2]}
+            intensity={isCrisis ? 3 : 1.8}
             color={isCrisis ? "#ff4444" : "#C8A24A"}
-            distance={30}
+            distance={25}
             decay={2}
           />
-          {/* Backlight for depth */}
-          <pointLight position={[0, 3, -8]} intensity={0.5} color="#C8A24A" distance={25} decay={2} />
+          {/* Core glow */}
+          <pointLight position={[0, 0.3, 0]} intensity={1.5} color="#C8A24A" distance={15} decay={2} />
+          {/* Subtle blue rim */}
+          <pointLight position={[6, 3, -5]} intensity={0.2} color="#00d4ff" distance={20} decay={2} />
+          <pointLight position={[-5, -1, 4]} intensity={0.1} color="#00d4ff" distance={15} decay={2} />
+          <directionalLight position={[0, 8, 0]} intensity={0.04} color="#eee8dd" />
 
-          {/* Galactic lighting */}
-          <pointLight position={[8, 4, -6]} intensity={0.35} color="#00d4ff" distance={30} decay={2} />
-          <pointLight position={[-7, -2, 5]} intensity={0.2} color="#00d4ff" distance={20} decay={2} />
-          <pointLight position={[-4, 5, -4]} intensity={0.12} color="#10b981" distance={18} decay={2} />
-          <directionalLight position={[0, 10, 0]} intensity={0.06} color="#eeeeff" />
+          {/* Background layers */}
+          <SubtleStarfield />
+          <ExecutiveAmbience isCrisis={isCrisis} />
+          <ExecutiveBeams />
 
-          {/* Deep space layers */}
-          <DeepStarfield />
-          <NebulaLayer />
-          <VolumetricBeams />
+          {/* Neural intelligence network */}
+          <NeuralNetwork />
 
           {/* Environment */}
           <CoreSpotlight isCrisis={isCrisis} />
           <HUDGrid isDay={false} />
           <ScanSweep isCrisis={isCrisis} isDay={false} />
-          <CosmicDust />
-          <AmbientFog isCrisis={isCrisis} />
+          <GoldDust />
 
-          {/* RISE Galactic Core */}
+          {/* RISE Neural Core */}
           <RISECoreEmblem
             isActive={isListening}
             isCrisis={isCrisis}
@@ -314,7 +383,7 @@ export default function InterstellarScene({
           {metrics.length > 0 && <MetricRings metrics={metrics} isCrisis={isCrisis} />}
           {aiMetrics.length > 0 && <AIResponseMetrics metrics={aiMetrics} />}
 
-          {/* Holographic Globe */}
+          {/* Global Expansion Map */}
           <GlobalCommandMap isDay={false} />
         </Suspense>
       </Canvas>

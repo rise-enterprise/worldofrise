@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-export type AIPersonality = "strategic" | "deepscan" | "expansion" | "predictive" | "crisis";
+export type AIPersonality = "strategic" | "expansion" | "neural" | "investor" | "risk";
 
 interface PersonalityConfig {
   id: AIPersonality;
@@ -18,39 +18,39 @@ export const PERSONALITIES: Record<AIPersonality, PersonalityConfig> = {
     accent: "42 50% 54%",
     accentHex: "#C8A24A",
     icon: "◆",
-    systemPromptPrefix: "You are in Strategic Command Mode. Provide concise, high-level strategic insights focused on P&L impact, board-ready summaries, and top-line KPIs. Speak with authority and brevity. You are the intelligence core of a galactic-scale loyalty operation.",
-  },
-  deepscan: {
-    id: "deepscan",
-    label: "Deep Scan",
-    accent: "195 90% 50%",
-    accentHex: "#00d4ff",
-    icon: "◎",
-    systemPromptPrefix: "You are in Deep Scan Mode. Dive into granular data analysis, pattern detection, anomaly investigation, and micro-segmentation. Surface hidden correlations and operational details. Be precise and thorough.",
+    systemPromptPrefix: "You are in Strategic Command Mode. Provide concise, board-level strategic insights focused on P&L impact, executive summaries, and top-line KPIs. Speak with authority and brevity. You are the intelligence core of a planetary-scale loyalty operation.",
   },
   expansion: {
     id: "expansion",
     label: "Expansion Ops",
-    accent: "25 90% 55%",
-    accentHex: "#f59e0b",
-    icon: "◇",
-    systemPromptPrefix: "You are in Expansion Operations Mode. Focus on new market opportunities, geographic growth, brand extension, competitive landscape, and scaling strategies. Think planetary-scale.",
+    accent: "195 90% 50%",
+    accentHex: "#00d4ff",
+    icon: "◎",
+    systemPromptPrefix: "You are in Expansion Operations Mode. Focus on new market opportunities, geographic growth, branch ROI simulation, competitive landscape, and scaling strategies. Simulate expansion impact with projected loyalty gains.",
   },
-  predictive: {
-    id: "predictive",
-    label: "Predictive Intel",
+  neural: {
+    id: "neural",
+    label: "Neural Analysis",
     accent: "160 60% 45%",
     accentHex: "#10b981",
     icon: "◈",
-    systemPromptPrefix: "You are in Predictive Intelligence Mode. Lead with forecasts, trend analysis, churn predictions, and revenue projections. Use probabilistic language and confidence intervals. Project the future.",
+    systemPromptPrefix: "You are in Neural Analysis Mode. Dive into relationship mapping, behavioral pattern detection, guest interconnections, and micro-segmentation. Surface hidden correlations between guest clusters, spending patterns, and loyalty pathways.",
   },
-  crisis: {
-    id: "crisis",
-    label: "Crisis Protocol",
+  investor: {
+    id: "investor",
+    label: "Investor Brief",
+    accent: "25 90% 55%",
+    accentHex: "#f59e0b",
+    icon: "◇",
+    systemPromptPrefix: "You are in Investor Presentation Mode. Generate board-ready summaries with clean metrics, growth narratives, and strategic positioning. Use precise financial language, confidence intervals, and revenue projections. Present data as an investor relations executive would.",
+  },
+  risk: {
+    id: "risk",
+    label: "Risk Detection",
     accent: "0 75% 55%",
     accentHex: "#ef4444",
     icon: "◉",
-    systemPromptPrefix: "You are in Crisis Protocol Mode. Assess threats, anomalies, and critical operational risks. Provide immediate action plans, escalation paths, and damage containment strategies. Urgent, decisive, authoritative.",
+    systemPromptPrefix: "You are in Risk Detection Mode. Assess threats, anomalies, churn spikes, and critical operational risks. Provide immediate action plans, escalation paths, and damage containment strategies. Urgent, decisive, authoritative.",
   },
 };
 
