@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Sun, Moon } from "lucide-react";
 import { useVesselTheme } from "@/contexts/VesselThemeContext";
-import { useAIPersonality, PERSONALITIES, AIPersonality } from "@/contexts/AIPersonalityContext";
+import { useAIPersonality, PERSONALITIES } from "@/contexts/AIPersonalityContext";
 
 interface SystemStatusBarProps {
   isCrisis: boolean;
@@ -15,12 +15,9 @@ interface SystemStatusBarProps {
 export default function SystemStatusBar({
   isCrisis,
   totalMembers,
-  activeMembers,
-  visitsMonth,
   vipCount,
   churnRisk,
 }: SystemStatusBarProps) {
-  const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
   const { isDay, toggleMode, colors } = useVesselTheme();
   const { personality, config, setPersonality } = useAIPersonality();
 
@@ -35,9 +32,7 @@ export default function SystemStatusBar({
         borderColor: isCrisis ? "rgba(239,68,68,0.2)" : colors.border,
         backgroundColor: isCrisis
           ? "rgba(239,68,68,0.05)"
-          : isDay
-          ? "rgba(245,240,232,0.6)"
-          : "rgba(2,8,24,0.4)",
+          : "rgba(3,8,16,0.5)",
       }}
     >
       {/* Left — System identity */}
@@ -50,13 +45,13 @@ export default function SystemStatusBar({
           className="text-[8px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.25em] font-semibold"
           style={{ color: config.accentHex }}
         >
-          {isCrisis ? "⚠ INSTABILITY" : `${config.icon} ${config.label.toUpperCase()} MODE`}
+          {isCrisis ? "⚠ THREAT DETECTED" : `${config.icon} ${config.label.toUpperCase()}`}
         </span>
       </div>
 
-      {/* Center — AI Personality selector + metrics */}
+      {/* Center — AI Mode selector + metrics */}
       <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide w-full sm:w-auto justify-start sm:justify-center">
-        {/* Personality pills */}
+        {/* Mode pills */}
         <div className="flex items-center gap-1 shrink-0">
           {modes.map((mode) => (
             <button
@@ -69,12 +64,16 @@ export default function SystemStatusBar({
                   : "border-transparent opacity-40 hover:opacity-70"
               )}
               style={{
-                color: personality === mode.id ? mode.accentHex : (isDay ? "#8a7d6a" : "#667788"),
+                color: personality === mode.id ? mode.accentHex : "#5a6878",
                 backgroundColor: personality === mode.id ? `${mode.accentHex}15` : "transparent",
               }}
-              title={`${mode.label} Mode`}
+              title={mode.label}
             >
-              <span className="hidden sm:inline">{mode.icon} </span>{mode.label}
+              <span className="hidden sm:inline">{mode.icon} </span>
+              {mode.id === "strategic" ? "CMD" :
+               mode.id === "deepscan" ? "SCAN" :
+               mode.id === "expansion" ? "EXP" :
+               mode.id === "predictive" ? "PRED" : "CRIT"}
             </button>
           ))}
         </div>
@@ -84,9 +83,9 @@ export default function SystemStatusBar({
 
         {/* Key metrics */}
         <div className="flex items-center gap-3 sm:gap-5 shrink-0">
-          <StatusMetric label="MEMBERS" value={totalMembers.toLocaleString()} isDay={isDay} accent={config.accentHex} />
-          <span className="hidden sm:inline-flex"><StatusMetric label="VIP" value={vipCount.toLocaleString()} isDay={isDay} accent={config.accentHex} /></span>
-          <StatusMetric label="CHURN" value={churnRisk.toLocaleString()} warn={churnRisk > totalMembers * 0.3} isDay={isDay} accent={config.accentHex} />
+          <StatusMetric label="NODES" value={totalMembers.toLocaleString()} accent={config.accentHex} />
+          <span className="hidden sm:inline-flex"><StatusMetric label="VIP" value={vipCount.toLocaleString()} accent={config.accentHex} /></span>
+          <StatusMetric label="THREAT" value={churnRisk.toLocaleString()} warn={churnRisk > totalMembers * 0.3} accent={config.accentHex} />
         </div>
       </div>
 
@@ -115,18 +114,18 @@ export default function SystemStatusBar({
   );
 }
 
-function StatusMetric({ label, value, warn, isDay, accent }: { label: string; value: string; warn?: boolean; isDay: boolean; accent: string }) {
+function StatusMetric({ label, value, warn, accent }: { label: string; value: string; warn?: boolean; accent: string }) {
   return (
     <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
       <span
         className="text-[8px] sm:text-[9px] uppercase tracking-wider"
-        style={{ color: isDay ? "rgba(138,125,106,0.6)" : "rgba(102,119,136,0.4)" }}
+        style={{ color: "rgba(90,104,120,0.5)" }}
       >
         {label}
       </span>
       <span
         className="text-[10px] sm:text-[11px] font-mono tabular-nums"
-        style={{ color: warn ? "rgba(239,68,68,0.8)" : isDay ? "rgba(26,21,16,0.7)" : "rgba(232,228,220,0.7)" }}
+        style={{ color: warn ? "rgba(239,68,68,0.8)" : "rgba(232,228,220,0.7)" }}
       >
         {value}
       </span>

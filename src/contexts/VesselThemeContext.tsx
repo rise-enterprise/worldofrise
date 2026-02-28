@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
 type VesselMode = "day" | "night";
 
@@ -21,13 +21,27 @@ interface VesselThemeContextValue {
   };
 }
 
+const GALACTIC_COLORS = {
+  bg: "#030810",
+  accent: "#00d4ff",
+  grid: "#00d4ff",
+  glow: "#00d4ff",
+  particle: "#C8A24A",
+  fog: "#030810",
+  text: "#e8e4dc",
+  textMuted: "#5a6878",
+  border: "rgba(0,212,255,0.08)",
+  corePrimary: "#C8A24A",
+  coreSecondary: "#00d4ff",
+};
+
 const DAY_COLORS = {
-  bg: "#f5f0e8",         // Light marble
-  accent: "#C8A24A",     // Champagne gold
-  grid: "#C8A24A",       // Soft gold grid
-  glow: "#d4c088",       // Champagne glow
-  particle: "#C8A24A",   // Gold particles
-  fog: "#ede5d5",        // Warm marble fog
+  bg: "#f5f0e8",
+  accent: "#C8A24A",
+  grid: "#C8A24A",
+  glow: "#d4c088",
+  particle: "#C8A24A",
+  fog: "#ede5d5",
   text: "#1a1510",
   textMuted: "#8a7d6a",
   border: "rgba(200,162,74,0.15)",
@@ -35,42 +49,17 @@ const DAY_COLORS = {
   coreSecondary: "#b8944a",
 };
 
-const NIGHT_COLORS = {
-  bg: "#020818",         // Deep midnight navy
-  accent: "#00d4ff",     // Neon cyan
-  grid: "#00d4ff",       // Cyan grid
-  glow: "#00d4ff",       // Neon glow
-  particle: "#C8A24A",   // Gold particles
-  fog: "#020818",        // Navy fog
-  text: "#e8e4dc",
-  textMuted: "#667788",
-  border: "rgba(0,212,255,0.1)",
-  corePrimary: "#C8A24A",
-  coreSecondary: "#00d4ff",
-};
-
 const VesselThemeContext = createContext<VesselThemeContextValue | null>(null);
 
-function getAutoMode(): VesselMode {
-  // Gulf time UTC+3
-  const gulfHour = (new Date().getUTCHours() + 3) % 24;
-  return gulfHour >= 6 && gulfHour < 18 ? "day" : "night";
-}
-
 export function VesselThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<VesselMode>(getAutoMode);
-
-  // Auto-detect on mount
-  useEffect(() => {
-    setMode(getAutoMode());
-  }, []);
+  const [mode, setMode] = useState<VesselMode>("night");
 
   const toggleMode = useCallback(() => {
     setMode(prev => prev === "day" ? "night" : "day");
   }, []);
 
   const isDay = mode === "day";
-  const colors = isDay ? DAY_COLORS : NIGHT_COLORS;
+  const colors = isDay ? DAY_COLORS : GALACTIC_COLORS;
 
   return (
     <VesselThemeContext.Provider value={{ mode, toggleMode, isDay, colors }}>
