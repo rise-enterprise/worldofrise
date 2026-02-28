@@ -15,31 +15,24 @@ interface MetricRingsProps {
   isCrisis?: boolean;
 }
 
-const ORBIT_RADIUS = 3.2;
-const ORBIT_Y = 0.3; // centered on the core
-const ORBIT_SPEED = 0.08;
+const ORBIT_RADIUS = 3;
+const ORBIT_Y = 0.3;
+const ORBIT_SPEED = 0.06;
 
 function OrbitalMetricSatellite({
-  metric,
-  index,
-  total,
-  isCrisis,
+  metric, index, total, isCrisis,
 }: {
-  metric: MetricData;
-  index: number;
-  total: number;
-  isCrisis?: boolean;
+  metric: MetricData; index: number; total: number; isCrisis?: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
   const trailRef = useRef<THREE.Mesh>(null);
 
   const pct = metric.max > 0 ? Math.min(metric.value / metric.max, 1) : 0;
-  const color = isCrisis ? "#ff4444" : metric.color;
+  const color = isCrisis ? "#b84a4a" : metric.color;
   const angleOffset = (index / total) * Math.PI * 2;
 
   const innerEdges = useMemo(
-    () => new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.1, 0.75)),
+    () => new THREE.EdgesGeometry(new THREE.PlaneGeometry(1, 0.65)),
     []
   );
 
@@ -48,121 +41,57 @@ function OrbitalMetricSatellite({
     const angle = angleOffset + t * ORBIT_SPEED;
 
     if (groupRef.current) {
-      // Elliptical orbit path
       groupRef.current.position.x = Math.cos(angle) * ORBIT_RADIUS;
-      groupRef.current.position.z = Math.sin(angle) * (ORBIT_RADIUS * 0.4);
-      groupRef.current.position.y =
-        ORBIT_Y + Math.sin(t * 0.5 + index * 1.3) * 0.15;
-    }
-
-    if (glowRef.current) {
-      const mat = glowRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = isCrisis
-        ? 0.08 + Math.sin(t * 4) * 0.05
-        : 0.04 + Math.sin(t * 0.8 + index) * 0.02;
+      groupRef.current.position.z = Math.sin(angle) * (ORBIT_RADIUS * 0.35);
+      groupRef.current.position.y = ORBIT_Y + Math.sin(t * 0.4 + index * 1.2) * 0.1;
     }
 
     if (trailRef.current) {
       const mat = trailRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.15 + Math.sin(t * 1.2 + index * 0.5) * 0.1;
+      mat.opacity = 0.1 + Math.sin(t * 1 + index * 0.4) * 0.06;
     }
   });
 
-  const filledWidth = 0.85 * pct;
+  const filledWidth = 0.75 * pct;
 
   return (
     <group ref={groupRef}>
       <Billboard follow lockX={false} lockY={false} lockZ={false}>
-        {/* Hexagonal glow backdrop */}
-        <mesh ref={glowRef} position={[0, 0, -0.02]}>
-          <circleGeometry args={[0.65, 6]} />
-          <meshBasicMaterial
-            color={color}
-            transparent
-            opacity={0.04}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-          />
+        {/* Panel bg */}
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[1, 0.65]} />
+          <meshBasicMaterial color={color} transparent opacity={0.02} blending={THREE.AdditiveBlending} depthWrite={false} />
         </mesh>
 
-        {/* Inner border frame */}
+        {/* Border */}
         <lineSegments geometry={innerEdges} position={[0, 0, -0.005]}>
-          <lineBasicMaterial
-            color={color}
-            transparent
-            opacity={0.3}
-            depthWrite={false}
-          />
+          <lineBasicMaterial color={color} transparent opacity={0.15} depthWrite={false} />
         </lineSegments>
 
-        {/* Panel background */}
-        <mesh position={[0, 0, -0.01]}>
-          <planeGeometry args={[1.1, 0.75]} />
-          <meshBasicMaterial
-            color={color}
-            transparent
-            opacity={0.03}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-          />
-        </mesh>
-
         {/* Label */}
-        <Text
-          position={[0, 0.22, 0]}
-          fontSize={0.07}
-          color="#889"
-          anchorX="center"
-          anchorY="middle"
-          font={undefined}
-          letterSpacing={0.14}
-        >
+        <Text position={[0, 0.2, 0]} fontSize={0.06} color="#5a5a64" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.12}>
           {metric.label.toUpperCase()}
         </Text>
 
-        {/* Value */}
-        <Text
-          position={[0, 0.02, 0]}
-          fontSize={0.2}
-          color={color}
-          anchorX="center"
-          anchorY="middle"
-          font={undefined}
-        >
-          {typeof metric.value === "number"
-            ? metric.value.toLocaleString()
-            : String(metric.value)}
+        {/* Value — LARGE dominant */}
+        <Text position={[0, 0, 0]} fontSize={0.18} color={color} anchorX="center" anchorY="middle" font={undefined}>
+          {typeof metric.value === "number" ? metric.value.toLocaleString() : String(metric.value)}
         </Text>
 
-        {/* Progress bar background */}
-        <mesh position={[0, -0.18, 0]}>
-          <planeGeometry args={[0.85, 0.04]} />
-          <meshBasicMaterial color="#222" transparent opacity={0.5} />
+        {/* Progress bar bg */}
+        <mesh position={[0, -0.17, 0]}>
+          <planeGeometry args={[0.75, 0.03]} />
+          <meshBasicMaterial color="#1a1a1e" transparent opacity={0.5} />
         </mesh>
 
         {/* Progress bar fill */}
-        <mesh
-          ref={trailRef}
-          position={[-(0.85 - filledWidth) / 2, -0.18, 0.001]}
-        >
-          <planeGeometry args={[filledWidth || 0.001, 0.04]} />
-          <meshBasicMaterial
-            color={color}
-            transparent
-            opacity={0.85}
-            blending={THREE.AdditiveBlending}
-          />
+        <mesh ref={trailRef} position={[-(0.75 - filledWidth) / 2, -0.17, 0.001]}>
+          <planeGeometry args={[filledWidth || 0.001, 0.03]} />
+          <meshBasicMaterial color={color} transparent opacity={0.6} blending={THREE.AdditiveBlending} />
         </mesh>
 
-        {/* Percentage indicator */}
-        <Text
-          position={[0.48, -0.18, 0]}
-          fontSize={0.045}
-          color={color}
-          anchorX="right"
-          anchorY="middle"
-          font={undefined}
-        >
+        {/* Percentage */}
+        <Text position={[0.42, -0.17, 0]} fontSize={0.04} color={color} anchorX="right" anchorY="middle" font={undefined}>
           {Math.round(pct * 100) + "%"}
         </Text>
       </Billboard>
@@ -170,25 +99,22 @@ function OrbitalMetricSatellite({
   );
 }
 
-/* Orbital ring visual (the path the satellites follow) */
 function OrbitPath({ isCrisis }: { isCrisis?: boolean }) {
   const lineObj = useMemo(() => {
     const pts: THREE.Vector3[] = [];
     for (let i = 0; i <= 128; i++) {
       const angle = (i / 128) * Math.PI * 2;
-      pts.push(
-        new THREE.Vector3(
-          Math.cos(angle) * ORBIT_RADIUS,
-          ORBIT_Y,
-          Math.sin(angle) * (ORBIT_RADIUS * 0.4)
-        )
-      );
+      pts.push(new THREE.Vector3(
+        Math.cos(angle) * ORBIT_RADIUS,
+        ORBIT_Y,
+        Math.sin(angle) * (ORBIT_RADIUS * 0.35)
+      ));
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
-      color: isCrisis ? "#ff4444" : "#C8A24A",
+      color: isCrisis ? "#b84a4a" : "#C8A24A",
       transparent: true,
-      opacity: 0.08,
+      opacity: 0.05,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -197,7 +123,7 @@ function OrbitPath({ isCrisis }: { isCrisis?: boolean }) {
 
   useFrame(({ clock }) => {
     const mat = lineObj.material as THREE.LineBasicMaterial;
-    mat.opacity = 0.08 + Math.sin(clock.getElapsedTime() * 0.5) * 0.03;
+    mat.opacity = 0.05 + Math.sin(clock.getElapsedTime() * 0.4) * 0.02;
   });
 
   return <primitive object={lineObj} />;
@@ -210,13 +136,7 @@ export default function MetricRings({ metrics, isCrisis }: MetricRingsProps) {
     <group>
       <OrbitPath isCrisis={isCrisis} />
       {metrics.map((m, i) => (
-        <OrbitalMetricSatellite
-          key={m.label}
-          metric={m}
-          index={i}
-          total={total}
-          isCrisis={isCrisis}
-        />
+        <OrbitalMetricSatellite key={m.label} metric={m} index={i} total={total} isCrisis={isCrisis} />
       ))}
     </group>
   );

@@ -26,17 +26,16 @@ function AdminPanelInner() {
   const churnRisk = m.churnRiskCount ?? 0;
   const noir = m.visitsByBrand?.noir ?? 0;
   const sasso = m.visitsByBrand?.sasso ?? 0;
-
   const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
 
   const metricRings = [
-    { label: "Nodes", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
-    { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#00d4ff" },
+    { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
+    { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#6b93b8" },
     { label: "VIP", value: vipCount, max: totalMembers || 1, color: "#C8A24A" },
-    { label: "Retention", value: retentionRate, max: 100, color: "#10b981" },
-    { label: "Risk", value: churnRisk, max: totalMembers || 1, color: "#ef4444" },
+    { label: "Retention", value: retentionRate, max: 100, color: "#5a8a6a" },
+    { label: "Risk", value: churnRisk, max: totalMembers || 1, color: "#b84a4a" },
     { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#C8A24A" },
-    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#3b82f6" },
+    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#6b7db8" },
   ];
 
   const handleCrisis = useCallback((crisis: boolean) => {
@@ -46,11 +45,11 @@ function AdminPanelInner() {
 
   return (
     <div
-      className="h-screen w-screen overflow-hidden relative flex flex-col pt-safe transition-colors duration-1000"
-      style={{ backgroundColor: colors.bg }}
+      className="h-screen w-screen overflow-hidden relative flex flex-col pt-safe"
+      style={{ backgroundColor: "#0a0a0c" }}
     >
-      {/* 3D Neural Intelligence Environment */}
-      <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: colors.bg }} />}>
+      {/* 3D Tactical Environment */}
+      <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: "#0a0a0c" }} />}>
         <InterstellarScene
           isListening={isListening}
           isCrisis={isCrisis}
@@ -62,33 +61,40 @@ function AdminPanelInner() {
         />
       </Suspense>
 
-      {/* Subtle stone texture overlay */}
+      {/* Matte graphite depth overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(200,162,74,0.004) 3px, rgba(200,162,74,0.004) 6px)",
+          background: "radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(10,10,12,0.4) 70%, rgba(10,10,12,0.8) 100%)",
+        }}
+      />
+
+      {/* Subtle horizontal scan line */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[1]"
+        style={{
+          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,162,74,0.008) 2px, rgba(200,162,74,0.008) 4px)",
           mixBlendMode: "overlay",
         }}
       />
 
-      {/* Personality accent vignette */}
+      {/* Mode accent vignette — subtle color shift */}
       <div
         className="fixed inset-0 pointer-events-none z-[2] transition-all duration-1000"
         style={{
-          background: `radial-gradient(ellipse at center, transparent 50%, ${personality.accentHex}08 100%)`,
-          boxShadow: `inset 0 0 300px -80px ${personality.accentHex}06`,
+          boxShadow: `inset 0 0 200px -60px ${personality.accentHex}05`,
         }}
       />
 
-      {/* Top edge accent — gold executive line */}
+      {/* Top gold edge line */}
       <div
         className="fixed top-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent, ${personality.accentHex}30, transparent)`,
+          background: `linear-gradient(90deg, transparent 15%, ${personality.accentHex}20, transparent 85%)`,
         }}
       />
 
-      {/* System status bar */}
+      {/* Strategic Header Strip */}
       <SystemStatusBar
         isCrisis={isCrisis}
         totalMembers={totalMembers}
@@ -98,7 +104,7 @@ function AdminPanelInner() {
         churnRisk={churnRisk}
       />
 
-      {/* Command interface */}
+      {/* Central Intelligence + Command */}
       <div className="flex-1 min-h-0 relative z-10">
         <VesselCommandInterface
           onListeningChange={setIsListening}
@@ -115,8 +121,8 @@ function AdminPanelInner() {
         <div
           className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"
           style={{
-            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.1) 100%)",
-            boxShadow: "inset 0 0 200px rgba(200,30,30,0.08)",
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(160,30,30,0.08) 100%)",
+            boxShadow: "inset 0 0 200px rgba(180,30,30,0.06)",
           }}
         />
       )}
@@ -125,7 +131,7 @@ function AdminPanelInner() {
       <div
         className="fixed bottom-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent 10%, ${personality.accentHex}18, transparent 90%)`,
+          background: `linear-gradient(90deg, transparent 20%, ${personality.accentHex}10, transparent 80%)`,
         }}
       />
     </div>

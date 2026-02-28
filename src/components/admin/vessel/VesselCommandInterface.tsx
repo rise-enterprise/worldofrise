@@ -68,36 +68,26 @@ async function streamChat({
   onDone();
 }
 
-/* ── Extract numeric metrics from AI text ── */
 function extractMetrics(text: string): { label: string; value: number }[] {
   const metrics: { label: string; value: number }[] = [];
   const seen = new Set<string>();
-
   const parseNum = (s: string) => Number(s.replace(/,/g, "").replace(/%$/, ""));
-
-  // Pattern 1: **number** label  (bold markdown numbers)
   const p1 = /\*\*([0-9,]+(?:\.[0-9]+)?%?)\*\*\s+([a-zA-Z][a-zA-Z\s]{1,25})/g;
-  // Pattern 2: number + keyword label
   const p2 = /(?:^|\s)([0-9,]+(?:\.[0-9]+)?%?)\s+((?:total|active|vip|new|dormant|at.risk|high.risk|churn|members?|guests?|visits?|points?|rewards?|campaigns?|retention)[a-zA-Z\s]{0,20})/gi;
-  // Pattern 3: label: number
   const p3 = /([\w\s]{2,20}):\s*\*?\*?([0-9,]+(?:\.[0-9]+)?%?)\*?\*?/g;
-
   const add = (label: string, raw: string) => {
     const v = parseNum(raw);
     if (isNaN(v) || v === 0) return;
     const key = label.trim().toLowerCase().replace(/\s+/g, " ");
     if (key.length < 2 || key.length > 25 || seen.has(key)) return;
-    // Skip pure noise words
     if (/^(the|and|or|is|are|was|were|has|have|a|an|in|on|of|to|for|with|that|this)$/i.test(key)) return;
     seen.add(key);
     metrics.push({ label: label.trim(), value: v });
   };
-
   let m: RegExpExecArray | null;
   while ((m = p1.exec(text)) !== null) add(m[2], m[1]);
   while ((m = p2.exec(text)) !== null) add(m[2], m[1]);
   while ((m = p3.exec(text)) !== null) add(m[1], m[2]);
-
   return metrics.slice(0, 6);
 }
 
@@ -126,7 +116,6 @@ export default function VesselCommandInterface({
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -146,7 +135,6 @@ export default function VesselCommandInterface({
 
   useEffect(scrollToBottom, [messages, scrollToBottom]);
 
-  // Cleanup TTS on unmount
   useEffect(() => {
     return () => {
       ttsAbortRef.current?.abort();
@@ -155,7 +143,6 @@ export default function VesselCommandInterface({
     };
   }, []);
 
-  // Stop current TTS playback
   const stopTts = useCallback(() => {
     ttsAbortRef.current?.abort();
     ttsAudioRef.current?.pause();
@@ -166,22 +153,17 @@ export default function VesselCommandInterface({
     }
   }, []);
 
-  // ElevenLabs TTS
   const speak = useCallback(async (text: string) => {
     if (!ttsEnabled) return;
     const clean = text.replace(/[#*_`>~\[\]()]/g, "").replace(/\n+/g, ". ").trim();
     if (!clean || clean === lastSpokenRef.current) return;
     lastSpokenRef.current = clean;
-
     stopTts();
-
     const controller = new AbortController();
     ttsAbortRef.current = controller;
-
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) return;
-
       const resp = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
         {
@@ -195,16 +177,10 @@ export default function VesselCommandInterface({
           signal: controller.signal,
         }
       );
-
-      if (!resp.ok) {
-        console.warn("ElevenLabs TTS failed:", resp.status);
-        return;
-      }
-
+      if (!resp.ok) return;
       const blob = await resp.blob();
       const url = URL.createObjectURL(blob);
       ttsObjectUrlRef.current = url;
-
       const audio = new Audio(url);
       ttsAudioRef.current = audio;
       audio.volume = 0.8;
@@ -214,11 +190,9 @@ export default function VesselCommandInterface({
     } catch (err: unknown) {
       onSpeakingChange?.(false);
       if (err instanceof Error && err.name === "AbortError") return;
-      console.warn("ElevenLabs TTS error:", err);
     }
-  }, [ttsEnabled, stopTts]);
+  }, [ttsEnabled, stopTts, onSpeakingChange]);
 
-  // Detect crisis keywords in AI response
   const detectCrisis = useCallback((content: string) => {
     const crisisKeywords = ["instability", "anomaly", "crisis", "critical", "alert", "urgent", "immediate action", "sharp drop", "sudden"];
     const isCrisis = crisisKeywords.some(k => content.toLowerCase().includes(k));
@@ -276,7 +250,7 @@ export default function VesselCommandInterface({
         onProcessingChange?.(false);
       },
     });
-  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, personalityConfig]);
+  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, personalityConfig, onAIMetrics]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -307,10 +281,8 @@ export default function VesselCommandInterface({
       analyser.fftSize = 64;
       source.connect(analyser);
       analyserRef.current = analyser;
-
       const data = new Uint8Array(analyser.frequencyBinCount);
       const bins = [2, 5, 8, 12, 16];
-
       const tick = () => {
         analyser.getByteFrequencyData(data);
         const bars = barsRef.current?.children;
@@ -328,9 +300,7 @@ export default function VesselCommandInterface({
         animFrameRef.current = requestAnimationFrame(tick);
       };
       animFrameRef.current = requestAnimationFrame(tick);
-    } catch {
-      // voice still works
-    }
+    } catch { /* voice still works */ }
   }, [onPulseIntensity]);
 
   const toggleVoice = useCallback(() => {
@@ -341,7 +311,6 @@ export default function VesselCommandInterface({
       onListeningChange?.(false);
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const w = window as any;
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
     if (!SR) {
@@ -353,17 +322,13 @@ export default function VesselCommandInterface({
     recognition.interimResults = true;
     recognition.lang = "en-US";
     recognitionRef.current = recognition;
-
     recognition.onresult = (event: any) => {
       let interim = "";
       let finalText = "";
       for (let i = 0; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalText += transcript;
-        } else {
-          interim += transcript;
-        }
+        if (event.results[i].isFinal) finalText += transcript;
+        else interim += transcript;
       }
       if (finalText) {
         setInput("");
@@ -390,50 +355,48 @@ export default function VesselCommandInterface({
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-6 sm:py-12 px-3 sm:px-4">
-            {/* AI Identity */}
-            <div className="mb-4 sm:mb-6 flex flex-col items-center">
-              <img src={riseLogo} alt="Rise Holding" className="h-12 sm:h-16 w-auto mb-3 opacity-80" />
-              <div className="text-xl sm:text-2xl font-serif text-primary tracking-widest">RISE INTELLIGENCE NEXUS</div>
-              <div className="text-[9px] sm:text-[10px] text-muted-foreground/40 mt-2 tracking-wider">
-                Neural intelligence · Expansion simulator · Executive war room
+          <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
+            {/* RISE Identity — minimal */}
+            <div className="mb-6 flex flex-col items-center">
+              <img src={riseLogo} alt="Rise" className="h-10 sm:h-12 w-auto mb-4 opacity-60" />
+              <div className="text-lg sm:text-xl font-serif tracking-[0.25em] text-[#C8A24A]/80">
+                RISE TACTICAL
               </div>
-            </div>
-            
-            {/* Status indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-6 sm:mb-8 text-[9px] sm:text-[10px] uppercase tracking-widest">
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-muted-foreground/50">AI Core</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-muted-foreground/50">Synced</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-                <span className="text-muted-foreground/50">Clear</span>
+              <div className="text-[9px] text-[#4a4a54] mt-2 tracking-[0.2em] uppercase">
+                Intelligence · Strategy · Expansion
               </div>
             </div>
 
-            <p className="text-[11px] sm:text-xs text-muted-foreground/50 max-w-md mb-4">
-              Speak or type commands. The AI manages all operations — campaigns, analytics, member management, rewards, and predictive intelligence.
+            {/* Status indicators */}
+            <div className="flex items-center gap-6 mb-8 text-[9px] uppercase tracking-[0.2em]">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5a8a6a]" />
+                <span className="text-[#4a4a54]">System Online</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C8A24A]" />
+                <span className="text-[#4a4a54]">AI Ready</span>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-[#4a4a54] max-w-md mb-5 leading-relaxed">
+              Speak or type commands. The AI manages campaigns, analytics, member operations, rewards, and predictive intelligence.
             </p>
 
             <a
               href="/admin/operator"
-              className="inline-flex items-center gap-2 text-[9px] sm:text-[10px] px-3 sm:px-4 py-2 rounded-lg border border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 transition-all mb-4 sm:mb-6 uppercase tracking-widest"
+              className="inline-flex items-center gap-2 text-[9px] px-4 py-2 rounded border border-[#C8A24A]/12 bg-[#C8A24A]/04 text-[#C8A24A]/60 hover:text-[#C8A24A]/90 hover:bg-[#C8A24A]/08 transition-all mb-6 uppercase tracking-[0.2em]"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="w-1 h-1 rounded-full bg-[#C8A24A]" />
               AI Operator Console
             </a>
 
-            <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center max-w-lg">
+            <div className="flex flex-wrap gap-1.5 justify-center max-w-lg">
               {EXAMPLE_COMMANDS.slice(0, 6).map((cmd) => (
                 <button
                   key={cmd}
                   onClick={() => send(cmd)}
-                  className="text-[9px] sm:text-[10px] px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full border border-primary/15 bg-primary/5 text-muted-foreground/60 hover:text-primary hover:border-primary/30 hover:bg-primary/10 transition-all backdrop-blur-sm"
+                  className="text-[9px] px-3 py-2 rounded border border-[#C8A24A]/08 bg-[#C8A24A]/03 text-[#5a5a64] hover:text-[#C8A24A]/70 hover:border-[#C8A24A]/15 hover:bg-[#C8A24A]/06 transition-all"
                 >
                   {cmd.length > 35 ? cmd.slice(0, 35) + "…" : cmd}
                 </button>
@@ -461,7 +424,7 @@ export default function VesselCommandInterface({
             <button
               key={cmd}
               onClick={() => send(cmd)}
-              className="shrink-0 text-[9px] px-2.5 py-1.5 rounded-full border border-primary/10 bg-primary/5 text-muted-foreground/50 hover:text-primary hover:border-primary/20 transition-all"
+              className="shrink-0 text-[9px] px-2.5 py-1.5 rounded border border-[#C8A24A]/06 bg-[#C8A24A]/03 text-[#4a4a54] hover:text-[#C8A24A]/60 hover:border-[#C8A24A]/12 transition-all"
             >
               {cmd.length > 40 ? cmd.slice(0, 40) + "…" : cmd}
             </button>
@@ -469,101 +432,92 @@ export default function VesselCommandInterface({
         </div>
       )}
 
-      {/* ── Neural Command Strip ── */}
-      <div className="px-3 sm:px-6 pb-safe pb-5 pt-2 relative">
-        {/* Light beam from input to core (when active) */}
+      {/* ── Tactical Command Strip ── */}
+      <div className="px-4 sm:px-6 pb-safe pb-5 pt-2 relative">
+        {/* Beam from input to core */}
         {(isListening || isLoading) && (
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-[2px] pointer-events-none"
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-[1px] pointer-events-none"
             style={{
-              height: "40vh",
-              background: `linear-gradient(to top, ${isListening ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.6)"}, transparent)`,
-              opacity: isListening ? 0.5 : 0.25,
-              animation: "neuralBeamPulse 2s ease-in-out infinite",
+              height: "35vh",
+              background: `linear-gradient(to top, ${isListening ? "#C8A24A" : "rgba(200,162,74,0.4)"}, transparent)`,
+              opacity: isListening ? 0.35 : 0.15,
             }}
           />
         )}
 
-        {/* Glass command bar */}
+        {/* Command bar */}
         <div
           className={cn(
-            "relative flex items-end gap-2 sm:gap-3 rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 transition-all duration-500",
-            "bg-background/10 backdrop-blur-2xl",
-            "border shadow-lg",
+            "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-500",
+            "backdrop-blur-2xl",
+            "border",
             isListening
-              ? "border-primary/40 shadow-[0_0_60px_-10px_hsl(var(--primary)/0.3),inset_0_1px_0_0_hsl(var(--primary)/0.1)]"
+              ? "border-[#C8A24A]/25 shadow-[0_0_40px_-10px_rgba(200,162,74,0.15)]"
               : isLoading
-                ? "border-primary/20 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.15)]"
-                : "border-primary/8 shadow-[0_0_30px_-10px_hsl(var(--primary)/0.08)]"
+                ? "border-[#C8A24A]/12 shadow-[0_0_30px_-10px_rgba(200,162,74,0.08)]"
+                : "border-[rgba(200,162,74,0.06)]"
           )}
+          style={{
+            backgroundColor: isListening ? "rgba(200,162,74,0.04)" : "rgba(10,10,12,0.5)",
+          }}
         >
-          {/* Subtle gradient border overlay */}
-          <div
-            className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{
-              background: isListening
-                ? "linear-gradient(135deg, hsl(var(--primary) / 0.06), transparent 50%, hsl(var(--primary) / 0.03))"
-                : "linear-gradient(135deg, hsl(var(--primary) / 0.02), transparent 60%)",
-            }}
-          />
-
           {/* TTS toggle */}
           <Button
             onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
             variant="ghost"
             size="icon"
             className={cn(
-              "shrink-0 h-9 w-9 rounded-xl transition-all relative z-10",
+              "shrink-0 h-9 w-9 rounded-lg transition-all relative z-10",
               ttsEnabled
-                ? "text-primary/70 hover:text-primary hover:bg-primary/10"
-                : "text-muted-foreground/25 hover:text-muted-foreground/50"
+                ? "text-[#C8A24A]/50 hover:text-[#C8A24A]/80 hover:bg-[#C8A24A]/06"
+                : "text-[#4a4a54]/30 hover:text-[#4a4a54]/60"
             )}
             title={ttsEnabled ? "Mute AI voice" : "Enable AI voice"}
           >
             {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </Button>
 
-          {/* Input field */}
+          {/* Input */}
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? "Neural link active — speak your command…" : "Command the intelligence nexus…"}
+            placeholder={isListening ? "Listening…" : "Command…"}
             className={cn(
               "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2 relative z-10",
-              "bg-transparent text-sm text-foreground/90 placeholder:text-muted-foreground/25",
-              "focus:outline-none focus:placeholder:text-muted-foreground/40",
+              "bg-transparent text-sm text-[rgba(220,218,214,0.8)] placeholder:text-[#4a4a54]/40",
+              "focus:outline-none focus:placeholder:text-[#4a4a54]/60",
               "transition-all duration-300"
             )}
             rows={1}
           />
 
-          {/* Enhanced waveform visualizer */}
+          {/* Waveform */}
           {isListening && (
             <div ref={barsRef} className="flex items-center gap-[3px] h-9 px-2 relative z-10">
               {[0.5, 0.65, 0.8, 1, 0.8, 0.65, 0.5].map((base, i) => (
                 <span
                   key={i}
-                  className="w-[2.5px] h-5 rounded-full origin-center"
+                  className="w-[2px] h-5 rounded-full origin-center"
                   style={{
-                    background: `linear-gradient(to top, hsl(var(--primary)), hsl(var(--primary) / 0.4))`,
+                    background: "linear-gradient(to top, #C8A24A, rgba(200,162,74,0.3))",
                     transform: `scaleY(${base * 0.15})`,
                     transition: "transform 60ms ease-out",
-                    boxShadow: "0 0 6px hsl(var(--primary) / 0.3)",
                   }}
                 />
               ))}
             </div>
           )}
 
-          {/* Mic button */}
+          {/* Mic */}
           <div className="relative shrink-0 z-10">
             {isListening && (
               <>
                 {[0, 0.5, 1].map((delay) => (
                   <span
                     key={delay}
-                    className="absolute inset-[-4px] rounded-xl border border-primary/30 pointer-events-none"
+                    className="absolute inset-[-4px] rounded-lg border border-[#C8A24A]/20 pointer-events-none"
                     style={{ animation: `micRipple 2s ease-out ${delay}s infinite` }}
                   />
                 ))}
@@ -574,36 +528,35 @@ export default function VesselCommandInterface({
               variant="ghost"
               size="icon"
               className={cn(
-                "relative h-9 w-9 rounded-xl transition-all overflow-visible",
+                "relative h-9 w-9 rounded-lg transition-all overflow-visible",
                 isListening
-                  ? "text-primary bg-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.5)]"
-                  : "text-muted-foreground/35 hover:text-primary hover:bg-primary/10"
+                  ? "text-[#C8A24A] bg-[#C8A24A]/10"
+                  : "text-[#4a4a54]/40 hover:text-[#C8A24A]/60 hover:bg-[#C8A24A]/06"
               )}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
           </div>
 
-          {/* Send button */}
+          {/* Send */}
           <Button
             onClick={() => send(input)}
             disabled={!input.trim() || isLoading}
             size="icon"
             className={cn(
-              "shrink-0 h-9 w-9 rounded-xl transition-all relative z-10",
-              "bg-primary/80 hover:bg-primary text-primary-foreground",
-              "shadow-[0_0_25px_-5px_hsl(var(--primary)/0.4)]",
-              "disabled:opacity-20 disabled:shadow-none"
+              "shrink-0 h-9 w-9 rounded-lg transition-all relative z-10",
+              "bg-[#C8A24A]/60 hover:bg-[#C8A24A]/80 text-[#0a0a0c]",
+              "disabled:opacity-15 disabled:bg-[#4a4a54]/20"
             )}
           >
             <Send className="w-3.5 h-3.5" />
           </Button>
         </div>
 
-        {/* Subtle label under the bar */}
+        {/* Label */}
         <div className="flex justify-center mt-2">
-          <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.35em] text-muted-foreground/20">
-            {isListening ? "◉ NEURAL LINK ACTIVE" : isLoading ? "◎ PROCESSING INTEL" : "RISE INTELLIGENCE COMMAND"}
+          <span className="text-[8px] uppercase tracking-[0.3em] text-[#4a4a54]/30">
+            {isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE TACTICAL COMMAND"}
           </span>
         </div>
       </div>

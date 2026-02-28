@@ -31,41 +31,35 @@ function latLngToSphere(lat: number, lng: number, radius: number): THREE.Vector3
   );
 }
 
-/* ── Holographic globe with luxury styling ── */
-function HolographicGlobe() {
+/* ── Tactical dark globe ── */
+function TacticalGlobe() {
   const globeRef = useRef<THREE.Group>(null);
-  const innerRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (globeRef.current) {
-      globeRef.current.rotation.y = clock.getElapsedTime() * 0.025;
-    }
-    if (innerRef.current) {
-      const mat = innerRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.015 + Math.sin(clock.getElapsedTime() * 0.4) * 0.006;
+      globeRef.current.rotation.y = clock.getElapsedTime() * 0.02;
     }
   });
 
   const GLOBE_R = 2.2;
-  const gold = "#C8A24A";
   const gridColor = "#C8A24A";
 
   return (
     <group ref={globeRef}>
-      {/* Inner glow sphere */}
-      <mesh ref={innerRef}>
+      {/* Dark sphere fill */}
+      <mesh>
         <sphereGeometry args={[GLOBE_R - 0.05, 48, 48]} />
-        <meshBasicMaterial color="#0a0806" transparent opacity={0.02} depthWrite={false} />
+        <meshBasicMaterial color="#08080a" transparent opacity={0.03} depthWrite={false} />
       </mesh>
 
-      {/* Wireframe — subtle gold grid */}
+      {/* Wireframe — very subtle gold */}
       <mesh>
-        <sphereGeometry args={[GLOBE_R, 32, 24]} />
+        <sphereGeometry args={[GLOBE_R, 28, 20]} />
         <meshBasicMaterial
           color={gridColor}
           wireframe
           transparent
-          opacity={0.03}
+          opacity={0.025}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
@@ -78,11 +72,11 @@ function HolographicGlobe() {
         const y = GLOBE_R * Math.cos(phi);
         return (
           <mesh key={`lat-${i}`} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[r - 0.004, r + 0.004, 96]} />
+            <ringGeometry args={[r - 0.003, r + 0.003, 96]} />
             <meshBasicMaterial
               color={gridColor}
               transparent
-              opacity={lat === 0 ? 0.08 : 0.03}
+              opacity={lat === 0 ? 0.06 : 0.02}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
               side={THREE.DoubleSide}
@@ -94,11 +88,11 @@ function HolographicGlobe() {
       {/* Meridian rings */}
       {[0, 30, 60, 90, 120, 150].map((lng, i) => (
         <mesh key={`mer-${i}`} rotation={[0, (lng * Math.PI) / 180, 0]}>
-          <ringGeometry args={[GLOBE_R - 0.004, GLOBE_R + 0.004, 96]} />
+          <ringGeometry args={[GLOBE_R - 0.003, GLOBE_R + 0.003, 96]} />
           <meshBasicMaterial
             color={gridColor}
             transparent
-            opacity={0.025}
+            opacity={0.018}
             blending={THREE.AdditiveBlending}
             depthWrite={false}
             side={THREE.DoubleSide}
@@ -106,26 +100,26 @@ function HolographicGlobe() {
         </mesh>
       ))}
 
-      {/* Outer executive ring — gold */}
+      {/* Outer tactical ring — gold accent */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[GLOBE_R + 0.3, GLOBE_R + 0.315, 128]} />
+        <ringGeometry args={[GLOBE_R + 0.3, GLOBE_R + 0.312, 128]} />
         <meshBasicMaterial
-          color={gold}
+          color={gridColor}
           transparent
-          opacity={0.1}
+          opacity={0.07}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* Second ring — tilted accent */}
-      <mesh rotation={[Math.PI / 2 + 0.25, 0.15, 0]}>
-        <ringGeometry args={[GLOBE_R + 0.5, GLOBE_R + 0.51, 128]} />
+      {/* Second ring — cool white accent */}
+      <mesh rotation={[Math.PI / 2 + 0.2, 0.12, 0]}>
+        <ringGeometry args={[GLOBE_R + 0.48, GLOBE_R + 0.49, 128]} />
         <meshBasicMaterial
-          color="#00d4ff"
+          color="#8a9aaa"
           transparent
-          opacity={0.04}
+          opacity={0.03}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
           side={THREE.DoubleSide}
@@ -135,19 +129,19 @@ function HolographicGlobe() {
   );
 }
 
-/* ── Energy arc connection ── */
-function EnergyArc({ from, to }: { from: THREE.Vector3; to: THREE.Vector3 }) {
+/* ── Connection arc between cities ── */
+function TacticalArc({ from, to }: { from: THREE.Vector3; to: THREE.Vector3 }) {
   const lineObj = useMemo(() => {
     const mid = new THREE.Vector3().addVectors(from, to).multiplyScalar(0.5);
     const dist = from.distanceTo(to);
-    mid.normalize().multiplyScalar(2.2 + dist * 0.22);
+    mid.normalize().multiplyScalar(2.2 + dist * 0.2);
     const curve = new THREE.QuadraticBezierCurve3(from, mid, to);
     const pts = curve.getPoints(48);
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
       color: "#C8A24A",
       transparent: true,
-      opacity: 0.12,
+      opacity: 0.08,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -156,13 +150,13 @@ function EnergyArc({ from, to }: { from: THREE.Vector3; to: THREE.Vector3 }) {
 
   useFrame(({ clock }) => {
     const mat = lineObj.material as THREE.LineBasicMaterial;
-    mat.opacity = 0.08 + Math.sin(clock.getElapsedTime() * 0.6) * 0.06;
+    mat.opacity = 0.06 + Math.sin(clock.getElapsedTime() * 0.5) * 0.04;
   });
 
   return <primitive object={lineObj} />;
 }
 
-/* ── City beacon — executive data marker ── */
+/* ── City beacon — tactical marker ── */
 function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector3 }) {
   const beaconRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
@@ -175,21 +169,21 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
     const t = clock.getElapsedTime();
     if (beaconRef.current) {
       const mat = beaconRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.7 + Math.sin(t * 2 + position.x * 3) * 0.2;
-      const s = hovered ? 1.5 : 1;
+      mat.opacity = 0.6 + Math.sin(t * 1.8 + position.x * 3) * 0.15;
+      const s = hovered ? 1.4 : 1;
       beaconRef.current.scale.setScalar(
-        beaconRef.current.scale.x + (s - beaconRef.current.scale.x) * 0.1
+        beaconRef.current.scale.x + (s - beaconRef.current.scale.x) * 0.08
       );
     }
     if (ringRef.current) {
-      const scale = 1 + ((t * 0.4 + position.x) % 2);
+      const scale = 1 + ((t * 0.35 + position.x) % 2);
       ringRef.current.scale.setScalar(scale);
       const mat = ringRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = Math.max(0, 0.3 - (scale - 1) * 0.18);
+      mat.opacity = Math.max(0, 0.2 - (scale - 1) * 0.12);
     }
     if (beamRef.current) {
       const mat = beamRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.12 + Math.sin(t * 1.2) * 0.06;
+      mat.opacity = 0.08 + Math.sin(t * 1) * 0.04;
     }
   });
 
@@ -204,63 +198,63 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
     >
-      {/* Data beam rising from surface */}
-      <mesh ref={beamRef} position={[0, 0.4, 0]}>
-        <cylinderGeometry args={[0.003, 0.003, 0.8, 6]} />
-        <meshBasicMaterial color={gold} transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
+      {/* Data beam */}
+      <mesh ref={beamRef} position={[0, 0.35, 0]}>
+        <cylinderGeometry args={[0.002, 0.002, 0.7, 6]} />
+        <meshBasicMaterial color={gold} transparent opacity={0.1} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
       {/* Core beacon */}
       <mesh ref={beaconRef}>
-        <sphereGeometry args={[0.045, 16, 16]} />
-        <meshBasicMaterial color={gold} transparent opacity={0.85} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <sphereGeometry args={[0.04, 16, 16]} />
+        <meshBasicMaterial color={gold} transparent opacity={0.7} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
       {/* Pulse ring */}
       <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.06, 0.075, 32]} />
-        <meshBasicMaterial color={gold} transparent opacity={0.25} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+        <ringGeometry args={[0.05, 0.065, 32]} />
+        <meshBasicMaterial color={gold} transparent opacity={0.18} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
 
       {/* City label */}
       <Billboard follow>
-        <Text position={[0, 0.95, 0]} fontSize={0.085} color={gold} anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.2}>
+        <Text position={[0, 0.85, 0]} fontSize={0.075} color={gold} anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.18}>
           {city.name}
         </Text>
-        <Text position={[0, 0.8, 0]} fontSize={0.04} color="#6a6058" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.12}>
-          {city.brand + " · " + city.branches + (city.branches > 1 ? " BRANCHES" : " BRANCH")}
+        <Text position={[0, 0.72, 0]} fontSize={0.035} color="#5a5a64" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.1}>
+          {city.brand}
         </Text>
       </Billboard>
 
-      {/* Hover intel panel — executive war room style */}
+      {/* Hover intel panel */}
       {hovered && (
         <Billboard follow>
-          <group position={[0, 1.5, 0]}>
+          <group position={[0, 1.4, 0]}>
             <mesh>
-              <planeGeometry args={[1.4, 0.8]} />
-              <meshBasicMaterial color="#0a0806" transparent opacity={0.88} depthWrite={false} />
+              <planeGeometry args={[1.3, 0.75]} />
+              <meshBasicMaterial color="#0c0c10" transparent opacity={0.92} depthWrite={false} />
             </mesh>
-            {/* Gold border */}
-            <lineSegments geometry={new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.4, 0.8))}>
-              <lineBasicMaterial color={gold} transparent opacity={0.25} depthWrite={false} />
+            {/* Border */}
+            <lineSegments geometry={new THREE.EdgesGeometry(new THREE.PlaneGeometry(1.3, 0.75))}>
+              <lineBasicMaterial color={gold} transparent opacity={0.15} depthWrite={false} />
             </lineSegments>
-            <Text position={[0, 0.28, 0.01]} fontSize={0.055} color={gold} anchorX="center" font={undefined} letterSpacing={0.15}>
-              {city.name + " OPERATIONS"}
+            <Text position={[0, 0.26, 0.01]} fontSize={0.05} color={gold} anchorX="center" font={undefined} letterSpacing={0.12}>
+              {city.name + " · INTEL"}
             </Text>
-            <Text position={[-0.6, 0.12, 0.01]} fontSize={0.038} color="#6a6058" anchorX="left" font={undefined}>Active Members</Text>
-            <Text position={[0.6, 0.12, 0.01]} fontSize={0.042} color="#00d4ff" anchorX="right" font={undefined}>
+            <Text position={[-0.55, 0.1, 0.01]} fontSize={0.035} color="#5a5a64" anchorX="left" font={undefined}>Members</Text>
+            <Text position={[0.55, 0.1, 0.01]} fontSize={0.038} color="#8a9aaa" anchorX="right" font={undefined}>
               {city.id === "doha" ? "2,841" : city.id === "riyadh" ? "412" : "287"}
             </Text>
-            <Text position={[-0.6, -0.02, 0.01]} fontSize={0.038} color="#6a6058" anchorX="left" font={undefined}>Revenue</Text>
-            <Text position={[0.6, -0.02, 0.01]} fontSize={0.042} color={gold} anchorX="right" font={undefined}>
+            <Text position={[-0.55, -0.03, 0.01]} fontSize={0.035} color="#5a5a64" anchorX="left" font={undefined}>Revenue</Text>
+            <Text position={[0.55, -0.03, 0.01]} fontSize={0.038} color={gold} anchorX="right" font={undefined}>
               {city.revenue}
             </Text>
-            <Text position={[-0.6, -0.14, 0.01]} fontSize={0.038} color="#6a6058" anchorX="left" font={undefined}>Growth</Text>
-            <Text position={[0.6, -0.14, 0.01]} fontSize={0.042} color="#10b981" anchorX="right" font={undefined}>
+            <Text position={[-0.55, -0.14, 0.01]} fontSize={0.035} color="#5a5a64" anchorX="left" font={undefined}>Growth</Text>
+            <Text position={[0.55, -0.14, 0.01]} fontSize={0.038} color="#5a8a6a" anchorX="right" font={undefined}>
               {city.growth}
             </Text>
-            <Text position={[-0.6, -0.26, 0.01]} fontSize={0.038} color="#6a6058" anchorX="left" font={undefined}>Risk Level</Text>
-            <Text position={[0.6, -0.26, 0.01]} fontSize={0.042} color={city.id === "london" ? "#ef4444" : gold} anchorX="right" font={undefined}>
+            <Text position={[-0.55, -0.25, 0.01]} fontSize={0.035} color="#5a5a64" anchorX="left" font={undefined}>Risk</Text>
+            <Text position={[0.55, -0.25, 0.01]} fontSize={0.038} color={city.id === "london" ? "#b84a4a" : "#5a8a6a"} anchorX="right" font={undefined}>
               {city.id === "doha" ? "Stable" : city.id === "riyadh" ? "Low" : "Elevated"}
             </Text>
           </group>
@@ -271,11 +265,7 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
 }
 
 /* ── Main Globe ── */
-interface GlobalCommandMapProps {
-  isDay?: boolean;
-}
-
-export default function GlobalCommandMap({ isDay = false }: GlobalCommandMapProps) {
+export default function GlobalCommandMap({ isDay = false }: { isDay?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const GLOBE_R = 2.2;
 
@@ -299,9 +289,9 @@ export default function GlobalCommandMap({ isDay = false }: GlobalCommandMapProp
 
   return (
     <group ref={groupRef} position={[0, -4, -2]}>
-      <HolographicGlobe />
+      <TacticalGlobe />
       {connections.map((conn, i) => (
-        <EnergyArc key={i} from={conn.from} to={conn.to} />
+        <TacticalArc key={i} from={conn.from} to={conn.to} />
       ))}
       {cityData.map(({ city, position }) => (
         <CityBeacon key={city.id} city={city} position={position} />
