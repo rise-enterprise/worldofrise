@@ -1,4 +1,4 @@
-import { Suspense, useRef, useMemo } from "react";
+import { Suspense, useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import HUDGrid from "./HUDGrid";
@@ -7,7 +7,6 @@ import MetricRings from "./MetricRings";
 import ScanSweep from "./ScanSweep";
 import AIResponseMetrics from "./AIResponseMetrics";
 import GlobalCommandMap from "./GlobalCommandMap";
-import { useEffect } from "react";
 
 /* ── Cursor-driven camera with parallax depth ── */
 function CameraController({ isProcessing }: { isProcessing?: boolean }) {
@@ -26,13 +25,12 @@ function CameraController({ isProcessing }: { isProcessing?: boolean }) {
   }, []);
 
   useFrame(() => {
-    // Smooth parallax with eased interpolation
-    target.current.x += (mouse.current.x * 0.5 - target.current.x) * 0.025;
-    target.current.y += (-mouse.current.y * 0.35 - target.current.y) * 0.025;
+    target.current.x += (mouse.current.x * 0.6 - target.current.x) * 0.02;
+    target.current.y += (-mouse.current.y * 0.4 - target.current.y) * 0.02;
     camera.position.x = target.current.x;
     camera.position.y = target.current.y + 1;
-    const zt = isProcessing ? 7 : 8;
-    zoomTarget.current += (zt - zoomTarget.current) * 0.015;
+    const zt = isProcessing ? 6.5 : 8;
+    zoomTarget.current += (zt - zoomTarget.current) * 0.012;
     camera.position.z = zoomTarget.current;
     camera.lookAt(0, 0.3, 0);
   });
@@ -40,19 +38,43 @@ function CameraController({ isProcessing }: { isProcessing?: boolean }) {
   return null;
 }
 
-/* ── Deep ambient fog layer ── */
-function AmbientFog({ isCrisis, isDay }: { isCrisis: boolean; isDay: boolean }) {
+/* ── Deep space nebula layer ── */
+function NebulaLayer() {
+  const ref = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    if (ref.current) {
+      const mat = ref.current.material as THREE.MeshBasicMaterial;
+      mat.opacity = 0.08 + Math.sin(clock.getElapsedTime() * 0.15) * 0.03;
+    }
+  });
+
+  return (
+    <mesh ref={ref} position={[0, 2, -40]}>
+      <planeGeometry args={[120, 80]} />
+      <meshBasicMaterial
+        color="#0a1628"
+        transparent
+        opacity={0.08}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+/* ── Deep ambient fog ── */
+function AmbientFog({ isCrisis }: { isCrisis: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
       const crisisBlend = isCrisis ? 0.04 : 0;
-      mat.opacity = (isDay ? 0.25 : 0.15) + Math.sin(clock.getElapsedTime() * 0.4) * 0.03 + crisisBlend;
+      mat.opacity = 0.12 + Math.sin(clock.getElapsedTime() * 0.4) * 0.03 + crisisBlend;
       if (isCrisis) {
         mat.color.lerp(new THREE.Color("#220000"), 0.02);
       } else {
-        mat.color.lerp(new THREE.Color(isDay ? "#ede5d5" : "#020610"), 0.02);
+        mat.color.lerp(new THREE.Color("#030810"), 0.02);
       }
     }
   });
@@ -60,29 +82,29 @@ function AmbientFog({ isCrisis, isDay }: { isCrisis: boolean; isDay: boolean }) 
   return (
     <mesh ref={ref} position={[0, 0, -25]}>
       <planeGeometry args={[120, 120]} />
-      <meshBasicMaterial color={isDay ? "#ede5d5" : "#020610"} transparent opacity={0.15} depthWrite={false} />
+      <meshBasicMaterial color="#030810" transparent opacity={0.12} depthWrite={false} />
     </mesh>
   );
 }
 
-/* ── Volumetric spotlight behind emblem ── */
-function CoreSpotlight({ isCrisis, isDay }: { isCrisis: boolean; isDay: boolean }) {
+/* ── Volumetric core spotlight ── */
+function CoreSpotlight({ isCrisis }: { isCrisis: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = (isDay ? 0.06 : 0.04) + Math.sin(clock.getElapsedTime() * 0.6) * 0.015;
+      mat.opacity = 0.05 + Math.sin(clock.getElapsedTime() * 0.6) * 0.02;
     }
   });
 
   return (
     <mesh ref={ref} position={[0, 0.3, -3]}>
-      <circleGeometry args={[6, 64]} />
+      <circleGeometry args={[8, 64]} />
       <meshBasicMaterial
-        color={isCrisis ? "#331111" : isDay ? "#d4c088" : "#1a1508"}
+        color={isCrisis ? "#331111" : "#0a1520"}
         transparent
-        opacity={0.04}
+        opacity={0.05}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -90,17 +112,17 @@ function CoreSpotlight({ isCrisis, isDay }: { isCrisis: boolean; isDay: boolean 
   );
 }
 
-/* ── Ambient dust particles ── */
-function DustParticles({ isDay }: { isDay: boolean }) {
+/* ── Cosmic dust particles ── */
+function CosmicDust() {
   const ref = useRef<THREE.Points>(null);
-  const count = 300; // Optimized for 60fps
+  const count = 400;
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 40;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 30;
+      arr[i * 3] = (Math.random() - 0.5) * 50;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 25;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 40;
     }
     return arr;
   }, []);
@@ -110,11 +132,11 @@ function DustParticles({ isDay }: { isDay: boolean }) {
     const pos = ref.current.geometry.attributes.position;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < count; i++) {
-      arr[i * 3 + 1] += delta * 0.05;
-      if (arr[i * 3 + 1] > 10) arr[i * 3 + 1] = -10;
+      arr[i * 3 + 1] += delta * 0.04;
+      if (arr[i * 3 + 1] > 12) arr[i * 3 + 1] = -12;
     }
     pos.needsUpdate = true;
-    ref.current.rotation.y += delta * 0.003;
+    ref.current.rotation.y += delta * 0.002;
   });
 
   return (
@@ -123,10 +145,10 @@ function DustParticles({ isDay }: { isDay: boolean }) {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.015}
-        color={isDay ? "#C8A24A" : "#C8A24A"}
+        size={0.012}
+        color="#C8A24A"
         transparent
-        opacity={isDay ? 0.1 : 0.15}
+        opacity={0.12}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -135,25 +157,25 @@ function DustParticles({ isDay }: { isDay: boolean }) {
   );
 }
 
-/* ── Galaxy particles (night only) ── */
-function GalaxyParticles() {
+/* ── Deep starfield ── */
+function DeepStarfield() {
   const ref = useRef<THREE.Points>(null);
-  const count = 1200; // Optimized for 60fps
+  const count = 2500;
 
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 80;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 60;
-      arr[i * 3 + 2] = -10 - Math.random() * 50;
+      arr[i * 3] = (Math.random() - 0.5) * 100;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 80;
+      arr[i * 3 + 2] = -10 - Math.random() * 60;
     }
     return arr;
   }, []);
 
   useFrame((_, delta) => {
     if (ref.current) {
-      ref.current.rotation.y += delta * 0.005;
-      ref.current.rotation.x += delta * 0.002;
+      ref.current.rotation.y += delta * 0.004;
+      ref.current.rotation.x += delta * 0.001;
     }
   });
 
@@ -163,15 +185,58 @@ function GalaxyParticles() {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.04}
+        size={0.035}
         color="#ffffff"
         transparent
-        opacity={0.4}
+        opacity={0.5}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
     </points>
+  );
+}
+
+/* ── Volumetric light beams ── */
+function VolumetricBeams() {
+  const refs = useRef<(THREE.Mesh | null)[]>([]);
+
+  const beams = useMemo(() => [
+    { x: -8, angle: 0.15, width: 0.8, height: 25, opacity: 0.015 },
+    { x: 6, angle: -0.1, width: 0.5, height: 30, opacity: 0.01 },
+    { x: 0, angle: 0, width: 1.2, height: 35, opacity: 0.008 },
+  ], []);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    refs.current.forEach((mesh, i) => {
+      if (!mesh) return;
+      const mat = mesh.material as THREE.MeshBasicMaterial;
+      mat.opacity = beams[i].opacity + Math.sin(t * 0.3 + i * 1.5) * 0.005;
+    });
+  });
+
+  return (
+    <group>
+      {beams.map((beam, i) => (
+        <mesh
+          key={i}
+          ref={(el) => { refs.current[i] = el; }}
+          position={[beam.x, beam.height / 2 - 5, -15]}
+          rotation={[0, 0, beam.angle]}
+        >
+          <planeGeometry args={[beam.width, beam.height]} />
+          <meshBasicMaterial
+            color="#C8A24A"
+            transparent
+            opacity={beam.opacity}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      ))}
+    </group>
   );
 }
 
@@ -194,59 +259,49 @@ export default function InterstellarScene({
   isSpeaking = false,
   metrics = [],
   aiMetrics = [],
-  isDay = false,
 }: InterstellarSceneProps) {
   return (
     <div className="absolute inset-0 z-0">
       <Canvas
-        camera={{ position: [0, 1, 8], fov: 50, near: 0.1, far: 100 }}
+        camera={{ position: [0, 1, 8], fov: 50, near: 0.1, far: 150 }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         style={{ background: "transparent" }}
       >
         <Suspense fallback={null}>
           <CameraController isProcessing={isProcessing} />
-          <ambientLight intensity={isDay ? 0.25 : 0.08} />
+          <ambientLight intensity={0.06} />
 
           {/* Primary core spotlight */}
           <pointLight
             position={[0, 0.3, 0]}
-            intensity={isCrisis ? 3.5 : isDay ? 1.5 : 2}
+            intensity={isCrisis ? 4 : 2.5}
             color={isCrisis ? "#ff4444" : "#C8A24A"}
-            distance={25}
+            distance={30}
             decay={2}
           />
           {/* Backlight for depth */}
-          <pointLight position={[0, 2, -5]} intensity={isDay ? 0.4 : 0.6} color="#C8A24A" distance={20} decay={2} />
+          <pointLight position={[0, 3, -8]} intensity={0.5} color="#C8A24A" distance={25} decay={2} />
 
-          {isDay ? (
-            <>
-              {/* Day mode: warm champagne lighting */}
-              <pointLight position={[6, 5, -4]} intensity={0.5} color="#d4c088" distance={25} decay={2} />
-              <pointLight position={[-4, 3, 4]} intensity={0.3} color="#C8A24A" distance={18} decay={2} />
-              <directionalLight position={[0, 10, 5]} intensity={0.2} color="#fff8e8" />
-            </>
-          ) : (
-            <>
-              {/* Night mode: cyan + emerald accents */}
-              <pointLight position={[6, 3, -6]} intensity={0.4} color="#00d4ff" distance={25} decay={2} />
-              <pointLight position={[-6, -2, 4]} intensity={0.25} color="#00d4ff" distance={18} decay={2} />
-              <pointLight position={[-3, 4, -3]} intensity={0.15} color="#10b981" distance={15} decay={2} />
-              <directionalLight position={[0, 8, 0]} intensity={0.08} color="#eeeeff" />
-            </>
-          )}
+          {/* Galactic lighting */}
+          <pointLight position={[8, 4, -6]} intensity={0.35} color="#00d4ff" distance={30} decay={2} />
+          <pointLight position={[-7, -2, 5]} intensity={0.2} color="#00d4ff" distance={20} decay={2} />
+          <pointLight position={[-4, 5, -4]} intensity={0.12} color="#10b981" distance={18} decay={2} />
+          <directionalLight position={[0, 10, 0]} intensity={0.06} color="#eeeeff" />
+
+          {/* Deep space layers */}
+          <DeepStarfield />
+          <NebulaLayer />
+          <VolumetricBeams />
 
           {/* Environment */}
-          <CoreSpotlight isCrisis={isCrisis} isDay={isDay} />
-          <HUDGrid isDay={isDay} />
-          <ScanSweep isCrisis={isCrisis} isDay={isDay} />
-          <DustParticles isDay={isDay} />
-          <AmbientFog isCrisis={isCrisis} isDay={isDay} />
+          <CoreSpotlight isCrisis={isCrisis} />
+          <HUDGrid isDay={false} />
+          <ScanSweep isCrisis={isCrisis} isDay={false} />
+          <CosmicDust />
+          <AmbientFog isCrisis={isCrisis} />
 
-          {/* Galaxy stars — night only */}
-          {!isDay && <GalaxyParticles />}
-
-          {/* RISE Quantum Core */}
+          {/* RISE Galactic Core */}
           <RISECoreEmblem
             isActive={isListening}
             isCrisis={isCrisis}
@@ -255,12 +310,12 @@ export default function InterstellarScene({
             isSpeaking={isSpeaking}
           />
 
-          {/* Data panels */}
+          {/* Metric satellites */}
           {metrics.length > 0 && <MetricRings metrics={metrics} isCrisis={isCrisis} />}
           {aiMetrics.length > 0 && <AIResponseMetrics metrics={aiMetrics} />}
 
-          {/* Global Command Map */}
-          <GlobalCommandMap isDay={isDay} />
+          {/* Holographic Globe */}
+          <GlobalCommandMap isDay={false} />
         </Suspense>
       </Canvas>
     </div>

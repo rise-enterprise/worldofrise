@@ -9,7 +9,7 @@ const InterstellarScene = lazy(() => import("@/components/admin/vessel/Interstel
 
 function AdminPanelInner() {
   const { data: metrics } = useDashboardMetrics("all");
-  const { isDay, colors } = useVesselTheme();
+  const { colors } = useVesselTheme();
   const { config: personality } = useAIPersonality();
   const [isListening, setIsListening] = useState(false);
   const [pulseIntensity, setPulseIntensity] = useState(0);
@@ -30,13 +30,13 @@ function AdminPanelInner() {
   const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
 
   const metricRings = [
-    { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
-    { label: "Visits", value: visitsMonth, max: totalMembers || 1, color: isDay ? "#8a7d6a" : "#4488ff" },
+    { label: "Nodes", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
+    { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#00d4ff" },
     { label: "VIP", value: vipCount, max: totalMembers || 1, color: "#C8A24A" },
-    { label: "Retention", value: retentionRate, max: 100, color: "#22c55e" },
-    { label: "Churn", value: churnRisk, max: totalMembers || 1, color: "#ef4444" },
+    { label: "Retention", value: retentionRate, max: 100, color: "#10b981" },
+    { label: "Threat", value: churnRisk, max: totalMembers || 1, color: "#ef4444" },
     { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#C8A24A" },
-    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: isDay ? "#6b7280" : "#3b82f6" },
+    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#3b82f6" },
   ];
 
   const handleCrisis = useCallback((crisis: boolean) => {
@@ -49,7 +49,7 @@ function AdminPanelInner() {
       className="h-screen w-screen overflow-hidden relative flex flex-col pt-safe transition-colors duration-1000"
       style={{ backgroundColor: colors.bg }}
     >
-      {/* 3D Background */}
+      {/* 3D Galactic Background */}
       <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: colors.bg }} />}>
         <InterstellarScene
           isListening={isListening}
@@ -59,35 +59,32 @@ function AdminPanelInner() {
           isSpeaking={isSpeaking}
           metrics={metricRings}
           aiMetrics={aiMetrics}
-          isDay={isDay}
         />
       </Suspense>
 
-      {/* CRT scanlines */}
+      {/* Scanline overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: isDay
-            ? "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,162,74,0.006) 2px, rgba(200,162,74,0.006) 4px)"
-            : "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px)",
+          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.008) 2px, rgba(0,212,255,0.008) 4px)",
           mixBlendMode: "screen",
         }}
       />
 
-      {/* Personality accent vignette — subtle colored edge glow */}
+      {/* Personality accent vignette */}
       <div
         className="fixed inset-0 pointer-events-none z-[2] transition-all duration-1000"
         style={{
-          background: `radial-gradient(ellipse at center, transparent 60%, ${personality.accentHex}08 100%)`,
-          boxShadow: `inset 0 0 200px -60px ${personality.accentHex}06`,
+          background: `radial-gradient(ellipse at center, transparent 55%, ${personality.accentHex}0a 100%)`,
+          boxShadow: `inset 0 0 250px -60px ${personality.accentHex}08`,
         }}
       />
 
-      {/* Top edge light sweep */}
+      {/* Top edge accent */}
       <div
         className="fixed top-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent, ${personality.accentHex}30, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${personality.accentHex}40, transparent)`,
         }}
       />
 
@@ -118,17 +115,17 @@ function AdminPanelInner() {
         <div
           className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"
           style={{
-            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.1) 100%)",
-            boxShadow: "inset 0 0 150px rgba(200,30,30,0.08)",
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(180,20,20,0.12) 100%)",
+            boxShadow: "inset 0 0 200px rgba(200,30,30,0.1)",
           }}
         />
       )}
 
-      {/* Bottom edge accent line */}
+      {/* Bottom edge accent */}
       <div
         className="fixed bottom-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent 10%, ${personality.accentHex}20, transparent 90%)`,
+          background: `linear-gradient(90deg, transparent 10%, ${personality.accentHex}25, transparent 90%)`,
         }}
       />
     </div>
