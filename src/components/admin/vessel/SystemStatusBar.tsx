@@ -32,7 +32,7 @@ export default function SystemStatusBar({
         borderColor: isCrisis ? "rgba(239,68,68,0.2)" : colors.border,
         backgroundColor: isCrisis
           ? "rgba(239,68,68,0.05)"
-          : "rgba(3,8,16,0.5)",
+          : "rgba(8,6,10,0.6)",
       }}
     >
       {/* Left — System identity */}
@@ -49,7 +49,7 @@ export default function SystemStatusBar({
         </span>
       </div>
 
-      {/* Center — AI Mode selector + metrics */}
+      {/* Center — Intelligence Mode selector + metrics */}
       <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto scrollbar-hide w-full sm:w-auto justify-start sm:justify-center">
         {/* Mode pills */}
         <div className="flex items-center gap-1 shrink-0">
@@ -64,16 +64,16 @@ export default function SystemStatusBar({
                   : "border-transparent opacity-40 hover:opacity-70"
               )}
               style={{
-                color: personality === mode.id ? mode.accentHex : "#5a6878",
+                color: personality === mode.id ? mode.accentHex : "#5a6058",
                 backgroundColor: personality === mode.id ? `${mode.accentHex}15` : "transparent",
               }}
               title={mode.label}
             >
               <span className="hidden sm:inline">{mode.icon} </span>
               {mode.id === "strategic" ? "CMD" :
-               mode.id === "deepscan" ? "SCAN" :
                mode.id === "expansion" ? "EXP" :
-               mode.id === "predictive" ? "PRED" : "CRIT"}
+               mode.id === "neural" ? "NEURAL" :
+               mode.id === "investor" ? "INV" : "RISK"}
             </button>
           ))}
         </div>
@@ -85,7 +85,7 @@ export default function SystemStatusBar({
         <div className="flex items-center gap-3 sm:gap-5 shrink-0">
           <StatusMetric label="NODES" value={totalMembers.toLocaleString()} accent={config.accentHex} />
           <span className="hidden sm:inline-flex"><StatusMetric label="VIP" value={vipCount.toLocaleString()} accent={config.accentHex} /></span>
-          <StatusMetric label="THREAT" value={churnRisk.toLocaleString()} warn={churnRisk > totalMembers * 0.3} accent={config.accentHex} />
+          <StatusMetric label="RISK" value={churnRisk.toLocaleString()} warn={churnRisk > totalMembers * 0.3} accent={config.accentHex} />
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export default function SystemStatusBar({
             "flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[8px] sm:text-[9px] uppercase tracking-wider transition-all duration-500 border",
             isDay
               ? "border-[#C8A24A]/20 bg-[#C8A24A]/10 text-[#C8A24A] hover:bg-[#C8A24A]/20"
-              : "border-[#00d4ff]/20 bg-[#00d4ff]/10 text-[#00d4ff] hover:bg-[#00d4ff]/20"
+              : "border-[#C8A24A]/15 bg-[#C8A24A]/5 text-[#C8A24A]/70 hover:bg-[#C8A24A]/15"
           )}
         >
           {isDay ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
@@ -119,7 +119,7 @@ function StatusMetric({ label, value, warn, accent }: { label: string; value: st
     <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
       <span
         className="text-[8px] sm:text-[9px] uppercase tracking-wider"
-        style={{ color: "rgba(90,104,120,0.5)" }}
+        style={{ color: "rgba(106,96,88,0.5)" }}
       >
         {label}
       </span>

@@ -394,9 +394,9 @@ export default function VesselCommandInterface({
             {/* AI Identity */}
             <div className="mb-4 sm:mb-6 flex flex-col items-center">
               <img src={riseLogo} alt="Rise Holding" className="h-12 sm:h-16 w-auto mb-3 opacity-80" />
-              <div className="text-xl sm:text-2xl font-serif text-primary tracking-widest">GALACTIC INTELLIGENCE NEXUS</div>
+              <div className="text-xl sm:text-2xl font-serif text-primary tracking-widest">RISE INTELLIGENCE NEXUS</div>
               <div className="text-[9px] sm:text-[10px] text-muted-foreground/40 mt-2 tracking-wider">
-                Planetary-scale intelligence · All sectors operational
+                Neural intelligence · Expansion simulator · Executive war room
               </div>
             </div>
             
@@ -528,7 +528,7 @@ export default function VesselCommandInterface({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isListening ? "Neural link active — speak your command…" : "Command the nexus…"}
+            placeholder={isListening ? "Neural link active — speak your command…" : "Command the intelligence nexus…"}
             className={cn(
               "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2 relative z-10",
               "bg-transparent text-sm text-foreground/90 placeholder:text-muted-foreground/25",
@@ -603,7 +603,7 @@ export default function VesselCommandInterface({
         {/* Subtle label under the bar */}
         <div className="flex justify-center mt-2">
           <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.35em] text-muted-foreground/20">
-            {isListening ? "◉ NEURAL LINK ACTIVE" : isLoading ? "◎ PROCESSING INTEL" : "RISE GALACTIC COMMAND"}
+            {isListening ? "◉ NEURAL LINK ACTIVE" : isLoading ? "◎ PROCESSING INTEL" : "RISE INTELLIGENCE COMMAND"}
           </span>
         </div>
       </div>
