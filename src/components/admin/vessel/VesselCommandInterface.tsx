@@ -19,14 +19,14 @@ type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachme
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-copilot`;
 
 const EXAMPLE_COMMANDS = [
-  "NOIR engagement growth projection.",
-  "SASSO Riyadh VIP retention status.",
-  "High-value member tier elevation candidates.",
-  "Executive summary. Key metrics.",
-  "Brand performance comparison. This quarter.",
-  "Predict churn risk. Next 30 days.",
-  "VIP campaign recommendation. Doha.",
-  "Generate investor-ready board report.",
+  "Customer lifetime value trends.",
+  "NOIR VIP engagement this quarter.",
+  "SASSO Riyadh retention status.",
+  "Tier elevation candidates.",
+  "Brand performance comparison.",
+  "Churn risk forecast. Next 30 days.",
+  "Campaign ROI analysis. Doha.",
+  "Cross-brand member overlap.",
 ];
 
 async function streamChat({
@@ -75,29 +75,6 @@ async function streamChat({
   onDone();
 }
 
-function extractMetrics(text: string): { label: string; value: number }[] {
-  const metrics: { label: string; value: number }[] = [];
-  const seen = new Set<string>();
-  const parseNum = (s: string) => Number(s.replace(/,/g, "").replace(/%$/, ""));
-  const p1 = /\*\*([0-9,]+(?:\.[0-9]+)?%?)\*\*\s+([a-zA-Z][a-zA-Z\s]{1,25})/g;
-  const p2 = /(?:^|\s)([0-9,]+(?:\.[0-9]+)?%?)\s+((?:total|active|vip|new|dormant|at.risk|high.risk|churn|members?|guests?|visits?|points?|rewards?|campaigns?|retention)[a-zA-Z\s]{0,20})/gi;
-  const p3 = /([\w\s]{2,20}):\s*\*?\*?([0-9,]+(?:\.[0-9]+)?%?)\*?\*?/g;
-  const add = (label: string, raw: string) => {
-    const v = parseNum(raw);
-    if (isNaN(v) || v === 0) return;
-    const key = label.trim().toLowerCase().replace(/\s+/g, " ");
-    if (key.length < 2 || key.length > 25 || seen.has(key)) return;
-    if (/^(the|and|or|is|are|was|were|has|have|a|an|in|on|of|to|for|with|that|this)$/i.test(key)) return;
-    seen.add(key);
-    metrics.push({ label: label.trim(), value: v });
-  };
-  let m: RegExpExecArray | null;
-  while ((m = p1.exec(text)) !== null) add(m[2], m[1]);
-  while ((m = p2.exec(text)) !== null) add(m[2], m[1]);
-  while ((m = p3.exec(text)) !== null) add(m[1], m[2]);
-  return metrics.slice(0, 6);
-}
-
 interface VesselCommandInterfaceProps {
   onListeningChange?: (listening: boolean) => void;
   onPulseIntensity?: (intensity: number) => void;
@@ -117,7 +94,7 @@ export default function VesselCommandInterface({
 }: VesselCommandInterfaceProps) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
-  const { config: personalityConfig } = useAIPersonality();
+  const { systemPrompt, modelConfig } = useAIPersonality();
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(true);
@@ -209,11 +186,9 @@ export default function VesselCommandInterface({
     onCrisisChange?.(isCrisis);
   }, [onCrisisChange]);
 
-  // File upload handler
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
     setIsUploading(true);
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
@@ -221,7 +196,6 @@ export default function VesselCommandInterface({
       setIsUploading(false);
       return;
     }
-
     const newAttachments: Attachment[] = [];
     for (const file of Array.from(files)) {
       if (file.size > 10 * 1024 * 1024) {
@@ -240,7 +214,6 @@ export default function VesselCommandInterface({
     }
     setPendingAttachments(prev => [...prev, ...newAttachments]);
     setIsUploading(false);
-    // Reset file input
     if (fileInputRef.current) fileInputRef.current.value = "";
   }, []);
 
@@ -271,8 +244,8 @@ export default function VesselCommandInterface({
       return;
     }
 
-    const systemMsg: Msg = { role: "user", content: `[SYSTEM MODE: ${personalityConfig.label.toUpperCase()}] ${personalityConfig.systemPromptPrefix}` };
-    const allMessages = [systemMsg, ...messages, userMsg];
+    const sysMsg: Msg = { role: "user", content: `[SYSTEM] ${systemPrompt}` };
+    const allMessages = [sysMsg, ...messages, userMsg];
     let assistantSoFar = "";
     const upsert = (chunk: string) => {
       assistantSoFar += chunk;
@@ -298,13 +271,10 @@ export default function VesselCommandInterface({
             if (assistantSoFar) {
               speak(assistantSoFar);
               detectCrisis(assistantSoFar);
-              const extracted = extractMetrics(assistantSoFar);
-              if (extracted.length > 0) onAIMetrics?.(extracted);
             }
           },
           onError: async (err) => {
             if (!retry && (err.includes("500") || err.includes("unavailable"))) {
-              // Self-healing: retry once after 2s
               await new Promise(r => setTimeout(r, 2000));
               assistantSoFar = "";
               await doStream(true);
@@ -329,7 +299,7 @@ export default function VesselCommandInterface({
     };
 
     await doStream();
-  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, personalityConfig, onAIMetrics, pendingAttachments]);
+  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, systemPrompt, pendingAttachments]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -431,7 +401,6 @@ export default function VesselCommandInterface({
 
   return (
     <div className="relative z-20 flex flex-col h-full max-w-3xl mx-auto w-full">
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -445,57 +414,81 @@ export default function VesselCommandInterface({
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
-            <div className="mb-6 flex flex-col items-center">
-              <img src={riseLogo} alt="Rise" className="h-10 sm:h-12 w-auto mb-4 opacity-40" />
-              <div className="text-lg sm:text-xl tracking-[0.3em]" style={{ color: "#C8A24A", fontFamily: "'Georgia', serif" }}>
-                RISE EXECUTIVE INTELLIGENCE
+            {/* AI Core Circle */}
+            <div className="relative mb-8">
+              <div
+                className="w-28 h-28 rounded-full flex items-center justify-center"
+                style={{
+                  background: "radial-gradient(circle, rgba(200,162,74,0.08) 0%, rgba(200,162,74,0.02) 60%, transparent 100%)",
+                  border: "1px solid rgba(200,162,74,0.12)",
+                }}
+              >
+                <div
+                  className="w-20 h-20 rounded-full flex items-center justify-center"
+                  style={{
+                    background: "radial-gradient(circle, rgba(200,162,74,0.1) 0%, transparent 70%)",
+                    border: "1px solid rgba(200,162,74,0.08)",
+                    animation: "breathe 4s ease-in-out infinite",
+                  }}
+                >
+                  <img src={riseLogo} alt="RISE" className="h-8 w-auto opacity-60" />
+                </div>
               </div>
-              <div className="text-[8px] mt-2 tracking-[0.25em] uppercase" style={{ color: "#8a8578", fontFamily: "'Georgia', serif" }}>
-                Global Luxury Intelligence
+              {/* Breathing glow */}
+              <div
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                  background: "radial-gradient(circle, rgba(200,162,74,0.06) 0%, transparent 70%)",
+                  animation: "breathe 4s ease-in-out infinite",
+                }}
+              />
+            </div>
+
+            <div className="text-lg tracking-[0.2em] font-medium mb-1" style={{ color: "#1a1510" }}>
+              RISE ONE
+            </div>
+            <div className="text-[10px] tracking-[0.15em] uppercase mb-8" style={{ color: "#8a7d6a" }}>
+              Executive Intelligence
+            </div>
+
+            <div className="flex items-center gap-5 mb-6 text-[9px] uppercase tracking-[0.15em]">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#5a8a6a" }} />
+                <span style={{ color: "#8a7d6a" }}>Online</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C8A24A" }} />
+                <span style={{ color: "#8a7d6a" }}>Tools Active</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-6 mb-8 text-[9px] uppercase tracking-[0.2em]" style={{ fontFamily: "'Georgia', serif" }}>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#5a8a6a]" />
-                <span className="text-[#8a8578]">Online</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C8A24A]" />
-                <span className="text-[#8a8578]">Tools Active</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#d4b86a]" />
-                <span className="text-[#8a8578]">Image Gen</span>
-              </div>
-            </div>
-
-            <p className="text-[10px] max-w-md mb-5 leading-relaxed" style={{ color: "#8a8578", fontFamily: "'Georgia', serif" }}>
+            <p className="text-[11px] max-w-md mb-6 leading-relaxed" style={{ color: "#8a7d6a" }}>
               Query insights. Analyze performance. Generate reports.
             </p>
 
-            <div className="flex flex-wrap gap-1.5 justify-center max-w-lg">
+            <div className="flex flex-wrap gap-2 justify-center max-w-lg">
               {EXAMPLE_COMMANDS.slice(0, 6).map((cmd) => (
                 <button
                   key={cmd}
                   onClick={() => send(cmd)}
-                 className="text-[8px] px-3 py-2 rounded border transition-all duration-400"
-                   style={{
-                     borderColor: "rgba(200,162,74,0.06)",
-                     backgroundColor: "rgba(200,162,74,0.02)",
-                     color: "#8a8578",
-                     fontFamily: "'Georgia', serif",
-                   }}
-                   onMouseEnter={(e) => {
-                     e.currentTarget.style.borderColor = "rgba(200,162,74,0.12)";
-                     e.currentTarget.style.color = "#C8A24A";
-                   }}
-                   onMouseLeave={(e) => {
-                     e.currentTarget.style.borderColor = "rgba(200,162,74,0.06)";
-                     e.currentTarget.style.color = "#8a8578";
-                   }}
+                  className="text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300"
+                  style={{
+                    border: "1px solid rgba(200,162,74,0.1)",
+                    backgroundColor: "rgba(200,162,74,0.03)",
+                    color: "#8a7d6a",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(200,162,74,0.2)";
+                    e.currentTarget.style.backgroundColor = "rgba(200,162,74,0.06)";
+                    e.currentTarget.style.color = "#C8A24A";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(200,162,74,0.1)";
+                    e.currentTarget.style.backgroundColor = "rgba(200,162,74,0.03)";
+                    e.currentTarget.style.color = "#8a7d6a";
+                  }}
                 >
-                  {cmd.length > 35 ? cmd.slice(0, 35) + "…" : cmd}
+                  {cmd}
                 </button>
               ))}
             </div>
@@ -509,6 +502,7 @@ export default function VesselCommandInterface({
                 content={msg.content}
                 attachments={msg.attachments}
                 isStreaming={isLoading && i === messages.length - 1 && msg.role === "assistant"}
+                modelTag={msg.role === "assistant" && i === messages.length - 1 && !isLoading ? modelConfig.tag : undefined}
               />
             ))}
           </div>
@@ -522,29 +516,28 @@ export default function VesselCommandInterface({
             <button
               key={cmd}
               onClick={() => send(cmd)}
-              className="shrink-0 text-[8px] px-2.5 py-1.5 rounded transition-all duration-400"
+              className="shrink-0 text-[9px] px-3 py-1.5 rounded-lg transition-all duration-300"
               style={{
-                border: "1px solid rgba(200,162,74,0.05)",
+                border: "1px solid rgba(200,162,74,0.08)",
                 backgroundColor: "rgba(200,162,74,0.02)",
-                color: "#8a8578",
-                fontFamily: "'Georgia', serif",
+                color: "#8a7d6a",
               }}
             >
-              {cmd.length > 40 ? cmd.slice(0, 40) + "…" : cmd}
+              {cmd}
             </button>
           ))}
         </div>
       )}
 
-      {/* Pending attachments preview */}
+      {/* Pending attachments */}
       {pendingAttachments.length > 0 && (
         <div className="flex gap-2 px-4 py-2 overflow-x-auto scrollbar-hide">
           {pendingAttachments.map((att, i) => (
             <div key={i} className="relative shrink-0 group">
               {att.type.startsWith("image/") ? (
-                <img src={att.url} alt={att.name} className="w-16 h-16 object-cover rounded-lg border border-[rgba(200,162,74,0.2)]" />
+                <img src={att.url} alt={att.name} className="w-16 h-16 object-cover rounded-lg border border-[rgba(200,162,74,0.15)]" />
               ) : (
-                <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-[rgba(200,162,74,0.1)] bg-[rgba(200,162,74,0.04)] text-[10px] text-[#5a5a64]">
+                <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-[rgba(200,162,74,0.1)] bg-[rgba(200,162,74,0.03)] text-[10px] text-[#8a7d6a]">
                   📎 {att.name.length > 15 ? att.name.slice(0, 15) + "…" : att.name}
                 </div>
               )}
@@ -559,31 +552,20 @@ export default function VesselCommandInterface({
         </div>
       )}
 
-      {/* ── Tactical Command Strip ── */}
-      <div className="px-4 sm:px-6 pb-safe pb-5 pt-2 relative">
-        {(isListening || isLoading) && (
-          <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-[1px] pointer-events-none"
-            style={{
-              height: "35vh",
-              background: `linear-gradient(to top, ${isListening ? "#C8A24A" : "rgba(200,162,74,0.4)"}, transparent)`,
-              opacity: isListening ? 0.35 : 0.15,
-            }}
-          />
-        )}
-
+      {/* Input bar */}
+      <div className="px-4 sm:px-6 pb-5 pt-2 relative">
         <div
           className={cn(
-            "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-500",
-            "backdrop-blur-2xl",
-            "border",
+            "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-400",
+            "backdrop-blur-xl border",
             isListening
-              ? "border-[#C8A24A]/25 shadow-[0_0_40px_-10px_rgba(200,162,74,0.15)]"
+              ? "border-[#C8A24A]/25 shadow-[0_0_30px_-10px_rgba(200,162,74,0.1)]"
               : isLoading
-                ? "border-[#C8A24A]/12 shadow-[0_0_30px_-10px_rgba(200,162,74,0.08)]"
-                : "border-[rgba(200,162,74,0.06)]"
+                ? "border-[#C8A24A]/15"
+                : "border-[rgba(200,162,74,0.1)]"
           )}
           style={{
-            backgroundColor: isListening ? "rgba(200,162,74,0.04)" : "rgba(10,10,15,0.5)",
+            backgroundColor: isListening ? "rgba(200,162,74,0.04)" : "rgba(255,255,255,0.7)",
           }}
         >
           {/* TTS toggle */}
@@ -592,33 +574,29 @@ export default function VesselCommandInterface({
             variant="ghost"
             size="icon"
             className={cn(
-              "shrink-0 h-9 w-9 rounded-lg transition-all relative z-10",
-              ttsEnabled
-                ? "text-[#C8A24A]/50 hover:text-[#C8A24A]/80 hover:bg-[#C8A24A]/06"
-                : "text-[#4a4a54]/30 hover:text-[#4a4a54]/60"
+              "shrink-0 h-9 w-9 rounded-lg transition-all",
+              ttsEnabled ? "text-[#C8A24A]/60 hover:text-[#C8A24A]" : "text-[#8a7d6a]/30 hover:text-[#8a7d6a]/60"
             )}
-            title={ttsEnabled ? "Mute AI voice" : "Enable AI voice"}
           >
             {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </Button>
 
-          {/* Attachment button */}
+          {/* Attachment */}
           <Button
             onClick={() => fileInputRef.current?.click()}
             variant="ghost"
             size="icon"
             disabled={isUploading}
             className={cn(
-              "shrink-0 h-9 w-9 rounded-lg transition-all relative z-10",
+              "shrink-0 h-9 w-9 rounded-lg transition-all",
               pendingAttachments.length > 0
-                ? "text-[#C8A24A]/70 hover:text-[#C8A24A] hover:bg-[#C8A24A]/08"
-                : "text-[#4a4a54]/40 hover:text-[#C8A24A]/60 hover:bg-[#C8A24A]/06"
+                ? "text-[#C8A24A]/70 hover:text-[#C8A24A]"
+                : "text-[#8a7d6a]/40 hover:text-[#C8A24A]/60"
             )}
-            title="Attach files"
           >
             <Paperclip className="w-3.5 h-3.5" />
             {pendingAttachments.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#C8A24A] text-[7px] text-[#0a0a0c] font-bold flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#C8A24A] text-[7px] text-white font-bold flex items-center justify-center">
                 {pendingAttachments.length}
               </span>
             )}
@@ -630,19 +608,19 @@ export default function VesselCommandInterface({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isUploading ? "Uploading…" : isListening ? "Listening…" : "Command…"}
+            placeholder={isUploading ? "Uploading…" : isListening ? "Listening…" : "Ask RISE ONE…"}
             className={cn(
-              "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2 relative z-10",
-            "bg-transparent text-sm text-[rgba(240,236,228,0.8)] placeholder:text-[#8a8578]/40",
-              "focus:outline-none focus:placeholder:text-[#8a8578]/60",
-              "transition-all duration-300"
+              "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2",
+              "bg-transparent text-sm placeholder:text-[#8a7d6a]/40",
+              "focus:outline-none transition-all duration-300"
             )}
+            style={{ color: "#1a1510" }}
             rows={1}
           />
 
           {/* Waveform */}
           {isListening && (
-            <div ref={barsRef} className="flex items-center gap-[3px] h-9 px-2 relative z-10">
+            <div ref={barsRef} className="flex items-center gap-[3px] h-9 px-2">
               {[0.5, 0.65, 0.8, 1, 0.8, 0.65, 0.5].map((base, i) => (
                 <span
                   key={i}
@@ -658,7 +636,7 @@ export default function VesselCommandInterface({
           )}
 
           {/* Mic */}
-          <div className="relative shrink-0 z-10">
+          <div className="relative shrink-0">
             {isListening && (
               <>
                 {[0, 0.5, 1].map((delay) => (
@@ -676,9 +654,7 @@ export default function VesselCommandInterface({
               size="icon"
               className={cn(
                 "relative h-9 w-9 rounded-lg transition-all overflow-visible",
-                isListening
-                  ? "text-[#C8A24A] bg-[#C8A24A]/10"
-                  : "text-[#4a4a54]/40 hover:text-[#C8A24A]/60 hover:bg-[#C8A24A]/06"
+                isListening ? "text-[#C8A24A] bg-[#C8A24A]/10" : "text-[#8a7d6a]/40 hover:text-[#C8A24A]/60"
               )}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -691,9 +667,9 @@ export default function VesselCommandInterface({
             disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
             size="icon"
             className={cn(
-              "shrink-0 h-9 w-9 rounded-lg transition-all relative z-10",
-              "bg-[#C8A24A]/60 hover:bg-[#C8A24A]/80 text-[#0a0a0c]",
-              "disabled:opacity-15 disabled:bg-[#4a4a54]/20"
+              "shrink-0 h-9 w-9 rounded-lg transition-all",
+              "bg-[#C8A24A] hover:bg-[#b8944a] text-white",
+              "disabled:opacity-20 disabled:bg-[#8a7d6a]/20"
             )}
           >
             <Send className="w-3.5 h-3.5" />
@@ -701,11 +677,22 @@ export default function VesselCommandInterface({
         </div>
 
         <div className="flex justify-center mt-2">
-          <span className="text-[7px] uppercase tracking-[0.35em]" style={{ color: "#8a8578", fontFamily: "'Georgia', serif" }}>
-            {isUploading ? "◎ UPLOADING" : isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE · EXECUTIVE INTELLIGENCE ACTIVE"}
+          <span className="text-[8px] uppercase tracking-[0.2em]" style={{ color: "#8a7d6a" }}>
+            {isUploading ? "UPLOADING" : isListening ? "LISTENING" : isLoading ? "PROCESSING" : "RISE ONE · ACTIVE"}
           </span>
         </div>
       </div>
+
+      <style>{`
+        @keyframes breathe {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.04); opacity: 0.85; }
+        }
+        @keyframes micRipple {
+          0% { transform: scale(1); opacity: 0.3; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
