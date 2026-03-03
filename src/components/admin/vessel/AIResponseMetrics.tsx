@@ -20,7 +20,7 @@ function AIOrbitSatellite({ metric, index, total }: { metric: AIMetric; index: n
   const groupRef = useRef<THREE.Group>(null);
   const [scale, setScale] = useState(0);
   const angleOffset = (index / total) * Math.PI * 2;
-  const accentColor = "#6b93b8";
+  const accentColor = "#8a8a94";
 
   useEffect(() => {
     setScale(0);
@@ -72,7 +72,7 @@ function AIOrbitSatellite({ metric, index, total }: { metric: AIMetric; index: n
         </Text>
 
         {/* Label */}
-        <Text position={[0, 0.13, 0]} fontSize={0.055} color="#5a5a64" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.1}>
+        <Text position={[0, 0.13, 0]} fontSize={0.055} color="#4a4a54" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.15}>
           {metric.label.toUpperCase()}
         </Text>
 
@@ -104,7 +104,7 @@ function OuterOrbitPath() {
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
-      color: "#6b93b8",
+      color: "#8a8a94",
       transparent: true,
       opacity: 0.04,
       blending: THREE.AdditiveBlending,

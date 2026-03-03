@@ -2,14 +2,13 @@ import { useState, useCallback, lazy, Suspense } from "react";
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
 import SystemStatusBar from "@/components/admin/vessel/SystemStatusBar";
 import VesselCommandInterface from "@/components/admin/vessel/VesselCommandInterface";
-import { VesselThemeProvider, useVesselTheme } from "@/contexts/VesselThemeContext";
+import { VesselThemeProvider } from "@/contexts/VesselThemeContext";
 import { AIPersonalityProvider, useAIPersonality } from "@/contexts/AIPersonalityContext";
 
 const InterstellarScene = lazy(() => import("@/components/admin/vessel/InterstellarScene"));
 
 function AdminPanelInner() {
   const { data: metrics } = useDashboardMetrics("all");
-  const { colors } = useVesselTheme();
   const { config: personality } = useAIPersonality();
   const [isListening, setIsListening] = useState(false);
   const [pulseIntensity, setPulseIntensity] = useState(0);
@@ -29,13 +28,13 @@ function AdminPanelInner() {
   const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
 
   const metricRings = [
-    { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
-    { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#6b93b8" },
+    { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#8a8a94" },
+    { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#6a7a8a" },
     { label: "VIP", value: vipCount, max: totalMembers || 1, color: "#C8A24A" },
     { label: "Retention", value: retentionRate, max: 100, color: "#5a8a6a" },
     { label: "Risk", value: churnRisk, max: totalMembers || 1, color: "#b84a4a" },
-    { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#C8A24A" },
-    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#6b7db8" },
+    { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#8a8a94" },
+    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#6a7a8a" },
   ];
 
   const handleCrisis = useCallback((crisis: boolean) => {
@@ -46,10 +45,10 @@ function AdminPanelInner() {
   return (
     <div
       className="h-screen w-screen overflow-hidden relative flex flex-col pt-safe"
-      style={{ backgroundColor: "#0a0a0c" }}
+      style={{ backgroundColor: "#060608" }}
     >
-      {/* 3D Tactical Environment */}
-      <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: "#0a0a0c" }} />}>
+      {/* 3D Industrial Headquarters Environment */}
+      <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: "#060608" }} />}>
         <InterstellarScene
           isListening={isListening}
           isCrisis={isCrisis}
@@ -61,36 +60,28 @@ function AdminPanelInner() {
         />
       </Suspense>
 
-      {/* Matte graphite depth overlay */}
+      {/* Industrial depth overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(10,10,12,0.4) 70%, rgba(10,10,12,0.8) 100%)",
+          background: "radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(6,6,8,0.4) 70%, rgba(6,6,8,0.85) 100%)",
         }}
       />
 
-      {/* Subtle horizontal scan line */}
+      {/* Subtle steel scan line texture */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,162,74,0.008) 2px, rgba(200,162,74,0.008) 4px)",
+          background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(138,138,148,0.004) 3px, rgba(138,138,148,0.004) 6px)",
           mixBlendMode: "overlay",
         }}
       />
 
-      {/* Mode accent vignette — subtle color shift */}
-      <div
-        className="fixed inset-0 pointer-events-none z-[2] transition-all duration-1000"
-        style={{
-          boxShadow: `inset 0 0 200px -60px ${personality.accentHex}05`,
-        }}
-      />
-
-      {/* Top gold edge line */}
+      {/* Top titanium edge line */}
       <div
         className="fixed top-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent 15%, ${personality.accentHex}20, transparent 85%)`,
+          background: "linear-gradient(90deg, transparent 15%, rgba(138,138,148,0.08), transparent 85%)",
         }}
       />
 
@@ -104,7 +95,7 @@ function AdminPanelInner() {
         churnRisk={churnRisk}
       />
 
-      {/* Central Intelligence + Command */}
+      {/* Central Intelligence & Command */}
       <div className="flex-1 min-h-0 relative z-10">
         <VesselCommandInterface
           onListeningChange={setIsListening}
@@ -121,17 +112,17 @@ function AdminPanelInner() {
         <div
           className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"
           style={{
-            background: "radial-gradient(ellipse at center, transparent 40%, rgba(160,30,30,0.08) 100%)",
-            boxShadow: "inset 0 0 200px rgba(180,30,30,0.06)",
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(160,30,30,0.06) 100%)",
+            boxShadow: "inset 0 0 200px rgba(180,30,30,0.04)",
           }}
         />
       )}
 
-      {/* Bottom edge accent */}
+      {/* Bottom titanium edge */}
       <div
         className="fixed bottom-0 left-0 right-0 h-px pointer-events-none z-[3]"
         style={{
-          background: `linear-gradient(90deg, transparent 20%, ${personality.accentHex}10, transparent 80%)`,
+          background: "linear-gradient(90deg, transparent 20%, rgba(138,138,148,0.05), transparent 80%)",
         }}
       />
     </div>

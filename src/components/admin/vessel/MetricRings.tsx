@@ -60,7 +60,7 @@ function OrbitalMetricSatellite({
         {/* Panel bg */}
         <mesh position={[0, 0, -0.01]}>
           <planeGeometry args={[1, 0.65]} />
-          <meshBasicMaterial color={color} transparent opacity={0.02} blending={THREE.AdditiveBlending} depthWrite={false} />
+          <meshBasicMaterial color={color} transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} />
         </mesh>
 
         {/* Border */}
@@ -69,7 +69,7 @@ function OrbitalMetricSatellite({
         </lineSegments>
 
         {/* Label */}
-        <Text position={[0, 0.2, 0]} fontSize={0.06} color="#5a5a64" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.12}>
+        <Text position={[0, 0.2, 0]} fontSize={0.06} color="#4a4a54" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.15}>
           {metric.label.toUpperCase()}
         </Text>
 
@@ -81,13 +81,13 @@ function OrbitalMetricSatellite({
         {/* Progress bar bg */}
         <mesh position={[0, -0.17, 0]}>
           <planeGeometry args={[0.75, 0.03]} />
-          <meshBasicMaterial color="#1a1a1e" transparent opacity={0.5} />
+          <meshBasicMaterial color="#1a1a1e" transparent opacity={0.35} />
         </mesh>
 
         {/* Progress bar fill */}
         <mesh ref={trailRef} position={[-(0.75 - filledWidth) / 2, -0.17, 0.001]}>
           <planeGeometry args={[filledWidth || 0.001, 0.03]} />
-          <meshBasicMaterial color={color} transparent opacity={0.6} blending={THREE.AdditiveBlending} />
+          <meshBasicMaterial color={color} transparent opacity={0.4} blending={THREE.AdditiveBlending} />
         </mesh>
 
         {/* Percentage */}
@@ -112,7 +112,7 @@ function OrbitPath({ isCrisis }: { isCrisis?: boolean }) {
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
-      color: isCrisis ? "#b84a4a" : "#C8A24A",
+      color: isCrisis ? "#b84a4a" : "#8a8a94",
       transparent: true,
       opacity: 0.05,
       blending: THREE.AdditiveBlending,

@@ -19,14 +19,14 @@ type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachme
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-copilot`;
 
 const EXAMPLE_COMMANDS = [
-  "Show me today's key metrics and anything that needs attention",
-  "Find members at high churn risk and suggest re-engagement strategies",
-  "Compare NOIR vs SASSO performance this month",
-  "Draft a reactivation campaign for dormant VIPs",
-  "Generate a luxury loyalty card design for RISE Black tier",
-  "Explain retention drop",
-  "Generate executive summary",
-  "Deploy double points for 5 days in Doha",
+  "Executive summary. Key metrics. Anomalies.",
+  "Identify high-churn members. Recommend intervention.",
+  "NOIR vs SASSO performance. This month.",
+  "Top 10 high-growth members. Strategic insight.",
+  "Predict churn risk. Next 30 days.",
+  "VIP campaign recommendation. Doha market.",
+  "Generate executive board report.",
+  "Deploy double points. 5 days. Doha.",
 ];
 
 async function streamChat({
@@ -446,12 +446,12 @@ export default function VesselCommandInterface({
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
             <div className="mb-6 flex flex-col items-center">
-              <img src={riseLogo} alt="Rise" className="h-10 sm:h-12 w-auto mb-4 opacity-60" />
-              <div className="text-lg sm:text-xl font-serif tracking-[0.25em] text-[#C8A24A]/80">
-                RISE TACTICAL
+              <img src={riseLogo} alt="Rise" className="h-10 sm:h-12 w-auto mb-4 opacity-40" />
+              <div className="text-lg sm:text-xl font-mono tracking-[0.3em]" style={{ color: "#8a8a94" }}>
+                RISE INTELLIGENCE
               </div>
-              <div className="text-[9px] text-[#4a4a54] mt-2 tracking-[0.2em] uppercase">
-                Intelligence · Strategy · Expansion · Full Authority
+              <div className="text-[8px] mt-2 tracking-[0.25em] uppercase font-mono" style={{ color: "#3a3a44" }}>
+                Operational Command · Full Authority
               </div>
             </div>
 
@@ -470,8 +470,8 @@ export default function VesselCommandInterface({
               </div>
             </div>
 
-            <p className="text-[11px] text-[#4a4a54] max-w-md mb-5 leading-relaxed">
-              Full operational authority. Execute commands, query data, generate images, analyze attachments, manage campaigns & members.
+            <p className="text-[10px] max-w-md mb-5 leading-relaxed font-mono" style={{ color: "#3a3a44" }}>
+              Execute commands. Query intelligence. Generate assets. Manage operations.
             </p>
 
             <div className="flex flex-wrap gap-1.5 justify-center max-w-lg">
@@ -479,7 +479,20 @@ export default function VesselCommandInterface({
                 <button
                   key={cmd}
                   onClick={() => send(cmd)}
-                  className="text-[9px] px-3 py-2 rounded border border-[#C8A24A]/08 bg-[#C8A24A]/03 text-[#5a5a64] hover:text-[#C8A24A]/70 hover:border-[#C8A24A]/15 hover:bg-[#C8A24A]/06 transition-all"
+                 className="text-[8px] px-3 py-2 rounded border font-mono transition-all duration-300"
+                   style={{
+                     borderColor: "rgba(138,138,148,0.06)",
+                     backgroundColor: "rgba(138,138,148,0.02)",
+                     color: "#4a4a54",
+                   }}
+                   onMouseEnter={(e) => {
+                     e.currentTarget.style.borderColor = "rgba(200,162,74,0.12)";
+                     e.currentTarget.style.color = "#C8A24A";
+                   }}
+                   onMouseLeave={(e) => {
+                     e.currentTarget.style.borderColor = "rgba(138,138,148,0.06)";
+                     e.currentTarget.style.color = "#4a4a54";
+                   }}
                 >
                   {cmd.length > 35 ? cmd.slice(0, 35) + "…" : cmd}
                 </button>
@@ -508,7 +521,12 @@ export default function VesselCommandInterface({
             <button
               key={cmd}
               onClick={() => send(cmd)}
-              className="shrink-0 text-[9px] px-2.5 py-1.5 rounded border border-[#C8A24A]/06 bg-[#C8A24A]/03 text-[#4a4a54] hover:text-[#C8A24A]/60 hover:border-[#C8A24A]/12 transition-all"
+              className="shrink-0 text-[8px] px-2.5 py-1.5 rounded font-mono transition-all duration-300"
+              style={{
+                border: "1px solid rgba(138,138,148,0.05)",
+                backgroundColor: "rgba(138,138,148,0.02)",
+                color: "#3a3a44",
+              }}
             >
               {cmd.length > 40 ? cmd.slice(0, 40) + "…" : cmd}
             </button>
@@ -681,8 +699,8 @@ export default function VesselCommandInterface({
         </div>
 
         <div className="flex justify-center mt-2">
-          <span className="text-[8px] uppercase tracking-[0.3em] text-[#4a4a54]/30">
-            {isUploading ? "◎ UPLOADING" : isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE TACTICAL COMMAND · FULL AUTHORITY"}
+          <span className="text-[7px] uppercase tracking-[0.35em] font-mono" style={{ color: "#3a3a44" }}>
+            {isUploading ? "◎ UPLOADING" : isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE HQ · INTELLIGENCE ACTIVE"}
           </span>
         </div>
       </div>
