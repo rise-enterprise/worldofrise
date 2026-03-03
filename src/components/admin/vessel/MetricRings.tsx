@@ -17,7 +17,7 @@ interface MetricRingsProps {
 
 const ORBIT_RADIUS = 3;
 const ORBIT_Y = 0.3;
-const ORBIT_SPEED = 0.06;
+const ORBIT_SPEED = 0.05;
 
 function OrbitalMetricSatellite({
   metric, index, total, isCrisis,
@@ -43,12 +43,12 @@ function OrbitalMetricSatellite({
     if (groupRef.current) {
       groupRef.current.position.x = Math.cos(angle) * ORBIT_RADIUS;
       groupRef.current.position.z = Math.sin(angle) * (ORBIT_RADIUS * 0.35);
-      groupRef.current.position.y = ORBIT_Y + Math.sin(t * 0.4 + index * 1.2) * 0.1;
+      groupRef.current.position.y = ORBIT_Y + Math.sin(t * 0.3 + index * 1.2) * 0.08;
     }
 
     if (trailRef.current) {
       const mat = trailRef.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.1 + Math.sin(t * 1 + index * 0.4) * 0.06;
+      mat.opacity = 0.1 + Math.sin(t * 0.8 + index * 0.4) * 0.05;
     }
   });
 
@@ -57,23 +57,23 @@ function OrbitalMetricSatellite({
   return (
     <group ref={groupRef}>
       <Billboard follow lockX={false} lockY={false} lockZ={false}>
-        {/* Panel bg */}
+        {/* Panel bg — warm glass */}
         <mesh position={[0, 0, -0.01]}>
           <planeGeometry args={[1, 0.65]} />
-          <meshBasicMaterial color={color} transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} />
+          <meshBasicMaterial color={color} transparent opacity={0.012} blending={THREE.AdditiveBlending} depthWrite={false} />
         </mesh>
 
-        {/* Border */}
+        {/* Champagne border */}
         <lineSegments geometry={innerEdges} position={[0, 0, -0.005]}>
-          <lineBasicMaterial color={color} transparent opacity={0.15} depthWrite={false} />
+          <lineBasicMaterial color={color} transparent opacity={0.1} depthWrite={false} />
         </lineSegments>
 
-        {/* Label */}
-        <Text position={[0, 0.2, 0]} fontSize={0.06} color="#4a4a54" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.15}>
+        {/* Label — warm stone */}
+        <Text position={[0, 0.2, 0]} fontSize={0.06} color="#8a8578" anchorX="center" anchorY="middle" font={undefined} letterSpacing={0.15}>
           {metric.label.toUpperCase()}
         </Text>
 
-        {/* Value — LARGE dominant */}
+        {/* Value — champagne gold */}
         <Text position={[0, 0, 0]} fontSize={0.18} color={color} anchorX="center" anchorY="middle" font={undefined}>
           {typeof metric.value === "number" ? metric.value.toLocaleString() : String(metric.value)}
         </Text>
@@ -81,13 +81,13 @@ function OrbitalMetricSatellite({
         {/* Progress bar bg */}
         <mesh position={[0, -0.17, 0]}>
           <planeGeometry args={[0.75, 0.03]} />
-          <meshBasicMaterial color="#1a1a1e" transparent opacity={0.35} />
+          <meshBasicMaterial color="#12121a" transparent opacity={0.3} />
         </mesh>
 
-        {/* Progress bar fill */}
+        {/* Progress bar fill — champagne */}
         <mesh ref={trailRef} position={[-(0.75 - filledWidth) / 2, -0.17, 0.001]}>
           <planeGeometry args={[filledWidth || 0.001, 0.03]} />
-          <meshBasicMaterial color={color} transparent opacity={0.4} blending={THREE.AdditiveBlending} />
+          <meshBasicMaterial color={color} transparent opacity={0.35} blending={THREE.AdditiveBlending} />
         </mesh>
 
         {/* Percentage */}
@@ -112,9 +112,9 @@ function OrbitPath({ isCrisis }: { isCrisis?: boolean }) {
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
-      color: isCrisis ? "#b84a4a" : "#8a8a94",
+      color: isCrisis ? "#b84a4a" : "#C8A24A",
       transparent: true,
-      opacity: 0.05,
+      opacity: 0.035,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -123,7 +123,7 @@ function OrbitPath({ isCrisis }: { isCrisis?: boolean }) {
 
   useFrame(({ clock }) => {
     const mat = lineObj.material as THREE.LineBasicMaterial;
-    mat.opacity = 0.05 + Math.sin(clock.getElapsedTime() * 0.4) * 0.02;
+    mat.opacity = 0.035 + Math.sin(clock.getElapsedTime() * 0.3) * 0.015;
   });
 
   return <primitive object={lineObj} />;

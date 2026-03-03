@@ -28,13 +28,13 @@ function AdminPanelInner() {
   const retentionRate = totalMembers > 0 ? Math.round((activeMembers / totalMembers) * 100) : 0;
 
   const metricRings = [
-    { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#8a8a94" },
-    { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#6a7a8a" },
+    { label: "Members", value: totalMembers, max: totalMembers || 1, color: "#C8A24A" },
+    { label: "Activity", value: visitsMonth, max: totalMembers || 1, color: "#d4b86a" },
     { label: "VIP", value: vipCount, max: totalMembers || 1, color: "#C8A24A" },
     { label: "Retention", value: retentionRate, max: 100, color: "#5a8a6a" },
     { label: "Risk", value: churnRisk, max: totalMembers || 1, color: "#b84a4a" },
-    { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#8a8a94" },
-    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#6a7a8a" },
+    { label: "NOIR", value: noir, max: noir + sasso || 1, color: "#C8A24A" },
+    { label: "SASSO", value: sasso, max: noir + sasso || 1, color: "#8a7a62" },
   ];
 
   const handleCrisis = useCallback((crisis: boolean) => {
@@ -45,10 +45,10 @@ function AdminPanelInner() {
   return (
     <div
       className="h-screen w-screen overflow-hidden relative flex flex-col pt-safe"
-      style={{ backgroundColor: "#060608" }}
+      style={{ backgroundColor: "#0a0a0f" }}
     >
-      {/* 3D Industrial Headquarters Environment */}
-      <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: "#060608" }} />}>
+      {/* 3D Luxury Headquarters Environment */}
+      <Suspense fallback={<div className="absolute inset-0" style={{ backgroundColor: "#0a0a0f" }} />}>
         <InterstellarScene
           isListening={isListening}
           isCrisis={isCrisis}
@@ -60,32 +60,23 @@ function AdminPanelInner() {
         />
       </Suspense>
 
-      {/* Industrial depth overlay */}
+      {/* Warm champagne depth overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(6,6,8,0.4) 70%, rgba(6,6,8,0.85) 100%)",
+          background: "radial-gradient(ellipse at 50% 35%, transparent 25%, rgba(10,10,15,0.35) 65%, rgba(10,10,15,0.8) 100%)",
         }}
       />
 
-      {/* Subtle steel scan line texture */}
+      {/* Subtle warm champagne glow from center */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(138,138,148,0.004) 3px, rgba(138,138,148,0.004) 6px)",
-          mixBlendMode: "overlay",
+          background: "radial-gradient(ellipse at 50% 40%, rgba(200,162,74,0.015) 0%, transparent 50%)",
         }}
       />
 
-      {/* Top titanium edge line */}
-      <div
-        className="fixed top-0 left-0 right-0 h-px pointer-events-none z-[3]"
-        style={{
-          background: "linear-gradient(90deg, transparent 15%, rgba(138,138,148,0.08), transparent 85%)",
-        }}
-      />
-
-      {/* Strategic Header Strip */}
+      {/* Executive Status Bar */}
       <SystemStatusBar
         isCrisis={isCrisis}
         totalMembers={totalMembers}
@@ -112,19 +103,11 @@ function AdminPanelInner() {
         <div
           className="fixed inset-0 pointer-events-none z-30 transition-opacity duration-1000"
           style={{
-            background: "radial-gradient(ellipse at center, transparent 40%, rgba(160,30,30,0.06) 100%)",
-            boxShadow: "inset 0 0 200px rgba(180,30,30,0.04)",
+            background: "radial-gradient(ellipse at center, transparent 40%, rgba(160,30,30,0.05) 100%)",
+            boxShadow: "inset 0 0 200px rgba(180,30,30,0.03)",
           }}
         />
       )}
-
-      {/* Bottom titanium edge */}
-      <div
-        className="fixed bottom-0 left-0 right-0 h-px pointer-events-none z-[3]"
-        style={{
-          background: "linear-gradient(90deg, transparent 20%, rgba(138,138,148,0.05), transparent 80%)",
-        }}
-      />
     </div>
   );
 }

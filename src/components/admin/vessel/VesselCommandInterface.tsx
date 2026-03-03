@@ -19,14 +19,14 @@ type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachme
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-copilot`;
 
 const EXAMPLE_COMMANDS = [
-  "Executive summary. Key metrics. Anomalies.",
-  "Identify high-churn members. Recommend intervention.",
-  "NOIR vs SASSO performance. This month.",
-  "Top 10 high-growth members. Strategic insight.",
+  "NOIR engagement growth projection.",
+  "SASSO Riyadh VIP retention status.",
+  "High-value member tier elevation candidates.",
+  "Executive summary. Key metrics.",
+  "Brand performance comparison. This quarter.",
   "Predict churn risk. Next 30 days.",
-  "VIP campaign recommendation. Doha market.",
-  "Generate executive board report.",
-  "Deploy double points. 5 days. Doha.",
+  "VIP campaign recommendation. Doha.",
+  "Generate investor-ready board report.",
 ];
 
 async function streamChat({
@@ -447,31 +447,31 @@ export default function VesselCommandInterface({
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
             <div className="mb-6 flex flex-col items-center">
               <img src={riseLogo} alt="Rise" className="h-10 sm:h-12 w-auto mb-4 opacity-40" />
-              <div className="text-lg sm:text-xl font-mono tracking-[0.3em]" style={{ color: "#8a8a94" }}>
-                RISE INTELLIGENCE
+              <div className="text-lg sm:text-xl tracking-[0.3em]" style={{ color: "#C8A24A", fontFamily: "'Georgia', serif" }}>
+                RISE EXECUTIVE INTELLIGENCE
               </div>
-              <div className="text-[8px] mt-2 tracking-[0.25em] uppercase font-mono" style={{ color: "#3a3a44" }}>
-                Operational Command · Full Authority
+              <div className="text-[8px] mt-2 tracking-[0.25em] uppercase" style={{ color: "#8a8578", fontFamily: "'Georgia', serif" }}>
+                Global Luxury Intelligence
               </div>
             </div>
 
-            <div className="flex items-center gap-6 mb-8 text-[9px] uppercase tracking-[0.2em]">
+            <div className="flex items-center gap-6 mb-8 text-[9px] uppercase tracking-[0.2em]" style={{ fontFamily: "'Georgia', serif" }}>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#5a8a6a]" />
-                <span className="text-[#4a4a54]">System Online</span>
+                <span className="text-[#8a8578]">Online</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#C8A24A]" />
-                <span className="text-[#4a4a54]">Tools Active</span>
+                <span className="text-[#8a8578]">Tools Active</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#6a8aba]" />
-                <span className="text-[#4a4a54]">Image Gen</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d4b86a]" />
+                <span className="text-[#8a8578]">Image Gen</span>
               </div>
             </div>
 
-            <p className="text-[10px] max-w-md mb-5 leading-relaxed font-mono" style={{ color: "#3a3a44" }}>
-              Execute commands. Query intelligence. Generate assets. Manage operations.
+            <p className="text-[10px] max-w-md mb-5 leading-relaxed" style={{ color: "#8a8578", fontFamily: "'Georgia', serif" }}>
+              Query insights. Analyze performance. Generate reports.
             </p>
 
             <div className="flex flex-wrap gap-1.5 justify-center max-w-lg">
@@ -479,19 +479,20 @@ export default function VesselCommandInterface({
                 <button
                   key={cmd}
                   onClick={() => send(cmd)}
-                 className="text-[8px] px-3 py-2 rounded border font-mono transition-all duration-300"
+                 className="text-[8px] px-3 py-2 rounded border transition-all duration-400"
                    style={{
-                     borderColor: "rgba(138,138,148,0.06)",
-                     backgroundColor: "rgba(138,138,148,0.02)",
-                     color: "#4a4a54",
+                     borderColor: "rgba(200,162,74,0.06)",
+                     backgroundColor: "rgba(200,162,74,0.02)",
+                     color: "#8a8578",
+                     fontFamily: "'Georgia', serif",
                    }}
                    onMouseEnter={(e) => {
                      e.currentTarget.style.borderColor = "rgba(200,162,74,0.12)";
                      e.currentTarget.style.color = "#C8A24A";
                    }}
                    onMouseLeave={(e) => {
-                     e.currentTarget.style.borderColor = "rgba(138,138,148,0.06)";
-                     e.currentTarget.style.color = "#4a4a54";
+                     e.currentTarget.style.borderColor = "rgba(200,162,74,0.06)";
+                     e.currentTarget.style.color = "#8a8578";
                    }}
                 >
                   {cmd.length > 35 ? cmd.slice(0, 35) + "…" : cmd}
@@ -521,11 +522,12 @@ export default function VesselCommandInterface({
             <button
               key={cmd}
               onClick={() => send(cmd)}
-              className="shrink-0 text-[8px] px-2.5 py-1.5 rounded font-mono transition-all duration-300"
+              className="shrink-0 text-[8px] px-2.5 py-1.5 rounded transition-all duration-400"
               style={{
-                border: "1px solid rgba(138,138,148,0.05)",
-                backgroundColor: "rgba(138,138,148,0.02)",
-                color: "#3a3a44",
+                border: "1px solid rgba(200,162,74,0.05)",
+                backgroundColor: "rgba(200,162,74,0.02)",
+                color: "#8a8578",
+                fontFamily: "'Georgia', serif",
               }}
             >
               {cmd.length > 40 ? cmd.slice(0, 40) + "…" : cmd}
@@ -581,7 +583,7 @@ export default function VesselCommandInterface({
                 : "border-[rgba(200,162,74,0.06)]"
           )}
           style={{
-            backgroundColor: isListening ? "rgba(200,162,74,0.04)" : "rgba(10,10,12,0.5)",
+            backgroundColor: isListening ? "rgba(200,162,74,0.04)" : "rgba(10,10,15,0.5)",
           }}
         >
           {/* TTS toggle */}
@@ -631,8 +633,8 @@ export default function VesselCommandInterface({
             placeholder={isUploading ? "Uploading…" : isListening ? "Listening…" : "Command…"}
             className={cn(
               "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2 relative z-10",
-              "bg-transparent text-sm text-[rgba(220,218,214,0.8)] placeholder:text-[#4a4a54]/40",
-              "focus:outline-none focus:placeholder:text-[#4a4a54]/60",
+            "bg-transparent text-sm text-[rgba(240,236,228,0.8)] placeholder:text-[#8a8578]/40",
+              "focus:outline-none focus:placeholder:text-[#8a8578]/60",
               "transition-all duration-300"
             )}
             rows={1}
@@ -699,8 +701,8 @@ export default function VesselCommandInterface({
         </div>
 
         <div className="flex justify-center mt-2">
-          <span className="text-[7px] uppercase tracking-[0.35em] font-mono" style={{ color: "#3a3a44" }}>
-            {isUploading ? "◎ UPLOADING" : isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE HQ · INTELLIGENCE ACTIVE"}
+          <span className="text-[7px] uppercase tracking-[0.35em]" style={{ color: "#8a8578", fontFamily: "'Georgia', serif" }}>
+            {isUploading ? "◎ UPLOADING" : isListening ? "◉ LISTENING" : isLoading ? "◎ PROCESSING" : "RISE · EXECUTIVE INTELLIGENCE ACTIVE"}
           </span>
         </div>
       </div>
