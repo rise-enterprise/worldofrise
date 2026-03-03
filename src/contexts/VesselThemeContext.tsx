@@ -22,31 +22,31 @@ interface VesselThemeContextValue {
 }
 
 const NIGHT_COLORS = {
-  bg: "#08060a",
+  bg: "#0a0a0f",
   accent: "#C8A24A",
   grid: "#C8A24A",
-  glow: "#C8A24A",
+  glow: "#d4b86a",
   particle: "#C8A24A",
-  fog: "#08060a",
-  text: "#e8e4dc",
-  textMuted: "#6a6058",
+  fog: "#0a0a0f",
+  text: "#f0ece4",
+  textMuted: "#8a8578",
   border: "rgba(200,162,74,0.08)",
   corePrimary: "#C8A24A",
-  coreSecondary: "#00d4ff",
+  coreSecondary: "#d4b86a",
 };
 
 const DAY_COLORS = {
-  bg: "#f5f0e8",
-  accent: "#C8A24A",
-  grid: "#C8A24A",
+  bg: "#f8f5f0",
+  accent: "#b8944a",
+  grid: "#b8944a",
   glow: "#d4c088",
-  particle: "#C8A24A",
-  fog: "#ede5d5",
+  particle: "#b8944a",
+  fog: "#f0ece4",
   text: "#1a1510",
   textMuted: "#8a7d6a",
-  border: "rgba(200,162,74,0.15)",
-  corePrimary: "#C8A24A",
-  coreSecondary: "#b8944a",
+  border: "rgba(200,162,74,0.06)",
+  corePrimary: "#b8944a",
+  coreSecondary: "#8a7a62",
 };
 
 const VesselThemeContext = createContext<VesselThemeContextValue | null>(null);

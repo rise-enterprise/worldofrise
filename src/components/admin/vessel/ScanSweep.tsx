@@ -12,14 +12,14 @@ export default function ScanSweep({ isCrisis = false }: ScanSweepProps) {
 
   useFrame(({ clock }) => {
     if (ref.current) {
-      // Slower, more mechanical rotation
-      ref.current.rotation.y = clock.getElapsedTime() * 0.08;
+      // Very slow, elegant rotation — luxury showroom feel
+      ref.current.rotation.y = clock.getElapsedTime() * 0.03;
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.018 + Math.sin(clock.getElapsedTime() * 0.6) * 0.006;
+      mat.opacity = 0.012 + Math.sin(clock.getElapsedTime() * 0.3) * 0.004;
       if (isCrisis) {
-        mat.color.lerp(new THREE.Color("#b84a4a"), 0.04);
+        mat.color.lerp(new THREE.Color("#b84a4a"), 0.03);
       } else {
-        mat.color.lerp(new THREE.Color("#8a8a94"), 0.04);
+        mat.color.lerp(new THREE.Color("#C8A24A"), 0.03);
       }
     }
   });
@@ -34,9 +34,9 @@ export default function ScanSweep({ isCrisis = false }: ScanSweepProps) {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.95, 0]}>
       <shapeGeometry args={[shape]} />
       <meshBasicMaterial
-        color={isCrisis ? "#b84a4a" : "#8a8a94"}
+        color={isCrisis ? "#b84a4a" : "#C8A24A"}
         transparent
-        opacity={0.018}
+        opacity={0.012}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         side={THREE.DoubleSide}

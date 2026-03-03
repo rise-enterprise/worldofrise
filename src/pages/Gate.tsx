@@ -9,29 +9,29 @@ import { CursorGlow } from "@/components/effects/CursorGlow";
 function RISEParticleAssembly() {
   return (
     <div className="relative w-64 h-28 md:w-80 md:h-36 mx-auto flex items-center justify-center">
-      {/* Ambient glow behind text */}
+      {/* Warm champagne glow behind text */}
       <motion.div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at center, rgba(200,162,74,0.08) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse at center, rgba(200,162,74,0.1) 0%, transparent 70%)",
         }}
-        animate={{ opacity: [0.4, 0.7, 0.4] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        animate={{ opacity: [0.4, 0.8, 0.4] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* RISE text assembling from particles */}
+      {/* RISE text assembling */}
       <motion.div
         className="relative z-10"
         initial={{ opacity: 0, filter: "blur(12px)", scale: 0.9 }}
         animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-        transition={{ duration: 2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 2.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
         <h1
           className="text-5xl md:text-7xl font-bold tracking-[0.3em] select-none"
           style={{
             color: "#C8A24A",
-            textShadow: "0 0 40px rgba(200,162,74,0.15), 0 0 80px rgba(200,162,74,0.05)",
-            fontFamily: "'Inter', 'Helvetica Neue', sans-serif",
+            textShadow: "0 0 50px rgba(200,162,74,0.12), 0 0 100px rgba(200,162,74,0.04)",
+            fontFamily: "'Georgia', 'Times New Roman', serif",
             fontWeight: 700,
           }}
         >
@@ -39,54 +39,54 @@ function RISEParticleAssembly() {
         </h1>
       </motion.div>
 
-      {/* Particle scatter effect */}
-      {Array.from({ length: 20 }).map((_, i) => (
+      {/* Warm gold particle scatter */}
+      {Array.from({ length: 16 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-[2px] h-[2px] rounded-full"
+          className="absolute w-[1.5px] h-[1.5px] rounded-full"
           style={{
-            backgroundColor: i % 3 === 0 ? "#C8A24A" : "#8a8a94",
+            backgroundColor: "#C8A24A",
             left: `${15 + Math.random() * 70}%`,
             top: `${20 + Math.random() * 60}%`,
           }}
           initial={{
-            opacity: 0.8,
-            x: (Math.random() - 0.5) * 120,
-            y: (Math.random() - 0.5) * 80,
+            opacity: 0.6,
+            x: (Math.random() - 0.5) * 100,
+            y: (Math.random() - 0.5) * 60,
           }}
           animate={{
-            opacity: [0, 0.6, 0],
+            opacity: [0, 0.5, 0],
             x: 0,
             y: 0,
           }}
           transition={{
-            duration: 2,
-            delay: 0.2 + i * 0.08,
+            duration: 2.5,
+            delay: 0.3 + i * 0.1,
             ease: [0.16, 1, 0.3, 1],
           }}
         />
       ))}
 
-      {/* Siri-style concentric pulse rings */}
+      {/* Champagne concentric pulse rings */}
       {[1, 2, 3].map((ring) => (
         <motion.div
           key={ring}
           className="absolute inset-0 rounded-full"
           style={{
-            border: "1px solid rgba(138,138,148,0.06)",
+            border: "1px solid rgba(200,162,74,0.04)",
             borderRadius: "50%",
             margin: "auto",
             width: `${60 + ring * 30}%`,
             height: `${60 + ring * 40}%`,
           }}
           animate={{
-            scale: [1, 1.15, 1],
-            opacity: [0.3, 0.08, 0.3],
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.06, 0.3],
           }}
           transition={{
-            duration: 3 + ring * 0.5,
+            duration: 4 + ring * 0.6,
             repeat: Infinity,
-            delay: ring * 0.4,
+            delay: ring * 0.5,
             ease: "easeInOut",
           }}
         />
@@ -95,41 +95,41 @@ function RISEParticleAssembly() {
   );
 }
 
-/* ── Industrial depth lines ── */
-function IndustrialDepth() {
+/* ── Marble vein lines ── */
+function MarbleVeins() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {/* Horizontal steel line */}
+      {/* Organic warm stone vein — horizontal */}
       <motion.div
         className="absolute left-0 right-0 h-px"
         style={{
-          top: "30%",
-          background: "linear-gradient(90deg, transparent 10%, rgba(138,138,148,0.04), transparent 90%)",
+          top: "32%",
+          background: "linear-gradient(90deg, transparent 10%, rgba(200,162,74,0.03), transparent 90%)",
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
+        transition={{ delay: 1.5, duration: 1.5 }}
       />
       <motion.div
         className="absolute left-0 right-0 h-px"
         style={{
-          top: "70%",
-          background: "linear-gradient(90deg, transparent 15%, rgba(138,138,148,0.03), transparent 85%)",
+          top: "68%",
+          background: "linear-gradient(90deg, transparent 15%, rgba(200,162,74,0.025), transparent 85%)",
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.8 }}
+        transition={{ delay: 1.8, duration: 1.5 }}
       />
-      {/* Vertical accent */}
+      {/* Vertical champagne accent */}
       <motion.div
         className="absolute top-0 bottom-0 w-px"
         style={{
           left: "50%",
-          background: "linear-gradient(180deg, transparent 20%, rgba(200,162,74,0.03), transparent 80%)",
+          background: "linear-gradient(180deg, transparent 25%, rgba(200,162,74,0.02), transparent 75%)",
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
+        transition={{ delay: 2, duration: 1.5 }}
       />
     </div>
   );
@@ -148,10 +148,10 @@ const Gate = () => {
   if (showLogin) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
-        style={{ backgroundColor: "#060608" }}>
+        style={{ backgroundColor: "#0a0a0f" }}>
         <CursorGlow />
         <motion.div className="absolute top-4 right-4 z-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <ThemeToggle className="text-[#8a8a94]/60 hover:text-[#8a8a94]" />
+          <ThemeToggle className="text-[#8a8578]/60 hover:text-[#8a8578]" />
         </motion.div>
         <UnifiedLoginForm onBack={() => setShowLogin(false)} />
       </div>
@@ -161,30 +161,30 @@ const Gate = () => {
   return (
     <div
       className="min-h-screen text-foreground overflow-hidden relative flex flex-col items-center justify-center px-6"
-      style={{ backgroundColor: "#060608" }}
+      style={{ backgroundColor: "#0a0a0f" }}
     >
       <CursorGlow />
-      <IndustrialDepth />
+      <MarbleVeins />
 
       {/* Theme toggle */}
       <motion.div
         className="fixed top-4 right-4 z-50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
+        transition={{ delay: 2.5 }}
       >
-        <ThemeToggle className="text-[#8a8a94]/40 hover:text-[#8a8a94]" />
+        <ThemeToggle className="text-[#8a8578]/40 hover:text-[#8a8578]" />
       </motion.div>
 
       {/* System identifier */}
       <motion.span
-        className="text-[8px] tracking-[0.5em] uppercase font-mono mb-12"
-        style={{ color: "#4a4a54" }}
+        className="text-[8px] tracking-[0.5em] uppercase mb-12"
+        style={{ color: "#8a8578", fontFamily: "'Georgia', serif", letterSpacing: "0.5em" }}
         initial={{ opacity: 0, y: -15 }}
-        animate={{ opacity: loaded ? 1 : 0, y: loaded ? 0 : -15 }}
-        transition={{ duration: 1, delay: 0.3 }}
+        animate={{ opacity: loaded ? 0.6 : 0, y: loaded ? 0 : -15 }}
+        transition={{ duration: 1.2, delay: 0.3 }}
       >
-        ─── INTELLIGENCE HEADQUARTERS ───
+        GLOBAL LUXURY INTELLIGENCE
       </motion.span>
 
       {/* Particle Assembly RISE Logo */}
@@ -192,13 +192,13 @@ const Gate = () => {
 
       {/* Subtitle */}
       <motion.p
-        className="text-[9px] tracking-[0.35em] uppercase font-mono mt-8"
-        style={{ color: "#5a5a64" }}
+        className="text-[9px] tracking-[0.35em] uppercase mt-8"
+        style={{ color: "#8a8578", fontFamily: "'Georgia', serif" }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 2 }}
+        animate={{ opacity: 0.5 }}
+        transition={{ duration: 1.2, delay: 2.2 }}
       >
-        LOYALTY INTELLIGENCE · OPERATIONAL COMMAND
+        NOIR · SASSO · GLOBAL HOSPITALITY
       </motion.p>
 
       {/* CTA buttons */}
@@ -206,49 +206,51 @@ const Gate = () => {
         className="flex flex-col sm:flex-row items-center gap-4 mt-14"
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 2.4 }}
+        transition={{ duration: 1, delay: 2.6 }}
       >
-        {/* Enter Headquarters — matte steel button */}
+        {/* Enter — luxury minimal */}
         <motion.button
-          className="relative px-10 py-4 rounded-lg text-[10px] tracking-[0.3em] uppercase font-mono overflow-hidden transition-all duration-500"
+          className="relative px-12 py-4 rounded-lg text-[10px] tracking-[0.35em] uppercase overflow-hidden transition-all duration-500"
           style={{
-            backgroundColor: "rgba(200,162,74,0.06)",
-            border: "1px solid rgba(200,162,74,0.15)",
+            backgroundColor: "rgba(200,162,74,0.05)",
+            border: "1px solid rgba(200,162,74,0.12)",
             color: "#C8A24A",
+            fontFamily: "'Georgia', serif",
           }}
           whileHover={{
             scale: 1.02,
-            boxShadow: "0 0 40px -10px rgba(200,162,74,0.15)",
-            borderColor: "rgba(200,162,74,0.3)",
+            boxShadow: "0 0 50px -15px rgba(200,162,74,0.12)",
+            borderColor: "rgba(200,162,74,0.25)",
           }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowLogin(true)}
         >
-          {/* Metallic hover sweep */}
+          {/* Warm champagne hover sweep */}
           <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: "linear-gradient(105deg, transparent 40%, rgba(200,162,74,0.06) 50%, transparent 60%)",
+              background: "linear-gradient(105deg, transparent 40%, rgba(200,162,74,0.04) 50%, transparent 60%)",
             }}
             initial={{ x: "-100%" }}
             whileHover={{ x: "100%" }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           />
-          Enter Headquarters
+          Enter
         </motion.button>
 
-        {/* Request Invitation — minimal steel */}
+        {/* Request Access — warm stone */}
         <motion.button
-          className="px-10 py-4 rounded-lg text-[10px] tracking-[0.3em] uppercase font-mono transition-all duration-500"
+          className="px-10 py-4 rounded-lg text-[10px] tracking-[0.3em] uppercase transition-all duration-500"
           style={{
             backgroundColor: "transparent",
-            border: "1px solid rgba(138,138,148,0.08)",
-            color: "#5a5a64",
+            border: "1px solid rgba(200,162,74,0.06)",
+            color: "#8a8578",
+            fontFamily: "'Georgia', serif",
           }}
           whileHover={{
             scale: 1.02,
-            color: "#8a8a94",
-            borderColor: "rgba(138,138,148,0.15)",
+            color: "#C8A24A",
+            borderColor: "rgba(200,162,74,0.12)",
           }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/request-invitation")}
@@ -257,15 +259,15 @@ const Gate = () => {
         </motion.button>
       </motion.div>
 
-      {/* Bottom system line */}
+      {/* Bottom tagline */}
       <motion.p
-        className="absolute bottom-6 left-0 right-0 text-center text-[7px] tracking-[0.3em] uppercase font-mono"
-        style={{ color: "#3a3a44" }}
+        className="absolute bottom-6 left-0 right-0 text-center text-[7px] tracking-[0.4em] uppercase"
+        style={{ color: "#8a8578", fontFamily: "'Georgia', serif", opacity: 0.3 }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 3 }}
+        animate={{ opacity: 0.3 }}
+        transition={{ delay: 3.5, duration: 1.5 }}
       >
-        RISE · WHERE ACCESS IS ENGINEERED
+        RISE · GLOBAL HOSPITALITY INTELLIGENCE
       </motion.p>
     </div>
   );

@@ -2,14 +2,14 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-/* ── Brushed steel grid floor ── */
+/* ── Warm gold grid floor — marble shimmer ── */
 function GridFloor() {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.035 + Math.sin(clock.getElapsedTime() * 0.3) * 0.008;
+      mat.opacity = 0.02 + Math.sin(clock.getElapsedTime() * 0.2) * 0.006;
     }
   });
 
@@ -17,10 +17,10 @@ function GridFloor() {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
       <planeGeometry args={[50, 50, 50, 50]} />
       <meshBasicMaterial
-        color="#5a5a64"
+        color="#C8A24A"
         wireframe
         transparent
-        opacity={0.035}
+        opacity={0.02}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -34,10 +34,10 @@ function GridFloorSecondary() {
     <mesh rotation={[-Math.PI / 2, 0, Math.PI / 4]} position={[0, -3.03, 0]}>
       <planeGeometry args={[40, 40, 20, 20]} />
       <meshBasicMaterial
-        color="#3a3a44"
+        color="#d4b86a"
         wireframe
         transparent
-        opacity={0.012}
+        opacity={0.008}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -45,8 +45,8 @@ function GridFloorSecondary() {
   );
 }
 
-/* ── Industrial dust particles (steel-blue tones) ── */
-function DataStreams({ count = 350 }: { count?: number }) {
+/* ── Warm luminous gold particles ── */
+function LuminousParticles({ count = 250 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
@@ -67,11 +67,11 @@ function DataStreams({ count = 350 }: { count?: number }) {
     const pos = ref.current.geometry.attributes.position;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < count; i++) {
-      arr[i * 3 + 1] += delta * (0.8 + (i % 4) * 0.15);
+      arr[i * 3 + 1] += delta * (0.5 + (i % 4) * 0.1);
       if (arr[i * 3 + 1] > 12) arr[i * 3 + 1] = -12;
     }
     pos.needsUpdate = true;
-    ref.current.rotation.y += delta * 0.005;
+    ref.current.rotation.y += delta * 0.003;
   });
 
   return (
@@ -80,10 +80,10 @@ function DataStreams({ count = 350 }: { count?: number }) {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.025}
-        color="#6a7a8a"
+        size={0.02}
+        color="#C8A24A"
         transparent
-        opacity={0.1}
+        opacity={0.08}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -92,8 +92,8 @@ function DataStreams({ count = 350 }: { count?: number }) {
   );
 }
 
-/* ── Ambient particles ── */
-function AmbientParticles({ count = 120 }: { count?: number }) {
+/* ── Ambient warmth particles ── */
+function AmbientParticles({ count = 80 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
@@ -107,7 +107,7 @@ function AmbientParticles({ count = 120 }: { count?: number }) {
   }, [count]);
 
   useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.y += delta * 0.002;
+    if (ref.current) ref.current.rotation.y += delta * 0.001;
   });
 
   return (
@@ -116,10 +116,10 @@ function AmbientParticles({ count = 120 }: { count?: number }) {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.03}
-        color="#8a8a94"
+        size={0.025}
+        color="#d4b86a"
         transparent
-        opacity={0.08}
+        opacity={0.06}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -134,8 +134,8 @@ export default function HUDGrid({ isDay = false }: { isDay?: boolean }) {
     <group>
       <GridFloor />
       <GridFloorSecondary />
-      <DataStreams count={300} />
-      <AmbientParticles count={100} />
+      <LuminousParticles count={200} />
+      <AmbientParticles count={60} />
     </group>
   );
 }

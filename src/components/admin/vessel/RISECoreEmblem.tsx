@@ -12,7 +12,8 @@ interface RISECoreEmblemProps {
   isSpeaking?: boolean;
 }
 
-function WaveRing({ radius, speed, phase, isSpeaking, isProcessing, isCrisis }: {
+/* ── Elegant concentric halo rings ── */
+function HaloRing({ radius, speed, phase, isSpeaking, isProcessing, isCrisis }: {
   radius: number; speed: number; phase: number;
   isSpeaking?: boolean; isProcessing?: boolean; isCrisis?: boolean;
 }) {
@@ -21,30 +22,31 @@ function WaveRing({ radius, speed, phase, isSpeaking, isProcessing, isCrisis }: 
     if (!ref.current) return;
     const t = clock.getElapsedTime();
     const wave = Math.sin(t * speed + phase);
-    const mult = isSpeaking ? 1.6 : isProcessing ? 1.3 : 1;
-    ref.current.scale.setScalar(1 + wave * 0.08 * mult);
-    (ref.current.material as THREE.MeshBasicMaterial).opacity = 0.04 + Math.abs(wave) * 0.06 * mult;
+    const mult = isSpeaking ? 1.4 : isProcessing ? 1.2 : 1;
+    ref.current.scale.setScalar(1 + wave * 0.05 * mult);
+    (ref.current.material as THREE.MeshBasicMaterial).opacity = 0.03 + Math.abs(wave) * 0.04 * mult;
   });
   return (
     <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[radius - 0.008, radius + 0.008, 128]} />
-      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#8a8a94"} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <ringGeometry args={[radius - 0.005, radius + 0.005, 128]} />
+      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
 
-function LightPulse({ isCrisis, offset = 0 }: { isCrisis?: boolean; offset?: number }) {
+/* ── Gentle ambient glow pulse ── */
+function AmbientGlow({ isCrisis, offset = 0 }: { isCrisis?: boolean; offset?: number }) {
   const ref = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
     if (!ref.current) return;
-    const cycle = ((clock.getElapsedTime() * 0.4) + offset) % 3;
-    ref.current.scale.setScalar(1 + cycle * 1.2);
-    (ref.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.1 - cycle * 0.035);
+    const cycle = ((clock.getElapsedTime() * 0.25) + offset) % 4;
+    ref.current.scale.setScalar(1 + cycle * 0.8);
+    (ref.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.06 - cycle * 0.016);
   });
   return (
     <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
-      <ringGeometry args={[1.0, 1.03, 96]} />
-      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <ringGeometry args={[1.0, 1.02, 96]} />
+      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#d4b86a"} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
@@ -75,43 +77,54 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
     const t = clock.getElapsedTime();
     if (textRef.current) {
       const mat = textRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 0.6 + pulseIntensity * 1.2 * (isProcessing ? 1.5 : 1) + Math.sin(t * 2) * 0.15;
-      textRef.current.scale.setScalar(1 + Math.sin(t * 1.5) * 0.008);
+      mat.emissiveIntensity = 0.5 + pulseIntensity * 0.8 * (isProcessing ? 1.3 : 1) + Math.sin(t * 1.5) * 0.1;
+      textRef.current.scale.setScalar(1 + Math.sin(t * 1) * 0.005);
     }
     if (glowRef.current) {
-      (glowRef.current.material as THREE.MeshBasicMaterial).opacity = 0.06 + pulseIntensity * 0.1 + Math.sin(t * 2.5) * 0.02;
-      glowRef.current.scale.setScalar(1.05 + Math.sin(t * 1.5) * 0.01);
+      (glowRef.current.material as THREE.MeshBasicMaterial).opacity = 0.04 + pulseIntensity * 0.06 + Math.sin(t * 2) * 0.015;
+      glowRef.current.scale.setScalar(1.04 + Math.sin(t * 1) * 0.008);
     }
-    if (frameRef.current) frameRef.current.rotation.z = t * 0.015;
+    if (frameRef.current) frameRef.current.rotation.z = t * 0.008;
   });
 
   if (!textGeom) return <mesh><sphereGeometry args={[0.15, 16, 16]} /><meshBasicMaterial color="#C8A24A" transparent opacity={0.3} /></mesh>;
 
   return (
     <group>
+      {/* Crystal-like RISE text — high metalness, low roughness */}
       <mesh ref={textRef} geometry={textGeom}>
-        <meshStandardMaterial color={baseColor} emissive={baseColor} emissiveIntensity={0.6} metalness={0.92} roughness={0.15} transparent opacity={0.95} />
+        <meshStandardMaterial color={baseColor} emissive={baseColor} emissiveIntensity={0.5} metalness={0.95} roughness={0.08} transparent opacity={0.95} />
       </mesh>
+      {/* Soft outer glow */}
       <mesh ref={glowRef} geometry={textGeom}>
-        <meshBasicMaterial color={baseColor} transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color={baseColor} transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
-      <WaveRing radius={1.6} speed={2.0} phase={0} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
-      <WaveRing radius={1.9} speed={1.7} phase={1.2} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
-      <WaveRing radius={2.2} speed={1.4} phase={2.4} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
-      <WaveRing radius={2.5} speed={1.1} phase={3.6} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
-      <LightPulse isCrisis={isCrisis} />
-      <LightPulse isCrisis={isCrisis} offset={1.5} />
+
+      {/* Elegant concentric halos */}
+      <HaloRing radius={1.6} speed={1.2} phase={0} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
+      <HaloRing radius={1.9} speed={1.0} phase={1.2} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
+      <HaloRing radius={2.2} speed={0.8} phase={2.4} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
+      <HaloRing radius={2.5} speed={0.6} phase={3.6} isSpeaking={isSpeaking} isProcessing={isProcessing} isCrisis={isCrisis} />
+
+      {/* Gentle ambient glow pulses */}
+      <AmbientGlow isCrisis={isCrisis} />
+      <AmbientGlow isCrisis={isCrisis} offset={2} />
+
+      {/* Thin champagne gold torus frame */}
       <mesh ref={frameRef} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[2.4, 0.015, 8, 128]} />
-        <meshStandardMaterial color="#5a5a64" metalness={0.95} roughness={0.3} transparent opacity={0.3} />
+        <torusGeometry args={[2.4, 0.01, 8, 128]} />
+        <meshStandardMaterial color="#C8A24A" metalness={0.95} roughness={0.15} transparent opacity={0.25} />
       </mesh>
+      {/* Inner halo ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[1.8, 0.006, 8, 128]} />
-        <meshBasicMaterial color="#8a8a94" transparent opacity={0.08} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <torusGeometry args={[1.8, 0.004, 8, 128]} />
+        <meshBasicMaterial color="#d4b86a" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
+
+      {/* Floor ambient circle */}
       <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[2.5, 64]} />
-        <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.02} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );
