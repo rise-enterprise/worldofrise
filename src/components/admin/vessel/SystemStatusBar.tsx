@@ -1,7 +1,4 @@
-import { cn } from "@/lib/utils";
-import { Sun, Moon } from "lucide-react";
-import { useVesselTheme } from "@/contexts/VesselThemeContext";
-import { useAIPersonality, PERSONALITIES } from "@/contexts/AIPersonalityContext";
+import { useAIPersonality, PERSONALITIES, type AIPersonality } from "@/contexts/AIPersonalityContext";
 
 interface SystemStatusBarProps {
   isCrisis: boolean;
@@ -20,112 +17,74 @@ export default function SystemStatusBar({
   vipCount,
   churnRisk,
 }: SystemStatusBarProps) {
-  const { isDay, toggleMode } = useVesselTheme();
-  const { personality, config, setPersonality } = useAIPersonality();
-  const modes = Object.values(PERSONALITIES);
+  const { personality, setPersonality, config } = useAIPersonality();
 
   return (
     <div
-      className={cn(
-        "relative z-20 flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-2.5 transition-all duration-700 gap-1.5 sm:gap-0",
-      )}
+      className="relative z-20 flex items-center justify-between px-4 sm:px-6 py-2.5 shrink-0"
       style={{
-        borderBottom: `1px solid ${isCrisis ? "rgba(184,74,74,0.15)" : "rgba(200,162,74,0.06)"}`,
-        backgroundColor: isCrisis ? "rgba(184,74,74,0.03)" : "rgba(10,10,12,0.7)",
-        backdropFilter: "blur(24px)",
+        backgroundColor: "rgba(6,6,8,0.85)",
+        backdropFilter: "blur(20px) saturate(1.2)",
+        borderBottom: `1px solid ${isCrisis ? "rgba(184,74,74,0.12)" : "rgba(138,138,148,0.06)"}`,
       }}
     >
-      {/* Left — System identity + health */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className={cn(
-          "w-1.5 h-1.5 rounded-full",
-          isCrisis ? "bg-[#b84a4a] animate-pulse" : "bg-[#5a8a6a]"
-        )} />
-        <span
-          className="text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-medium"
-          style={{ color: isCrisis ? "#b84a4a" : config.accentHex }}
-        >
-          {isCrisis ? "ALERT ACTIVE" : "RISE TACTICAL"}
-        </span>
-        <div className="w-px h-3 bg-[rgba(200,162,74,0.08)]" />
-        <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.15em] text-[#5a5a64]">
-          {config.label}
-        </span>
-      </div>
-
-      {/* Center — Mode selector + key metrics */}
-      <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto scrollbar-hide w-full sm:w-auto justify-start sm:justify-center">
-        {/* Mode pills */}
-        <div className="flex items-center gap-0.5 shrink-0">
-          {modes.map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() => setPersonality(mode.id)}
-              className={cn(
-                "text-[7px] sm:text-[8px] uppercase tracking-wider px-2 py-1 rounded transition-all duration-300 border whitespace-nowrap",
-                personality === mode.id
-                  ? "border-current/20"
-                  : "border-transparent opacity-30 hover:opacity-60"
-              )}
-              style={{
-                color: personality === mode.id ? mode.accentHex : "#4a4a54",
-                backgroundColor: personality === mode.id ? `${mode.accentHex}0a` : "transparent",
-              }}
-              title={mode.label}
-            >
-              {mode.id === "strategic" ? "STR" :
-               mode.id === "expansion" ? "EXP" :
-               mode.id === "neural" ? "NRL" :
-               mode.id === "investor" ? "INV" : "RSK"}
-            </button>
-          ))}
-        </div>
-
-        <div className="w-px h-3.5 shrink-0 bg-[rgba(200,162,74,0.06)]" />
-
-        {/* Key metrics — large dominant numbers */}
-        <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-          <TacticalMetric label="MEMBERS" value={totalMembers.toLocaleString()} />
-          <TacticalMetric label="ACTIVE" value={activeMembers.toLocaleString()} />
-          <span className="hidden sm:inline-flex">
-            <TacticalMetric label="VISITS" value={visitsMonth.toLocaleString()} />
+      {/* Left: System identity */}
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{
+              backgroundColor: isCrisis ? "#b84a4a" : "#5a8a6a",
+              boxShadow: isCrisis ? "0 0 8px rgba(184,74,74,0.5)" : "0 0 6px rgba(90,138,106,0.3)",
+            }}
+          />
+          <span className="text-[9px] uppercase tracking-[0.25em] font-mono" style={{ color: isCrisis ? "#b84a4a" : "#8a8a94" }}>
+            {isCrisis ? "ALERT ACTIVE" : "RISE INTELLIGENCE SYSTEM"}
           </span>
-          <TacticalMetric label="VIP" value={vipCount.toLocaleString()} accent />
-          <TacticalMetric label="RISK" value={churnRisk.toLocaleString()} warn={churnRisk > totalMembers * 0.3} />
+        </div>
+
+        {/* Mode selector — titanium pills */}
+        <div className="hidden md:flex items-center gap-1">
+          {(Object.keys(PERSONALITIES) as AIPersonality[]).map((p) => {
+            const pc = PERSONALITIES[p];
+            const active = personality === p;
+            return (
+              <button
+                key={p}
+                onClick={() => setPersonality(p)}
+                className="px-2.5 py-1 rounded text-[8px] uppercase tracking-[0.15em] font-mono transition-all duration-300"
+                style={{
+                  backgroundColor: active ? "rgba(138,138,148,0.08)" : "transparent",
+                  color: active ? pc.accentHex : "#4a4a54",
+                  border: active ? `1px solid ${pc.accentHex}15` : "1px solid transparent",
+                }}
+              >
+                {pc.icon} {pc.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Right — Toggle + Time */}
-      <div className="flex items-center gap-3 shrink-0">
-        <button
-          onClick={toggleMode}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] sm:text-[9px] uppercase tracking-wider transition-all duration-500 border border-[rgba(200,162,74,0.08)] text-[#C8A24A]/50 hover:text-[#C8A24A]/80 hover:bg-[rgba(200,162,74,0.04)]"
-        >
-          {isDay ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
-          {isDay ? "Night" : "Day"}
-        </button>
-        <span className="hidden sm:inline text-[10px] tabular-nums tracking-wider text-[#4a4a54]">
-          {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
-        </span>
+      {/* Right: Metrics strip */}
+      <div className="flex items-center gap-4 sm:gap-6">
+        {[
+          { label: "MEMBERS", value: totalMembers, color: "#8a8a94" },
+          { label: "ACTIVE", value: activeMembers, color: "#5a8a6a" },
+          { label: "VISITS/MO", value: visitsMonth, color: "#8a8a94" },
+          { label: "VIP", value: vipCount, color: "#C8A24A" },
+          { label: "AT RISK", value: churnRisk, color: "#b84a4a" },
+        ].map(({ label, value, color }) => (
+          <div key={label} className="hidden sm:flex flex-col items-end">
+            <span className="text-[7px] uppercase tracking-[0.2em] font-mono" style={{ color: "#4a4a54" }}>
+              {label}
+            </span>
+            <span className="text-[11px] font-mono tabular-nums" style={{ color }}>
+              {value.toLocaleString()}
+            </span>
+          </div>
+        ))}
       </div>
-    </div>
-  );
-}
-
-function TacticalMetric({ label, value, warn, accent }: { label: string; value: string; warn?: boolean; accent?: boolean }) {
-  return (
-    <div className="flex flex-col items-center gap-0 shrink-0">
-      <span className="text-[7px] sm:text-[8px] uppercase tracking-[0.15em] text-[#4a4a54]">
-        {label}
-      </span>
-      <span
-        className="text-[12px] sm:text-[14px] font-mono tabular-nums font-medium tracking-wide"
-        style={{
-          color: warn ? "#b84a4a" : accent ? "#C8A24A" : "rgba(220,218,214,0.7)",
-        }}
-      >
-        {value}
-      </span>
     </div>
   );
 }

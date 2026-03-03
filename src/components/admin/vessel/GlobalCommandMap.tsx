@@ -42,7 +42,7 @@ function TacticalGlobe() {
   });
 
   const GLOBE_R = 2.2;
-  const gridColor = "#C8A24A";
+  const gridColor = "#5a5a64";
 
   return (
     <group ref={globeRef}>
@@ -163,7 +163,7 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
   const beamRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
-  const gold = "#C8A24A";
+  const gold = "#C8A24A"; // Gold accent only for city beacons
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
