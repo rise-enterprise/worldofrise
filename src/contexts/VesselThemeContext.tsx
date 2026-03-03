@@ -1,68 +1,34 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-
-type VesselMode = "day" | "night";
+import { createContext, useContext, ReactNode } from "react";
 
 interface VesselThemeContextValue {
-  mode: VesselMode;
-  toggleMode: () => void;
-  isDay: boolean;
   colors: {
     bg: string;
+    surface: string;
     accent: string;
-    grid: string;
-    glow: string;
-    particle: string;
-    fog: string;
+    accentLight: string;
     text: string;
     textMuted: string;
     border: string;
-    corePrimary: string;
-    coreSecondary: string;
+    sand: string;
   };
 }
 
-const NIGHT_COLORS = {
-  bg: "#0a0a0f",
+const COLORS = {
+  bg: "#faf8f5",
+  surface: "#ffffff",
   accent: "#C8A24A",
-  grid: "#C8A24A",
-  glow: "#d4b86a",
-  particle: "#C8A24A",
-  fog: "#0a0a0f",
-  text: "#f0ece4",
-  textMuted: "#8a8578",
-  border: "rgba(200,162,74,0.08)",
-  corePrimary: "#C8A24A",
-  coreSecondary: "#d4b86a",
-};
-
-const DAY_COLORS = {
-  bg: "#f8f5f0",
-  accent: "#b8944a",
-  grid: "#b8944a",
-  glow: "#d4c088",
-  particle: "#b8944a",
-  fog: "#f0ece4",
+  accentLight: "#d4b86a",
   text: "#1a1510",
   textMuted: "#8a7d6a",
-  border: "rgba(200,162,74,0.06)",
-  corePrimary: "#b8944a",
-  coreSecondary: "#8a7a62",
+  border: "rgba(200,162,74,0.08)",
+  sand: "#f3efe8",
 };
 
-const VesselThemeContext = createContext<VesselThemeContextValue | null>(null);
+const VesselThemeContext = createContext<VesselThemeContextValue>({ colors: COLORS });
 
 export function VesselThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<VesselMode>("night");
-
-  const toggleMode = useCallback(() => {
-    setMode(prev => prev === "day" ? "night" : "day");
-  }, []);
-
-  const isDay = mode === "day";
-  const colors = isDay ? DAY_COLORS : NIGHT_COLORS;
-
   return (
-    <VesselThemeContext.Provider value={{ mode, toggleMode, isDay, colors }}>
+    <VesselThemeContext.Provider value={{ colors: COLORS }}>
       {children}
     </VesselThemeContext.Provider>
   );

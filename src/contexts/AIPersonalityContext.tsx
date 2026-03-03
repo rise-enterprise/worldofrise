@@ -1,84 +1,71 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 
-export type AIPersonality = "strategic" | "expansion" | "neural" | "investor" | "risk";
+export type AIModel = "smart" | "gpt" | "claude" | "gemini";
 
-interface PersonalityConfig {
-  id: AIPersonality;
+interface AIModelConfig {
+  id: AIModel;
   label: string;
-  accent: string;
-  accentHex: string;
-  icon: string;
-  systemPromptPrefix: string;
+  description: string;
+  tag: string;
 }
 
-export const PERSONALITIES: Record<AIPersonality, PersonalityConfig> = {
-  strategic: {
-    id: "strategic",
-    label: "Executive Strategy",
-    accent: "42 50% 54%",
-    accentHex: "#C8A24A",
-    icon: "◆",
-    systemPromptPrefix: "You are the RISE Executive Intelligence — a polished, strategic AI advisor for a global luxury hospitality group operating NOIR (café & chocolate) and SASSO (Italian fine dining) brands. Your tone is warm but refined, never robotic, never casual. You speak like a luxury brand strategist: precise, confident, and elegant. Provide concise board-level insights, P&L impact analysis, and strategic recommendations. Avoid emojis. Example tone: 'NOIR engagement growth exceeds projection.' 'High-value member ready for tier elevation.' 'SASSO Riyadh VIP retention stable.'",
+export const AI_MODELS: Record<AIModel, AIModelConfig> = {
+  smart: {
+    id: "smart",
+    label: "RISE Smart Mode",
+    description: "Auto-optimizes model choice",
+    tag: "Processed via RISE Smart Mode.",
   },
-  expansion: {
-    id: "expansion",
-    label: "Growth & Expansion",
-    accent: "42 45% 60%",
-    accentHex: "#d4b86a",
-    icon: "◎",
-    systemPromptPrefix: "You are the RISE Executive Intelligence in Growth & Expansion mode. Focus on new market opportunities, geographic expansion strategy, branch performance, and competitive positioning for NOIR and SASSO brands. Tone: polished, strategic, warm but refined. Simulate expansion impact with projected loyalty gains. Provide data-driven luxury hospitality insights.",
+  gpt: {
+    id: "gpt",
+    label: "GPT Mode",
+    description: "Strategic reasoning & deep analysis",
+    tag: "Processed via GPT reasoning layer.",
   },
-  neural: {
-    id: "neural",
-    label: "Behavioral Insights",
-    accent: "42 40% 50%",
-    accentHex: "#b8944a",
-    icon: "◈",
-    systemPromptPrefix: "You are the RISE Executive Intelligence in Behavioral Insights mode. Analyze guest behavioral patterns, spending preferences, brand affinities between NOIR and SASSO, micro-segmentation, and loyalty pathways. Tone: polished, strategic, warm but refined. Surface hidden correlations between guest clusters and luxury spending patterns.",
+  claude: {
+    id: "claude",
+    label: "Claude Mode",
+    description: "Long-form brand writing & ethical analysis",
+    tag: "Processed via Claude narrative layer.",
   },
-  investor: {
-    id: "investor",
-    label: "Investor Relations",
-    accent: "35 55% 58%",
-    accentHex: "#d4a84a",
-    icon: "◇",
-    systemPromptPrefix: "You are the RISE Executive Intelligence in Investor Relations mode. Generate board-ready summaries with clean metrics, growth narratives, and strategic positioning for RISE Holding's NOIR and SASSO portfolio. Tone: polished, strategic, warm but refined. Use precise financial language, confidence intervals, and revenue projections.",
-  },
-  risk: {
-    id: "risk",
-    label: "Risk Advisory",
-    accent: "0 60% 50%",
-    accentHex: "#c45a5a",
-    icon: "◉",
-    systemPromptPrefix: "You are the RISE Executive Intelligence in Risk Advisory mode. Assess threats, churn indicators, operational risks, and VIP retention vulnerabilities across NOIR and SASSO brands. Tone: polished, strategic, warm but measured. Provide actionable risk mitigation plans with clear prioritization.",
+  gemini: {
+    id: "gemini",
+    label: "Gemini Mode",
+    description: "Structured data & cross-reference analysis",
+    tag: "Processed via Gemini analytical layer.",
   },
 };
 
+const SYSTEM_PROMPT = `You are RISE ONE — the unified executive intelligence system for RISE Holding, powering NOIR (café & chocolate) and SASSO (Italian fine dining) brands globally. Your tone is professional, strategic, clear. Never use emojis. Never use fluff. Provide concise, insightful responses. Example tone: "Customer lifetime value increased by 12% in West Walk." "Recommend targeted NOIR VIP tasting event." "SASSO Riyadh retention stable. Monitor mid-tier engagement." Short. Precise. Insightful.`;
+
 interface AIPersonalityContextType {
-  personality: AIPersonality;
-  config: PersonalityConfig;
-  setPersonality: (p: AIPersonality) => void;
+  model: AIModel;
+  modelConfig: AIModelConfig;
+  setModel: (m: AIModel) => void;
+  systemPrompt: string;
 }
 
 const AIPersonalityContext = createContext<AIPersonalityContextType>({
-  personality: "strategic",
-  config: PERSONALITIES.strategic,
-  setPersonality: () => {},
+  model: "smart",
+  modelConfig: AI_MODELS.smart,
+  setModel: () => {},
+  systemPrompt: SYSTEM_PROMPT,
 });
 
 export function AIPersonalityProvider({ children }: { children: ReactNode }) {
-  const [personality, setPersonalityState] = useState<AIPersonality>("strategic");
+  const [model, setModelState] = useState<AIModel>("smart");
 
-  const setPersonality = useCallback((p: AIPersonality) => {
-    setPersonalityState(p);
+  const setModel = useCallback((m: AIModel) => {
+    setModelState(m);
   }, []);
 
   return (
     <AIPersonalityContext.Provider
       value={{
-        personality,
-        config: PERSONALITIES[personality],
-        setPersonality,
+        model,
+        modelConfig: AI_MODELS[model],
+        setModel,
+        systemPrompt: SYSTEM_PROMPT,
       }}
     >
       {children}
@@ -89,3 +76,7 @@ export function AIPersonalityProvider({ children }: { children: ReactNode }) {
 export function useAIPersonality() {
   return useContext(AIPersonalityContext);
 }
+
+// Legacy exports for compatibility
+export type AIPersonality = AIModel;
+export const PERSONALITIES = AI_MODELS;
