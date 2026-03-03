@@ -2,14 +2,14 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-/* ── Tactical grid floor ── */
+/* ── Brushed steel grid floor ── */
 function GridFloor() {
   const ref = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
     if (ref.current) {
       const mat = ref.current.material as THREE.MeshBasicMaterial;
-      mat.opacity = 0.04 + Math.sin(clock.getElapsedTime() * 0.3) * 0.01;
+      mat.opacity = 0.035 + Math.sin(clock.getElapsedTime() * 0.3) * 0.008;
     }
   });
 
@@ -17,10 +17,10 @@ function GridFloor() {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
       <planeGeometry args={[50, 50, 50, 50]} />
       <meshBasicMaterial
-        color="#C8A24A"
+        color="#5a5a64"
         wireframe
         transparent
-        opacity={0.04}
+        opacity={0.035}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -34,10 +34,10 @@ function GridFloorSecondary() {
     <mesh rotation={[-Math.PI / 2, 0, Math.PI / 4]} position={[0, -3.03, 0]}>
       <planeGeometry args={[40, 40, 20, 20]} />
       <meshBasicMaterial
-        color="#C8A24A"
+        color="#3a3a44"
         wireframe
         transparent
-        opacity={0.015}
+        opacity={0.012}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
@@ -45,7 +45,7 @@ function GridFloorSecondary() {
   );
 }
 
-/* ── Controlled data stream particles ── */
+/* ── Industrial dust particles (steel-blue tones) ── */
 function DataStreams({ count = 350 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
 
@@ -67,11 +67,11 @@ function DataStreams({ count = 350 }: { count?: number }) {
     const pos = ref.current.geometry.attributes.position;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < count; i++) {
-      arr[i * 3 + 1] += delta * (1 + (i % 4) * 0.2);
+      arr[i * 3 + 1] += delta * (0.8 + (i % 4) * 0.15);
       if (arr[i * 3 + 1] > 12) arr[i * 3 + 1] = -12;
     }
     pos.needsUpdate = true;
-    ref.current.rotation.y += delta * 0.008;
+    ref.current.rotation.y += delta * 0.005;
   });
 
   return (
@@ -80,10 +80,10 @@ function DataStreams({ count = 350 }: { count?: number }) {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.03}
-        color="#C8A24A"
+        size={0.025}
+        color="#6a7a8a"
         transparent
-        opacity={0.15}
+        opacity={0.1}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -107,7 +107,7 @@ function AmbientParticles({ count = 120 }: { count?: number }) {
   }, [count]);
 
   useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.y += delta * 0.003;
+    if (ref.current) ref.current.rotation.y += delta * 0.002;
   });
 
   return (
@@ -116,10 +116,10 @@ function AmbientParticles({ count = 120 }: { count?: number }) {
         <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.04}
-        color="#C8A24A"
+        size={0.03}
+        color="#8a8a94"
         transparent
-        opacity={0.12}
+        opacity={0.08}
         sizeAttenuation
         blending={THREE.AdditiveBlending}
         depthWrite={false}
