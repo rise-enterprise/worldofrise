@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Button } from './button';
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
     const root = document.documentElement;
