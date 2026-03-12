@@ -33,13 +33,48 @@ function AdminPanelInner() {
         }}
       />
 
-      {/* Soft warm glow */}
+      {/* Slow drifting warm glow */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 30%, rgba(200,162,74,0.03) 0%, transparent 60%)",
+          background: "radial-gradient(ellipse at 50% 30%, rgba(200,162,74,0.04) 0%, transparent 60%)",
+          animation: "glowDrift 20s ease-in-out infinite",
         }}
       />
+
+      {/* Floating ambient particles */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div
+            key={`particle-${i}`}
+            className="absolute rounded-full"
+            style={{
+              width: 2 + (i % 3),
+              height: 2 + (i % 3),
+              left: `${8 + i * 9}%`,
+              bottom: `-${4 + (i % 5) * 2}px`,
+              backgroundColor: "#C8A24A",
+              opacity: 0.08 + (i % 4) * 0.04,
+              animation: `floatUp ${12 + i * 2}s linear ${i * 1.5}s infinite`,
+            }}
+          />
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes glowDrift {
+          0%, 100% { background-position: 50% 30%; }
+          25% { background-position: 40% 25%; }
+          50% { background-position: 55% 35%; }
+          75% { background-position: 60% 28%; }
+        }
+        @keyframes floatUp {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          10% { opacity: 0.15; }
+          90% { opacity: 0.08; }
+          100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+        }
+      `}</style>
 
       <SystemStatusBar
         isCrisis={isCrisis}

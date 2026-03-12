@@ -779,6 +779,27 @@ export default function VesselCommandInterface({
           0% { transform: scale(1); opacity: 0.3; }
           100% { transform: scale(1.8); opacity: 0; }
         }
+        @keyframes sonarPulse {
+          0% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+          100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+        }
+        @keyframes orbitDot {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes statusPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+        @keyframes shimmerText {
+          0% { background-position: 200% 0; }
+          50% { background-position: -200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        @keyframes spinArc {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
       `}</style>
     </div>
   );
