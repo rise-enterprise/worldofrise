@@ -531,10 +531,10 @@ export default function VesselCommandInterface({
               />
             </div>
 
-            <div className="text-lg tracking-[0.2em] font-medium mb-1 relative overflow-hidden" style={{ color: "#1a1510" }}>
-              <span style={{ animation: "shimmerText 6s ease-in-out infinite", backgroundImage: "linear-gradient(90deg, #1a1510 0%, #1a1510 40%, #C8A24A 50%, #1a1510 60%, #1a1510 100%)", backgroundSize: "200% 100%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>RISE ONE</span>
+            <div className="text-lg tracking-[0.2em] font-medium mb-1 relative overflow-hidden" style={{ color: `rgb(var(--vessel-text-alpha))` }}>
+              <span style={{ animation: "shimmerText 6s ease-in-out infinite", backgroundImage: `linear-gradient(90deg, rgb(var(--vessel-text-alpha)) 0%, rgb(var(--vessel-text-alpha)) 40%, rgb(var(--vessel-gold-alpha)) 50%, rgb(var(--vessel-text-alpha)) 60%, rgb(var(--vessel-text-alpha)) 100%)`, backgroundSize: "200% 100%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>RISE ONE</span>
             </div>
-            <div className="text-[10px] tracking-[0.15em] uppercase mb-8" style={{ color: "#8a7d6a" }}>
+            <div className="text-[10px] tracking-[0.15em] uppercase mb-8" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
               Executive Intelligence
             </div>
 
