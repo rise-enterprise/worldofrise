@@ -605,9 +605,9 @@ export default function VesselCommandInterface({
               onClick={() => send(cmd)}
               className="shrink-0 text-[9px] px-3 py-1.5 rounded-lg transition-all duration-300"
               style={{
-                border: "1px solid rgba(200,162,74,0.08)",
-                backgroundColor: "rgba(200,162,74,0.02)",
-                color: "#8a7d6a",
+                border: `1px solid rgba(var(--vessel-gold-alpha), 0.08)`,
+                backgroundColor: `rgba(var(--vessel-gold-alpha), 0.02)`,
+                color: `rgb(var(--vessel-muted-alpha))`,
               }}
             >
               {cmd}
