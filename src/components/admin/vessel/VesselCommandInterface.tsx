@@ -540,11 +540,11 @@ export default function VesselCommandInterface({
 
             <div className="flex items-center gap-5 mb-6 text-[9px] uppercase tracking-[0.15em]">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#5a8a6a" }} />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#5a8a6a", animation: "statusPulse 3s ease-in-out infinite" }} />
                 <span style={{ color: "#8a7d6a" }}>Online</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C8A24A" }} />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C8A24A", animation: "statusPulse 3s ease-in-out 1s infinite" }} />
                 <span style={{ color: "#8a7d6a" }}>Tools Active</span>
               </div>
             </div>
