@@ -210,6 +210,19 @@
     --bevel-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.8);
     --bevel-shadow: inset 0 -1px 0 0 hsl(220 10% 50% / 0.1);
     --bevel-gold: inset 0 1px 0 0 hsl(var(--gold-light) / 0.4);
+
+    /* Vessel tokens for Light mode */
+    --vessel-bg: 40 15% 97%;
+    --vessel-surface: 0 0% 100%;
+    --vessel-text: 220 14% 10%;
+    --vessel-muted: 220 10% 45%;
+    --vessel-gold: 42 60% 42%;
+    --vessel-surface-alpha: 255,255,255;
+    --vessel-text-alpha: 26,21,16;
+    --vessel-muted-alpha: 138,125,106;
+    --vessel-gold-alpha: 200,162,74;
+    --vessel-green-alpha: 90,138,106;
+    --vessel-red-alpha: 184,74,74;
   }
 
   /* ═══════════════════════════════════════════════════════════
