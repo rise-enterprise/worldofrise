@@ -652,7 +652,7 @@ export default function VesselCommandInterface({
                 : "border-[rgba(200,162,74,0.1)]"
           )}
           style={{
-            backgroundColor: isListening ? "rgba(200,162,74,0.04)" : "rgba(255,255,255,0.7)",
+            backgroundColor: isListening ? `rgba(var(--vessel-gold-alpha), 0.04)` : `rgba(var(--vessel-surface-alpha), 0.7)`,
           }}
         >
           {/* TTS toggle */}
