@@ -414,32 +414,119 @@ export default function VesselCommandInterface({
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
-            {/* AI Core Circle */}
-            <div className="relative mb-8">
+            {/* AI Core Circle with Live Motion */}
+            <div className="relative mb-8" style={{ width: 200, height: 200 }}>
+              {/* Sonar pulse rings */}
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={`sonar-${i}`}
+                  className="absolute rounded-full pointer-events-none"
+                  style={{
+                    top: "50%", left: "50%",
+                    width: 112, height: 112,
+                    transform: "translate(-50%, -50%)",
+                    border: "1px solid rgba(200,162,74,0.15)",
+                    animation: `sonarPulse ${isLoading ? "2.5s" : "4.5s"} ease-out ${i * (isLoading ? 0.8 : 1.5)}s infinite`,
+                  }}
+                />
+              ))}
+
+              {/* Orbiting particles */}
+              {[
+                { r: 62, dur: 8, size: 3, opacity: 0.5 },
+                { r: 62, dur: 12, size: 2, opacity: 0.35, offset: 120 },
+                { r: 62, dur: 10, size: 2.5, opacity: 0.45, offset: 200 },
+                { r: 78, dur: 14, size: 2, opacity: 0.3 },
+                { r: 78, dur: 9, size: 3, opacity: 0.4, offset: 90 },
+                { r: 78, dur: 16, size: 1.5, opacity: 0.25, offset: 250 },
+              ].map((p, i) => (
+                <div
+                  key={`orbit-${i}`}
+                  className="absolute pointer-events-none"
+                  style={{
+                    top: "50%", left: "50%",
+                    width: p.r * 2, height: p.r * 2,
+                    marginLeft: -p.r, marginTop: -p.r,
+                    animation: `orbitDot ${isListening ? p.dur * 0.6 : p.dur}s linear ${(p.offset || 0) / 360 * p.dur}s infinite`,
+                  }}
+                >
+                  <div
+                    className="absolute rounded-full"
+                    style={{
+                      width: p.size, height: p.size,
+                      top: 0, left: "50%",
+                      marginLeft: -p.size / 2,
+                      backgroundColor: "#C8A24A",
+                      opacity: p.opacity,
+                      boxShadow: "0 0 6px rgba(200,162,74,0.4)",
+                    }}
+                  />
+                </div>
+              ))}
+
+              {/* Loading arc */}
+              {isLoading && (
+                <svg
+                  className="absolute"
+                  style={{ top: "50%", left: "50%", marginLeft: -56, marginTop: -56 }}
+                  width={112} height={112}
+                  viewBox="0 0 112 112"
+                >
+                  <circle
+                    cx={56} cy={56} r={52}
+                    fill="none"
+                    stroke="rgba(200,162,74,0.3)"
+                    strokeWidth={1.5}
+                    strokeDasharray="60 268"
+                    strokeLinecap="round"
+                    style={{ animation: "spinArc 1.8s linear infinite", transformOrigin: "center" }}
+                  />
+                </svg>
+              )}
+
+              {/* Outer ring */}
               <div
-                className="w-28 h-28 rounded-full flex items-center justify-center"
+                className="absolute rounded-full"
                 style={{
+                  top: "50%", left: "50%",
+                  width: 112, height: 112,
+                  transform: "translate(-50%, -50%)",
                   background: "radial-gradient(circle, rgba(200,162,74,0.08) 0%, rgba(200,162,74,0.02) 60%, transparent 100%)",
                   border: "1px solid rgba(200,162,74,0.12)",
                 }}
+              />
+
+              {/* Inner core */}
+              <div
+                className="absolute rounded-full flex items-center justify-center"
+                style={{
+                  top: "50%", left: "50%",
+                  width: 80, height: 80,
+                  transform: "translate(-50%, -50%)",
+                  background: isListening
+                    ? "radial-gradient(circle, rgba(200,162,74,0.18) 0%, transparent 70%)"
+                    : "radial-gradient(circle, rgba(200,162,74,0.1) 0%, transparent 70%)",
+                  border: "1px solid rgba(200,162,74,0.08)",
+                  animation: `breathe ${isLoading ? "2s" : "4s"} ease-in-out infinite`,
+                  boxShadow: isLoading
+                    ? "0 0 40px rgba(200,162,74,0.15)"
+                    : isListening
+                      ? "0 0 30px rgba(200,162,74,0.12)"
+                      : "0 0 20px rgba(200,162,74,0.06)",
+                }}
               >
-                <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center"
-                  style={{
-                    background: "radial-gradient(circle, rgba(200,162,74,0.1) 0%, transparent 70%)",
-                    border: "1px solid rgba(200,162,74,0.08)",
-                    animation: "breathe 4s ease-in-out infinite",
-                  }}
-                >
-                  <img src={riseLogo} alt="RISE" className="h-8 w-auto opacity-60" />
-                </div>
+                <img src={riseLogo} alt="RISE" className="h-8 w-auto opacity-60" />
               </div>
+
               {/* Breathing glow */}
               <div
-                className="absolute inset-0 rounded-full pointer-events-none"
+                className="absolute rounded-full pointer-events-none"
                 style={{
+                  top: "50%", left: "50%",
+                  width: 140, height: 140,
+                  transform: "translate(-50%, -50%)",
                   background: "radial-gradient(circle, rgba(200,162,74,0.06) 0%, transparent 70%)",
-                  animation: "breathe 4s ease-in-out infinite",
+                  animation: `breathe ${isLoading ? "2s" : "4s"} ease-in-out infinite`,
                 }}
               />
             </div>
