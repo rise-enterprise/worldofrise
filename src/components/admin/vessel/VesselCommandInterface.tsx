@@ -764,7 +764,7 @@ export default function VesselCommandInterface({
         </div>
 
         <div className="flex justify-center mt-2">
-          <span className="text-[8px] uppercase tracking-[0.2em]" style={{ color: "#8a7d6a" }}>
+          <span className="text-[8px] uppercase tracking-[0.2em]" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
             {isUploading ? "UPLOADING" : isListening ? "LISTENING" : isLoading ? "PROCESSING" : "RISE ONE · ACTIVE"}
           </span>
         </div>

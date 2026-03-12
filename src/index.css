@@ -212,27 +212,62 @@
     --bevel-gold: inset 0 1px 0 0 hsl(var(--gold-light) / 0.4);
   }
 
-  /* Dark mode same as root */
+  /* ═══════════════════════════════════════════════════════════
+     VESSEL TOKENS — Light Mode (Pearl/Sand)
+  ═══════════════════════════════════════════════════════════ */
+  :root {
+    --vessel-bg: 40 25% 97%;               /* #faf8f5 */
+    --vessel-surface: 0 0% 100%;           /* #ffffff */
+    --vessel-text: 30 18% 9%;              /* #1a1510 */
+    --vessel-muted: 33 13% 47%;            /* #8a7d6a */
+    --vessel-gold: 42 56% 53%;             /* #C8A24A */
+    --vessel-surface-alpha: 255,255,255;
+    --vessel-text-alpha: 26,21,16;
+    --vessel-muted-alpha: 138,125,106;
+    --vessel-gold-alpha: 200,162,74;
+    --vessel-green-alpha: 90,138,106;
+    --vessel-red-alpha: 184,74,74;
+  }
+
+  /* Dark mode — Velvet Noir */
   .dark {
-    --background: 220 14% 4%;
-    --foreground: 220 20% 93%;
-    --card: 220 12% 7%;
-    --card-foreground: 220 20% 93%;
-    --popover: 220 12% 6%;
-    --popover-foreground: 220 20% 93%;
+    --background: 260 20% 4%;              /* #0c0b10 */
+    --foreground: 35 18% 92%;              /* #f0ece4 */
+    --card: 260 14% 10%;                   /* #16151c */
+    --card-foreground: 35 18% 92%;
+    --popover: 260 16% 8%;
+    --popover-foreground: 35 18% 92%;
     --primary: 42 50% 54%;
-    --primary-foreground: 220 14% 4%;
-    --secondary: 220 10% 10%;
-    --secondary-foreground: 220 20% 93%;
-    --muted: 220 10% 12%;
-    --muted-foreground: 220 10% 60%;
+    --primary-foreground: 260 20% 4%;
+    --secondary: 260 10% 12%;
+    --secondary-foreground: 35 18% 92%;
+    --muted: 260 10% 14%;
+    --muted-foreground: 33 10% 55%;
     --accent: 195 62% 32%;
-    --accent-foreground: 220 20% 93%;
+    --accent-foreground: 35 18% 92%;
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 20%;
-    --input: 220 12% 15%;
+    --border: 260 12% 20%;
+    --input: 260 12% 16%;
     --ring: 42 50% 54%;
+
+    /* Vessel tokens — Dark */
+    --vessel-bg: 260 20% 4%;               /* #0c0b10 */
+    --vessel-surface: 260 14% 10%;         /* #16151c */
+    --vessel-text: 35 18% 92%;             /* #f0ece4 */
+    --vessel-muted: 33 10% 55%;            /* #8a8578 */
+    --vessel-gold: 42 56% 53%;             /* #C8A24A */
+    --vessel-surface-alpha: 22,21,28;
+    --vessel-text-alpha: 240,236,228;
+    --vessel-muted-alpha: 138,133,120;
+    --vessel-gold-alpha: 200,162,74;
+    --vessel-green-alpha: 90,138,106;
+    --vessel-red-alpha: 184,74,74;
+
+    /* Sidebar Dark */
+    --sidebar-background: 260 18% 5%;
+    --sidebar-foreground: 35 18% 92%;
+    --sidebar-border: 260 12% 16%;
   }
 }
 

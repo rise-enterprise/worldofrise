@@ -1,6 +1,7 @@
 import { useAIPersonality, AI_MODELS, type AIModel } from "@/contexts/AIPersonalityContext";
 import { ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface SystemStatusBarProps {
   isCrisis: boolean;
@@ -37,9 +38,9 @@ export default function SystemStatusBar({
     <div
       className="relative z-20 flex items-center justify-between px-4 sm:px-6 py-3 shrink-0"
       style={{
-        backgroundColor: "rgba(255,255,255,0.85)",
+        backgroundColor: `rgba(var(--vessel-surface-alpha), 0.85)`,
         backdropFilter: "blur(24px) saturate(1.2)",
-        borderBottom: `1px solid ${isCrisis ? "rgba(184,74,74,0.12)" : "rgba(200,162,74,0.08)"}`,
+        borderBottom: `1px solid ${isCrisis ? `rgba(var(--vessel-red-alpha), 0.12)` : `rgba(var(--vessel-gold-alpha), 0.08)`}`,
       }}
     >
       {/* Left: Identity + Model selector */}
@@ -48,11 +49,11 @@ export default function SystemStatusBar({
           <span
             className="w-1.5 h-1.5 rounded-full"
             style={{
-              backgroundColor: isCrisis ? "#b84a4a" : "#5a8a6a",
-              boxShadow: isCrisis ? "0 0 6px rgba(184,74,74,0.3)" : "0 0 4px rgba(90,138,106,0.2)",
+              backgroundColor: isCrisis ? `rgb(var(--vessel-red-alpha))` : `rgb(var(--vessel-green-alpha))`,
+              boxShadow: isCrisis ? `0 0 6px rgba(var(--vessel-red-alpha), 0.3)` : `0 0 4px rgba(var(--vessel-green-alpha), 0.2)`,
             }}
           />
-          <span className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: "#1a1510" }}>
+          <span className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: `rgb(var(--vessel-text-alpha))` }}>
             RISE ONE
           </span>
         </div>
@@ -63,9 +64,9 @@ export default function SystemStatusBar({
             onClick={() => setShowDropdown(!showDropdown)}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] uppercase tracking-[0.1em] transition-all duration-300"
             style={{
-              backgroundColor: "rgba(200,162,74,0.06)",
-              border: "1px solid rgba(200,162,74,0.1)",
-              color: "#C8A24A",
+              backgroundColor: `rgba(var(--vessel-gold-alpha), 0.06)`,
+              border: `1px solid rgba(var(--vessel-gold-alpha), 0.1)`,
+              color: `rgb(var(--vessel-gold-alpha))`,
             }}
           >
             {modelConfig.label}
@@ -76,9 +77,9 @@ export default function SystemStatusBar({
             <div
               className="absolute top-full mt-1 left-0 rounded-xl py-1.5 min-w-[220px] z-50"
               style={{
-                backgroundColor: "#ffffff",
-                border: "1px solid rgba(200,162,74,0.1)",
-                boxShadow: "0 12px 40px -8px rgba(0,0,0,0.08)",
+                backgroundColor: `rgb(var(--vessel-surface-alpha))`,
+                border: `1px solid rgba(var(--vessel-gold-alpha), 0.1)`,
+                boxShadow: "0 12px 40px -8px rgba(0,0,0,0.15)",
               }}
             >
               {(Object.keys(AI_MODELS) as AIModel[]).map((m) => {
@@ -88,12 +89,15 @@ export default function SystemStatusBar({
                   <button
                     key={m}
                     onClick={() => { setModel(m); setShowDropdown(false); }}
-                    className="w-full text-left px-4 py-2.5 transition-all duration-200 hover:bg-[rgba(200,162,74,0.04)]"
+                    className="w-full text-left px-4 py-2.5 transition-all duration-200"
+                    style={{ backgroundColor: active ? `rgba(var(--vessel-gold-alpha), 0.06)` : "transparent" }}
+                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = `rgba(var(--vessel-gold-alpha), 0.04)`; }}
+                    onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = "transparent"; }}
                   >
-                    <div className="text-[10px] uppercase tracking-[0.1em] font-medium" style={{ color: active ? "#C8A24A" : "#1a1510" }}>
+                    <div className="text-[10px] uppercase tracking-[0.1em] font-medium" style={{ color: active ? `rgb(var(--vessel-gold-alpha))` : `rgb(var(--vessel-text-alpha))` }}>
                       {mc.label}
                     </div>
-                    <div className="text-[9px] mt-0.5" style={{ color: "#8a7d6a" }}>
+                    <div className="text-[9px] mt-0.5" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
                       {mc.description}
                     </div>
                   </button>
@@ -104,17 +108,18 @@ export default function SystemStatusBar({
         </div>
       </div>
 
-      {/* Right: Metrics */}
+      {/* Right: Theme toggle + Metrics */}
       <div className="flex items-center gap-4 sm:gap-6">
+        <ThemeToggle className="h-8 w-8" />
         {[
-          { label: "MEMBERS", value: totalMembers, color: "#C8A24A" },
-          { label: "ACTIVE", value: activeMembers, color: "#5a8a6a" },
-          { label: "VISITS/MO", value: visitsMonth, color: "#1a1510" },
-          { label: "VIP", value: vipCount, color: "#C8A24A" },
-          { label: "AT RISK", value: churnRisk, color: "#b84a4a" },
+          { label: "MEMBERS", value: totalMembers, color: `rgb(var(--vessel-gold-alpha))` },
+          { label: "ACTIVE", value: activeMembers, color: `rgb(var(--vessel-green-alpha))` },
+          { label: "VISITS/MO", value: visitsMonth, color: `rgb(var(--vessel-text-alpha))` },
+          { label: "VIP", value: vipCount, color: `rgb(var(--vessel-gold-alpha))` },
+          { label: "AT RISK", value: churnRisk, color: `rgb(var(--vessel-red-alpha))` },
         ].map(({ label, value, color }) => (
           <div key={label} className="hidden sm:flex flex-col items-end">
-            <span className="text-[7px] uppercase tracking-[0.15em]" style={{ color: "#8a7d6a" }}>
+            <span className="text-[7px] uppercase tracking-[0.15em]" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
               {label}
             </span>
             <span className="text-[12px] font-mono tabular-nums font-medium" style={{ color }}>

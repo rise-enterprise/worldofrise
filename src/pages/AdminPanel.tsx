@@ -24,12 +24,15 @@ function AdminPanelInner() {
   }, []);
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative flex flex-col" style={{ backgroundColor: "#faf8f5" }}>
-      {/* Subtle sand gradient */}
+    <div
+      className="h-screen w-screen overflow-hidden relative flex flex-col transition-colors duration-300"
+      style={{ backgroundColor: "hsl(var(--vessel-bg))" }}
+    >
+      {/* Subtle gradient */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
-          background: "linear-gradient(180deg, #faf8f5 0%, #f3efe8 40%, #faf8f5 100%)",
+          background: "linear-gradient(180deg, hsl(var(--vessel-bg)) 0%, hsl(var(--vessel-bg) / 0.85) 40%, hsl(var(--vessel-bg)) 100%)",
         }}
       />
 
@@ -37,7 +40,7 @@ function AdminPanelInner() {
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 30%, rgba(200,162,74,0.04) 0%, transparent 60%)",
+          background: `radial-gradient(ellipse at 50% 30%, rgba(var(--vessel-gold-alpha), 0.04) 0%, transparent 60%)`,
           animation: "glowDrift 20s ease-in-out infinite",
         }}
       />
@@ -53,7 +56,7 @@ function AdminPanelInner() {
               height: 2 + (i % 3),
               left: `${8 + i * 9}%`,
               bottom: `-${4 + (i % 5) * 2}px`,
-              backgroundColor: "#C8A24A",
+              backgroundColor: `rgb(var(--vessel-gold-alpha))`,
               opacity: 0.08 + (i % 4) * 0.04,
               animation: `floatUp ${12 + i * 2}s linear ${i * 1.5}s infinite`,
             }}
