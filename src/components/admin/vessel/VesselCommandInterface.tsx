@@ -531,25 +531,25 @@ export default function VesselCommandInterface({
               />
             </div>
 
-            <div className="text-lg tracking-[0.2em] font-medium mb-1 relative overflow-hidden" style={{ color: "#1a1510" }}>
-              <span style={{ animation: "shimmerText 6s ease-in-out infinite", backgroundImage: "linear-gradient(90deg, #1a1510 0%, #1a1510 40%, #C8A24A 50%, #1a1510 60%, #1a1510 100%)", backgroundSize: "200% 100%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>RISE ONE</span>
+            <div className="text-lg tracking-[0.2em] font-medium mb-1 relative overflow-hidden" style={{ color: `rgb(var(--vessel-text-alpha))` }}>
+              <span style={{ animation: "shimmerText 6s ease-in-out infinite", backgroundImage: `linear-gradient(90deg, rgb(var(--vessel-text-alpha)) 0%, rgb(var(--vessel-text-alpha)) 40%, rgb(var(--vessel-gold-alpha)) 50%, rgb(var(--vessel-text-alpha)) 60%, rgb(var(--vessel-text-alpha)) 100%)`, backgroundSize: "200% 100%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>RISE ONE</span>
             </div>
-            <div className="text-[10px] tracking-[0.15em] uppercase mb-8" style={{ color: "#8a7d6a" }}>
+            <div className="text-[10px] tracking-[0.15em] uppercase mb-8" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
               Executive Intelligence
             </div>
 
             <div className="flex items-center gap-5 mb-6 text-[9px] uppercase tracking-[0.15em]">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#5a8a6a", animation: "statusPulse 3s ease-in-out infinite" }} />
-                <span style={{ color: "#8a7d6a" }}>Online</span>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `rgb(var(--vessel-green-alpha))`, animation: "statusPulse 3s ease-in-out infinite" }} />
+                <span style={{ color: `rgb(var(--vessel-muted-alpha))` }}>Online</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C8A24A", animation: "statusPulse 3s ease-in-out 1s infinite" }} />
-                <span style={{ color: "#8a7d6a" }}>Tools Active</span>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `rgb(var(--vessel-gold-alpha))`, animation: "statusPulse 3s ease-in-out 1s infinite" }} />
+                <span style={{ color: `rgb(var(--vessel-muted-alpha))` }}>Tools Active</span>
               </div>
             </div>
 
-            <p className="text-[11px] max-w-md mb-6 leading-relaxed" style={{ color: "#8a7d6a" }}>
+            <p className="text-[11px] max-w-md mb-6 leading-relaxed" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
               Query insights. Analyze performance. Generate reports.
             </p>
 
@@ -560,19 +560,19 @@ export default function VesselCommandInterface({
                   onClick={() => send(cmd)}
                   className="text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300"
                   style={{
-                    border: "1px solid rgba(200,162,74,0.1)",
-                    backgroundColor: "rgba(200,162,74,0.03)",
-                    color: "#8a7d6a",
+                    border: `1px solid rgba(var(--vessel-gold-alpha), 0.1)`,
+                    backgroundColor: `rgba(var(--vessel-gold-alpha), 0.03)`,
+                    color: `rgb(var(--vessel-muted-alpha))`,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(200,162,74,0.2)";
-                    e.currentTarget.style.backgroundColor = "rgba(200,162,74,0.06)";
-                    e.currentTarget.style.color = "#C8A24A";
+                    e.currentTarget.style.borderColor = `rgba(var(--vessel-gold-alpha), 0.2)`;
+                    e.currentTarget.style.backgroundColor = `rgba(var(--vessel-gold-alpha), 0.06)`;
+                    e.currentTarget.style.color = `rgb(var(--vessel-gold-alpha))`;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(200,162,74,0.1)";
-                    e.currentTarget.style.backgroundColor = "rgba(200,162,74,0.03)";
-                    e.currentTarget.style.color = "#8a7d6a";
+                    e.currentTarget.style.borderColor = `rgba(var(--vessel-gold-alpha), 0.1)`;
+                    e.currentTarget.style.backgroundColor = `rgba(var(--vessel-gold-alpha), 0.03)`;
+                    e.currentTarget.style.color = `rgb(var(--vessel-muted-alpha))`;
                   }}
                 >
                   {cmd}
@@ -605,9 +605,9 @@ export default function VesselCommandInterface({
               onClick={() => send(cmd)}
               className="shrink-0 text-[9px] px-3 py-1.5 rounded-lg transition-all duration-300"
               style={{
-                border: "1px solid rgba(200,162,74,0.08)",
-                backgroundColor: "rgba(200,162,74,0.02)",
-                color: "#8a7d6a",
+                border: `1px solid rgba(var(--vessel-gold-alpha), 0.08)`,
+                backgroundColor: `rgba(var(--vessel-gold-alpha), 0.02)`,
+                color: `rgb(var(--vessel-muted-alpha))`,
               }}
             >
               {cmd}
@@ -652,7 +652,7 @@ export default function VesselCommandInterface({
                 : "border-[rgba(200,162,74,0.1)]"
           )}
           style={{
-            backgroundColor: isListening ? "rgba(200,162,74,0.04)" : "rgba(255,255,255,0.7)",
+            backgroundColor: isListening ? `rgba(var(--vessel-gold-alpha), 0.04)` : `rgba(var(--vessel-surface-alpha), 0.7)`,
           }}
         >
           {/* TTS toggle */}
@@ -701,7 +701,7 @@ export default function VesselCommandInterface({
               "bg-transparent text-sm placeholder:text-[#8a7d6a]/40",
               "focus:outline-none transition-all duration-300"
             )}
-            style={{ color: "#1a1510" }}
+            style={{ color: `rgb(var(--vessel-text-alpha))` }}
             rows={1}
           />
 
@@ -764,7 +764,7 @@ export default function VesselCommandInterface({
         </div>
 
         <div className="flex justify-center mt-2">
-          <span className="text-[8px] uppercase tracking-[0.2em]" style={{ color: "#8a7d6a" }}>
+          <span className="text-[8px] uppercase tracking-[0.2em]" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
             {isUploading ? "UPLOADING" : isListening ? "LISTENING" : isLoading ? "PROCESSING" : "RISE ONE · ACTIVE"}
           </span>
         </div>

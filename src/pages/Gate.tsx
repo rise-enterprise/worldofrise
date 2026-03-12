@@ -6,14 +6,12 @@ import UnifiedLoginForm from "@/components/auth/UnifiedLoginForm";
 function RISELogo() {
   return (
     <div className="relative w-64 h-28 md:w-80 md:h-36 mx-auto flex items-center justify-center">
-      {/* Soft warm glow */}
       <motion.div
         className="absolute inset-0"
-        style={{ background: "radial-gradient(ellipse at center, rgba(200,162,74,0.06) 0%, transparent 70%)" }}
+        style={{ background: `radial-gradient(ellipse at center, rgba(var(--vessel-gold-alpha), 0.06) 0%, transparent 70%)` }}
         animate={{ opacity: [0.5, 0.8, 0.5] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
       />
-
       <motion.div
         className="relative z-10"
         initial={{ opacity: 0, scale: 0.95 }}
@@ -22,19 +20,17 @@ function RISELogo() {
       >
         <h1
           className="text-5xl md:text-7xl font-bold tracking-[0.3em] select-none"
-          style={{ color: "#C8A24A", fontWeight: 700 }}
+          style={{ color: `rgb(var(--vessel-gold-alpha))`, fontWeight: 700 }}
         >
           RISE
         </h1>
       </motion.div>
-
-      {/* Subtle concentric rings */}
       {[1, 2].map((ring) => (
         <motion.div
           key={ring}
           className="absolute rounded-full"
           style={{
-            border: "1px solid rgba(200,162,74,0.06)",
+            border: `1px solid rgba(var(--vessel-gold-alpha), 0.06)`,
             margin: "auto",
             width: `${60 + ring * 30}%`,
             height: `${60 + ring * 40}%`,
@@ -60,21 +56,19 @@ const Gate = () => {
 
   if (showLogin) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden" style={{ backgroundColor: "#faf8f5" }}>
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden transition-colors duration-300" style={{ backgroundColor: "hsl(var(--vessel-bg))" }}>
         <UnifiedLoginForm onBack={() => setShowLogin(false)} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen overflow-hidden relative flex flex-col items-center justify-center px-6" style={{ backgroundColor: "#faf8f5" }}>
-      {/* Subtle sand gradient */}
-      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, #faf8f5 0%, #f3efe8 50%, #faf8f5 100%)" }} />
+    <div className="min-h-screen overflow-hidden relative flex flex-col items-center justify-center px-6 transition-colors duration-300" style={{ backgroundColor: "hsl(var(--vessel-bg))" }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, hsl(var(--vessel-bg)) 0%, hsl(var(--vessel-bg) / 0.85) 50%, hsl(var(--vessel-bg)) 100%)" }} />
 
-      {/* Label */}
       <motion.span
         className="relative text-[9px] tracking-[0.4em] uppercase mb-12"
-        style={{ color: "#8a7d6a" }}
+        style={{ color: `rgb(var(--vessel-muted-alpha))` }}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: loaded ? 0.6 : 0, y: loaded ? 0 : -10 }}
         transition={{ duration: 1, delay: 0.3 }}
@@ -84,10 +78,9 @@ const Gate = () => {
 
       <RISELogo />
 
-      {/* Subtitle */}
       <motion.p
         className="relative text-[10px] tracking-[0.25em] uppercase mt-6"
-        style={{ color: "#8a7d6a" }}
+        style={{ color: `rgb(var(--vessel-muted-alpha))` }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.5 }}
         transition={{ duration: 1, delay: 1.5 }}
@@ -95,7 +88,6 @@ const Gate = () => {
         NOIR · SASSO · GLOBAL HOSPITALITY
       </motion.p>
 
-      {/* CTAs */}
       <motion.div
         className="relative flex flex-col sm:flex-row items-center gap-4 mt-14"
         initial={{ opacity: 0, y: 10 }}
@@ -105,11 +97,11 @@ const Gate = () => {
         <motion.button
           className="px-12 py-4 rounded-lg text-[10px] tracking-[0.3em] uppercase transition-all duration-400"
           style={{
-            backgroundColor: "#C8A24A",
+            backgroundColor: `rgb(var(--vessel-gold-alpha))`,
             color: "#ffffff",
             border: "none",
           }}
-          whileHover={{ scale: 1.02, boxShadow: "0 8px 30px -8px rgba(200,162,74,0.3)" }}
+          whileHover={{ scale: 1.02, boxShadow: `0 8px 30px -8px rgba(var(--vessel-gold-alpha), 0.3)` }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowLogin(true)}
         >
@@ -120,10 +112,10 @@ const Gate = () => {
           className="px-10 py-4 rounded-lg text-[10px] tracking-[0.25em] uppercase transition-all duration-400"
           style={{
             backgroundColor: "transparent",
-            border: "1px solid rgba(200,162,74,0.15)",
-            color: "#8a7d6a",
+            border: `1px solid rgba(var(--vessel-gold-alpha), 0.15)`,
+            color: `rgb(var(--vessel-muted-alpha))`,
           }}
-          whileHover={{ scale: 1.02, borderColor: "rgba(200,162,74,0.3)", color: "#C8A24A" }}
+          whileHover={{ scale: 1.02, borderColor: `rgba(var(--vessel-gold-alpha), 0.3)`, color: `rgb(var(--vessel-gold-alpha))` }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/request-invitation")}
         >
@@ -131,10 +123,9 @@ const Gate = () => {
         </motion.button>
       </motion.div>
 
-      {/* Footer */}
       <motion.p
         className="absolute bottom-6 left-0 right-0 text-center text-[8px] tracking-[0.3em] uppercase"
-        style={{ color: "#8a7d6a", opacity: 0.3 }}
+        style={{ color: `rgb(var(--vessel-muted-alpha))`, opacity: 0.3 }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.3 }}
         transition={{ delay: 3, duration: 1 }}
