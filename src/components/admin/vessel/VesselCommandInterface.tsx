@@ -560,19 +560,19 @@ export default function VesselCommandInterface({
                   onClick={() => send(cmd)}
                   className="text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300"
                   style={{
-                    border: "1px solid rgba(200,162,74,0.1)",
-                    backgroundColor: "rgba(200,162,74,0.03)",
-                    color: "#8a7d6a",
+                    border: `1px solid rgba(var(--vessel-gold-alpha), 0.1)`,
+                    backgroundColor: `rgba(var(--vessel-gold-alpha), 0.03)`,
+                    color: `rgb(var(--vessel-muted-alpha))`,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(200,162,74,0.2)";
-                    e.currentTarget.style.backgroundColor = "rgba(200,162,74,0.06)";
-                    e.currentTarget.style.color = "#C8A24A";
+                    e.currentTarget.style.borderColor = `rgba(var(--vessel-gold-alpha), 0.2)`;
+                    e.currentTarget.style.backgroundColor = `rgba(var(--vessel-gold-alpha), 0.06)`;
+                    e.currentTarget.style.color = `rgb(var(--vessel-gold-alpha))`;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "rgba(200,162,74,0.1)";
-                    e.currentTarget.style.backgroundColor = "rgba(200,162,74,0.03)";
-                    e.currentTarget.style.color = "#8a7d6a";
+                    e.currentTarget.style.borderColor = `rgba(var(--vessel-gold-alpha), 0.1)`;
+                    e.currentTarget.style.backgroundColor = `rgba(var(--vessel-gold-alpha), 0.03)`;
+                    e.currentTarget.style.color = `rgb(var(--vessel-muted-alpha))`;
                   }}
                 >
                   {cmd}
