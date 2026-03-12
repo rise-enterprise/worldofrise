@@ -1,142 +1,68 @@
 
 
-# Plan: Ultra-Luxury Global Hospitality Intelligence Platform
+# Plan: Add Dark & Day Mode to RISE ONE
 
 ## Overview
 
-Strip all industrial/warehouse/superhero aesthetics. Replace with an ultra-luxury hospitality aesthetic: pearl white, champagne gold, Italian marble textures, deep noir accents. Think private banking + luxury fashion house + Apple minimalism.
+The entire admin dashboard and gate currently use hardcoded light colors (`#faf8f5`, `#1a1510`, `#ffffff`, etc.). This plan makes all components theme-aware so toggling dark/light mode applies consistently everywhere.
 
-## Design Tokens
+## Approach
+
+Use a CSS class-based theme (`dark`/`light` on `<html>`) with CSS custom properties. The existing `.light` and `.dark` CSS variable definitions in `index.css` already exist. We'll add a `ThemeToggle` button to the admin status bar and replace all hardcoded hex colors with CSS variable references or conditional logic.
+
+## Dark Mode Palette (for admin/vessel components)
 
 ```text
-DARK MODE (Velvet Noir):
-  Background:     #0a0a0f (deep velvet black)
-  Surface:        #12121a (dark silk)
-  Card:           rgba(255,255,255,0.03) (glass)
-  Gold Accent:    #C8A24A (champagne gold — signature)
-  Gold Light:     #d4b86a (warm champagne)
-  Text Primary:   #f0ece4 (warm ivory)
-  Text Muted:     #8a8578 (warm stone)
-  Border:         rgba(200,162,74,0.08)
-  NOIR Brand:     #1a1a1a + #C8A24A
-  SASSO Brand:    #e8e2d8 + #8a7a62
-
-LIGHT MODE (Pearl & Marble):
-  Background:     #f8f5f0 (pearl white)
-  Surface:        #ffffff
-  Card:           rgba(200,162,74,0.03) (champagne glass)
-  Gold Accent:    #b8944a (brushed champagne)
-  Text Primary:   #1a1510 (deep noir)
-  Text Muted:     #8a7d6a (warm stone)
-  Border:         rgba(200,162,74,0.06)
+DAY (default):     Background #faf8f5 · Surface #ffffff · Text #1a1510 · Muted #8a7d6a · Gold #C8A24A
+DARK (velvet noir): Background #0c0b10 · Surface #16151c · Text #f0ece4 · Muted #8a8578 · Gold #C8A24A
 ```
 
 ## Files to Edit
 
-### 1. `src/contexts/VesselThemeContext.tsx`
-- Update NIGHT_COLORS to velvet noir palette (deep black + champagne gold)
-- Update DAY_COLORS to pearl + marble palette (warm whites + brushed champagne)
-- Remove all steel/titanium references
+### 1. `src/index.css` — Update dark mode variables
+- Update `:root` and `.dark` block to use velvet noir palette (`#0c0b10` background, `#16151c` surface, `#f0ece4` foreground)
+- Keep `.light` block as the pearl/sand palette (already correct)
+- Add `--vessel-bg`, `--vessel-surface`, `--vessel-text`, `--vessel-muted`, `--vessel-gold` custom properties in both modes for the admin vessel components
 
-### 2. `src/components/admin/vessel/InterstellarScene.tsx` — Complete rewrite
-- Remove: steel grid floor, industrial dust, ceiling lights, scan sweep
-- Add: soft ambient pearl/champagne lighting
-- Add: gentle floating luminous particles (like light catching crystal facets)
-- Add: subtle marble-like floor reflection plane
-- Background: deep velvet (#0a0a0f) in dark mode
-- Lighting: warm champagne point lights, soft ambient, no harsh directional
-- Premium showroom feel — slow, calm light movements
+### 2. `src/components/admin/vessel/SystemStatusBar.tsx` — Theme toggle + dark support
+- Import and add `ThemeToggle` button between model selector and metrics
+- Replace hardcoded `backgroundColor: "rgba(255,255,255,0.85)"` with theme-aware value
+- Replace hardcoded text colors (`#1a1510`, `#8a7d6a`) with CSS variables
+- Use `document.documentElement.classList.contains('dark')` or a small hook to detect theme
 
-### 3. `src/components/admin/vessel/RISECoreEmblem.tsx` — Restyle
-- Keep 3D "RISE" text structure
-- Change material: crystal-like finish with subtle gold rim light
-- Replace steel wave rings with elegant concentric halos (softer, slower)
-- Replace LightPulse with gentle ambient glow pulses (champagne, not processor-like)
-- Torus frame: thin champagne gold, not steel
-- Overall: crystal elegance, not industrial machinery
+### 3. `src/pages/AdminPanel.tsx` — Theme-aware backgrounds
+- Replace hardcoded `#faf8f5` background with `var(--vessel-bg)`
+- Replace gradient colors with CSS variable references
+- Adjust particle opacity for dark mode (brighter gold particles on dark)
 
-### 4. `src/pages/Gate.tsx` — Luxury hospitality entry
-- Background: deep velvet black (dark) or pearl white (light)
-- Remove "INTELLIGENCE HEADQUARTERS" — replace with "GLOBAL LUXURY INTELLIGENCE"
-- Remove industrial depth lines — replace with subtle marble vein lines (warm stone, organic curves)
-- Particle assembly: softer, warmer gold particles, slower assembly
-- Pulse rings: champagne gold, very subtle
-- CTA: "Enter" — minimal, luxury serif font feel, champagne gold border
-- "Request Access" — understated, warm stone text
-- Bottom tagline: "RISE · GLOBAL HOSPITALITY INTELLIGENCE"
+### 4. `src/components/admin/vessel/VesselCommandInterface.tsx` — Dark mode support
+- Replace all hardcoded inline colors with CSS variable references:
+  - `#1a1510` text → `var(--vessel-text)`
+  - `#8a7d6a` muted → `var(--vessel-muted)`
+  - `#ffffff` surfaces → `var(--vessel-surface)`
+  - Input bar background adapts to dark
+- AI core glow intensifies slightly in dark mode (more visible gold glow on dark surface)
 
-### 5. `src/pages/AdminPanel.tsx` — Luxury atmosphere
-- Background: `#0a0a0f` (velvet black, not industrial)
-- Remove scan line texture overlay
-- Remove "titanium edge" lines
-- Add: subtle warm radial gradient (champagne glow from center)
-- Comments updated: "Luxury headquarters" not "Industrial"
+### 5. `src/components/admin/copilot/CopilotMessage.tsx` — Dark message panels
+- Assistant bubble: `#ffffff` → `var(--vessel-surface)` with appropriate border
+- Code block background: `#f3efe8` → theme-aware sand/dark surface
+- Bold text color: `#1a1510` → `var(--vessel-text)`
+- Body text: `#3a3530` → `var(--vessel-text)` with slight opacity
 
-### 6. `src/components/admin/vessel/SystemStatusBar.tsx` — Executive bar
-- Restyle: warm frosted glass, champagne gold borders
-- "RISE EXECUTIVE INTELLIGENCE" label
-- Mode pills: warm champagne styling, luxury serif-inspired
-- Metrics: champagne gold for VIP, warm stone for labels
+### 6. `src/pages/Gate.tsx` — Dark gate background
+- Replace `#faf8f5` with `var(--vessel-bg)`
+- Gradient adapts: dark mode uses velvet black gradients with champagne gold glow
+- CTA buttons adjust for dark background (gold on dark = more contrast)
+- Login form background adapts
 
-### 7. `src/components/admin/vessel/VesselCommandInterface.tsx`
-- Rename: "RISE EXECUTIVE INTELLIGENCE" branding
-- Empty state: remove "Operational Command" — replace with "Global Luxury Intelligence"
-- Status labels: "RISE · EXECUTIVE INTELLIGENCE ACTIVE"
-- Example commands refined to luxury strategist tone:
-  - "NOIR engagement growth projection."
-  - "SASSO Riyadh VIP retention status."
-  - "High-value member tier elevation candidates."
-- Input bar: warm glass, champagne border on focus
-- All steel/titanium colors → warm champagne/ivory
-- Waveform: champagne gold gradient
+### 7. `src/components/ui/theme-toggle.tsx` — Default to light
+- Change default from `'dark'` to `'light'` to match RISE ONE bright executive identity
 
-### 8. `src/components/admin/copilot/CopilotMessage.tsx`
-- Message panels: warm glass with champagne gold borders
-- Bot icon: elegant "R" in champagne, not steel gray
-- Code blocks: warm dark surface
-- Headings/bold: warm ivory, not steel
-- Remove all `#8a8a94` steel references → warm stone tones
+## Implementation Detail
 
-### 9. `src/components/admin/vessel/GlobalCommandMap.tsx`
-- Globe wireframe: soft gold outlines (not steel gray)
-- Arc connections: champagne gold, premium airline route style
-- City beacons: warm gold glow
-- Hover panels: dark silk background + champagne borders
-- Keep 3 cities (Doha, Riyadh, London) with existing data
+Create a small `useThemeMode()` hook or use inline detection (`typeof window !== 'undefined' && document.documentElement.classList.contains('dark')`) with a state listener for reactivity. This avoids adding a new context — the CSS variables handle most of the work, and only components with inline `style={}` props need JS-level awareness.
 
-### 10. `src/components/admin/vessel/MetricRings.tsx`
-- Orbit panels: warm glass with champagne gold borders
-- Labels: warm stone tones
-- Values: champagne gold for primary metrics
-- Progress bars: champagne gold fills
-- Remove all steel colors
+## Motion
 
-### 11. `src/components/admin/vessel/AIResponseMetrics.tsx`
-- Same treatment as MetricRings: warm glass, champagne gold
-
-### 12. `src/contexts/AIPersonalityContext.tsx`
-- Rename system: "RISE Executive Intelligence"
-- Update all system prompts:
-  - Remove "No emojis. No casual language." (keep enforcement but softer)
-  - Add "Polished. Strategic. Warm but refined. Never robotic."
-  - Tone: luxury brand strategist, not military commander
-  - Examples: "NOIR engagement growth exceeds projection." / "SASSO Riyadh VIP retention stable."
-- Mode labels refined: "Executive Strategy", "Growth & Expansion", "Behavioral Insights", "Investor Relations", "Risk Advisory"
-- Accent colors: warmer tones (remove cyan/neon)
-
-### 13. `src/components/admin/vessel/HUDGrid.tsx`
-- Grid floor: subtle warm gold wireframe (not steel)
-- Dust particles: warm luminous gold (not steel-blue)
-- Overall opacity reduced — luxury calm
-
-### 14. `src/components/admin/vessel/ScanSweep.tsx`
-- Change to champagne gold sweep
-- Very slow, elegant rotation — luxury showroom scanner feel
-
-## Motion Principles
-- All transitions: slow, deliberate (300-500ms), ease-out
-- No mechanical/industrial feel
-- Hover: warm champagne glow, no metallic sweep
-- Data loads: gentle fade-in with champagne shimmer
-- Everything whispers luxury, nothing shouts technology
+Dark mode: particles glow brighter, AI core gold glow more prominent. Day mode: subtle, calm as current. Transition between modes: 300ms CSS transition on background/color properties (already set in `index.css` body transition).
 
