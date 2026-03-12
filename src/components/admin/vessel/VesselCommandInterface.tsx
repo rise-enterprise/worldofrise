@@ -701,7 +701,7 @@ export default function VesselCommandInterface({
               "bg-transparent text-sm placeholder:text-[#8a7d6a]/40",
               "focus:outline-none transition-all duration-300"
             )}
-            style={{ color: "#1a1510" }}
+            style={{ color: `rgb(var(--vessel-text-alpha))` }}
             rows={1}
           />
 
