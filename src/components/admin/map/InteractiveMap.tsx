@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLocations } from "@/hooks/useLocations";
-import { MapPin, X, TrendingUp, Users, Star } from "lucide-react";
+import { X, TrendingUp, Users, Star, Brain, Sparkles } from "lucide-react";
 
 interface LocationInsight {
   id: string;
@@ -27,40 +27,25 @@ const BRAND_COLORS: Record<string, string> = {
   both: "#C8A24A",
 };
 
+// AI insights per city
+const AI_INSIGHTS: Record<string, string> = {
+  doha: "West Walk has the highest dessert orders after 9 PM. Al Hazm shows 23% VIP growth this quarter.",
+  riyadh: "Riyadh branch has increasing VIP customer visits (+18%). Peak hours shifting to later evenings.",
+  london: "London location shows strong weekend brunch demand. Consider loyalty-exclusive tasting events.",
+};
+
 function createCustomIcon(brand: string, isActive: boolean) {
   const color = BRAND_COLORS[brand] || "#C8A24A";
   return L.divIcon({
     className: "custom-map-pin",
     html: `
-      <div style="
-        position: relative;
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      ">
-        <div style="
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          background: ${color};
-          opacity: ${isActive ? 0.2 : 0.08};
-          animation: pinPulse 2s ease-in-out infinite;
-        "></div>
-        <div style="
-          width: 14px;
-          height: 14px;
-          border-radius: 50%;
-          background: ${color};
-          border: 2px solid #0a0a0f;
-          box-shadow: 0 0 12px ${color}66;
-          z-index: 1;
-        "></div>
+      <div style="position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
+        <div style="position:absolute;inset:0;border-radius:50%;background:${color};opacity:${isActive ? 0.2 : 0.08};animation:pinPulse 2s ease-in-out infinite;"></div>
+        <div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid hsl(var(--background));box-shadow:0 0 12px ${color}66;z-index:1;"></div>
       </div>
     `,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
   });
 }
 
@@ -69,6 +54,7 @@ export default function InteractiveMap() {
   const mapInstanceRef = useRef<L.Map | null>(null);
   const { data: locations } = useLocations();
   const [selectedLocation, setSelectedLocation] = useState<LocationInsight | null>(null);
+  const [activeCity, setActiveCity] = useState<string | null>(null);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
@@ -81,13 +67,11 @@ export default function InteractiveMap() {
       scrollWheelZoom: true,
     });
 
-    // Dark tile layer
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
       maxZoom: 19,
     }).addTo(map);
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
-
     mapInstanceRef.current = map;
 
     return () => {
@@ -100,7 +84,6 @@ export default function InteractiveMap() {
     const map = mapInstanceRef.current;
     if (!map || !locations) return;
 
-    // Clear existing markers
     map.eachLayer((layer) => {
       if (layer instanceof L.Marker) map.removeLayer(layer);
     });
@@ -109,7 +92,6 @@ export default function InteractiveMap() {
       const coords = CITY_COORDS[loc.city];
       if (!coords) return;
 
-      // Offset pins slightly so they don't overlap
       const offset = Math.random() * 0.02 - 0.01;
       const marker = L.marker([coords[0] + offset, coords[1] + offset], {
         icon: createCustomIcon(loc.brand, loc.isActive),
@@ -126,15 +108,21 @@ export default function InteractiveMap() {
           members: Math.floor(Math.random() * 2000) + 500,
           topProduct: loc.brand === "sasso" ? "Truffle Risotto" : "Signature Latte",
         });
-
-        map.flyTo([coords[0] + offset, coords[1] + offset], 12, {
-          duration: 1.2,
-        });
+        setActiveCity(loc.city);
+        map.flyTo([coords[0] + offset, coords[1] + offset], 12, { duration: 1.2 });
       });
 
       marker.addTo(map);
     });
   }, [locations]);
+
+  const flyToCity = (city: string) => {
+    const coords = CITY_COORDS[city];
+    if (coords) {
+      mapInstanceRef.current?.flyTo(coords, city === "london" ? 10 : 11, { duration: 1 });
+      setActiveCity(city);
+    }
+  };
 
   return (
     <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/30">
@@ -143,7 +131,7 @@ export default function InteractiveMap() {
       {/* Location Insight Panel */}
       {selectedLocation && (
         <div
-          className="absolute top-4 right-4 w-72 rounded-xl p-4 z-[1000] animate-soft-reveal"
+          className="absolute top-4 right-4 w-80 rounded-xl z-[1000] overflow-hidden"
           style={{
             background: "linear-gradient(180deg, hsl(var(--card) / 0.95) 0%, hsl(var(--card) / 0.9) 100%)",
             backdropFilter: "blur(20px)",
@@ -151,68 +139,85 @@ export default function InteractiveMap() {
             boxShadow: "0 16px 48px -12px hsl(0 0% 0% / 0.6)",
           }}
         >
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground">{selectedLocation.name}</h3>
-              <p className="text-xs text-muted-foreground capitalize mt-0.5">
-                {selectedLocation.city} · {selectedLocation.brand}
-              </p>
+          {/* Header */}
+          <div className="p-4 border-b border-border/20">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground">{selectedLocation.name}</h3>
+                <p className="text-xs text-muted-foreground capitalize mt-0.5">
+                  {selectedLocation.city} · {selectedLocation.brand}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedLocation(null)}
+                className="w-6 h-6 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors bg-muted/50"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <button
-              onClick={() => setSelectedLocation(null)}
-              className="w-6 h-6 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-              style={{ background: "hsl(var(--muted) / 0.5)" }}
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
           </div>
 
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2.5 p-2 rounded-lg" style={{ background: "hsl(var(--muted) / 0.3)" }}>
-              <TrendingUp className="w-4 h-4 text-primary" />
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Visits</div>
-                <div className="text-sm font-semibold text-foreground">{selectedLocation.visits?.toLocaleString()}</div>
+          {/* Stats */}
+          <div className="p-4 space-y-2">
+            {[
+              { icon: TrendingUp, label: "Total Visits", value: selectedLocation.visits?.toLocaleString() },
+              { icon: Users, label: "Active Members", value: selectedLocation.members?.toLocaleString() },
+              { icon: Star, label: "Top Product", value: selectedLocation.topProduct },
+            ].map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/20">
+                <Icon className="w-4 h-4 text-primary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+                  <div className="text-sm font-semibold text-foreground truncate">{value}</div>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2.5 p-2 rounded-lg" style={{ background: "hsl(var(--muted) / 0.3)" }}>
-              <Users className="w-4 h-4 text-primary" />
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Active Members</div>
-                <div className="text-sm font-semibold text-foreground">{selectedLocation.members?.toLocaleString()}</div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5 p-2 rounded-lg" style={{ background: "hsl(var(--muted) / 0.3)" }}>
-              <Star className="w-4 h-4 text-primary" />
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Top Product</div>
-                <div className="text-sm font-semibold text-foreground">{selectedLocation.topProduct}</div>
-              </div>
-            </div>
+            ))}
           </div>
 
           {selectedLocation.address && (
-            <p className="text-[10px] text-muted-foreground mt-3 pt-2 border-t border-border/30">
-              {selectedLocation.address}
-            </p>
+            <div className="px-4 pb-3">
+              <p className="text-[10px] text-muted-foreground pt-2 border-t border-border/30">
+                {selectedLocation.address}
+              </p>
+            </div>
           )}
         </div>
       )}
 
-      {/* Quick city navigation */}
+      {/* AI Insight Banner */}
+      {activeCity && AI_INSIGHTS[activeCity] && (
+        <div
+          className="absolute top-4 left-4 max-w-sm z-[1000] rounded-xl p-3"
+          style={{
+            background: "linear-gradient(135deg, hsl(var(--card) / 0.95), hsl(var(--gold) / 0.05))",
+            backdropFilter: "blur(16px)",
+            border: "1px solid hsl(var(--gold) / 0.2)",
+            boxShadow: "0 8px 32px -8px hsl(var(--gold) / 0.15)",
+          }}
+        >
+          <div className="flex items-start gap-2">
+            <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-primary font-medium mb-1">AI Insight</p>
+              <p className="text-xs text-foreground/80 leading-relaxed">{AI_INSIGHTS[activeCity]}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* City Navigation */}
       <div className="absolute bottom-4 left-4 flex gap-2 z-[1000]">
-        {Object.entries(CITY_COORDS).map(([city, coords]) => (
+        {Object.entries(CITY_COORDS).map(([city]) => (
           <button
             key={city}
-            onClick={() => {
-              mapInstanceRef.current?.flyTo(coords, city === "london" ? 10 : 11, { duration: 1 });
-            }}
-            className="px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-medium transition-all duration-300 hover:scale-105"
+            onClick={() => flyToCity(city)}
+            className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider font-medium transition-all duration-300 hover:scale-105 ${
+              activeCity === city ? "text-primary-foreground" : "text-foreground"
+            }`}
             style={{
-              background: "hsl(var(--card) / 0.9)",
+              background: activeCity === city ? "hsl(var(--gold))" : "hsl(var(--card) / 0.9)",
               backdropFilter: "blur(12px)",
-              border: "1px solid hsl(var(--gold) / 0.15)",
-              color: "hsl(var(--foreground))",
+              border: `1px solid ${activeCity === city ? "hsl(var(--gold))" : "hsl(var(--gold) / 0.15)"}`,
             }}
           >
             {city}
@@ -223,28 +228,17 @@ export default function InteractiveMap() {
       <style>{`
         @keyframes pinPulse {
           0%, 100% { transform: scale(1); opacity: 0.2; }
-          50% { transform: scale(1.5); opacity: 0.05; }
+          50% { transform: scale(1.6); opacity: 0.05; }
         }
-        .custom-map-pin {
-          background: transparent !important;
-          border: none !important;
-        }
-        .leaflet-control-zoom {
-          border: none !important;
-          box-shadow: 0 4px 16px -4px rgba(0,0,0,0.4) !important;
-        }
+        .custom-map-pin { background: transparent !important; border: none !important; }
+        .leaflet-control-zoom { border: none !important; box-shadow: 0 4px 16px -4px rgba(0,0,0,0.4) !important; }
         .leaflet-control-zoom a {
           background: hsl(var(--card)) !important;
           color: hsl(var(--foreground)) !important;
           border: 1px solid hsl(var(--border)) !important;
-          width: 32px !important;
-          height: 32px !important;
-          line-height: 32px !important;
-          font-size: 14px !important;
+          width: 32px !important; height: 32px !important; line-height: 32px !important; font-size: 14px !important;
         }
-        .leaflet-control-zoom a:hover {
-          background: hsl(var(--muted)) !important;
-        }
+        .leaflet-control-zoom a:hover { background: hsl(var(--muted)) !important; }
       `}</style>
     </div>
   );

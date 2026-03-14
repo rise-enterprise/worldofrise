@@ -6,12 +6,12 @@ import {
   MessageSquare,
   BarChart3,
   Gift,
-  Settings,
-  Crown,
-  Brain,
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Brain,
+  Settings,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -58,21 +58,19 @@ export default function AdminDashboardLayout() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "h-full flex flex-col shrink-0 transition-all duration-300 ease-out border-r border-border/40",
-          collapsed ? "w-16" : "w-56"
+          "h-full flex flex-col shrink-0 transition-all duration-300 ease-out border-r border-border/30",
+          collapsed ? "w-[60px]" : "w-56"
         )}
-        style={{
-          background: "linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%)",
-        }}
+        style={{ background: "hsl(var(--sidebar-background))" }}
       >
         {/* Logo */}
         <div className={cn(
-          "flex items-center gap-3 px-4 h-14 shrink-0 border-b border-border/30",
+          "flex items-center gap-3 px-4 h-14 shrink-0 border-b border-border/20",
           collapsed && "justify-center px-0"
         )}>
           <img src={riseLogo} alt="RISE" className="h-7 w-auto" />
           {!collapsed && (
-            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-foreground">
+            <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-foreground">
               RISE ONE
             </span>
           )}
@@ -91,8 +89,9 @@ export default function AdminDashboardLayout() {
                   collapsed && "justify-center px-0",
                   isActive
                     ? "bg-primary/10 text-primary font-medium"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
                 )}
+                title={collapsed ? item.label : undefined}
               >
                 <item.icon className={cn("w-4 h-4 shrink-0", isActive && "text-primary")} />
                 {!collapsed && <span>{item.label}</span>}
@@ -102,14 +101,14 @@ export default function AdminDashboardLayout() {
         </nav>
 
         {/* Bottom actions */}
-        <div className="p-2 border-t border-border/30 space-y-1">
+        <div className="p-2 border-t border-border/20 space-y-1">
           <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between px-2")}>
             {!collapsed && <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Theme</span>}
             <ThemeToggle className="h-8 w-8" />
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             {!collapsed && <span>Collapse</span>}
