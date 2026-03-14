@@ -17,6 +17,6 @@ export default defineConfig(({ mode }) => ({
     dedupe: ['react', 'react-dom'],
   },
   optimizeDeps: {
-    include: ['framer-motion'],
+    include: ['framer-motion', 'leaflet'],
   },
 }));
