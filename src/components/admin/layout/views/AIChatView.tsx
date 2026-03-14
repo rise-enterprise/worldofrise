@@ -2,10 +2,13 @@ import VesselCommandInterface from "@/components/admin/vessel/VesselCommandInter
 import { Brain, Wifi, Zap } from "lucide-react";
 import { useState } from "react";
 import type { AIState } from "@/components/admin/ai/AIAvatar";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export default function AIChatView() {
   const [aiState, setAIState] = useState<AIState>("idle");
   const [audioLevel, setAudioLevel] = useState(0);
+  const isMobile = useIsMobile();
 
   return (
     <div className="relative h-full flex flex-col overflow-hidden bg-background">
@@ -22,24 +25,39 @@ export default function AIChatView() {
         }}
       />
 
-      {/* Subtle HUD grid */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.015]"
-        style={{
-          backgroundImage: `
-            linear-gradient(hsl(var(--neon-purple) / 0.4) 1px, transparent 1px),
-            linear-gradient(90deg, hsl(var(--neon-purple) / 0.4) 1px, transparent 1px)
-          `,
-          backgroundSize: "80px 80px",
-        }}
-      />
+      {/* Subtle HUD grid — hide on mobile */}
+      {!isMobile && (
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.015]"
+          style={{
+            backgroundImage: `
+              linear-gradient(hsl(var(--neon-purple) / 0.4) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(var(--neon-purple) / 0.4) 1px, transparent 1px)
+            `,
+            backgroundSize: "80px 80px",
+          }}
+        />
+      )}
 
-      {/* Top status bar */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-3 border-b border-neon-purple/10">
+      {/* Top status bar — condensed on mobile */}
+      <div
+        className={cn(
+          "relative z-10 flex items-center justify-between border-b border-neon-purple/10",
+          isMobile ? "px-4 py-2" : "px-6 py-3"
+        )}
+        style={isMobile ? {
+          background: "hsl(var(--background) / 0.72)",
+          backdropFilter: "blur(40px) saturate(1.8)",
+          WebkitBackdropFilter: "blur(40px) saturate(1.8)",
+        } : undefined}
+      >
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Brain className="w-4 h-4 text-neon-purple/70" />
-            <span className="text-xs font-medium tracking-widest uppercase text-foreground/80">
+            <Brain className={cn("text-neon-purple/70", isMobile ? "w-3.5 h-3.5" : "w-4 h-4")} />
+            <span className={cn(
+              "font-medium tracking-widest uppercase text-foreground/80",
+              isMobile ? "text-[10px]" : "text-xs"
+            )}>
               RISE Intelligence
             </span>
           </div>
@@ -54,28 +72,31 @@ export default function AIChatView() {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          {/* Audio level indicator */}
-          {aiState === "speaking" && audioLevel > 0.05 && (
-            <div className="flex items-center gap-[2px] h-4">
-              {[0.3, 0.6, 1, 0.7, 0.4].map((base, i) => (
-                <div
-                  key={i}
-                  className="w-[2px] rounded-full bg-neon-magenta/60 origin-bottom transition-all duration-75"
-                  style={{ height: `${4 + base * audioLevel * 12}px` }}
-                />
-              ))}
+
+        {/* Desktop-only secondary indicators */}
+        {!isMobile && (
+          <div className="flex items-center gap-4">
+            {aiState === "speaking" && audioLevel > 0.05 && (
+              <div className="flex items-center gap-[2px] h-4">
+                {[0.3, 0.6, 1, 0.7, 0.4].map((base, i) => (
+                  <div
+                    key={i}
+                    className="w-[2px] rounded-full bg-neon-magenta/60 origin-bottom transition-all duration-75"
+                    style={{ height: `${4 + base * audioLevel * 12}px` }}
+                  />
+                ))}
+              </div>
+            )}
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-neon-magenta/40" />
+              <span className="text-[9px] tracking-wider uppercase text-muted-foreground/40">Neural Active</span>
             </div>
-          )}
-          <div className="flex items-center gap-1.5">
-            <Zap className="w-3 h-3 text-neon-magenta/40" />
-            <span className="text-[9px] tracking-wider uppercase text-muted-foreground/40">Neural Active</span>
+            <div className="flex items-center gap-1.5">
+              <Wifi className="w-3 h-3 text-neon-blue/40" />
+              <span className="text-[9px] tracking-wider uppercase text-muted-foreground/40">Stream</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Wifi className="w-3 h-3 text-neon-blue/40" />
-            <span className="text-[9px] tracking-wider uppercase text-muted-foreground/40">Stream</span>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Main content */}

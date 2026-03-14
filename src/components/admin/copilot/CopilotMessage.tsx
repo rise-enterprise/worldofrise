@@ -1,6 +1,7 @@
 import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMemo } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Attachment {
   url: string;
@@ -37,11 +38,13 @@ function renderMarkdown(text: string): string {
 export default function CopilotMessage({ role, content, isStreaming, attachments, modelTag }: CopilotMessageProps) {
   const isUser = role === "user";
   const html = useMemo(() => (isUser ? "" : renderMarkdown(content)), [content, isUser]);
+  const isMobile = useIsMobile();
 
   return (
     <div
       className={cn(
-        "flex gap-3 py-3 px-2 animate-fade-in",
+        "flex animate-fade-in",
+        isMobile ? "gap-2.5 py-2 px-1" : "gap-3 py-3 px-2",
         isUser ? "flex-row-reverse" : ""
       )}
     >
@@ -57,16 +60,17 @@ export default function CopilotMessage({ role, content, isStreaming, attachments
         )}
         <div
           className={cn(
-            "relative w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm border",
+            "relative rounded-lg flex items-center justify-center backdrop-blur-sm border",
+            isMobile ? "w-7 h-7" : "w-8 h-8",
             isUser
               ? "bg-neon-blue/8 border-neon-blue/15"
               : "bg-neon-purple/8 border-neon-purple/15"
           )}
         >
           {isUser ? (
-            <User className="w-3.5 h-3.5 text-neon-blue/70" />
+            <User className={cn(isMobile ? "w-3 h-3" : "w-3.5 h-3.5", "text-neon-blue/70")} />
           ) : (
-            <span className="text-[10px] font-bold text-neon-purple">R</span>
+            <span className={cn(isMobile ? "text-[9px]" : "text-[10px]", "font-bold text-neon-purple")}>R</span>
           )}
         </div>
       </div>
@@ -74,8 +78,9 @@ export default function CopilotMessage({ role, content, isStreaming, attachments
       {/* Message */}
       <div
         className={cn(
-          "relative flex-1 min-w-0 rounded-xl text-sm leading-relaxed overflow-hidden",
-          isUser ? "ml-12" : "mr-12"
+          "relative flex-1 min-w-0 overflow-hidden",
+          isMobile ? "rounded-2xl text-[14px] leading-relaxed" : "rounded-xl text-sm leading-relaxed",
+          isUser ? (isMobile ? "ml-6" : "ml-12") : (isMobile ? "mr-6" : "mr-12")
         )}
       >
         {/* Neon accent bar for assistant */}
@@ -89,14 +94,18 @@ export default function CopilotMessage({ role, content, isStreaming, attachments
         )}
 
         <div
-          className={cn("px-4 py-3", !isUser && "pl-5")}
+          className={cn(
+            !isUser && "pl-5",
+            isMobile ? "px-3.5 py-3" : "px-4 py-3"
+          )}
           style={{
             backgroundColor: isUser
               ? "hsl(var(--neon-blue) / 0.04)"
               : "hsl(var(--muted) / 0.4)",
             border: `1px solid hsl(var(${isUser ? "--neon-blue" : "--neon-purple"}) / 0.08)`,
-            borderRadius: "0.75rem",
+            borderRadius: isMobile ? "1rem" : "0.75rem",
             color: "hsl(var(--foreground))",
+            WebkitTapHighlightColor: "transparent",
           }}
         >
           {isUser && attachments && attachments.length > 0 && (

@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Send, Mic, MicOff, Volume2, VolumeX, Paperclip, X, TrendingUp, Users, Zap, BarChart3, Target, Globe } from "lucide-react";
+import { Send, Mic, MicOff, Volume2, VolumeX, Paperclip, X, TrendingUp, Users, Zap, BarChart3, Target, Globe, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useAIPersonality } from "@/contexts/AIPersonalityContext";
 import AIAvatar from "@/components/admin/ai/AIAvatar";
 import type { AIState } from "@/components/admin/ai/AIAvatar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Attachment {
   url: string;
@@ -107,6 +108,7 @@ export default function VesselCommandInterface({
   const [isUploading, setIsUploading] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [hasGreeted, setHasGreeted] = useState(false);
+  const [showInputExtras, setShowInputExtras] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +125,7 @@ export default function VesselCommandInterface({
   const ttsAnalyserRef = useRef<AnalyserNode | null>(null);
   const ttsAnimRef = useRef<number>(0);
   const ttsAudioCtxRef = useRef<AudioContext | null>(null);
+  const isMobile = useIsMobile();
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -157,7 +160,6 @@ export default function VesselCommandInterface({
     if (!session?.access_token) return;
 
     onAIStateChange?.("thinking");
-    // Brief thinking pause
     await new Promise(r => setTimeout(r, 400));
 
     const greetingMessages: Msg[] = [
@@ -339,6 +341,7 @@ export default function VesselCommandInterface({
     onAIStateChange?.("thinking");
     lastSpokenRef.current = "";
     stopTts();
+    setShowInputExtras(false);
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
@@ -519,21 +522,27 @@ export default function VesselCommandInterface({
       />
 
       {/* Messages / Empty state */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
+      <div ref={scrollRef} className={cn("flex-1 overflow-y-auto scrollbar-hide min-h-0", isMobile ? "px-3" : "px-4")}>
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-12 px-4">
+          <div className={cn(
+            "flex flex-col items-center justify-center h-full text-center px-4",
+            isMobile ? "py-6" : "py-8 sm:py-12"
+          )}>
             {/* Click-to-talk AI Avatar */}
             <AIAvatar
               state={aiState}
-              size="lg"
-              className="mb-8"
+              size={isMobile ? "md" : "lg"}
+              className={isMobile ? "mb-5" : "mb-8"}
               audioLevel={audioLevel}
               onClick={toggleVoice}
               clickLabel="Tap to speak"
             />
 
             {/* Title */}
-            <div className="text-2xl tracking-[0.25em] font-medium mb-2 relative overflow-hidden">
+            <div className={cn(
+              "tracking-[0.25em] font-medium mb-2 relative overflow-hidden",
+              isMobile ? "text-xl" : "text-2xl"
+            )}>
               <span
                 className="bg-clip-text"
                 style={{
@@ -550,30 +559,43 @@ export default function VesselCommandInterface({
             </div>
 
             <div
-              className="text-[11px] tracking-[0.2em] uppercase mb-10 text-neon-purple/40 animate-fade-in"
+              className={cn(
+                "text-[11px] tracking-[0.2em] uppercase text-neon-purple/40 animate-fade-in",
+                isMobile ? "mb-6" : "mb-10"
+              )}
               style={{ animationDelay: "300ms", animationFillMode: "both" }}
             >
               Executive Intelligence System
             </div>
 
-            {/* Glass command cards */}
-            <div className="grid grid-cols-2 gap-2.5 max-w-md w-full">
+            {/* Glass command cards — single column on mobile */}
+            <div className={cn(
+              "gap-2.5 w-full",
+              isMobile ? "flex flex-col max-w-sm" : "grid grid-cols-2 max-w-md"
+            )}>
               {EXAMPLE_COMMANDS.map((item, idx) => {
                 const Icon = item.icon;
                 return (
                   <button
                     key={item.cmd}
                     onClick={() => send(item.cmd)}
-                    className="group relative flex items-center gap-2.5 px-4 py-3 rounded-xl text-left transition-all duration-300 backdrop-blur-md border border-neon-purple/10 bg-neon-purple/[0.02] hover:bg-neon-purple/[0.06] hover:border-neon-purple/25 hover:shadow-[0_0_20px_-6px_hsl(var(--neon-purple)_/_0.15)] animate-fade-in"
+                    className={cn(
+                      "group relative flex items-center gap-2.5 rounded-xl text-left transition-all duration-300 backdrop-blur-md border border-neon-purple/10 bg-neon-purple/[0.02] hover:bg-neon-purple/[0.06] hover:border-neon-purple/25 hover:shadow-[0_0_20px_-6px_hsl(var(--neon-purple)_/_0.15)] animate-fade-in active:scale-[0.97]",
+                      isMobile ? "px-4 py-3.5 min-h-[44px]" : "px-4 py-3"
+                    )}
                     style={{
                       animationDelay: `${600 + idx * 80}ms`,
                       animationFillMode: "both",
+                      WebkitTapHighlightColor: "transparent",
                     }}
                   >
                     <div className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-neon-purple/[0.06] border border-neon-purple/10 transition-all duration-300 group-hover:bg-neon-purple/10 group-hover:border-neon-purple/20">
                       <Icon className="w-3.5 h-3.5 text-neon-purple/50 transition-all duration-300 group-hover:text-neon-purple-light group-hover:drop-shadow-[0_0_6px_hsl(var(--neon-purple)_/_0.5)]" />
                     </div>
-                    <span className="text-[10px] tracking-wide text-muted-foreground/60 transition-colors duration-300 group-hover:text-foreground/80">
+                    <span className={cn(
+                      "tracking-wide text-muted-foreground/60 transition-colors duration-300 group-hover:text-foreground/80",
+                      isMobile ? "text-[11px]" : "text-[10px]"
+                    )}>
                       {item.label}
                     </span>
                   </button>
@@ -601,14 +623,21 @@ export default function VesselCommandInterface({
         )}
       </div>
 
-      {/* Quick actions */}
+      {/* Quick actions — horizontal scroll with snap on mobile */}
       {!isEmpty && !isLoading && (
-        <div className="flex gap-1.5 px-4 py-2 overflow-x-auto scrollbar-hide">
+        <div className={cn(
+          "flex gap-1.5 py-2 overflow-x-auto scrollbar-hide",
+          isMobile ? "px-3 snap-x snap-mandatory" : "px-4"
+        )}>
           {EXAMPLE_COMMANDS.slice(3, 6).map((item) => (
             <button
               key={item.cmd}
               onClick={() => send(item.cmd)}
-              className="shrink-0 text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-neon-purple/10 bg-neon-purple/[0.02] text-muted-foreground/50 hover:text-neon-purple/70 hover:border-neon-purple/20 hover:bg-neon-purple/[0.05]"
+              className={cn(
+                "shrink-0 text-[9px] rounded-lg transition-all duration-300 backdrop-blur-sm border border-neon-purple/10 bg-neon-purple/[0.02] text-muted-foreground/50 hover:text-neon-purple/70 hover:border-neon-purple/20 hover:bg-neon-purple/[0.05] active:scale-[0.96]",
+                isMobile ? "px-4 py-2.5 min-h-[36px] snap-start" : "px-3.5 py-2"
+              )}
+              style={{ WebkitTapHighlightColor: "transparent" }}
             >
               {item.label}
             </button>
@@ -630,7 +659,7 @@ export default function VesselCommandInterface({
               )}
               <button
                 onClick={() => removeAttachment(i)}
-                className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive/80 text-white flex items-center justify-center"
               >
                 <X className="w-2.5 h-2.5" />
               </button>
@@ -640,11 +669,17 @@ export default function VesselCommandInterface({
       )}
 
       {/* Input bar */}
-      <div className="px-4 sm:px-6 pb-5 pt-2 relative">
+      <div
+        className={cn("relative", isMobile ? "px-3 pb-2 pt-1.5" : "px-4 sm:px-6 pb-5 pt-2")}
+        style={isMobile ? {
+          paddingBottom: "env(safe-area-inset-bottom, 8px)",
+        } : undefined}
+      >
         <div
           className={cn(
-            "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-300",
+            "relative flex items-end gap-2 rounded-2xl transition-all duration-300",
             "backdrop-blur-xl border",
+            isMobile ? "px-2.5 py-2.5" : "px-4 py-3 gap-2.5",
             isListening
               ? "border-neon-cyan/30 shadow-[0_0_30px_-10px_hsl(var(--neon-cyan)_/_0.2)]"
               : isLoading
@@ -659,44 +694,95 @@ export default function VesselCommandInterface({
         >
           {(input.trim() || isListening) && (
             <div
-              className="absolute inset-0 rounded-xl pointer-events-none opacity-30"
+              className="absolute inset-0 rounded-2xl pointer-events-none opacity-30"
               style={{
                 background: "linear-gradient(135deg, hsl(var(--neon-purple) / 0.06), transparent, hsl(var(--neon-blue) / 0.04))",
               }}
             />
           )}
 
-          <Button
-            onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "shrink-0 h-9 w-9 rounded-lg transition-all",
-              ttsEnabled ? "text-neon-purple/60 hover:text-neon-purple" : "text-muted-foreground/30 hover:text-muted-foreground/60"
-            )}
-          >
-            {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-          </Button>
+          {/* Mobile: "+" toggle for extras */}
+          {isMobile ? (
+            <>
+              <Button
+                onClick={() => setShowInputExtras(!showInputExtras)}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "shrink-0 h-9 w-9 rounded-xl transition-all",
+                  showInputExtras ? "text-neon-purple bg-neon-purple/10 rotate-45" : "text-muted-foreground/40"
+                )}
+                style={{ WebkitTapHighlightColor: "transparent", minWidth: 36, minHeight: 36 }}
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
 
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            variant="ghost"
-            size="icon"
-            disabled={isUploading}
-            className={cn(
-              "shrink-0 h-9 w-9 rounded-lg transition-all",
-              pendingAttachments.length > 0
-                ? "text-neon-magenta/70 hover:text-neon-magenta"
-                : "text-muted-foreground/40 hover:text-neon-purple/60"
-            )}
-          >
-            <Paperclip className="w-3.5 h-3.5" />
-            {pendingAttachments.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-neon-magenta text-[7px] text-white font-bold flex items-center justify-center">
-                {pendingAttachments.length}
-              </span>
-            )}
-          </Button>
+              {/* Expandable extras */}
+              {showInputExtras && (
+                <div className="flex gap-1 animate-fade-in">
+                  <Button
+                    onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      "shrink-0 h-9 w-9 rounded-xl transition-all",
+                      ttsEnabled ? "text-neon-purple/60" : "text-muted-foreground/30"
+                    )}
+                    style={{ minWidth: 36, minHeight: 36 }}
+                  >
+                    {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                  </Button>
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="ghost"
+                    size="icon"
+                    disabled={isUploading}
+                    className={cn(
+                      "shrink-0 h-9 w-9 rounded-xl transition-all",
+                      pendingAttachments.length > 0 ? "text-neon-magenta/70" : "text-muted-foreground/40"
+                    )}
+                    style={{ minWidth: 36, minHeight: 36 }}
+                  >
+                    <Paperclip className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <Button
+                onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "shrink-0 h-9 w-9 rounded-lg transition-all",
+                  ttsEnabled ? "text-neon-purple/60 hover:text-neon-purple" : "text-muted-foreground/30 hover:text-muted-foreground/60"
+                )}
+              >
+                {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              </Button>
+
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="ghost"
+                size="icon"
+                disabled={isUploading}
+                className={cn(
+                  "shrink-0 h-9 w-9 rounded-lg transition-all",
+                  pendingAttachments.length > 0
+                    ? "text-neon-magenta/70 hover:text-neon-magenta"
+                    : "text-muted-foreground/40 hover:text-neon-purple/60"
+                )}
+              >
+                <Paperclip className="w-3.5 h-3.5" />
+                {pendingAttachments.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-neon-magenta text-[7px] text-white font-bold flex items-center justify-center">
+                    {pendingAttachments.length}
+                  </span>
+                )}
+              </Button>
+            </>
+          )}
 
           <textarea
             ref={inputRef}
@@ -706,8 +792,9 @@ export default function VesselCommandInterface({
             placeholder={isUploading ? "Uploading…" : isListening ? "Listening…" : "Ask RISE ONE…"}
             className={cn(
               "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2",
-              "bg-transparent text-sm text-foreground placeholder:text-muted-foreground/30",
-              "focus:outline-none transition-all duration-300"
+              "bg-transparent text-foreground placeholder:text-muted-foreground/30",
+              "focus:outline-none transition-all duration-300",
+              isMobile ? "text-[16px]" : "text-sm"
             )}
             rows={1}
           />
@@ -734,7 +821,7 @@ export default function VesselCommandInterface({
                 {[0, 0.5, 1].map((delay) => (
                   <span
                     key={delay}
-                    className="absolute inset-[-4px] rounded-lg border border-neon-cyan/20 pointer-events-none"
+                    className="absolute inset-[-4px] rounded-xl border border-neon-cyan/20 pointer-events-none"
                     style={{ animation: `micRipple 2s ease-out ${delay}s infinite` }}
                   />
                 ))}
@@ -745,9 +832,11 @@ export default function VesselCommandInterface({
               variant="ghost"
               size="icon"
               className={cn(
-                "relative h-9 w-9 rounded-lg transition-all overflow-visible",
+                "relative rounded-xl transition-all overflow-visible",
+                isMobile ? "h-10 w-10" : "h-9 w-9",
                 isListening ? "text-neon-cyan bg-neon-cyan/10" : "text-muted-foreground/40 hover:text-neon-purple/60"
               )}
+              style={{ minWidth: isMobile ? 40 : 36, minHeight: isMobile ? 40 : 36 }}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
@@ -758,21 +847,25 @@ export default function VesselCommandInterface({
             disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
             size="icon"
             className={cn(
-              "shrink-0 h-9 w-9 rounded-lg transition-all",
+              "shrink-0 rounded-xl transition-all",
+              isMobile ? "h-10 w-10" : "h-9 w-9",
               "bg-neon-purple hover:bg-neon-purple/80 text-white",
               "disabled:opacity-15 disabled:bg-muted-foreground/20",
               (input.trim() || pendingAttachments.length > 0) && !isLoading && "shadow-[0_0_14px_-3px_hsl(var(--neon-purple)_/_0.4)]"
             )}
+            style={{ minWidth: isMobile ? 40 : 36, minHeight: isMobile ? 40 : 36 }}
           >
             <Send className="w-3.5 h-3.5" />
           </Button>
         </div>
 
-        <div className="flex justify-center mt-2.5">
-          <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground/25">
-            {isUploading ? "UPLOADING" : isListening ? "LISTENING" : isLoading ? "PROCESSING" : "RISE ONE · ACTIVE"}
-          </span>
-        </div>
+        {!isMobile && (
+          <div className="flex justify-center mt-2.5">
+            <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground/25">
+              {isUploading ? "UPLOADING" : isListening ? "LISTENING" : isLoading ? "PROCESSING" : "RISE ONE · ACTIVE"}
+            </span>
+          </div>
+        )}
       </div>
 
       <style>{`
