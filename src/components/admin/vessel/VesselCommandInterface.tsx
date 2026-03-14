@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Send, Mic, MicOff, Volume2, VolumeX, Paperclip, X } from "lucide-react";
+import { Send, Mic, MicOff, Volume2, VolumeX, Paperclip, X, TrendingUp, Users, Zap, BarChart3, Target, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,14 +19,12 @@ type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachme
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-copilot`;
 
 const EXAMPLE_COMMANDS = [
-  "Customer lifetime value trends.",
-  "NOIR VIP engagement this quarter.",
-  "SASSO Riyadh retention status.",
-  "Tier elevation candidates.",
-  "Brand performance comparison.",
-  "Churn risk forecast. Next 30 days.",
-  "Campaign ROI analysis. Doha.",
-  "Cross-brand member overlap.",
+  { icon: TrendingUp, label: "Lifetime Value Trends", cmd: "Customer lifetime value trends." },
+  { icon: Users, label: "VIP Engagement", cmd: "NOIR VIP engagement this quarter." },
+  { icon: Target, label: "Retention Status", cmd: "SASSO Riyadh retention status." },
+  { icon: Zap, label: "Tier Candidates", cmd: "Tier elevation candidates." },
+  { icon: BarChart3, label: "Brand Comparison", cmd: "Brand performance comparison." },
+  { icon: Globe, label: "Churn Forecast", cmd: "Churn risk forecast. Next 30 days." },
 ];
 
 async function streamChat({
@@ -414,8 +412,34 @@ export default function VesselCommandInterface({
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
-            {/* AI Core Circle with Live Motion */}
-            <div className="relative mb-8" style={{ width: 200, height: 200 }}>
+            {/* Enlarged AI Core — 240px with HUD grid */}
+            <div className="relative mb-10" style={{ width: 240, height: 240 }}>
+              {/* HUD grid behind orb */}
+              <div
+                className="absolute inset-[-20px] rounded-full pointer-events-none opacity-[0.04]"
+                style={{
+                  backgroundImage: `
+                    linear-gradient(hsl(var(--gold) / 0.5) 1px, transparent 1px),
+                    linear-gradient(90deg, hsl(var(--gold) / 0.5) 1px, transparent 1px)
+                  `,
+                  backgroundSize: "20px 20px",
+                  maskImage: "radial-gradient(circle, black 40%, transparent 70%)",
+                  WebkitMaskImage: "radial-gradient(circle, black 40%, transparent 70%)",
+                }}
+              />
+
+              {/* Outer ring — counter-rotating */}
+              <div
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  top: "50%", left: "50%",
+                  width: 180, height: 180,
+                  transform: "translate(-50%, -50%)",
+                  border: "1px solid hsl(var(--gold) / 0.06)",
+                  animation: "orbitDot 30s linear infinite reverse",
+                }}
+              />
+
               {/* Sonar pulse rings */}
               {[0, 1, 2].map((i) => (
                 <div
@@ -423,22 +447,24 @@ export default function VesselCommandInterface({
                   className="absolute rounded-full pointer-events-none"
                   style={{
                     top: "50%", left: "50%",
-                    width: 112, height: 112,
+                    width: 140, height: 140,
                     transform: "translate(-50%, -50%)",
-                    border: "1px solid rgba(200,162,74,0.15)",
+                    border: "1px solid hsl(var(--gold) / 0.12)",
                     animation: `sonarPulse ${isLoading ? "2.5s" : "4.5s"} ease-out ${i * (isLoading ? 0.8 : 1.5)}s infinite`,
                   }}
                 />
               ))}
 
-              {/* Orbiting particles */}
+              {/* Orbiting particles — more dense */}
               {[
-                { r: 62, dur: 8, size: 3, opacity: 0.5 },
-                { r: 62, dur: 12, size: 2, opacity: 0.35, offset: 120 },
-                { r: 62, dur: 10, size: 2.5, opacity: 0.45, offset: 200 },
-                { r: 78, dur: 14, size: 2, opacity: 0.3 },
-                { r: 78, dur: 9, size: 3, opacity: 0.4, offset: 90 },
-                { r: 78, dur: 16, size: 1.5, opacity: 0.25, offset: 250 },
+                { r: 75, dur: 8, size: 3.5, opacity: 0.55 },
+                { r: 75, dur: 12, size: 2.5, opacity: 0.4, offset: 120 },
+                { r: 75, dur: 10, size: 3, opacity: 0.5, offset: 200 },
+                { r: 95, dur: 14, size: 2.5, opacity: 0.35 },
+                { r: 95, dur: 9, size: 3.5, opacity: 0.45, offset: 90 },
+                { r: 95, dur: 16, size: 2, opacity: 0.3, offset: 250 },
+                { r: 60, dur: 7, size: 2, opacity: 0.6, offset: 45 },
+                { r: 60, dur: 11, size: 2.5, opacity: 0.5, offset: 180 },
               ].map((p, i) => (
                 <div
                   key={`orbit-${i}`}
@@ -456,9 +482,9 @@ export default function VesselCommandInterface({
                       width: p.size, height: p.size,
                       top: 0, left: "50%",
                       marginLeft: -p.size / 2,
-                      backgroundColor: "#C8A24A",
+                      backgroundColor: "hsl(var(--gold))",
                       opacity: p.opacity,
-                      boxShadow: "0 0 6px rgba(200,162,74,0.4)",
+                      boxShadow: "0 0 8px hsl(var(--gold) / 0.5)",
                     }}
                   />
                 </div>
@@ -468,31 +494,31 @@ export default function VesselCommandInterface({
               {isLoading && (
                 <svg
                   className="absolute"
-                  style={{ top: "50%", left: "50%", marginLeft: -56, marginTop: -56 }}
-                  width={112} height={112}
-                  viewBox="0 0 112 112"
+                  style={{ top: "50%", left: "50%", marginLeft: -70, marginTop: -70 }}
+                  width={140} height={140}
+                  viewBox="0 0 140 140"
                 >
                   <circle
-                    cx={56} cy={56} r={52}
+                    cx={70} cy={70} r={65}
                     fill="none"
-                    stroke="rgba(200,162,74,0.3)"
+                    stroke="hsl(var(--gold) / 0.3)"
                     strokeWidth={1.5}
-                    strokeDasharray="60 268"
+                    strokeDasharray="70 340"
                     strokeLinecap="round"
                     style={{ animation: "spinArc 1.8s linear infinite", transformOrigin: "center" }}
                   />
                 </svg>
               )}
 
-              {/* Outer ring */}
+              {/* Outer glow ring */}
               <div
                 className="absolute rounded-full"
                 style={{
                   top: "50%", left: "50%",
-                  width: 112, height: 112,
+                  width: 140, height: 140,
                   transform: "translate(-50%, -50%)",
-                  background: "radial-gradient(circle, rgba(200,162,74,0.08) 0%, rgba(200,162,74,0.02) 60%, transparent 100%)",
-                  border: "1px solid rgba(200,162,74,0.12)",
+                  background: "radial-gradient(circle, hsl(var(--gold) / 0.08) 0%, hsl(var(--gold) / 0.02) 60%, transparent 100%)",
+                  border: "1px solid hsl(var(--gold) / 0.12)",
                 }}
               />
 
@@ -501,87 +527,112 @@ export default function VesselCommandInterface({
                 className="absolute rounded-full flex items-center justify-center"
                 style={{
                   top: "50%", left: "50%",
-                  width: 80, height: 80,
+                  width: 100, height: 100,
                   transform: "translate(-50%, -50%)",
                   background: isListening
-                    ? "radial-gradient(circle, rgba(200,162,74,0.18) 0%, transparent 70%)"
-                    : "radial-gradient(circle, rgba(200,162,74,0.1) 0%, transparent 70%)",
-                  border: "1px solid rgba(200,162,74,0.08)",
+                    ? "radial-gradient(circle, hsl(var(--gold) / 0.2) 0%, transparent 70%)"
+                    : "radial-gradient(circle, hsl(var(--gold) / 0.12) 0%, transparent 70%)",
+                  border: "1px solid hsl(var(--gold) / 0.1)",
                   animation: `breathe ${isLoading ? "2s" : "4s"} ease-in-out infinite`,
                   boxShadow: isLoading
-                    ? "0 0 40px rgba(200,162,74,0.15)"
+                    ? "0 0 60px hsl(var(--gold) / 0.2)"
                     : isListening
-                      ? "0 0 30px rgba(200,162,74,0.12)"
-                      : "0 0 20px rgba(200,162,74,0.06)",
+                      ? "0 0 40px hsl(var(--gold) / 0.15)"
+                      : "0 0 30px hsl(var(--gold) / 0.08)",
                 }}
               >
-                <img src={riseLogo} alt="RISE" className="h-8 w-auto opacity-60" />
+                <img src={riseLogo} alt="RISE" className="h-10 w-auto opacity-70" />
               </div>
 
-              {/* Breathing glow */}
+              {/* Breathing glow — larger */}
               <div
                 className="absolute rounded-full pointer-events-none"
                 style={{
                   top: "50%", left: "50%",
-                  width: 140, height: 140,
+                  width: 200, height: 200,
                   transform: "translate(-50%, -50%)",
-                  background: "radial-gradient(circle, rgba(200,162,74,0.06) 0%, transparent 70%)",
+                  background: "radial-gradient(circle, hsl(var(--gold) / 0.06) 0%, transparent 70%)",
                   animation: `breathe ${isLoading ? "2s" : "4s"} ease-in-out infinite`,
                 }}
               />
             </div>
 
-            <div className="text-lg tracking-[0.2em] font-medium mb-1 relative overflow-hidden" style={{ color: `rgb(var(--vessel-text-alpha))` }}>
-              <span style={{ animation: "shimmerText 6s ease-in-out infinite", backgroundImage: `linear-gradient(90deg, rgb(var(--vessel-text-alpha)) 0%, rgb(var(--vessel-text-alpha)) 40%, rgb(var(--vessel-gold-alpha)) 50%, rgb(var(--vessel-text-alpha)) 60%, rgb(var(--vessel-text-alpha)) 100%)`, backgroundSize: "200% 100%", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>RISE ONE</span>
-            </div>
-            <div className="text-[10px] tracking-[0.15em] uppercase mb-8" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
-              Executive Intelligence
+            {/* Title with gradient sweep */}
+            <div className="text-2xl tracking-[0.25em] font-medium mb-2 relative overflow-hidden">
+              <span
+                className="bg-clip-text"
+                style={{
+                  animation: "shimmerText 6s ease-in-out infinite",
+                  backgroundImage: `linear-gradient(90deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--gold)) 50%, hsl(var(--foreground)) 60%, hsl(var(--foreground)) 100%)`,
+                  backgroundSize: "200% 100%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                RISE ONE
+              </span>
             </div>
 
-            <div className="flex items-center gap-5 mb-6 text-[9px] uppercase tracking-[0.15em]">
+            <div
+              className="text-[11px] tracking-[0.2em] uppercase mb-10 text-muted-foreground/50 animate-fade-in"
+              style={{ animationDelay: "300ms", animationFillMode: "both" }}
+            >
+              Executive Intelligence System
+            </div>
+
+            {/* Status indicators */}
+            <div className="flex items-center gap-5 mb-8 text-[9px] uppercase tracking-[0.15em]">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `rgb(var(--vessel-green-alpha))`, animation: "statusPulse 3s ease-in-out infinite" }} />
-                <span style={{ color: `rgb(var(--vessel-muted-alpha))` }}>Online</span>
+                <span
+                  className="w-1.5 h-1.5 rounded-full bg-emerald-500"
+                  style={{ animation: "statusPulse 3s ease-in-out infinite" }}
+                />
+                <span className="text-muted-foreground/50">Online</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: `rgb(var(--vessel-gold-alpha))`, animation: "statusPulse 3s ease-in-out 1s infinite" }} />
-                <span style={{ color: `rgb(var(--vessel-muted-alpha))` }}>Tools Active</span>
+                <span
+                  className="w-1.5 h-1.5 rounded-full bg-primary"
+                  style={{ animation: "statusPulse 3s ease-in-out 1s infinite" }}
+                />
+                <span className="text-muted-foreground/50">Tools Active</span>
               </div>
             </div>
 
-            <p className="text-[11px] max-w-md mb-6 leading-relaxed" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
+            <p
+              className="text-xs max-w-md mb-8 leading-relaxed text-muted-foreground/40 animate-fade-in"
+              style={{ animationDelay: "500ms", animationFillMode: "both" }}
+            >
               Query insights. Analyze performance. Generate reports.
             </p>
 
-            <div className="flex flex-wrap gap-2 justify-center max-w-lg">
-              {EXAMPLE_COMMANDS.slice(0, 6).map((cmd) => (
-                <button
-                  key={cmd}
-                  onClick={() => send(cmd)}
-                  className="text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300"
-                  style={{
-                    border: `1px solid rgba(var(--vessel-gold-alpha), 0.1)`,
-                    backgroundColor: `rgba(var(--vessel-gold-alpha), 0.03)`,
-                    color: `rgb(var(--vessel-muted-alpha))`,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = `rgba(var(--vessel-gold-alpha), 0.2)`;
-                    e.currentTarget.style.backgroundColor = `rgba(var(--vessel-gold-alpha), 0.06)`;
-                    e.currentTarget.style.color = `rgb(var(--vessel-gold-alpha))`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = `rgba(var(--vessel-gold-alpha), 0.1)`;
-                    e.currentTarget.style.backgroundColor = `rgba(var(--vessel-gold-alpha), 0.03)`;
-                    e.currentTarget.style.color = `rgb(var(--vessel-muted-alpha))`;
-                  }}
-                >
-                  {cmd}
-                </button>
-              ))}
+            {/* Glass command cards — 2-column grid */}
+            <div className="grid grid-cols-2 gap-2.5 max-w-md w-full">
+              {EXAMPLE_COMMANDS.map((item, idx) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.cmd}
+                    onClick={() => send(item.cmd)}
+                    className="group relative flex items-center gap-2.5 px-4 py-3 rounded-xl text-left transition-all duration-300 backdrop-blur-md border border-border/20 bg-card/30 hover:bg-primary/[0.06] hover:border-primary/20 hover:shadow-[0_0_20px_-6px_hsl(var(--gold)_/_0.12)] animate-fade-in"
+                    style={{
+                      animationDelay: `${600 + idx * 80}ms`,
+                      animationFillMode: "both",
+                    }}
+                  >
+                    <div className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-primary/[0.06] border border-primary/10 transition-all duration-300 group-hover:bg-primary/10 group-hover:border-primary/20">
+                      <Icon className="w-3.5 h-3.5 text-primary/50 transition-all duration-300 group-hover:text-primary group-hover:drop-shadow-[0_0_6px_hsl(var(--gold)_/_0.4)]" />
+                    </div>
+                    <span className="text-[10px] tracking-wide text-muted-foreground/60 transition-colors duration-300 group-hover:text-foreground/80">
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         ) : (
-          <div className="py-4 space-y-1">
+          <div className="py-4 space-y-2">
             {messages.map((msg, i) => (
               <CopilotMessage
                 key={i}
@@ -596,21 +647,16 @@ export default function VesselCommandInterface({
         )}
       </div>
 
-      {/* Quick actions */}
+      {/* Quick actions when chatting */}
       {!isEmpty && !isLoading && (
         <div className="flex gap-1.5 px-4 py-2 overflow-x-auto scrollbar-hide">
-          {EXAMPLE_COMMANDS.slice(4, 8).map((cmd) => (
+          {EXAMPLE_COMMANDS.slice(3, 6).map((item) => (
             <button
-              key={cmd}
-              onClick={() => send(cmd)}
-              className="shrink-0 text-[9px] px-3 py-1.5 rounded-lg transition-all duration-300"
-              style={{
-                border: `1px solid rgba(var(--vessel-gold-alpha), 0.08)`,
-                backgroundColor: `rgba(var(--vessel-gold-alpha), 0.02)`,
-                color: `rgb(var(--vessel-muted-alpha))`,
-              }}
+              key={item.cmd}
+              onClick={() => send(item.cmd)}
+              className="shrink-0 text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-border/15 bg-card/20 text-muted-foreground/50 hover:text-primary/70 hover:border-primary/15 hover:bg-primary/[0.04]"
             >
-              {cmd}
+              {item.label}
             </button>
           ))}
         </div>
@@ -622,15 +668,15 @@ export default function VesselCommandInterface({
           {pendingAttachments.map((att, i) => (
             <div key={i} className="relative shrink-0 group">
               {att.type.startsWith("image/") ? (
-                <img src={att.url} alt={att.name} className="w-16 h-16 object-cover rounded-lg border border-[rgba(200,162,74,0.15)]" />
+                <img src={att.url} alt={att.name} className="w-16 h-16 object-cover rounded-lg border border-primary/15" />
               ) : (
-                <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-[rgba(200,162,74,0.1)] bg-[rgba(200,162,74,0.03)] text-[10px] text-[#8a7d6a]">
+                <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-primary/10 bg-primary/[0.03] text-[10px] text-muted-foreground">
                   📎 {att.name.length > 15 ? att.name.slice(0, 15) + "…" : att.name}
                 </div>
               )}
               <button
                 onClick={() => removeAttachment(i)}
-                className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-destructive/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X className="w-2.5 h-2.5" />
               </button>
@@ -639,22 +685,34 @@ export default function VesselCommandInterface({
         </div>
       )}
 
-      {/* Input bar */}
+      {/* Premium input bar */}
       <div className="px-4 sm:px-6 pb-5 pt-2 relative">
         <div
           className={cn(
-            "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-400",
+            "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-300",
             "backdrop-blur-xl border",
             isListening
-              ? "border-[#C8A24A]/25 shadow-[0_0_30px_-10px_rgba(200,162,74,0.1)]"
+              ? "border-primary/25 shadow-[0_0_30px_-10px_hsl(var(--gold)_/_0.15)]"
               : isLoading
-                ? "border-[#C8A24A]/15"
-                : "border-[rgba(200,162,74,0.1)]"
+                ? "border-primary/15"
+                : "border-border/20 hover:border-border/30"
           )}
           style={{
-            backgroundColor: isListening ? `rgba(var(--vessel-gold-alpha), 0.04)` : `rgba(var(--vessel-surface-alpha), 0.7)`,
+            backgroundColor: isListening
+              ? "hsl(var(--gold) / 0.04)"
+              : "hsl(var(--card) / 0.6)",
           }}
         >
+          {/* Gold gradient focus glow */}
+          {(input.trim() || isListening) && (
+            <div
+              className="absolute inset-0 rounded-xl pointer-events-none opacity-40"
+              style={{
+                background: "linear-gradient(135deg, hsl(var(--gold) / 0.05), transparent, hsl(var(--gold) / 0.03))",
+              }}
+            />
+          )}
+
           {/* TTS toggle */}
           <Button
             onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
@@ -662,7 +720,7 @@ export default function VesselCommandInterface({
             size="icon"
             className={cn(
               "shrink-0 h-9 w-9 rounded-lg transition-all",
-              ttsEnabled ? "text-[#C8A24A]/60 hover:text-[#C8A24A]" : "text-[#8a7d6a]/30 hover:text-[#8a7d6a]/60"
+              ttsEnabled ? "text-primary/60 hover:text-primary" : "text-muted-foreground/30 hover:text-muted-foreground/60"
             )}
           >
             {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
@@ -677,13 +735,13 @@ export default function VesselCommandInterface({
             className={cn(
               "shrink-0 h-9 w-9 rounded-lg transition-all",
               pendingAttachments.length > 0
-                ? "text-[#C8A24A]/70 hover:text-[#C8A24A]"
-                : "text-[#8a7d6a]/40 hover:text-[#C8A24A]/60"
+                ? "text-primary/70 hover:text-primary"
+                : "text-muted-foreground/40 hover:text-primary/60"
             )}
           >
             <Paperclip className="w-3.5 h-3.5" />
             {pendingAttachments.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#C8A24A] text-[7px] text-white font-bold flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-[7px] text-primary-foreground font-bold flex items-center justify-center">
                 {pendingAttachments.length}
               </span>
             )}
@@ -698,10 +756,9 @@ export default function VesselCommandInterface({
             placeholder={isUploading ? "Uploading…" : isListening ? "Listening…" : "Ask RISE ONE…"}
             className={cn(
               "flex-1 min-h-[36px] max-h-[100px] resize-none rounded-lg px-3 py-2",
-              "bg-transparent text-sm placeholder:text-[#8a7d6a]/40",
+              "bg-transparent text-sm text-foreground placeholder:text-muted-foreground/30",
               "focus:outline-none transition-all duration-300"
             )}
-            style={{ color: `rgb(var(--vessel-text-alpha))` }}
             rows={1}
           />
 
@@ -713,7 +770,7 @@ export default function VesselCommandInterface({
                   key={i}
                   className="w-[2px] h-5 rounded-full origin-center"
                   style={{
-                    background: "linear-gradient(to top, #C8A24A, rgba(200,162,74,0.3))",
+                    background: "linear-gradient(to top, hsl(var(--gold)), hsl(var(--gold) / 0.3))",
                     transform: `scaleY(${base * 0.15})`,
                     transition: "transform 60ms ease-out",
                   }}
@@ -729,7 +786,7 @@ export default function VesselCommandInterface({
                 {[0, 0.5, 1].map((delay) => (
                   <span
                     key={delay}
-                    className="absolute inset-[-4px] rounded-lg border border-[#C8A24A]/20 pointer-events-none"
+                    className="absolute inset-[-4px] rounded-lg border border-primary/20 pointer-events-none"
                     style={{ animation: `micRipple 2s ease-out ${delay}s infinite` }}
                   />
                 ))}
@@ -741,30 +798,31 @@ export default function VesselCommandInterface({
               size="icon"
               className={cn(
                 "relative h-9 w-9 rounded-lg transition-all overflow-visible",
-                isListening ? "text-[#C8A24A] bg-[#C8A24A]/10" : "text-[#8a7d6a]/40 hover:text-[#C8A24A]/60"
+                isListening ? "text-primary bg-primary/10" : "text-muted-foreground/40 hover:text-primary/60"
               )}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
           </div>
 
-          {/* Send */}
+          {/* Send — with pulse when ready */}
           <Button
             onClick={() => send(input)}
             disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
             size="icon"
             className={cn(
               "shrink-0 h-9 w-9 rounded-lg transition-all",
-              "bg-[#C8A24A] hover:bg-[#b8944a] text-white",
-              "disabled:opacity-20 disabled:bg-[#8a7d6a]/20"
+              "bg-primary hover:bg-primary/90 text-primary-foreground",
+              "disabled:opacity-15 disabled:bg-muted-foreground/20",
+              (input.trim() || pendingAttachments.length > 0) && !isLoading && "shadow-[0_0_12px_-3px_hsl(var(--gold)_/_0.3)]"
             )}
           >
             <Send className="w-3.5 h-3.5" />
           </Button>
         </div>
 
-        <div className="flex justify-center mt-2">
-          <span className="text-[8px] uppercase tracking-[0.2em]" style={{ color: `rgb(var(--vessel-muted-alpha))` }}>
+        <div className="flex justify-center mt-2.5">
+          <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground/30">
             {isUploading ? "UPLOADING" : isListening ? "LISTENING" : isLoading ? "PROCESSING" : "RISE ONE · ACTIVE"}
           </span>
         </div>
@@ -772,8 +830,8 @@ export default function VesselCommandInterface({
 
       <style>{`
         @keyframes breathe {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.04); opacity: 0.85; }
+          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+          50% { transform: translate(-50%, -50%) scale(1.04); opacity: 0.85; }
         }
         @keyframes micRipple {
           0% { transform: scale(1); opacity: 0.3; }
