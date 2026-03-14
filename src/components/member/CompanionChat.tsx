@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, User, Volume2, VolumeX, Mic, MicOff, Brain } from 'lucide-react';
+import { Send, User, Volume2, VolumeX, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -108,8 +108,11 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
   const [aiState, setAIState] = useState<AIState>("idle");
+  const [audioLevel, setAudioLevel] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const ttsAudioCtxRef = useRef<AudioContext | null>(null);
+  const ttsAnimRef = useRef<number>(0);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -118,15 +121,18 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     }
   }, [messages]);
 
+  // Auto-greeting with cinematic delay
   useEffect(() => {
-    if (!hasGreeted && member) {
+    if (hasGreeted || !member) return;
+    const timer = setTimeout(() => {
       setHasGreeted(true);
       sendInitialGreeting();
-    }
+    }, 1200);
+    return () => clearTimeout(timer);
   }, [member, hasGreeted]);
 
   const sendInitialGreeting = async () => {
-    const greetingPrompt = "Greet me warmly as my personal concierge. Reference my last visit and tier progress if relevant. Keep it to 2-3 sentences. Be genuinely warm.";
+    const greetingPrompt = `Greet ${member.name} warmly as their personal concierge. Reference their tier progress if relevant. Keep it to 2-3 sentences. Be genuinely warm.`;
     await sendMessage(greetingPrompt, true);
   };
 
@@ -135,8 +141,30 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     return session?.access_token || '';
   };
 
-  const speakText = async (text: string) => {
-    if (!voiceEnabled) return;
+  const startTtsAnalyser = useCallback((audio: HTMLAudioElement) => {
+    try {
+      const ctx = new AudioContext();
+      ttsAudioCtxRef.current = ctx;
+      const source = ctx.createMediaElementSource(audio);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i];
+        const level = Math.min(1, (sum / data.length / 255) * 2.5);
+        setAudioLevel(level);
+        ttsAnimRef.current = requestAnimationFrame(tick);
+      };
+      ttsAnimRef.current = requestAnimationFrame(tick);
+    } catch { /* no AudioContext */ }
+  }, []);
+
+  const speakText = useCallback(async (text: string) => {
+    if (!voiceEnabled) { setAIState("idle"); return; }
     try {
       setAIState("speaking");
       const token = await getToken();
@@ -160,7 +188,14 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
         audio.volume = 0.7;
-        audio.onended = () => setAIState("idle");
+        audio.crossOrigin = "anonymous";
+        startTtsAnalyser(audio);
+        audio.onended = () => {
+          setAIState("idle");
+          setAudioLevel(0);
+          if (ttsAnimRef.current) cancelAnimationFrame(ttsAnimRef.current);
+          ttsAudioCtxRef.current?.close().catch(() => {});
+        };
         await audio.play();
       } else {
         setAIState("idle");
@@ -168,8 +203,9 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     } catch (e) {
       console.error("TTS error:", e);
       setAIState("idle");
+      setAudioLevel(0);
     }
-  };
+  }, [voiceEnabled, startTtsAnalyser]);
 
   const sendMessage = useCallback(async (text: string, isSystem = false) => {
     if (!text.trim()) return;
@@ -195,6 +231,9 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     setInput('');
     setIsStreaming(true);
     setAIState("thinking");
+
+    // Brief thinking pause for natural rhythm
+    await new Promise(r => setTimeout(r, 300));
 
     let assistantContent = "";
 
@@ -243,7 +282,7 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
       setAIState("idle");
       toast.error(e.message || "Something went wrong");
     }
-  }, [messages, voiceEnabled]);
+  }, [messages, voiceEnabled, speakText]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -301,7 +340,7 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
       {/* Empty state with avatar */}
       {isEmpty && (
         <div className="relative z-10 flex flex-col items-center justify-center pt-8 pb-4">
-          <AIAvatar state={aiState} size="sm" className="mb-6" />
+          <AIAvatar state={aiState} size="sm" className="mb-6" audioLevel={audioLevel} />
           <div className="text-xs tracking-[0.2em] uppercase text-neon-purple/50 mb-1">
             Personal Concierge
           </div>
@@ -355,7 +394,6 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
                     background: 'linear-gradient(135deg, hsl(var(--card) / 0.7) 0%, hsl(var(--card) / 0.4) 100%)',
                   } : undefined}
                 >
-                  {/* Neon accent bar for assistant */}
                   {message.role === 'assistant' && (
                     <div
                       className="absolute left-0 top-3 bottom-3 w-[2px] rounded-full"
@@ -424,7 +462,7 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
           className="px-4 py-2 relative z-10"
         >
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {getSuggestions().map((suggestion, i) => (
+            {getSuggestions().map((suggestion) => (
               <Button
                 key={suggestion}
                 variant="outline"
@@ -496,8 +534,8 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
 
       <style>{`
         @keyframes companionDotWave {
-          0%, 100% { transform: translateY(0); opacity: 0.4; }
-          50% { transform: translateY(-4px); opacity: 1; }
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+          40% { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </div>
