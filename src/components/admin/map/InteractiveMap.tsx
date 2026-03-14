@@ -51,10 +51,23 @@ function createCustomIcon(brand: string, isActive: boolean) {
 
 export default function InteractiveMap() {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<L.Map | null>(null);
+  const mapInstanceRef = useRef<any>(null);
   const { data: locations } = useLocations();
   const [selectedLocation, setSelectedLocation] = useState<LocationInsight | null>(null);
   const [activeCity, setActiveCity] = useState<string | null>(null);
+  const [L, setL] = useState<typeof L_Type | null>(null);
+
+  // Dynamically import leaflet to avoid SSR/module issues
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([
+      import("leaflet"),
+      import("leaflet/dist/leaflet.css"),
+    ]).then(([leaflet]) => {
+      if (!cancelled) setL(() => leaflet.default);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
