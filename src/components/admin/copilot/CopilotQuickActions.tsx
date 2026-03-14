@@ -17,16 +17,20 @@ const quickActions = [
 export default function CopilotQuickActions({ onAction, disabled }: CopilotQuickActionsProps) {
   return (
     <div className="flex flex-wrap gap-2 px-4 py-2">
-      {quickActions.map((action) => {
+      {quickActions.map((action, idx) => {
         const Icon = action.icon;
         return (
           <button
             key={action.label}
             disabled={disabled}
             onClick={() => onAction(action.prompt)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border/40 bg-muted/30 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/60 hover:border-primary/30 transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none"
+            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md border border-border/20 bg-card/30 text-xs text-muted-foreground/70 transition-all duration-300 hover:text-primary hover:bg-primary/[0.06] hover:border-primary/25 hover:shadow-[0_0_12px_-4px_hsl(var(--gold)_/_0.15)] disabled:opacity-30 disabled:pointer-events-none animate-fade-in"
+            style={{
+              animationDelay: `${idx * 60}ms`,
+              animationFillMode: "both",
+            }}
           >
-            <Icon className="w-3.5 h-3.5" />
+            <Icon className="w-3.5 h-3.5 transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--gold)_/_0.4)]" />
             {action.label}
           </button>
         );

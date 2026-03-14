@@ -3,11 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, TrendingDown, Sparkles, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const severityConfig: Record<string, { icon: typeof AlertTriangle; color: string }> = {
-  critical: { icon: AlertTriangle, color: "text-destructive bg-destructive/10 border-destructive/20" },
-  warning: { icon: TrendingDown, color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20" },
-  info: { icon: Info, color: "text-blue-400 bg-blue-400/10 border-blue-400/20" },
-  opportunity: { icon: Sparkles, color: "text-primary bg-primary/10 border-primary/20" },
+const severityConfig: Record<string, { icon: typeof AlertTriangle; accent: string }> = {
+  critical: { icon: AlertTriangle, accent: "hsl(var(--burgundy-light))" },
+  warning: { icon: TrendingDown, accent: "hsl(var(--gold))" },
+  info: { icon: Info, accent: "hsl(var(--sapphire-bright))" },
+  opportunity: { icon: Sparkles, accent: "hsl(var(--gold-light))" },
 };
 
 export default function CopilotInsightCards() {
@@ -29,21 +29,27 @@ export default function CopilotInsightCards() {
 
   return (
     <div className="flex gap-3 px-4 py-3 overflow-x-auto scrollbar-none">
-      {insights.map((insight) => {
+      {insights.map((insight, idx) => {
         const config = severityConfig[insight.severity ?? "info"] ?? severityConfig.info;
         const Icon = config.icon;
         return (
           <div
             key={insight.id}
-            className={cn(
-              "shrink-0 flex items-start gap-2.5 rounded-lg border px-3 py-2.5 min-w-[220px] max-w-[280px]",
-              config.color
-            )}
+            className="shrink-0 relative flex items-start gap-2.5 rounded-xl min-w-[230px] max-w-[280px] px-4 py-3 backdrop-blur-md border border-border/20 bg-card/40 transition-all duration-300 hover:bg-card/60 hover:border-primary/15 animate-fade-in"
+            style={{
+              animationDelay: `${idx * 80}ms`,
+              animationFillMode: "both",
+            }}
           >
-            <Icon className="w-4 h-4 mt-0.5 shrink-0" />
+            {/* Top gold edge line */}
+            <div
+              className="absolute top-0 left-3 right-3 h-px rounded-full"
+              style={{ background: `linear-gradient(90deg, transparent, ${config.accent}, transparent)`, opacity: 0.4 }}
+            />
+            <Icon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: config.accent }} />
             <div className="min-w-0">
-              <p className="text-xs font-semibold truncate">{insight.title}</p>
-              <p className="text-[11px] opacity-80 line-clamp-2 mt-0.5">{insight.summary}</p>
+              <p className="text-xs font-semibold text-foreground/90 truncate">{insight.title}</p>
+              <p className="text-[11px] text-muted-foreground/60 line-clamp-2 mt-0.5">{insight.summary}</p>
             </div>
           </div>
         );
