@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import CopilotMessage from "../copilot/CopilotMessage";
 import { cn } from "@/lib/utils";
 import { useAIPersonality } from "@/contexts/AIPersonalityContext";
-import HolographicAvatar3D from "@/components/admin/ai/HolographicAvatar3D";
 import AIAvatar from "@/components/admin/ai/AIAvatar";
 import type { AIState } from "@/components/admin/ai/AIAvatar";
 
@@ -524,7 +523,7 @@ export default function VesselCommandInterface({
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-12 px-4">
             {/* Click-to-talk AI Avatar */}
-            <HolographicAvatar3D
+            <AIAvatar
               state={aiState}
               size="lg"
               className="mb-8"
@@ -586,7 +585,7 @@ export default function VesselCommandInterface({
           <div className="py-4 space-y-2">
             {/* Compact avatar when chatting */}
             <div className="flex justify-center py-2 mb-2">
-              <HolographicAvatar3D state={aiState} size="sm" audioLevel={audioLevel} />
+              <AIAvatar state={aiState} size="sm" audioLevel={audioLevel} />
             </div>
             {messages.map((msg, i) => (
               <CopilotMessage
