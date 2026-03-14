@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import type L_Type from "leaflet";
+import { useLocations } from "@/hooks/useLocations";
 import { useLocations } from "@/hooks/useLocations";
 import { X, TrendingUp, Users, Star, Brain, Sparkles } from "lucide-react";
 
