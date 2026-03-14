@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, User, Volume2, VolumeX, Mic } from 'lucide-react';
+import { Send, Sparkles, User, Volume2, VolumeX, Mic, MicOff, Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import ReactMarkdown from 'react-markdown';
+import AIAvatar from '@/components/admin/ai/AIAvatar';
+import type { AIState } from '@/components/admin/ai/AIAvatar';
 import type { Guest } from '@/types/loyalty';
 
 interface Message {
@@ -25,10 +26,7 @@ interface CompanionChatProps {
 const COMPANION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/member-companion`;
 
 async function streamCompanion({
-  messages,
-  token,
-  onDelta,
-  onDone,
+  messages, token, onDelta, onDone,
 }: {
   messages: { role: string; content: string }[];
   token: string;
@@ -84,7 +82,6 @@ async function streamCompanion({
     }
   }
 
-  // Flush remaining
   if (buffer.trim()) {
     for (let raw of buffer.split("\n")) {
       if (!raw) continue;
@@ -110,10 +107,10 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
   const [isStreaming, setIsStreaming] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
+  const [aiState, setAIState] = useState<AIState>("idle");
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) {
       const el = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
@@ -121,7 +118,6 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     }
   }, [messages]);
 
-  // Auto-greet on mount
   useEffect(() => {
     if (!hasGreeted && member) {
       setHasGreeted(true);
@@ -142,6 +138,7 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
   const speakText = async (text: string) => {
     if (!voiceEnabled) return;
     try {
+      setAIState("speaking");
       const token = await getToken();
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
@@ -163,10 +160,14 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
         const audioUrl = URL.createObjectURL(audioBlob);
         const audio = new Audio(audioUrl);
         audio.volume = 0.7;
+        audio.onended = () => setAIState("idle");
         await audio.play();
+      } else {
+        setAIState("idle");
       }
     } catch (e) {
       console.error("TTS error:", e);
+      setAIState("idle");
     }
   };
 
@@ -179,7 +180,6 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
       return;
     }
 
-    // Add user message (unless it's a system greeting)
     const allMsgs = [...messages];
     if (!isSystem) {
       const userMsg: Message = {
@@ -194,6 +194,7 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
 
     setInput('');
     setIsStreaming(true);
+    setAIState("thinking");
 
     let assistantContent = "";
 
@@ -227,18 +228,19 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
         onDelta: upsertAssistant,
         onDone: () => {
           setIsStreaming(false);
-          // Finalize the streaming message ID
           setMessages(prev => prev.map(m => 
             m.id.startsWith('streaming-') ? { ...m, id: 'final-' + Date.now() } : m
           ));
-          // Voice response
           if (assistantContent && voiceEnabled) {
             speakText(assistantContent);
+          } else {
+            setAIState("idle");
           }
         },
       });
     } catch (e: any) {
       setIsStreaming(false);
+      setAIState("idle");
       toast.error(e.message || "Something went wrong");
     }
   }, [messages, voiceEnabled]);
@@ -249,7 +251,6 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     sendMessage(input);
   };
 
-  // Smart suggestions based on member data
   const getSuggestions = () => {
     const suggestions: string[] = [];
     const daysSinceLast = member.lastVisit 
@@ -269,10 +270,52 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
     return suggestions.slice(0, 3);
   };
 
+  const isEmpty = messages.length === 0;
+
   return (
-    <div className={cn("flex flex-col h-full", className)}>
+    <div className={cn("flex flex-col h-full relative overflow-hidden", className)}>
+      {/* Cybernetic ambient background */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse 60% 40% at 50% 0%, hsl(var(--neon-purple) / 0.06) 0%, transparent 60%),
+            radial-gradient(ellipse 40% 30% at 80% 100%, hsl(var(--neon-magenta) / 0.04) 0%, transparent 50%),
+            radial-gradient(ellipse 30% 20% at 20% 60%, hsl(var(--neon-blue) / 0.03) 0%, transparent 50%)
+          `,
+        }}
+      />
+
+      {/* Subtle grid */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.012]"
+        style={{
+          backgroundImage: `
+            linear-gradient(hsl(var(--neon-purple) / 0.5) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(var(--neon-purple) / 0.5) 1px, transparent 1px)
+          `,
+          backgroundSize: "60px 60px",
+        }}
+      />
+
+      {/* Empty state with avatar */}
+      {isEmpty && (
+        <div className="relative z-10 flex flex-col items-center justify-center pt-8 pb-4">
+          <AIAvatar state={aiState} size="sm" className="mb-6" />
+          <div className="text-xs tracking-[0.2em] uppercase text-neon-purple/50 mb-1">
+            Personal Concierge
+          </div>
+          <div
+            className="text-[10px] tracking-wider text-muted-foreground/40"
+            style={{ animationDelay: "200ms" }}
+          >
+            Your AI-powered luxury assistant
+          </div>
+        </div>
+      )}
+
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 px-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 px-4 relative z-10" ref={scrollRef}>
         <div className="space-y-4 py-4 pb-2">
           <AnimatePresence mode="popLayout">
             {messages.map((message) => (
@@ -289,23 +332,40 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
                 <div className={cn(
                   'w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1',
                   message.role === 'assistant'
-                    ? 'bg-primary/10 ring-1 ring-primary/20'
+                    ? 'ring-1 ring-neon-purple/30'
                     : 'bg-muted ring-1 ring-border/30'
-                )}>
+                )}
+                  style={message.role === 'assistant' ? {
+                    background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.15) 0%, hsl(var(--neon-magenta) / 0.08) 100%)',
+                  } : undefined}
+                >
                   {message.role === 'assistant' ? (
-                    <Sparkles className="h-4 w-4 text-primary" />
+                    <Brain className="h-4 w-4 text-neon-purple" />
                   ) : (
                     <User className="h-4 w-4 text-muted-foreground" />
                   )}
                 </div>
                 <div className={cn(
-                  'max-w-[80%] rounded-2xl px-4 py-3',
+                  'max-w-[80%] rounded-2xl px-4 py-3 relative',
                   message.role === 'assistant'
-                    ? 'bg-card/80 backdrop-blur-sm text-foreground rounded-tl-sm border border-border/30'
+                    ? 'rounded-tl-sm border border-neon-purple/15 backdrop-blur-sm'
                     : 'bg-primary text-primary-foreground rounded-tr-sm'
-                )}>
+                )}
+                  style={message.role === 'assistant' ? {
+                    background: 'linear-gradient(135deg, hsl(var(--card) / 0.7) 0%, hsl(var(--card) / 0.4) 100%)',
+                  } : undefined}
+                >
+                  {/* Neon accent bar for assistant */}
+                  {message.role === 'assistant' && (
+                    <div
+                      className="absolute left-0 top-3 bottom-3 w-[2px] rounded-full"
+                      style={{
+                        background: 'linear-gradient(180deg, hsl(var(--neon-purple) / 0.6), hsl(var(--neon-magenta) / 0.3))',
+                      }}
+                    />
+                  )}
                   {message.role === 'assistant' ? (
-                    <div className="text-sm prose prose-sm prose-invert max-w-none [&>p]:mb-1.5 [&>p:last-child]:mb-0 [&>ul]:mb-1.5 [&>strong]:text-primary">
+                    <div className="text-sm prose prose-sm prose-invert max-w-none [&>p]:mb-1.5 [&>p:last-child]:mb-0 [&>ul]:mb-1.5 [&>strong]:text-neon-purple-light pl-1">
                       <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                   ) : (
@@ -323,14 +383,31 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
               animate={{ opacity: 1 }}
               className="flex gap-3"
             >
-              <div className="w-8 h-8 rounded-full bg-primary/10 ring-1 ring-primary/20 flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+              <div
+                className="w-8 h-8 rounded-full ring-1 ring-neon-purple/30 flex items-center justify-center"
+                style={{
+                  background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.15) 0%, hsl(var(--neon-magenta) / 0.08) 100%)',
+                }}
+              >
+                <Brain className="h-4 w-4 text-neon-purple animate-pulse" />
               </div>
-              <div className="bg-card/80 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 border border-border/30">
-                <div className="flex gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div
+                className="rounded-2xl rounded-tl-sm px-4 py-3 border border-neon-purple/15 backdrop-blur-sm"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(var(--card) / 0.7) 0%, hsl(var(--card) / 0.4) 100%)',
+                }}
+              >
+                <div className="flex gap-1.5 items-center">
+                  {[0, 1, 2].map(i => (
+                    <span
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full bg-neon-purple/60"
+                      style={{
+                        animation: 'companionDotWave 1.2s ease-in-out infinite',
+                        animationDelay: `${i * 0.15}s`,
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -344,15 +421,15 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="px-4 py-2"
+          className="px-4 py-2 relative z-10"
         >
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {getSuggestions().map((suggestion) => (
+            {getSuggestions().map((suggestion, i) => (
               <Button
                 key={suggestion}
                 variant="outline"
                 size="sm"
-                className="whitespace-nowrap text-xs shrink-0 border-primary/20 text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+                className="whitespace-nowrap text-xs shrink-0 border-neon-purple/20 text-muted-foreground hover:text-neon-purple-light hover:border-neon-purple/40 hover:bg-neon-purple/5 transition-all backdrop-blur-sm"
                 onClick={() => sendMessage(suggestion)}
                 disabled={isStreaming}
               >
@@ -364,38 +441,65 @@ export function CompanionChat({ member, className }: CompanionChatProps) {
       )}
 
       {/* Input Area */}
-      <div className="p-4 border-t border-border/30 bg-background/50 backdrop-blur-sm">
+      <div className="p-4 border-t border-neon-purple/10 relative z-10" style={{
+        background: 'linear-gradient(180deg, hsl(var(--background) / 0.5) 0%, hsl(var(--background) / 0.9) 100%)',
+        backdropFilter: 'blur(20px)',
+      }}>
         <form onSubmit={handleSubmit} className="flex gap-2 items-center">
           <Button
             type="button"
             variant="ghost"
             size="icon"
             className={cn(
-              "shrink-0 h-9 w-9 rounded-full transition-colors",
-              voiceEnabled ? "text-primary bg-primary/10" : "text-muted-foreground"
+              "shrink-0 h-9 w-9 rounded-full transition-all",
+              voiceEnabled 
+                ? "text-neon-cyan bg-neon-cyan/10 ring-1 ring-neon-cyan/30" 
+                : "text-muted-foreground hover:text-neon-purple/60"
             )}
             onClick={() => setVoiceEnabled(!voiceEnabled)}
           >
             {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           </Button>
-          <Input
-            ref={inputRef}
-            placeholder="Ask your concierge anything..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isStreaming}
-            className="flex-1 bg-card/50 border-border/30 focus:border-primary/40 text-sm"
-          />
+          <div className="flex-1 relative">
+            <input
+              ref={inputRef}
+              placeholder="Ask your concierge anything..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isStreaming}
+              className={cn(
+                "w-full h-11 rounded-xl px-4 py-2 text-sm font-body",
+                "bg-card/40 border border-neon-purple/15 text-foreground",
+                "placeholder:text-muted-foreground/40",
+                "focus:outline-none focus:border-neon-purple/40",
+                "focus:shadow-[0_0_0_3px_hsl(var(--neon-purple)_/_0.08)]",
+                "transition-all duration-300 backdrop-blur-sm",
+                "disabled:opacity-50"
+              )}
+            />
+          </div>
           <Button 
             type="submit" 
             size="icon" 
             disabled={!input.trim() || isStreaming}
-            className="shrink-0 h-9 w-9 rounded-full bg-primary/90 hover:bg-primary"
+            className={cn(
+              "shrink-0 h-9 w-9 rounded-full transition-all",
+              input.trim()
+                ? "bg-neon-purple text-white shadow-[0_0_15px_hsl(var(--neon-purple)_/_0.3)]"
+                : "bg-neon-purple/15 text-muted-foreground/40"
+            )}
           >
             <Send className="h-4 w-4" />
           </Button>
         </form>
       </div>
+
+      <style>{`
+        @keyframes companionDotWave {
+          0%, 100% { transform: translateY(0); opacity: 0.4; }
+          50% { transform: translateY(-4px); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 }
