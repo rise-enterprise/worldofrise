@@ -24,13 +24,13 @@ export default function CopilotQuickActions({ onAction, disabled }: CopilotQuick
             key={action.label}
             disabled={disabled}
             onClick={() => onAction(action.prompt)}
-            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md border border-border/20 bg-card/30 text-xs text-muted-foreground/70 transition-all duration-300 hover:text-primary hover:bg-primary/[0.06] hover:border-primary/25 hover:shadow-[0_0_12px_-4px_hsl(var(--gold)_/_0.15)] disabled:opacity-30 disabled:pointer-events-none animate-fade-in"
+            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full backdrop-blur-md border border-neon-purple/10 bg-neon-purple/[0.03] text-xs text-muted-foreground/70 transition-all duration-300 hover:text-neon-purple-light hover:bg-neon-purple/[0.08] hover:border-neon-purple/25 hover:shadow-[0_0_14px_-4px_hsl(var(--neon-purple)_/_0.2)] disabled:opacity-30 disabled:pointer-events-none animate-fade-in"
             style={{
               animationDelay: `${idx * 60}ms`,
               animationFillMode: "both",
             }}
           >
-            <Icon className="w-3.5 h-3.5 transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--gold)_/_0.4)]" />
+            <Icon className="w-3.5 h-3.5 transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--neon-purple)_/_0.5)]" />
             {action.label}
           </button>
         );

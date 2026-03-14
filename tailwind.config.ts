@@ -87,6 +87,17 @@ export default {
         sapphire: "hsl(var(--sapphire))",
         "burgundy-crystal": "hsl(var(--burgundy-crystal))",
         "crystal-white": "hsl(var(--crystal-white))",
+        // AI Neon Colors
+        neon: {
+          purple: "hsl(var(--neon-purple))",
+          "purple-light": "hsl(var(--neon-purple-light))",
+          magenta: "hsl(var(--neon-magenta))",
+          "magenta-light": "hsl(var(--neon-magenta-light))",
+          blue: "hsl(var(--neon-blue))",
+          "blue-light": "hsl(var(--neon-blue-light))",
+          cyan: "hsl(var(--neon-cyan))",
+          glow: "hsl(var(--neon-glow))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
