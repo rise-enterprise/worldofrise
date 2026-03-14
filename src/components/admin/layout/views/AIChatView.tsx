@@ -5,6 +5,7 @@ import type { AIState } from "@/components/admin/ai/AIAvatar";
 
 export default function AIChatView() {
   const [aiState, setAIState] = useState<AIState>("idle");
+  const [audioLevel, setAudioLevel] = useState(0);
 
   return (
     <div className="relative h-full flex flex-col overflow-hidden bg-background">
@@ -54,6 +55,18 @@ export default function AIChatView() {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          {/* Audio level indicator */}
+          {aiState === "speaking" && audioLevel > 0.05 && (
+            <div className="flex items-center gap-[2px] h-4">
+              {[0.3, 0.6, 1, 0.7, 0.4].map((base, i) => (
+                <div
+                  key={i}
+                  className="w-[2px] rounded-full bg-neon-magenta/60 origin-bottom transition-all duration-75"
+                  style={{ height: `${4 + base * audioLevel * 12}px` }}
+                />
+              ))}
+            </div>
+          )}
           <div className="flex items-center gap-1.5">
             <Zap className="w-3 h-3 text-neon-magenta/40" />
             <span className="text-[9px] tracking-wider uppercase text-muted-foreground/40">Neural Active</span>
@@ -81,6 +94,7 @@ export default function AIChatView() {
           }}
           aiState={aiState}
           onAIStateChange={setAIState}
+          onAudioLevel={setAudioLevel}
         />
       </div>
     </div>

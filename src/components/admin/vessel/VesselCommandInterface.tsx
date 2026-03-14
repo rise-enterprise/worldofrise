@@ -83,6 +83,7 @@ interface VesselCommandInterfaceProps {
   onSpeakingChange?: (speaking: boolean) => void;
   aiState?: AIState;
   onAIStateChange?: (state: AIState) => void;
+  onAudioLevel?: (level: number) => void;
 }
 
 export default function VesselCommandInterface({
@@ -94,6 +95,7 @@ export default function VesselCommandInterface({
   onSpeakingChange,
   aiState = "idle",
   onAIStateChange,
+  onAudioLevel,
 }: VesselCommandInterfaceProps) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -103,6 +105,8 @@ export default function VesselCommandInterface({
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const [pendingAttachments, setPendingAttachments] = useState<Attachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [hasGreeted, setHasGreeted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -116,6 +120,9 @@ export default function VesselCommandInterface({
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const ttsAbortRef = useRef<AbortController | null>(null);
   const ttsObjectUrlRef = useRef<string | null>(null);
+  const ttsAnalyserRef = useRef<AnalyserNode | null>(null);
+  const ttsAnimRef = useRef<number>(0);
+  const ttsAudioCtxRef = useRef<AudioContext | null>(null);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -130,8 +137,56 @@ export default function VesselCommandInterface({
       ttsAbortRef.current?.abort();
       ttsAudioRef.current?.pause();
       if (ttsObjectUrlRef.current) URL.revokeObjectURL(ttsObjectUrlRef.current);
+      if (ttsAnimRef.current) cancelAnimationFrame(ttsAnimRef.current);
+      ttsAudioCtxRef.current?.close().catch(() => {});
     };
   }, []);
+
+  // Auto-greeting on mount
+  useEffect(() => {
+    if (hasGreeted || messages.length > 0) return;
+    const timer = setTimeout(() => {
+      setHasGreeted(true);
+      triggerGreeting();
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [hasGreeted, messages.length]);
+
+  const triggerGreeting = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) return;
+
+    onAIStateChange?.("thinking");
+    // Brief thinking pause
+    await new Promise(r => setTimeout(r, 400));
+
+    const greetingMessages: Msg[] = [
+      { role: "user", content: `[SYSTEM] ${systemPrompt}` },
+      { role: "user", content: "Greet me as the RISE ONE executive AI. One sentence. Be confident and ready to assist." },
+    ];
+
+    let assistantSoFar = "";
+    const upsert = (chunk: string) => {
+      assistantSoFar += chunk;
+      setMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") {
+          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
+        }
+        return [{ role: "assistant", content: assistantSoFar }];
+      });
+    };
+
+    await streamChat({
+      messages: greetingMessages,
+      token: session.access_token,
+      onDelta: upsert,
+      onDone: () => {
+        if (assistantSoFar) speak(assistantSoFar);
+      },
+      onError: () => { onAIStateChange?.("idle"); },
+    });
+  };
 
   const stopTts = useCallback(() => {
     ttsAbortRef.current?.abort();
@@ -141,12 +196,43 @@ export default function VesselCommandInterface({
       URL.revokeObjectURL(ttsObjectUrlRef.current);
       ttsObjectUrlRef.current = null;
     }
-  }, []);
+    if (ttsAnimRef.current) cancelAnimationFrame(ttsAnimRef.current);
+    ttsAnimRef.current = 0;
+    setAudioLevel(0);
+    onAudioLevel?.(0);
+  }, [onAudioLevel]);
+
+  const startTtsAnalyser = useCallback((audio: HTMLAudioElement) => {
+    try {
+      const ctx = new AudioContext();
+      ttsAudioCtxRef.current = ctx;
+      const source = ctx.createMediaElementSource(audio);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+      ttsAnalyserRef.current = analyser;
+
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) sum += data[i];
+        const level = Math.min(1, (sum / data.length / 255) * 2.5);
+        setAudioLevel(level);
+        onAudioLevel?.(level);
+        ttsAnimRef.current = requestAnimationFrame(tick);
+      };
+      ttsAnimRef.current = requestAnimationFrame(tick);
+    } catch {
+      // AudioContext not available
+    }
+  }, [onAudioLevel]);
 
   const speak = useCallback(async (text: string) => {
-    if (!ttsEnabled) return;
+    if (!ttsEnabled) { onAIStateChange?.("idle"); return; }
     const clean = text.replace(/[#*_`>~\[\]()]/g, "").replace(/\n+/g, ". ").trim();
-    if (!clean || clean === lastSpokenRef.current) return;
+    if (!clean || clean === lastSpokenRef.current) { onAIStateChange?.("idle"); return; }
     lastSpokenRef.current = clean;
     stopTts();
     const controller = new AbortController();
@@ -175,15 +261,26 @@ export default function VesselCommandInterface({
       const audio = new Audio(url);
       ttsAudioRef.current = audio;
       audio.volume = 0.8;
+      audio.crossOrigin = "anonymous";
       onSpeakingChange?.(true);
-      audio.onended = () => { onSpeakingChange?.(false); onAIStateChange?.("idle"); };
+      startTtsAnalyser(audio);
+      audio.onended = () => {
+        onSpeakingChange?.(false);
+        onAIStateChange?.("idle");
+        setAudioLevel(0);
+        onAudioLevel?.(0);
+        if (ttsAnimRef.current) cancelAnimationFrame(ttsAnimRef.current);
+        ttsAudioCtxRef.current?.close().catch(() => {});
+      };
       await audio.play();
     } catch (err: unknown) {
       onSpeakingChange?.(false);
       onAIStateChange?.("idle");
+      setAudioLevel(0);
+      onAudioLevel?.(0);
       if (err instanceof Error && err.name === "AbortError") return;
     }
-  }, [ttsEnabled, stopTts, onSpeakingChange, onAIStateChange]);
+  }, [ttsEnabled, stopTts, onSpeakingChange, onAIStateChange, startTtsAnalyser, onAudioLevel]);
 
   const detectCrisis = useCallback((content: string) => {
     const crisisKeywords = ["instability", "anomaly", "crisis", "critical", "alert", "urgent", "immediate action", "sharp drop", "sudden"];
@@ -425,11 +522,18 @@ export default function VesselCommandInterface({
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-12 px-4">
-            {/* AI Avatar as centerpiece */}
-            <AIAvatar state={aiState} size="lg" className="mb-12" />
+            {/* Click-to-talk AI Avatar */}
+            <AIAvatar
+              state={aiState}
+              size="lg"
+              className="mb-8"
+              audioLevel={audioLevel}
+              onClick={toggleVoice}
+              clickLabel="Tap to speak"
+            />
 
             {/* Title */}
-            <div className="text-2xl tracking-[0.25em] font-medium mb-2 relative overflow-hidden mt-4">
+            <div className="text-2xl tracking-[0.25em] font-medium mb-2 relative overflow-hidden">
               <span
                 className="bg-clip-text"
                 style={{
@@ -481,7 +585,7 @@ export default function VesselCommandInterface({
           <div className="py-4 space-y-2">
             {/* Compact avatar when chatting */}
             <div className="flex justify-center py-2 mb-2">
-              <AIAvatar state={aiState} size="sm" />
+              <AIAvatar state={aiState} size="sm" audioLevel={audioLevel} />
             </div>
             {messages.map((msg, i) => (
               <CopilotMessage
@@ -553,7 +657,6 @@ export default function VesselCommandInterface({
               : "hsl(var(--card) / 0.5)",
           }}
         >
-          {/* Focus glow */}
           {(input.trim() || isListening) && (
             <div
               className="absolute inset-0 rounded-xl pointer-events-none opacity-30"
