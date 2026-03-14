@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import type L_Type from "leaflet";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocations } from "@/hooks/useLocations";
-import { useLocations } from "@/hooks/useLocations";
-import { X, TrendingUp, Users, Star, Brain, Sparkles } from "lucide-react";
+import { X, TrendingUp, Users, Star, Sparkles } from "lucide-react";
 
 interface LocationInsight {
   id: string;
@@ -27,77 +25,66 @@ const BRAND_COLORS: Record<string, string> = {
   both: "#C8A24A",
 };
 
-// AI insights per city
 const AI_INSIGHTS: Record<string, string> = {
   doha: "West Walk has the highest dessert orders after 9 PM. Al Hazm shows 23% VIP growth this quarter.",
   riyadh: "Riyadh branch has increasing VIP customer visits (+18%). Peak hours shifting to later evenings.",
   london: "London location shows strong weekend brunch demand. Consider loyalty-exclusive tasting events.",
 };
 
-function createCustomIcon(brand: string, isActive: boolean) {
-  const color = BRAND_COLORS[brand] || "#C8A24A";
-  return L.divIcon({
-    className: "custom-map-pin",
-    html: `
-      <div style="position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
-        <div style="position:absolute;inset:0;border-radius:50%;background:${color};opacity:${isActive ? 0.2 : 0.08};animation:pinPulse 2s ease-in-out infinite;"></div>
-        <div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid hsl(var(--background));box-shadow:0 0 12px ${color}66;z-index:1;"></div>
-      </div>
-    `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-  });
-}
-
 export default function InteractiveMap() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
+  const leafletRef = useRef<any>(null);
   const { data: locations } = useLocations();
   const [selectedLocation, setSelectedLocation] = useState<LocationInsight | null>(null);
   const [activeCity, setActiveCity] = useState<string | null>(null);
-  const [L, setL] = useState<typeof L_Type | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
-  // Dynamically import leaflet to avoid SSR/module issues
-  useEffect(() => {
-    let cancelled = false;
-    Promise.all([
-      import("leaflet"),
-      import("leaflet/dist/leaflet.css"),
-    ]).then(([leaflet]) => {
-      if (!cancelled) setL(() => leaflet.default);
-    });
-    return () => { cancelled = true; };
-  }, []);
-
+  // Initialize map with dynamic import
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
+    let cancelled = false;
 
-    const map = L.map(mapRef.current, {
-      center: [28, 40],
-      zoom: 4,
-      zoomControl: false,
-      attributionControl: false,
-      scrollWheelZoom: true,
-    });
+    (async () => {
+      const L = (await import("leaflet")).default;
+      await import("leaflet/dist/leaflet.css");
+      if (cancelled || !mapRef.current) return;
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19,
-    }).addTo(map);
+      leafletRef.current = L;
 
-    L.control.zoom({ position: "bottomright" }).addTo(map);
-    mapInstanceRef.current = map;
+      const map = L.map(mapRef.current, {
+        center: [28, 40],
+        zoom: 4,
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: true,
+      });
+
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+      }).addTo(map);
+
+      L.control.zoom({ position: "bottomright" }).addTo(map);
+      mapInstanceRef.current = map;
+      setMapReady(true);
+    })();
 
     return () => {
-      map.remove();
-      mapInstanceRef.current = null;
+      cancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
     };
   }, []);
 
+  // Add markers when map + locations are ready
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map || !locations) return;
+    const L = leafletRef.current;
+    if (!map || !L || !locations || !mapReady) return;
 
-    map.eachLayer((layer) => {
+    map.eachLayer((layer: any) => {
       if (layer instanceof L.Marker) map.removeLayer(layer);
     });
 
@@ -105,10 +92,21 @@ export default function InteractiveMap() {
       const coords = CITY_COORDS[loc.city];
       if (!coords) return;
 
-      const offset = Math.random() * 0.02 - 0.01;
-      const marker = L.marker([coords[0] + offset, coords[1] + offset], {
-        icon: createCustomIcon(loc.brand, loc.isActive),
+      const color = BRAND_COLORS[loc.brand] || "#C8A24A";
+      const icon = L.divIcon({
+        className: "custom-map-pin",
+        html: `
+          <div style="position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
+            <div style="position:absolute;inset:0;border-radius:50%;background:${color};opacity:${loc.isActive ? 0.2 : 0.08};animation:pinPulse 2s ease-in-out infinite;"></div>
+            <div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid hsl(var(--background));box-shadow:0 0 12px ${color}66;z-index:1;"></div>
+          </div>
+        `,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
       });
+
+      const offset = Math.random() * 0.02 - 0.01;
+      const marker = L.marker([coords[0] + offset, coords[1] + offset], { icon });
 
       marker.on("click", () => {
         setSelectedLocation({
@@ -127,19 +125,25 @@ export default function InteractiveMap() {
 
       marker.addTo(map);
     });
-  }, [locations]);
+  }, [locations, mapReady]);
 
-  const flyToCity = (city: string) => {
+  const flyToCity = useCallback((city: string) => {
     const coords = CITY_COORDS[city];
     if (coords) {
       mapInstanceRef.current?.flyTo(coords, city === "london" ? 10 : 11, { duration: 1 });
       setActiveCity(city);
     }
-  };
+  }, []);
 
   return (
     <div className="relative h-full w-full rounded-xl overflow-hidden border border-border/30">
       <div ref={mapRef} className="h-full w-full" />
+
+      {!mapReady && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+          <p className="text-sm text-muted-foreground">Loading map…</p>
+        </div>
+      )}
 
       {/* Location Insight Panel */}
       {selectedLocation && (
@@ -152,7 +156,6 @@ export default function InteractiveMap() {
             boxShadow: "0 16px 48px -12px hsl(0 0% 0% / 0.6)",
           }}
         >
-          {/* Header */}
           <div className="p-4 border-b border-border/20">
             <div className="flex items-start justify-between">
               <div>
@@ -170,7 +173,6 @@ export default function InteractiveMap() {
             </div>
           </div>
 
-          {/* Stats */}
           <div className="p-4 space-y-2">
             {[
               { icon: TrendingUp, label: "Total Visits", value: selectedLocation.visits?.toLocaleString() },
