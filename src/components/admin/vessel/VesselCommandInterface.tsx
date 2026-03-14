@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import CopilotMessage from "../copilot/CopilotMessage";
 import { cn } from "@/lib/utils";
 import { useAIPersonality } from "@/contexts/AIPersonalityContext";
-import HolographicAvatar3D from "@/components/admin/ai/HolographicAvatar3D";
 import AIAvatar from "@/components/admin/ai/AIAvatar";
 import type { AIState } from "@/components/admin/ai/AIAvatar";
 
