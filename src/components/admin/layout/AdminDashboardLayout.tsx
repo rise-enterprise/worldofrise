@@ -120,7 +120,7 @@ export default function AdminDashboardLayout() {
       {/* Main Content */}
       <main className="flex-1 min-h-0 overflow-auto">
         <Suspense fallback={<LoadingView />}>
-          {activeView === "overview" && <DashboardOverview onNavigate={setActiveView} />}
+          {activeView === "overview" && <DashboardOverview onNavigate={(v) => setActiveView(v as ViewId)} />}
           {activeView === "map" && <MapView />}
           {activeView === "ai" && <AIChat />}
           {activeView === "members" && <MembersView />}

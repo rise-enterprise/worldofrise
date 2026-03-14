@@ -111,7 +111,7 @@ export default function DashboardOverview({ onNavigate }: Props) {
           <h3 className="text-sm font-semibold text-foreground mb-4">Tier Distribution</h3>
           <div className="space-y-3">
             {Object.entries(tierDist).map(([tier, count]) => {
-              const total = Object.values(tierDist).reduce((a: number, b: any) => a + Number(b), 0);
+              const total = Object.values(tierDist).reduce((a: number, b) => a + Number(b), 0) as number;
               const pct = total > 0 ? (Number(count) / total) * 100 : 0;
               return (
                 <div key={tier}>
