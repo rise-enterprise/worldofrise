@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import CopilotMessage from "../copilot/CopilotMessage";
 import { cn } from "@/lib/utils";
 import { useAIPersonality } from "@/contexts/AIPersonalityContext";
-import riseLogo from "@/assets/rise-holding-logo.png";
+import AIAvatar from "@/components/admin/ai/AIAvatar";
+import type { AIState } from "@/components/admin/ai/AIAvatar";
 
 interface Attachment {
   url: string;
@@ -80,6 +81,8 @@ interface VesselCommandInterfaceProps {
   onAIMetrics?: (metrics: { label: string; value: number }[]) => void;
   onProcessingChange?: (processing: boolean) => void;
   onSpeakingChange?: (speaking: boolean) => void;
+  aiState?: AIState;
+  onAIStateChange?: (state: AIState) => void;
 }
 
 export default function VesselCommandInterface({
@@ -89,6 +92,8 @@ export default function VesselCommandInterface({
   onAIMetrics,
   onProcessingChange,
   onSpeakingChange,
+  aiState = "idle",
+  onAIStateChange,
 }: VesselCommandInterfaceProps) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -149,6 +154,7 @@ export default function VesselCommandInterface({
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) return;
+      onAIStateChange?.("speaking");
       const resp = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/elevenlabs-tts`,
         {
@@ -162,7 +168,7 @@ export default function VesselCommandInterface({
           signal: controller.signal,
         }
       );
-      if (!resp.ok) return;
+      if (!resp.ok) { onAIStateChange?.("idle"); return; }
       const blob = await resp.blob();
       const url = URL.createObjectURL(blob);
       ttsObjectUrlRef.current = url;
@@ -170,13 +176,14 @@ export default function VesselCommandInterface({
       ttsAudioRef.current = audio;
       audio.volume = 0.8;
       onSpeakingChange?.(true);
-      audio.onended = () => onSpeakingChange?.(false);
+      audio.onended = () => { onSpeakingChange?.(false); onAIStateChange?.("idle"); };
       await audio.play();
     } catch (err: unknown) {
       onSpeakingChange?.(false);
+      onAIStateChange?.("idle");
       if (err instanceof Error && err.name === "AbortError") return;
     }
-  }, [ttsEnabled, stopTts, onSpeakingChange]);
+  }, [ttsEnabled, stopTts, onSpeakingChange, onAIStateChange]);
 
   const detectCrisis = useCallback((content: string) => {
     const crisisKeywords = ["instability", "anomaly", "crisis", "critical", "alert", "urgent", "immediate action", "sharp drop", "sudden"];
@@ -232,6 +239,7 @@ export default function VesselCommandInterface({
     setPendingAttachments([]);
     setIsLoading(true);
     onProcessingChange?.(true);
+    onAIStateChange?.("thinking");
     lastSpokenRef.current = "";
     stopTts();
 
@@ -239,6 +247,7 @@ export default function VesselCommandInterface({
     if (!session?.access_token) {
       toast({ title: "Session expired", description: "Please log in again.", variant: "destructive" });
       setIsLoading(false);
+      onAIStateChange?.("idle");
       return;
     }
 
@@ -280,6 +289,7 @@ export default function VesselCommandInterface({
               toast({ title: "AI Error", description: err, variant: "destructive" });
               setIsLoading(false);
               onProcessingChange?.(false);
+              onAIStateChange?.("idle");
             }
           },
         });
@@ -292,12 +302,13 @@ export default function VesselCommandInterface({
           toast({ title: "AI Error", description: "Failed after retry. Please try again.", variant: "destructive" });
           setIsLoading(false);
           onProcessingChange?.(false);
+          onAIStateChange?.("idle");
         }
       }
     };
 
     await doStream();
-  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, systemPrompt, pendingAttachments]);
+  }, [isLoading, messages, speak, detectCrisis, stopTts, onProcessingChange, systemPrompt, pendingAttachments, onAIStateChange]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -356,6 +367,7 @@ export default function VesselCommandInterface({
       stopAudio();
       setIsListening(false);
       onListeningChange?.(false);
+      onAIStateChange?.("idle");
       return;
     }
     const w = window as any;
@@ -387,13 +399,14 @@ export default function VesselCommandInterface({
         setInput(interim);
       }
     };
-    recognition.onerror = () => { stopAudio(); setIsListening(false); onListeningChange?.(false); };
-    recognition.onend = () => { stopAudio(); setIsListening(false); onListeningChange?.(false); };
+    recognition.onerror = () => { stopAudio(); setIsListening(false); onListeningChange?.(false); onAIStateChange?.("idle"); };
+    recognition.onend = () => { stopAudio(); setIsListening(false); onListeningChange?.(false); onAIStateChange?.("idle"); };
     recognition.start();
     startAudioVisualizer();
     setIsListening(true);
     onListeningChange?.(true);
-  }, [isListening, send, stopAudio, startAudioVisualizer, onListeningChange]);
+    onAIStateChange?.("listening");
+  }, [isListening, send, stopAudio, startAudioVisualizer, onListeningChange, onAIStateChange]);
 
   const isEmpty = messages.length === 0;
 
@@ -408,162 +421,20 @@ export default function VesselCommandInterface({
         onChange={handleFileSelect}
       />
 
-      {/* Messages */}
+      {/* Messages / Empty state */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 scrollbar-hide min-h-0">
         {isEmpty ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-16 px-4">
-            {/* Enlarged AI Core — 240px with HUD grid */}
-            <div className="relative mb-10" style={{ width: 240, height: 240 }}>
-              {/* HUD grid behind orb */}
-              <div
-                className="absolute inset-[-20px] rounded-full pointer-events-none opacity-[0.04]"
-                style={{
-                  backgroundImage: `
-                    linear-gradient(hsl(var(--gold) / 0.5) 1px, transparent 1px),
-                    linear-gradient(90deg, hsl(var(--gold) / 0.5) 1px, transparent 1px)
-                  `,
-                  backgroundSize: "20px 20px",
-                  maskImage: "radial-gradient(circle, black 40%, transparent 70%)",
-                  WebkitMaskImage: "radial-gradient(circle, black 40%, transparent 70%)",
-                }}
-              />
+          <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-12 px-4">
+            {/* AI Avatar as centerpiece */}
+            <AIAvatar state={aiState} size="lg" className="mb-12" />
 
-              {/* Outer ring — counter-rotating */}
-              <div
-                className="absolute rounded-full pointer-events-none"
-                style={{
-                  top: "50%", left: "50%",
-                  width: 180, height: 180,
-                  transform: "translate(-50%, -50%)",
-                  border: "1px solid hsl(var(--gold) / 0.06)",
-                  animation: "orbitDot 30s linear infinite reverse",
-                }}
-              />
-
-              {/* Sonar pulse rings */}
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={`sonar-${i}`}
-                  className="absolute rounded-full pointer-events-none"
-                  style={{
-                    top: "50%", left: "50%",
-                    width: 140, height: 140,
-                    transform: "translate(-50%, -50%)",
-                    border: "1px solid hsl(var(--gold) / 0.12)",
-                    animation: `sonarPulse ${isLoading ? "2.5s" : "4.5s"} ease-out ${i * (isLoading ? 0.8 : 1.5)}s infinite`,
-                  }}
-                />
-              ))}
-
-              {/* Orbiting particles — more dense */}
-              {[
-                { r: 75, dur: 8, size: 3.5, opacity: 0.55 },
-                { r: 75, dur: 12, size: 2.5, opacity: 0.4, offset: 120 },
-                { r: 75, dur: 10, size: 3, opacity: 0.5, offset: 200 },
-                { r: 95, dur: 14, size: 2.5, opacity: 0.35 },
-                { r: 95, dur: 9, size: 3.5, opacity: 0.45, offset: 90 },
-                { r: 95, dur: 16, size: 2, opacity: 0.3, offset: 250 },
-                { r: 60, dur: 7, size: 2, opacity: 0.6, offset: 45 },
-                { r: 60, dur: 11, size: 2.5, opacity: 0.5, offset: 180 },
-              ].map((p, i) => (
-                <div
-                  key={`orbit-${i}`}
-                  className="absolute pointer-events-none"
-                  style={{
-                    top: "50%", left: "50%",
-                    width: p.r * 2, height: p.r * 2,
-                    marginLeft: -p.r, marginTop: -p.r,
-                    animation: `orbitDot ${isListening ? p.dur * 0.6 : p.dur}s linear ${(p.offset || 0) / 360 * p.dur}s infinite`,
-                  }}
-                >
-                  <div
-                    className="absolute rounded-full"
-                    style={{
-                      width: p.size, height: p.size,
-                      top: 0, left: "50%",
-                      marginLeft: -p.size / 2,
-                      backgroundColor: "hsl(var(--gold))",
-                      opacity: p.opacity,
-                      boxShadow: "0 0 8px hsl(var(--gold) / 0.5)",
-                    }}
-                  />
-                </div>
-              ))}
-
-              {/* Loading arc */}
-              {isLoading && (
-                <svg
-                  className="absolute"
-                  style={{ top: "50%", left: "50%", marginLeft: -70, marginTop: -70 }}
-                  width={140} height={140}
-                  viewBox="0 0 140 140"
-                >
-                  <circle
-                    cx={70} cy={70} r={65}
-                    fill="none"
-                    stroke="hsl(var(--gold) / 0.3)"
-                    strokeWidth={1.5}
-                    strokeDasharray="70 340"
-                    strokeLinecap="round"
-                    style={{ animation: "spinArc 1.8s linear infinite", transformOrigin: "center" }}
-                  />
-                </svg>
-              )}
-
-              {/* Outer glow ring */}
-              <div
-                className="absolute rounded-full"
-                style={{
-                  top: "50%", left: "50%",
-                  width: 140, height: 140,
-                  transform: "translate(-50%, -50%)",
-                  background: "radial-gradient(circle, hsl(var(--gold) / 0.08) 0%, hsl(var(--gold) / 0.02) 60%, transparent 100%)",
-                  border: "1px solid hsl(var(--gold) / 0.12)",
-                }}
-              />
-
-              {/* Inner core */}
-              <div
-                className="absolute rounded-full flex items-center justify-center"
-                style={{
-                  top: "50%", left: "50%",
-                  width: 100, height: 100,
-                  transform: "translate(-50%, -50%)",
-                  background: isListening
-                    ? "radial-gradient(circle, hsl(var(--gold) / 0.2) 0%, transparent 70%)"
-                    : "radial-gradient(circle, hsl(var(--gold) / 0.12) 0%, transparent 70%)",
-                  border: "1px solid hsl(var(--gold) / 0.1)",
-                  animation: `breathe ${isLoading ? "2s" : "4s"} ease-in-out infinite`,
-                  boxShadow: isLoading
-                    ? "0 0 60px hsl(var(--gold) / 0.2)"
-                    : isListening
-                      ? "0 0 40px hsl(var(--gold) / 0.15)"
-                      : "0 0 30px hsl(var(--gold) / 0.08)",
-                }}
-              >
-                <img src={riseLogo} alt="RISE" className="h-10 w-auto opacity-70" />
-              </div>
-
-              {/* Breathing glow — larger */}
-              <div
-                className="absolute rounded-full pointer-events-none"
-                style={{
-                  top: "50%", left: "50%",
-                  width: 200, height: 200,
-                  transform: "translate(-50%, -50%)",
-                  background: "radial-gradient(circle, hsl(var(--gold) / 0.06) 0%, transparent 70%)",
-                  animation: `breathe ${isLoading ? "2s" : "4s"} ease-in-out infinite`,
-                }}
-              />
-            </div>
-
-            {/* Title with gradient sweep */}
-            <div className="text-2xl tracking-[0.25em] font-medium mb-2 relative overflow-hidden">
+            {/* Title */}
+            <div className="text-2xl tracking-[0.25em] font-medium mb-2 relative overflow-hidden mt-4">
               <span
                 className="bg-clip-text"
                 style={{
                   animation: "shimmerText 6s ease-in-out infinite",
-                  backgroundImage: `linear-gradient(90deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 40%, hsl(var(--gold)) 50%, hsl(var(--foreground)) 60%, hsl(var(--foreground)) 100%)`,
+                  backgroundImage: `linear-gradient(90deg, hsl(var(--foreground)) 0%, hsl(var(--foreground)) 35%, hsl(var(--neon-purple-light)) 50%, hsl(var(--foreground)) 65%, hsl(var(--foreground)) 100%)`,
                   backgroundSize: "200% 100%",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -575,38 +446,13 @@ export default function VesselCommandInterface({
             </div>
 
             <div
-              className="text-[11px] tracking-[0.2em] uppercase mb-10 text-muted-foreground/50 animate-fade-in"
+              className="text-[11px] tracking-[0.2em] uppercase mb-10 text-neon-purple/40 animate-fade-in"
               style={{ animationDelay: "300ms", animationFillMode: "both" }}
             >
               Executive Intelligence System
             </div>
 
-            {/* Status indicators */}
-            <div className="flex items-center gap-5 mb-8 text-[9px] uppercase tracking-[0.15em]">
-              <div className="flex items-center gap-1.5">
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-emerald-500"
-                  style={{ animation: "statusPulse 3s ease-in-out infinite" }}
-                />
-                <span className="text-muted-foreground/50">Online</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-primary"
-                  style={{ animation: "statusPulse 3s ease-in-out 1s infinite" }}
-                />
-                <span className="text-muted-foreground/50">Tools Active</span>
-              </div>
-            </div>
-
-            <p
-              className="text-xs max-w-md mb-8 leading-relaxed text-muted-foreground/40 animate-fade-in"
-              style={{ animationDelay: "500ms", animationFillMode: "both" }}
-            >
-              Query insights. Analyze performance. Generate reports.
-            </p>
-
-            {/* Glass command cards — 2-column grid */}
+            {/* Glass command cards */}
             <div className="grid grid-cols-2 gap-2.5 max-w-md w-full">
               {EXAMPLE_COMMANDS.map((item, idx) => {
                 const Icon = item.icon;
@@ -614,14 +460,14 @@ export default function VesselCommandInterface({
                   <button
                     key={item.cmd}
                     onClick={() => send(item.cmd)}
-                    className="group relative flex items-center gap-2.5 px-4 py-3 rounded-xl text-left transition-all duration-300 backdrop-blur-md border border-border/20 bg-card/30 hover:bg-primary/[0.06] hover:border-primary/20 hover:shadow-[0_0_20px_-6px_hsl(var(--gold)_/_0.12)] animate-fade-in"
+                    className="group relative flex items-center gap-2.5 px-4 py-3 rounded-xl text-left transition-all duration-300 backdrop-blur-md border border-neon-purple/10 bg-neon-purple/[0.02] hover:bg-neon-purple/[0.06] hover:border-neon-purple/25 hover:shadow-[0_0_20px_-6px_hsl(var(--neon-purple)_/_0.15)] animate-fade-in"
                     style={{
                       animationDelay: `${600 + idx * 80}ms`,
                       animationFillMode: "both",
                     }}
                   >
-                    <div className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-primary/[0.06] border border-primary/10 transition-all duration-300 group-hover:bg-primary/10 group-hover:border-primary/20">
-                      <Icon className="w-3.5 h-3.5 text-primary/50 transition-all duration-300 group-hover:text-primary group-hover:drop-shadow-[0_0_6px_hsl(var(--gold)_/_0.4)]" />
+                    <div className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center bg-neon-purple/[0.06] border border-neon-purple/10 transition-all duration-300 group-hover:bg-neon-purple/10 group-hover:border-neon-purple/20">
+                      <Icon className="w-3.5 h-3.5 text-neon-purple/50 transition-all duration-300 group-hover:text-neon-purple-light group-hover:drop-shadow-[0_0_6px_hsl(var(--neon-purple)_/_0.5)]" />
                     </div>
                     <span className="text-[10px] tracking-wide text-muted-foreground/60 transition-colors duration-300 group-hover:text-foreground/80">
                       {item.label}
@@ -633,6 +479,10 @@ export default function VesselCommandInterface({
           </div>
         ) : (
           <div className="py-4 space-y-2">
+            {/* Compact avatar when chatting */}
+            <div className="flex justify-center py-2 mb-2">
+              <AIAvatar state={aiState} size="sm" />
+            </div>
             {messages.map((msg, i) => (
               <CopilotMessage
                 key={i}
@@ -647,14 +497,14 @@ export default function VesselCommandInterface({
         )}
       </div>
 
-      {/* Quick actions when chatting */}
+      {/* Quick actions */}
       {!isEmpty && !isLoading && (
         <div className="flex gap-1.5 px-4 py-2 overflow-x-auto scrollbar-hide">
           {EXAMPLE_COMMANDS.slice(3, 6).map((item) => (
             <button
               key={item.cmd}
               onClick={() => send(item.cmd)}
-              className="shrink-0 text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-border/15 bg-card/20 text-muted-foreground/50 hover:text-primary/70 hover:border-primary/15 hover:bg-primary/[0.04]"
+              className="shrink-0 text-[9px] px-3.5 py-2 rounded-lg transition-all duration-300 backdrop-blur-sm border border-neon-purple/10 bg-neon-purple/[0.02] text-muted-foreground/50 hover:text-neon-purple/70 hover:border-neon-purple/20 hover:bg-neon-purple/[0.05]"
             >
               {item.label}
             </button>
@@ -668,9 +518,9 @@ export default function VesselCommandInterface({
           {pendingAttachments.map((att, i) => (
             <div key={i} className="relative shrink-0 group">
               {att.type.startsWith("image/") ? (
-                <img src={att.url} alt={att.name} className="w-16 h-16 object-cover rounded-lg border border-primary/15" />
+                <img src={att.url} alt={att.name} className="w-16 h-16 object-cover rounded-lg border border-neon-purple/15" />
               ) : (
-                <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-primary/10 bg-primary/[0.03] text-[10px] text-muted-foreground">
+                <div className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-neon-purple/10 bg-neon-purple/[0.03] text-[10px] text-muted-foreground">
                   📎 {att.name.length > 15 ? att.name.slice(0, 15) + "…" : att.name}
                 </div>
               )}
@@ -685,48 +535,46 @@ export default function VesselCommandInterface({
         </div>
       )}
 
-      {/* Premium input bar */}
+      {/* Input bar */}
       <div className="px-4 sm:px-6 pb-5 pt-2 relative">
         <div
           className={cn(
             "relative flex items-end gap-2.5 rounded-xl px-4 py-3 transition-all duration-300",
             "backdrop-blur-xl border",
             isListening
-              ? "border-primary/25 shadow-[0_0_30px_-10px_hsl(var(--gold)_/_0.15)]"
+              ? "border-neon-cyan/30 shadow-[0_0_30px_-10px_hsl(var(--neon-cyan)_/_0.2)]"
               : isLoading
-                ? "border-primary/15"
-                : "border-border/20 hover:border-border/30"
+                ? "border-neon-purple/20"
+                : "border-neon-purple/10 hover:border-neon-purple/15"
           )}
           style={{
             backgroundColor: isListening
-              ? "hsl(var(--gold) / 0.04)"
-              : "hsl(var(--card) / 0.6)",
+              ? "hsl(var(--neon-cyan) / 0.04)"
+              : "hsl(var(--card) / 0.5)",
           }}
         >
-          {/* Gold gradient focus glow */}
+          {/* Focus glow */}
           {(input.trim() || isListening) && (
             <div
-              className="absolute inset-0 rounded-xl pointer-events-none opacity-40"
+              className="absolute inset-0 rounded-xl pointer-events-none opacity-30"
               style={{
-                background: "linear-gradient(135deg, hsl(var(--gold) / 0.05), transparent, hsl(var(--gold) / 0.03))",
+                background: "linear-gradient(135deg, hsl(var(--neon-purple) / 0.06), transparent, hsl(var(--neon-blue) / 0.04))",
               }}
             />
           )}
 
-          {/* TTS toggle */}
           <Button
             onClick={() => { setTtsEnabled(p => !p); stopTts(); }}
             variant="ghost"
             size="icon"
             className={cn(
               "shrink-0 h-9 w-9 rounded-lg transition-all",
-              ttsEnabled ? "text-primary/60 hover:text-primary" : "text-muted-foreground/30 hover:text-muted-foreground/60"
+              ttsEnabled ? "text-neon-purple/60 hover:text-neon-purple" : "text-muted-foreground/30 hover:text-muted-foreground/60"
             )}
           >
             {ttsEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </Button>
 
-          {/* Attachment */}
           <Button
             onClick={() => fileInputRef.current?.click()}
             variant="ghost"
@@ -735,19 +583,18 @@ export default function VesselCommandInterface({
             className={cn(
               "shrink-0 h-9 w-9 rounded-lg transition-all",
               pendingAttachments.length > 0
-                ? "text-primary/70 hover:text-primary"
-                : "text-muted-foreground/40 hover:text-primary/60"
+                ? "text-neon-magenta/70 hover:text-neon-magenta"
+                : "text-muted-foreground/40 hover:text-neon-purple/60"
             )}
           >
             <Paperclip className="w-3.5 h-3.5" />
             {pendingAttachments.length > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary text-[7px] text-primary-foreground font-bold flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-neon-magenta text-[7px] text-white font-bold flex items-center justify-center">
                 {pendingAttachments.length}
               </span>
             )}
           </Button>
 
-          {/* Input */}
           <textarea
             ref={inputRef}
             value={input}
@@ -762,7 +609,6 @@ export default function VesselCommandInterface({
             rows={1}
           />
 
-          {/* Waveform */}
           {isListening && (
             <div ref={barsRef} className="flex items-center gap-[3px] h-9 px-2">
               {[0.5, 0.65, 0.8, 1, 0.8, 0.65, 0.5].map((base, i) => (
@@ -770,7 +616,7 @@ export default function VesselCommandInterface({
                   key={i}
                   className="w-[2px] h-5 rounded-full origin-center"
                   style={{
-                    background: "linear-gradient(to top, hsl(var(--gold)), hsl(var(--gold) / 0.3))",
+                    background: "linear-gradient(to top, hsl(var(--neon-cyan)), hsl(var(--neon-cyan) / 0.3))",
                     transform: `scaleY(${base * 0.15})`,
                     transition: "transform 60ms ease-out",
                   }}
@@ -779,14 +625,13 @@ export default function VesselCommandInterface({
             </div>
           )}
 
-          {/* Mic */}
           <div className="relative shrink-0">
             {isListening && (
               <>
                 {[0, 0.5, 1].map((delay) => (
                   <span
                     key={delay}
-                    className="absolute inset-[-4px] rounded-lg border border-primary/20 pointer-events-none"
+                    className="absolute inset-[-4px] rounded-lg border border-neon-cyan/20 pointer-events-none"
                     style={{ animation: `micRipple 2s ease-out ${delay}s infinite` }}
                   />
                 ))}
@@ -798,23 +643,22 @@ export default function VesselCommandInterface({
               size="icon"
               className={cn(
                 "relative h-9 w-9 rounded-lg transition-all overflow-visible",
-                isListening ? "text-primary bg-primary/10" : "text-muted-foreground/40 hover:text-primary/60"
+                isListening ? "text-neon-cyan bg-neon-cyan/10" : "text-muted-foreground/40 hover:text-neon-purple/60"
               )}
             >
               {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
           </div>
 
-          {/* Send — with pulse when ready */}
           <Button
             onClick={() => send(input)}
             disabled={(!input.trim() && pendingAttachments.length === 0) || isLoading}
             size="icon"
             className={cn(
               "shrink-0 h-9 w-9 rounded-lg transition-all",
-              "bg-primary hover:bg-primary/90 text-primary-foreground",
+              "bg-neon-purple hover:bg-neon-purple/80 text-white",
               "disabled:opacity-15 disabled:bg-muted-foreground/20",
-              (input.trim() || pendingAttachments.length > 0) && !isLoading && "shadow-[0_0_12px_-3px_hsl(var(--gold)_/_0.3)]"
+              (input.trim() || pendingAttachments.length > 0) && !isLoading && "shadow-[0_0_14px_-3px_hsl(var(--neon-purple)_/_0.4)]"
             )}
           >
             <Send className="w-3.5 h-3.5" />
@@ -822,41 +666,21 @@ export default function VesselCommandInterface({
         </div>
 
         <div className="flex justify-center mt-2.5">
-          <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground/30">
+          <span className="text-[8px] uppercase tracking-[0.2em] text-muted-foreground/25">
             {isUploading ? "UPLOADING" : isListening ? "LISTENING" : isLoading ? "PROCESSING" : "RISE ONE · ACTIVE"}
           </span>
         </div>
       </div>
 
       <style>{`
-        @keyframes breathe {
-          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-          50% { transform: translate(-50%, -50%) scale(1.04); opacity: 0.85; }
-        }
         @keyframes micRipple {
           0% { transform: scale(1); opacity: 0.3; }
           100% { transform: scale(1.8); opacity: 0; }
-        }
-        @keyframes sonarPulse {
-          0% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
-          100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
-        }
-        @keyframes orbitDot {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes statusPulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
         }
         @keyframes shimmerText {
           0% { background-position: 200% 0; }
           50% { background-position: -200% 0; }
           100% { background-position: -200% 0; }
-        }
-        @keyframes spinArc {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>

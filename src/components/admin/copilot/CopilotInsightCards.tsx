@@ -1,13 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, TrendingDown, Sparkles, Info } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const severityConfig: Record<string, { icon: typeof AlertTriangle; accent: string }> = {
-  critical: { icon: AlertTriangle, accent: "hsl(var(--burgundy-light))" },
+  critical: { icon: AlertTriangle, accent: "hsl(var(--neon-magenta))" },
   warning: { icon: TrendingDown, accent: "hsl(var(--gold))" },
-  info: { icon: Info, accent: "hsl(var(--sapphire-bright))" },
-  opportunity: { icon: Sparkles, accent: "hsl(var(--gold-light))" },
+  info: { icon: Info, accent: "hsl(var(--neon-blue))" },
+  opportunity: { icon: Sparkles, accent: "hsl(var(--neon-purple-light))" },
 };
 
 export default function CopilotInsightCards() {
@@ -35,16 +34,15 @@ export default function CopilotInsightCards() {
         return (
           <div
             key={insight.id}
-            className="shrink-0 relative flex items-start gap-2.5 rounded-xl min-w-[230px] max-w-[280px] px-4 py-3 backdrop-blur-md border border-border/20 bg-card/40 transition-all duration-300 hover:bg-card/60 hover:border-primary/15 animate-fade-in"
+            className="shrink-0 relative flex items-start gap-2.5 rounded-xl min-w-[230px] max-w-[280px] px-4 py-3 backdrop-blur-md border border-neon-purple/10 bg-card/30 transition-all duration-300 hover:bg-neon-purple/[0.04] hover:border-neon-purple/20 animate-fade-in"
             style={{
               animationDelay: `${idx * 80}ms`,
               animationFillMode: "both",
             }}
           >
-            {/* Top gold edge line */}
             <div
               className="absolute top-0 left-3 right-3 h-px rounded-full"
-              style={{ background: `linear-gradient(90deg, transparent, ${config.accent}, transparent)`, opacity: 0.4 }}
+              style={{ background: `linear-gradient(90deg, transparent, ${config.accent}, transparent)`, opacity: 0.3 }}
             />
             <Icon className="w-4 h-4 mt-0.5 shrink-0" style={{ color: config.accent }} />
             <div className="min-w-0">

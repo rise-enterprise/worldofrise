@@ -59,6 +59,19 @@
     --sapphire-light: 215 60% 35%;         /* Sapphire glow */
     --sapphire-bright: 220 65% 50%;        /* Vivid sapphire */
     
+    /* ═══════════════════════════════════════════════════════════
+       AI NEON SPECTRUM — Cyberpunk Intelligence Palette
+    ═══════════════════════════════════════════════════════════ */
+    --neon-purple: 270 70% 55%;            /* #8B5CF6 - Core neon purple */
+    --neon-purple-light: 270 80% 72%;      /* Lighter purple glow */
+    --neon-purple-dark: 270 60% 35%;       /* Deep purple */
+    --neon-magenta: 320 75% 55%;           /* #EC4899 - Hot magenta */
+    --neon-magenta-light: 320 85% 72%;     /* Pink glow */
+    --neon-blue: 210 100% 60%;             /* #3B82F6 - Electric blue */
+    --neon-blue-light: 210 100% 75%;       /* Light electric blue */
+    --neon-cyan: 185 90% 50%;              /* #06B6D4 - Cyan accent */
+    --neon-glow: 270 70% 55%;              /* Primary AI glow color */
+    
     /* Teal Spectrum */
     --teal: 195 62% 32%;                   /* #1F6E86 - Royal Teal */
     --teal-light: 195 50% 45%;             /* Aquamarine */
