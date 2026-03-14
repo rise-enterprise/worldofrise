@@ -585,7 +585,7 @@ export default function VesselCommandInterface({
           <div className="py-4 space-y-2">
             {/* Compact avatar when chatting */}
             <div className="flex justify-center py-2 mb-2">
-              <HolographicAvatar3D state={aiState} size="sm" audioLevel={audioLevel} />
+              <AIAvatar state={aiState} size="sm" audioLevel={audioLevel} />
             </div>
             {messages.map((msg, i) => (
               <CopilotMessage
