@@ -6,9 +6,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { Send, Brain, User, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Message {
@@ -52,7 +51,6 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
 
   const getConciergeResponse = (userMessage: string): string => {
     const lowerMessage = userMessage.toLowerCase();
-    
     if (lowerMessage.includes('reservation') || lowerMessage.includes('book')) {
       return "I'd be happy to help with a reservation. Which venue would you prefer - NOIR Café or SASSO? And for how many guests?";
     }
@@ -71,7 +69,6 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
     if (lowerMessage.includes('sasso')) {
       return "SASSO is our Italian fine dining experience. We offer an exquisite menu with authentic Italian cuisine. Would you like to book a table or learn about our Chef's Table experiences?";
     }
-    
     return "Thank you for reaching out! I'm here to help with reservations, event information, or any special requests. How may I assist you further?";
   };
 
@@ -90,7 +87,6 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
     setInput('');
     setIsTyping(true);
 
-    // Simulate response delay
     setTimeout(() => {
       const response: Message = {
         id: (Date.now() + 1).toString(),
@@ -113,20 +109,46 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md h-[600px] flex flex-col p-0">
-        <DialogHeader className="px-6 py-4 border-b border-border">
-          <DialogTitle className="font-display flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="h-5 w-5 text-primary" />
+      <DialogContent className="sm:max-w-md h-[600px] flex flex-col p-0 border-neon-purple/20 overflow-hidden"
+        style={{
+          background: 'linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card) / 0.95) 100%)',
+        }}
+      >
+        {/* Ambient neon glow */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `
+              radial-gradient(ellipse 60% 30% at 50% 0%, hsl(var(--neon-purple) / 0.08) 0%, transparent 60%),
+              radial-gradient(ellipse 40% 20% at 70% 100%, hsl(var(--neon-magenta) / 0.05) 0%, transparent 50%)
+            `,
+          }}
+        />
+
+        <DialogHeader className="relative z-10 px-6 py-4 border-b border-neon-purple/10">
+          <DialogTitle className="font-display flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center ring-1 ring-neon-purple/30"
+              style={{
+                background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.2) 0%, hsl(var(--neon-magenta) / 0.1) 100%)',
+              }}
+            >
+              <Brain className="h-5 w-5 text-neon-purple" />
             </div>
             <div>
-              <p className="text-foreground">RISE Concierge</p>
-              <p className="text-xs font-normal text-muted-foreground">Always at your service</p>
+              <p className="text-foreground tracking-wider text-sm">RISE Concierge</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-cyan opacity-40" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-neon-cyan" />
+                </span>
+                <p className="text-[10px] font-normal text-muted-foreground/50 tracking-wider uppercase">Online</p>
+              </div>
             </div>
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-4" ref={scrollRef}>
+        <ScrollArea className="flex-1 px-4 relative z-10" ref={scrollRef}>
           <div className="space-y-4 py-4">
             {messages.map((message) => (
               <div
@@ -138,24 +160,40 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
               >
                 <div className={cn(
                   'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-                  message.sender === 'concierge' ? 'bg-primary/10' : 'bg-muted'
-                )}>
+                  message.sender === 'concierge' ? 'ring-1 ring-neon-purple/25' : 'bg-muted'
+                )}
+                  style={message.sender === 'concierge' ? {
+                    background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.12) 0%, transparent 100%)',
+                  } : undefined}
+                >
                   {message.sender === 'concierge' ? (
-                    <Bot className="h-4 w-4 text-primary" />
+                    <Brain className="h-4 w-4 text-neon-purple" />
                   ) : (
                     <User className="h-4 w-4 text-muted-foreground" />
                   )}
                 </div>
                 <div className={cn(
-                  'max-w-[75%] rounded-2xl px-4 py-2.5',
+                  'max-w-[75%] rounded-2xl px-4 py-2.5 relative',
                   message.sender === 'concierge' 
-                    ? 'bg-muted text-foreground rounded-tl-sm' 
-                    : 'bg-primary text-primary-foreground rounded-tr-sm'
-                )}>
-                  <p className="text-sm">{message.content}</p>
+                    ? 'rounded-tl-sm border border-neon-purple/12 backdrop-blur-sm' 
+                    : 'bg-neon-purple text-white rounded-tr-sm'
+                )}
+                  style={message.sender === 'concierge' ? {
+                    background: 'linear-gradient(135deg, hsl(var(--card) / 0.6) 0%, hsl(var(--card) / 0.3) 100%)',
+                  } : undefined}
+                >
+                  {message.sender === 'concierge' && (
+                    <div
+                      className="absolute left-0 top-2.5 bottom-2.5 w-[2px] rounded-full"
+                      style={{
+                        background: 'linear-gradient(180deg, hsl(var(--neon-purple) / 0.5), hsl(var(--neon-magenta) / 0.25))',
+                      }}
+                    />
+                  )}
+                  <p className={cn("text-sm", message.sender === 'concierge' && "pl-1")}>{message.content}</p>
                   <p className={cn(
                     'text-[10px] mt-1',
-                    message.sender === 'concierge' ? 'text-muted-foreground' : 'text-primary-foreground/70'
+                    message.sender === 'concierge' ? 'text-muted-foreground/40 pl-1' : 'text-white/60'
                   )}>
                     {formatTime(message.timestamp)}
                   </p>
@@ -165,14 +203,31 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
 
             {isTyping && (
               <div className="flex gap-3 animate-fade-in">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Bot className="h-4 w-4 text-primary" />
+                <div
+                  className="w-8 h-8 rounded-full ring-1 ring-neon-purple/25 flex items-center justify-center"
+                  style={{
+                    background: 'radial-gradient(circle, hsl(var(--neon-purple) / 0.12) 0%, transparent 100%)',
+                  }}
+                >
+                  <Brain className="h-4 w-4 text-neon-purple" />
                 </div>
-                <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div
+                  className="rounded-2xl rounded-tl-sm px-4 py-3 border border-neon-purple/12 backdrop-blur-sm"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(var(--card) / 0.6) 0%, hsl(var(--card) / 0.3) 100%)',
+                  }}
+                >
+                  <div className="flex gap-1.5">
+                    {[0, 1, 2].map(i => (
+                      <span
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-full bg-neon-purple/50"
+                        style={{
+                          animation: 'conciergeDotWave 1.2s ease-in-out infinite',
+                          animationDelay: `${i * 0.15}s`,
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
@@ -181,14 +236,14 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
         </ScrollArea>
 
         {/* Quick Responses */}
-        <div className="px-4 py-2 border-t border-border">
+        <div className="relative z-10 px-4 py-2 border-t border-neon-purple/8">
           <div className="flex gap-2 overflow-x-auto pb-2">
             {quickResponses.map((response) => (
               <Button
                 key={response}
                 variant="outline"
                 size="sm"
-                className="whitespace-nowrap text-xs shrink-0"
+                className="whitespace-nowrap text-xs shrink-0 border-neon-purple/15 text-muted-foreground/60 hover:text-neon-purple-light hover:border-neon-purple/30 hover:bg-neon-purple/5 transition-all"
                 onClick={() => handleSend(response)}
                 disabled={isTyping}
               >
@@ -199,7 +254,7 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-border">
+        <div className="relative z-10 p-4 border-t border-neon-purple/10">
           <form 
             onSubmit={(e) => {
               e.preventDefault();
@@ -207,18 +262,43 @@ export function ConciergeChat({ open, onOpenChange, memberName }: ConciergeChatP
             }}
             className="flex gap-2"
           >
-            <Input
+            <input
               placeholder="Type your message..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={isTyping}
-              className="flex-1"
+              className={cn(
+                "flex-1 h-10 rounded-xl px-4 text-sm font-body",
+                "bg-card/40 border border-neon-purple/15 text-foreground",
+                "placeholder:text-muted-foreground/40",
+                "focus:outline-none focus:border-neon-purple/40",
+                "focus:shadow-[0_0_0_3px_hsl(var(--neon-purple)_/_0.08)]",
+                "transition-all duration-300 backdrop-blur-sm",
+                "disabled:opacity-50"
+              )}
             />
-            <Button type="submit" size="icon" disabled={!input.trim() || isTyping}>
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!input.trim() || isTyping}
+              className={cn(
+                "shrink-0 h-10 w-10 rounded-xl transition-all",
+                input.trim()
+                  ? "bg-neon-purple text-white shadow-[0_0_15px_hsl(var(--neon-purple)_/_0.3)]"
+                  : "bg-neon-purple/15 text-muted-foreground/40"
+              )}
+            >
               <Send className="h-4 w-4" />
             </Button>
           </form>
         </div>
+
+        <style>{`
+          @keyframes conciergeDotWave {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-4px); opacity: 1; }
+          }
+        `}</style>
       </DialogContent>
     </Dialog>
   );
