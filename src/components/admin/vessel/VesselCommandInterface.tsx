@@ -524,7 +524,7 @@ export default function VesselCommandInterface({
         {isEmpty ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8 sm:py-12 px-4">
             {/* Click-to-talk AI Avatar */}
-            <AIAvatar
+            <HolographicAvatar3D
               state={aiState}
               size="lg"
               className="mb-8"
