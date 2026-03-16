@@ -139,7 +139,7 @@ function RouteArc({ from, to }: { from: THREE.Vector3; to: THREE.Vector3 }) {
     const pts = curve.getPoints(48);
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
-      color: "#C8A24A",
+      color: "#D4A843",
       transparent: true,
       opacity: 0.06,
       blending: THREE.AdditiveBlending,
