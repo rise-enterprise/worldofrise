@@ -57,7 +57,7 @@ export function MetricCard({ title, value, subtitle, icon: Icon, trend, classNam
     <Card 
       variant="obsidian" 
       className={cn(
-        'animate-slide-up group hover:shadow-[inset_0_0_40px_rgba(200,162,74,0.06)] transition-all duration-500 relative overflow-hidden',
+        'animate-slide-up group hover:shadow-[inset_0_0_40px_rgba(212,168,67,0.06)] transition-all duration-500 relative overflow-hidden',
         className
       )}
       style={{ animationDelay: `${delay}ms` }}
