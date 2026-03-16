@@ -74,7 +74,7 @@ export function GateBrandPortal({ onEnter, theme }: GateBrandPortalProps) {
 
           <div
             className="w-20 h-px mx-auto mb-4 transition-all duration-500 group-hover:w-28"
-            style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--neon-purple) / 0.4), transparent)' }}
+            style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--gold) / 0.4), transparent)' }}
           />
 
           <p className="text-xs tracking-wide text-center text-neon-purple/50">
