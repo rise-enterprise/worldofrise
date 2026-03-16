@@ -40,7 +40,7 @@ const tierConfig: Record<TierLevel, {
     icon: Crown,
     gradient: 'from-zinc-900 via-black to-zinc-800',
     border: 'border-primary/30',
-    glow: 'shadow-[0_0_40px_rgba(200,162,74,0.2)]',
+    glow: 'shadow-[0_0_40px_rgba(212,168,67,0.2)]',
     label: 'Obsidian',
     arabicLabel: 'أوبسيديان',
   },
