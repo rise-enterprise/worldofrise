@@ -121,7 +121,7 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
       {/* HUD arc segments — Jarvis-style partial arcs */}
       {[
         { radius: 2.6, arc: 0.6, speed: 0.12, color: "#00d4ff", opacity: 0.2 },
-        { radius: 3.0, arc: 0.35, speed: -0.08, color: "#C8A24A", opacity: 0.15 },
+        { radius: 3.0, arc: 0.35, speed: -0.08, color: "#D4A843", opacity: 0.15 },
         { radius: 3.4, arc: 0.5, speed: 0.15, color: "#00d4ff", opacity: 0.12 },
         { radius: 3.8, arc: 0.25, speed: -0.1, color: "#C8A24A", opacity: 0.1 },
       ].map((hud, i) => (
