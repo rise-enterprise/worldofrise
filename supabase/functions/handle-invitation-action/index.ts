@@ -316,7 +316,7 @@ function renderRejectForm(requestId: string, token: string, name: string, error?
       width: 100%;
     }
     .logo {
-      color: #C8A24A;
+      color: #D4A843;
       font-size: 18px;
       letter-spacing: 0.3em;
       margin-bottom: 30px;
