@@ -46,7 +46,7 @@ function AmbientGlow({ isCrisis, offset = 0 }: { isCrisis?: boolean; offset?: nu
   return (
     <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
       <ringGeometry args={[1.0, 1.02, 96]} />
-      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#d4b86a"} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#E0C06A"} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
