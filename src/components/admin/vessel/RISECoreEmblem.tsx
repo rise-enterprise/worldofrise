@@ -29,7 +29,7 @@ function HaloRing({ radius, speed, phase, isSpeaking, isProcessing, isCrisis }: 
   return (
     <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
       <ringGeometry args={[radius - 0.005, radius + 0.005, 128]} />
-      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#D4A843"} transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
