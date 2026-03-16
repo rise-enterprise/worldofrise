@@ -38,7 +38,7 @@ export function GateBrandPortal({ onEnter, theme }: GateBrandPortalProps) {
         <div
           className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at 50% 30%, hsl(var(--neon-purple) / 0.04) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse at 50% 30%, hsl(var(--gold) / 0.04) 0%, transparent 60%)',
           }}
         />
 
