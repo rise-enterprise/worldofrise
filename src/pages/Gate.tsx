@@ -96,7 +96,7 @@ const Gate = () => {
           className="absolute -inset-20 rounded-full"
           style={{
             background: `
-              radial-gradient(ellipse at center, hsl(var(--neon-purple) / 0.08) 0%, hsl(var(--neon-magenta) / 0.04) 40%, transparent 70%)
+              radial-gradient(ellipse at center, hsl(var(--gold) / 0.1) 0%, hsl(var(--neon-purple) / 0.04) 40%, transparent 70%)
             `,
           }}
           animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.05, 1] }}
