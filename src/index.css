@@ -44,10 +44,10 @@
     ═══════════════════════════════════════════════════════════ */
     
     /* Gold Spectrum */
-    --gold: 42 50% 54%;                    /* #C8A24A - Gilded Gold */
-    --gold-light: 42 55% 70%;              /* Champagne Shimmer */
-    --gold-shadow: 42 60% 26%;             /* #6F5418 - Antique Gold */
-    --gold-foil: 45 65% 58%;               /* Bright Gold Foil */
+    --gold: 40 62% 56%;                    /* Warm Champagne Gold */
+    --gold-light: 38 65% 72%;              /* Rich Champagne Shimmer */
+    --gold-shadow: 36 70% 28%;             /* Deep Warm Amber */
+    --gold-foil: 42 72% 60%;               /* Saturated Gold Foil */
     
     /* Burgundy Spectrum */
     --burgundy: 350 65% 18%;               /* #4A0F18 - Burgundy Velvet */
