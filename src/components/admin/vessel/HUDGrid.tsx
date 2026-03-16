@@ -117,7 +117,7 @@ function AmbientParticles({ count = 80 }: { count?: number }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.025}
-        color="#d4b86a"
+        color="#E0C06A"
         transparent
         opacity={0.06}
         sizeAttenuation

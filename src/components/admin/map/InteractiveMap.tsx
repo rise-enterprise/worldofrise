@@ -92,7 +92,7 @@ export default function InteractiveMap() {
       const coords = CITY_COORDS[loc.city];
       if (!coords) return;
 
-      const color = BRAND_COLORS[loc.brand] || "#C8A24A";
+      const color = BRAND_COLORS[loc.brand] || "#D4A843";
       const icon = L.divIcon({
         className: "custom-map-pin",
         html: `

@@ -153,7 +153,7 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
         </bufferGeometry>
         <pointsMaterial
           size={0.025}
-          color={isCrisis ? "#ff6644" : "#C8A24A"}
+          color={isCrisis ? "#ff6644" : "#D4A843"}
           transparent
           opacity={0.4}
           sizeAttenuation

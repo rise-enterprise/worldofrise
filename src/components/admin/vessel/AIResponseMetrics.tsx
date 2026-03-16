@@ -104,7 +104,7 @@ function OuterOrbitPath() {
     }
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
-      color: "#C8A24A",
+      color: "#D4A843",
       transparent: true,
       opacity: 0.03,
       blending: THREE.AdditiveBlending,

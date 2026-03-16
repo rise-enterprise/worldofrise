@@ -241,7 +241,7 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
               {city.name}
             </Text>
             <Text position={[-0.55, 0.1, 0.01]} fontSize={0.035} color="#8a8578" anchorX="left" font={undefined}>Members</Text>
-            <Text position={[0.55, 0.1, 0.01]} fontSize={0.038} color="#d4b86a" anchorX="right" font={undefined}>
+            <Text position={[0.55, 0.1, 0.01]} fontSize={0.038} color="#E0C06A" anchorX="right" font={undefined}>
               {city.id === "doha" ? "2,841" : city.id === "riyadh" ? "412" : "287"}
             </Text>
             <Text position={[-0.55, -0.03, 0.01]} fontSize={0.035} color="#8a8578" anchorX="left" font={undefined}>Revenue</Text>

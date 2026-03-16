@@ -124,7 +124,7 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
       {/* Floor ambient circle */}
       <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[2.5, 64]} />
-        <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#D4A843"} transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );

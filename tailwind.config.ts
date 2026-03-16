@@ -142,7 +142,7 @@ export default {
       },
       boxShadow: {
         obsidian: "0 4px 24px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(233, 238, 247, 0.03)",
-        "obsidian-lg": "0 8px 32px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(200, 162, 74, 0.05)",
+        "obsidian-lg": "0 8px 32px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(212, 168, 67, 0.05)",
         "gold-glow": "0 0 20px rgba(212, 168, 67, 0.15)",
         "gold-glow-lg": "0 0 40px rgba(212, 168, 67, 0.25)",
         medallion: "0 4px 16px rgba(212, 168, 67, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",

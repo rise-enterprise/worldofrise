@@ -14,7 +14,7 @@ export default function LoyaltyDigitalCard() {
   const [googleWallet, setGoogleWallet] = useState(true);
   const [rfidEnabled, setRfidEnabled] = useState(false);
   const [cardColor, setCardColor] = useState("#07080A");
-  const [accentColor, setAccentColor] = useState("#C8A24A");
+  const [accentColor, setAccentColor] = useState("#D4A843");
 
   return (
     <div className="p-6 space-y-6">

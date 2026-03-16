@@ -14,7 +14,7 @@ interface Tier {
 const MOCK_TIERS: Tier[] = [
   { id: "1", name: "Bronze", color: "#92400e", minVisits: 0, minPoints: 0, multiplier: 1, benefits: ["Welcome drink", "Birthday message"] },
   { id: "2", name: "Silver", color: "#94a3b8", minVisits: 10, minPoints: 500, multiplier: 1.25, benefits: ["Priority seating", "10% off select items", "Birthday dessert"] },
-  { id: "3", name: "Gold", color: "#C8A24A", minVisits: 25, minPoints: 2000, multiplier: 1.5, benefits: ["Complimentary appetizer", "Priority reservations", "Exclusive tastings"] },
+  { id: "3", name: "Gold", color: "#D4A843", minVisits: 25, minPoints: 2000, multiplier: 1.5, benefits: ["Complimentary appetizer", "Priority reservations", "Exclusive tastings"] },
   { id: "4", name: "Platinum", color: "#8b5cf6", minVisits: 50, minPoints: 5000, multiplier: 2, benefits: ["Personal concierge", "Chef's table access", "Complimentary bottle", "Private events"] },
   { id: "5", name: "Black", color: "#e2e8f0", minVisits: 100, minPoints: 15000, multiplier: 3, benefits: ["All Platinum benefits", "Global VIP recognition", "Custom experiences", "Annual gala invitation"] },
 ];

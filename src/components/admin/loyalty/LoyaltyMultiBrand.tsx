@@ -92,7 +92,7 @@ export default function LoyaltyMultiBrand() {
         {/* SASSO */}
         <Card className="bg-card border-border/30 overflow-hidden">
           <div className="flex">
-            <div className="w-1.5 shrink-0" style={{ backgroundColor: "#C8A24A" }} />
+            <div className="w-1.5 shrink-0" style={{ backgroundColor: "#D4A843" }} />
             <div className="flex-1">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">

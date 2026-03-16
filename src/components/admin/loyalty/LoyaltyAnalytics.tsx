@@ -23,7 +23,7 @@ const REWARD_ROI = [
 const TIER_DIST = [
   { name: "Bronze", value: 1200, color: "#92400e" },
   { name: "Silver", value: 800, color: "#94a3b8" },
-  { name: "Gold", value: 480, color: "#C8A24A" },
+  { name: "Gold", value: 480, color: "#D4A843" },
   { name: "Platinum", value: 243, color: "#8b5cf6" },
   { name: "Black", value: 124, color: "#e2e8f0" },
 ];
