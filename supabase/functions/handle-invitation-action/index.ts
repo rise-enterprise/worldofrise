@@ -167,7 +167,7 @@ async function sendApprovalEmail(email: string, name: string) {
         
         <div style="border-top: 1px solid rgba(212, 168, 67, 0.15); border-bottom: 1px solid rgba(212, 168, 67, 0.15); padding: 30px 0; margin: 0 20px;">
           <p style="color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.8; margin: 0 0 20px; text-align: center;">
-            Your request to join our private circle has been <span style="color: #C8A24A;">approved</span>.
+            Your request to join our private circle has been <span style="color: #D4A843;">approved</span>.
           </p>
           <p style="color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.8; margin: 0; text-align: center;">
             You are now a member of World of Rise. On your next visit to any NOIR or SASSO location, simply provide your details to begin your journey with us.
