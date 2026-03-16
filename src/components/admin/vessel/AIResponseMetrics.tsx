@@ -20,7 +20,7 @@ function AIOrbitSatellite({ metric, index, total }: { metric: AIMetric; index: n
   const groupRef = useRef<THREE.Group>(null);
   const [scale, setScale] = useState(0);
   const angleOffset = (index / total) * Math.PI * 2;
-  const accentColor = "#C8A24A";
+  const accentColor = "#D4A843";
 
   useEffect(() => {
     setScale(0);
