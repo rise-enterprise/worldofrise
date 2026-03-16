@@ -133,7 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="text-align: center; margin-top: 35px;">
-            <p style="color: rgba(200, 162, 74, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
+            <p style="color: rgba(212, 168, 67, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
               NOIR &middot; SASSO
             </p>
             <p style="color: rgba(255,255,255,0.3); font-size: 11px; margin: 15px 0 0; letter-spacing: 0.1em;">

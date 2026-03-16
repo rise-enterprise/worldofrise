@@ -356,7 +356,7 @@ function renderRejectForm(requestId: string, token: string, name: string, error?
     }
     textarea:focus {
       outline: none;
-      border-color: rgba(200, 162, 74, 0.5);
+      border-color: rgba(212, 168, 67, 0.5);
     }
     .error {
       background: rgba(239, 68, 68, 0.1);
