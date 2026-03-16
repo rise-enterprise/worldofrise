@@ -113,7 +113,7 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
       {/* Thin champagne gold torus frame */}
       <mesh ref={frameRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.4, 0.01, 8, 128]} />
-        <meshStandardMaterial color="#C8A24A" metalness={0.95} roughness={0.15} transparent opacity={0.25} />
+        <meshStandardMaterial color="#D4A843" metalness={0.95} roughness={0.15} transparent opacity={0.25} />
       </mesh>
       {/* Inner halo ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
