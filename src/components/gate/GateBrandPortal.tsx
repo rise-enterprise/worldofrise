@@ -19,7 +19,7 @@ export function GateBrandPortal({ onEnter, theme }: GateBrandPortalProps) {
       whileTap={{ scale: 0.99 }}
     >
       <div
-        className="relative p-8 md:p-12 rounded-2xl transition-all duration-500 border border-neon-purple/10 group-hover:border-neon-purple/25"
+        className="relative p-8 md:p-12 rounded-2xl transition-all duration-500 border border-primary/10 group-hover:border-primary/25"
         style={{
           background: 'linear-gradient(135deg, hsl(var(--card) / 0.7) 0%, hsl(var(--card) / 0.3) 100%)',
           backdropFilter: 'blur(20px)',
