@@ -17,7 +17,7 @@ function GridFloor() {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
       <planeGeometry args={[50, 50, 50, 50]} />
       <meshBasicMaterial
-        color="#C8A24A"
+        color="#D4A843"
         wireframe
         transparent
         opacity={0.02}
