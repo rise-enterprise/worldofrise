@@ -81,7 +81,7 @@ const Gate = () => {
 
       {/* Top tag */}
       <motion.span
-        className="relative text-[9px] tracking-[0.5em] uppercase mb-16 text-neon-purple/40"
+        className="relative text-[9px] tracking-[0.5em] uppercase mb-16 text-primary/40"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: loaded ? 0.5 : 0, y: loaded ? 0 : -10 }}
         transition={{ duration: 1, delay: 0.3 }}
