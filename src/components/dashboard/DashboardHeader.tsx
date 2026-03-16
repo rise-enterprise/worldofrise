@@ -290,7 +290,7 @@ export function DashboardHeader({ onSearch, onGuestAdded, onMenuClick }: Dashboa
         <Dialog open={newGuestOpen} onOpenChange={setNewGuestOpen}>
           <Button 
             className={cn(
-              "gap-2 h-9 md:h-10 px-3 md:px-4 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-[0_0_20px_rgba(200,162,74,0.15)]",
+              "gap-2 h-9 md:h-10 px-3 md:px-4 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-[0_0_20px_rgba(212,168,67,0.15)]",
               isRTL && "flex-row-reverse"
             )}
             onClick={() => setNewGuestOpen(true)}
