@@ -23,7 +23,7 @@ export function AICoreOrb() {
       />
       {/* Core gold glow */}
       <div className="absolute inset-6 rounded-full" style={{
-        background: 'radial-gradient(circle, rgba(200,162,74,0.15) 0%, rgba(200,162,74,0.04) 50%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(212,168,67,0.15) 0%, rgba(212,168,67,0.04) 50%, transparent 70%)',
       }} />
       {/* Center diamond — gold accent */}
       <motion.div
@@ -33,9 +33,9 @@ export function AICoreOrb() {
       >
         <div className="w-5 h-5 md:w-7 md:h-7 rotate-45"
           style={{
-            border: '1px solid rgba(200,162,74,0.3)',
-            background: 'linear-gradient(135deg, rgba(200,162,74,0.15) 0%, rgba(200,162,74,0.05) 100%)',
-            boxShadow: '0 0 20px rgba(200,162,74,0.15)',
+            border: '1px solid rgba(212,168,67,0.3)',
+            background: 'linear-gradient(135deg, rgba(212,168,67,0.15) 0%, rgba(212,168,67,0.05) 100%)',
+            boxShadow: '0 0 20px rgba(212,168,67,0.15)',
           }}
         />
       </motion.div>

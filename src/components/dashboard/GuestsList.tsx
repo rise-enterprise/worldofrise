@@ -179,7 +179,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                     key={guest.id}
                     variant="obsidian"
                     className={cn(
-                      'cursor-pointer hover:shadow-[inset_0_0_20px_rgba(200,162,74,0.03)] transition-all duration-300 animate-slide-up active:scale-[0.99]',
+                      'cursor-pointer hover:shadow-[inset_0_0_20px_rgba(212,168,67,0.03)] transition-all duration-300 animate-slide-up active:scale-[0.99]',
                       isTopTier && 'border-primary/20'
                     )}
                     style={{ animationDelay: `${index * 30}ms` }}

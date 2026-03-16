@@ -48,7 +48,7 @@ const tierConfig: Record<TierLevel, {
     icon: Crown,
     gradient: 'from-amber-400 via-yellow-500 to-amber-600',
     border: 'border-primary/50',
-    glow: 'shadow-[0_0_50px_rgba(200,162,74,0.4)]',
+    glow: 'shadow-[0_0_50px_rgba(212,168,67,0.4)]',
     label: 'Royal',
     arabicLabel: 'ملكي',
   },

@@ -95,7 +95,7 @@ export default function LoyaltyAnalytics() {
                   <XAxis type="number" tick={{ fill: "hsl(220 10% 60%)", fontSize: 12 }} />
                   <YAxis dataKey="name" type="category" tick={{ fill: "hsl(220 10% 60%)", fontSize: 12 }} width={70} />
                   <Tooltip contentStyle={{ backgroundColor: "hsl(220 12% 7%)", border: "1px solid hsl(220 10% 20%)", borderRadius: 8 }} />
-                  <Bar dataKey="spend" fill="hsl(42 50% 54%)" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="spend" fill="hsl(40 62% 56%)" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

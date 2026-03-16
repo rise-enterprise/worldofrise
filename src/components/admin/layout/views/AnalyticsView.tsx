@@ -7,7 +7,7 @@ import {
   PieChart as RPieChart, Pie, Cell, AreaChart, Area, CartesianGrid,
 } from "recharts";
 
-const GOLD = "hsl(42 50% 54%)";
+const GOLD = "hsl(40 62% 56%)";
 const TEAL = "hsl(195 62% 32%)";
 const BURGUNDY = "hsl(350 55% 30%)";
 const SAPPHIRE = "hsl(215 60% 35%)";

@@ -17,7 +17,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           "px-4 py-2",
           // Focus — Gold crystal ring
           "focus:outline-none focus:border-primary/50",
-          "focus:shadow-[0_0_0_3px_hsl(42_50%_54%_/_0.1),inset_0_0_20px_hsl(42_50%_54%_/_0.02)]",
+          "focus:shadow-[0_0_0_3px_hsl(40_62%_56%_/_0.1),inset_0_0_20px_hsl(40_62%_56%_/_0.02)]",
           // Transitions
           "transition-all duration-220 ease-luxury",
           // File inputs

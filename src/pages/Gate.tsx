@@ -155,7 +155,7 @@ const Gate = () => {
         </motion.button>
 
         <motion.button
-          className="px-12 py-4 rounded-lg text-[10px] tracking-[0.3em] uppercase border border-neon-purple/20 text-muted-foreground transition-all duration-300 hover:border-neon-purple/40 hover:text-foreground"
+          className="px-12 py-4 rounded-lg text-[10px] tracking-[0.3em] uppercase border border-primary/20 text-muted-foreground transition-all duration-300 hover:border-primary/40 hover:text-foreground"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => navigate("/request-invitation")}

@@ -89,10 +89,10 @@ export function GateBrandPortal({ onEnter, theme }: GateBrandPortalProps) {
         </div>
 
         {/* Corner accents — neon purple */}
-        <div className="absolute top-0 left-0 w-8 h-px bg-neon-purple/25 group-hover:w-12 transition-all duration-500" />
-        <div className="absolute top-0 left-0 h-8 w-px bg-neon-purple/25 group-hover:h-12 transition-all duration-500" />
-        <div className="absolute bottom-0 right-0 w-8 h-px bg-neon-magenta/20 group-hover:w-12 transition-all duration-500" />
-        <div className="absolute bottom-0 right-0 h-8 w-px bg-neon-magenta/20 group-hover:h-12 transition-all duration-500" />
+        <div className="absolute top-0 left-0 w-8 h-px bg-primary/25 group-hover:w-12 transition-all duration-500" />
+        <div className="absolute top-0 left-0 h-8 w-px bg-primary/25 group-hover:h-12 transition-all duration-500" />
+        <div className="absolute bottom-0 right-0 w-8 h-px bg-primary/20 group-hover:w-12 transition-all duration-500" />
+        <div className="absolute bottom-0 right-0 h-8 w-px bg-primary/20 group-hover:h-12 transition-all duration-500" />
       </div>
     </motion.button>
   );
