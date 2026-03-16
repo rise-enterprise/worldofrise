@@ -89,7 +89,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
             {totalCount.toLocaleString()} members in your circle
           </p>
         </div>
-        <Button className="gap-2 w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-[0_0_20px_rgba(200,162,74,0.15)]">
+        <Button className="gap-2 w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-[0_0_20px_rgba(212,168,67,0.15)]">
           <Crown className="h-4 w-4" />
           <span className="hidden sm:inline">Export Distinguished</span>
           <span className="sm:hidden">Export VIPs</span>
@@ -179,7 +179,7 @@ export function GuestsList({ activeBrand, onSelectGuest }: GuestsListProps) {
                     key={guest.id}
                     variant="obsidian"
                     className={cn(
-                      'cursor-pointer hover:shadow-[inset_0_0_20px_rgba(200,162,74,0.03)] transition-all duration-300 animate-slide-up active:scale-[0.99]',
+                      'cursor-pointer hover:shadow-[inset_0_0_20px_rgba(212,168,67,0.03)] transition-all duration-300 animate-slide-up active:scale-[0.99]',
                       isTopTier && 'border-primary/20'
                     )}
                     style={{ animationDelay: `${index * 30}ms` }}

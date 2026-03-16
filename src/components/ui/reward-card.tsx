@@ -41,7 +41,7 @@ export function RewardCard({
         'group relative overflow-hidden rounded-2xl',
         'bg-card border border-border/40',
         'transition-all duration-500',
-        'hover:border-primary/30 hover:shadow-[0_8px_40px_-12px_rgba(200,162,74,0.2)]',
+        'hover:border-primary/30 hover:shadow-[0_8px_40px_-12px_rgba(212,168,67,0.2)]',
         !isUnlocked && 'opacity-60',
         className
       )}

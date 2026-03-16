@@ -57,7 +57,7 @@ export function MetricCard({ title, value, subtitle, icon: Icon, trend, classNam
     <Card 
       variant="obsidian" 
       className={cn(
-        'animate-slide-up group hover:shadow-[inset_0_0_40px_rgba(200,162,74,0.06)] transition-all duration-500 relative overflow-hidden',
+        'animate-slide-up group hover:shadow-[inset_0_0_40px_rgba(212,168,67,0.06)] transition-all duration-500 relative overflow-hidden',
         className
       )}
       style={{ animationDelay: `${delay}ms` }}
@@ -102,7 +102,7 @@ export function MetricCard({ title, value, subtitle, icon: Icon, trend, classNam
             )}
           </div>
           <motion.div 
-            className="p-2 md:p-3 rounded-xl bg-gradient-to-br from-muted to-card border border-primary/10 text-primary/70 group-hover:text-primary group-hover:border-primary/30 group-hover:shadow-[0_0_25px_rgba(200,162,74,0.2)] transition-all duration-500 relative shrink-0"
+            className="p-2 md:p-3 rounded-xl bg-gradient-to-br from-muted to-card border border-primary/10 text-primary/70 group-hover:text-primary group-hover:border-primary/30 group-hover:shadow-[0_0_25px_rgba(212,168,67,0.2)] transition-all duration-500 relative shrink-0"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: delay / 1000, duration: 0.3 }}
