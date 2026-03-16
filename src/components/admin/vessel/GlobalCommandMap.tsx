@@ -117,7 +117,7 @@ function LuxuryGlobe() {
       <mesh rotation={[Math.PI / 2 + 0.2, 0.12, 0]}>
         <ringGeometry args={[GLOBE_R + 0.48, GLOBE_R + 0.49, 128]} />
         <meshBasicMaterial
-          color="#d4b86a"
+        color="#E0C06A"
           transparent
           opacity={0.025}
           blending={THREE.AdditiveBlending}
