@@ -37,10 +37,10 @@ const Gate = () => {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0" style={{
           background: `
-            radial-gradient(ellipse 60% 40% at 50% 30%, hsl(var(--neon-purple) / 0.06) 0%, transparent 60%),
-            radial-gradient(ellipse 40% 30% at 20% 80%, hsl(var(--neon-magenta) / 0.04) 0%, transparent 50%),
-            radial-gradient(ellipse 30% 25% at 80% 20%, hsl(var(--neon-blue) / 0.03) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 50%, hsl(var(--gold) / 0.02) 0%, transparent 60%)
+            radial-gradient(ellipse 60% 40% at 50% 30%, hsl(var(--gold) / 0.06) 0%, transparent 60%),
+            radial-gradient(ellipse 40% 30% at 20% 80%, hsl(var(--neon-magenta) / 0.03) 0%, transparent 50%),
+            radial-gradient(ellipse 30% 25% at 80% 20%, hsl(var(--neon-purple) / 0.03) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, hsl(var(--gold) / 0.04) 0%, transparent 60%)
           `,
         }} />
       </div>
