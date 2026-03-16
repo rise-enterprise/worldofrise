@@ -127,11 +127,11 @@ const Gate = () => {
         animate={{ opacity: 0.4 }}
         transition={{ duration: 1, delay: 1.5 }}
       >
-        <div className="w-8 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--neon-purple) / 0.3))' }} />
+        <div className="w-8 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--gold) / 0.4))' }} />
         <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
           Noir · Sasso · Global
         </p>
-        <div className="w-8 h-px" style={{ background: 'linear-gradient(90deg, hsl(var(--neon-purple) / 0.3), transparent)' }} />
+        <div className="w-8 h-px" style={{ background: 'linear-gradient(90deg, hsl(var(--gold) / 0.4), transparent)' }} />
       </motion.div>
 
       {/* CTA buttons */}
