@@ -77,12 +77,12 @@ export function GateBrandPortal({ onEnter, theme }: GateBrandPortalProps) {
             style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--gold) / 0.4), transparent)' }}
           />
 
-          <p className="text-xs tracking-wide text-center text-neon-purple/50">
+          <p className="text-xs tracking-wide text-center text-primary/50">
             Enter the Ultra loyalty experience
           </p>
 
           <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0 text-center">
-            <span className="text-xs tracking-widest uppercase text-neon-purple/50">
+            <span className="text-xs tracking-widest uppercase text-primary/50">
               Sign In →
             </span>
           </div>
