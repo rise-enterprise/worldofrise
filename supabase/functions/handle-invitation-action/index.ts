@@ -152,22 +152,22 @@ async function sendApprovalEmail(email: string, name: string) {
 
   const html = `
     <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #07080A;">
-      <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(200, 162, 74, 0.2); border-radius: 12px;">
+      <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(212, 168, 67, 0.2); border-radius: 12px;">
         
         <div style="text-align: center; margin-bottom: 40px;">
-          <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(200, 162, 74, 0.3); border-radius: 4px;">
-            <h1 style="margin: 0; font-size: 20px; color: #C8A24A; letter-spacing: 0.3em; font-weight: 300;">WORLD OF RISE</h1>
+            <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(212, 168, 67, 0.3); border-radius: 4px;">
+              <h1 style="margin: 0; font-size: 20px; color: #D4A843; letter-spacing: 0.3em; font-weight: 300;">WORLD OF RISE</h1>
           </div>
         </div>
         
         <div style="text-align: center; margin-bottom: 35px;">
-          <p style="color: rgba(200, 162, 74, 0.8); font-size: 11px; letter-spacing: 0.2em; margin: 0 0 20px; text-transform: uppercase;">Welcome to the Circle</p>
+          <p style="color: rgba(212, 168, 67, 0.8); font-size: 11px; letter-spacing: 0.2em; margin: 0 0 20px; text-transform: uppercase;">Welcome to the Circle</p>
           <h2 style="color: #ffffff; font-size: 24px; font-weight: 300; margin: 0; letter-spacing: 0.05em;">Dear ${name},</h2>
         </div>
         
-        <div style="border-top: 1px solid rgba(200, 162, 74, 0.15); border-bottom: 1px solid rgba(200, 162, 74, 0.15); padding: 30px 0; margin: 0 20px;">
+        <div style="border-top: 1px solid rgba(212, 168, 67, 0.15); border-bottom: 1px solid rgba(212, 168, 67, 0.15); padding: 30px 0; margin: 0 20px;">
           <p style="color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.8; margin: 0 0 20px; text-align: center;">
-            Your request to join our private circle has been <span style="color: #C8A24A;">approved</span>.
+            Your request to join our private circle has been <span style="color: #D4A843;">approved</span>.
           </p>
           <p style="color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.8; margin: 0; text-align: center;">
             You are now a member of World of Rise. On your next visit to any NOIR or SASSO location, simply provide your details to begin your journey with us.
@@ -175,7 +175,7 @@ async function sendApprovalEmail(email: string, name: string) {
         </div>
         
         <div style="text-align: center; margin-top: 35px;">
-          <p style="color: rgba(200, 162, 74, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
+          <p style="color: rgba(212, 168, 67, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
             NOIR &middot; SASSO
           </p>
         </div>
@@ -232,14 +232,14 @@ function renderHtmlResponse(title: string, message: string, type: "success" | "e
     }
     .card {
       background: linear-gradient(135deg, #0E1116 0%, #07080A 100%);
-      border: 1px solid rgba(200, 162, 74, 0.2);
+      border: 1px solid rgba(212, 168, 67, 0.2);
       border-radius: 12px;
       padding: 40px;
       max-width: 500px;
       text-align: center;
     }
     .logo {
-      color: #C8A24A;
+      color: #D4A843;
       font-size: 18px;
       letter-spacing: 0.3em;
       margin-bottom: 30px;
@@ -309,14 +309,14 @@ function renderRejectForm(requestId: string, token: string, name: string, error?
     }
     .card {
       background: linear-gradient(135deg, #0E1116 0%, #07080A 100%);
-      border: 1px solid rgba(200, 162, 74, 0.2);
+      border: 1px solid rgba(212, 168, 67, 0.2);
       border-radius: 12px;
       padding: 40px;
       max-width: 500px;
       width: 100%;
     }
     .logo {
-      color: #C8A24A;
+      color: #D4A843;
       font-size: 18px;
       letter-spacing: 0.3em;
       margin-bottom: 30px;
@@ -345,7 +345,7 @@ function renderRejectForm(requestId: string, token: string, name: string, error?
     textarea {
       width: 100%;
       background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(200, 162, 74, 0.2);
+      border: 1px solid rgba(212, 168, 67, 0.2);
       border-radius: 8px;
       padding: 12px;
       color: #fff;
@@ -356,7 +356,7 @@ function renderRejectForm(requestId: string, token: string, name: string, error?
     }
     textarea:focus {
       outline: none;
-      border-color: rgba(200, 162, 74, 0.5);
+      border-color: rgba(212, 168, 67, 0.5);
     }
     .error {
       background: rgba(239, 68, 68, 0.1);

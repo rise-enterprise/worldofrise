@@ -246,7 +246,7 @@
     --vessel-surface: 0 0% 100%;           /* #ffffff */
     --vessel-text: 30 18% 9%;              /* #1a1510 */
     --vessel-muted: 33 13% 47%;            /* #8a7d6a */
-    --vessel-gold: 42 56% 53%;             /* #C8A24A */
+    --vessel-gold: 40 62% 56%;             /* #D4A843 */
     --vessel-surface-alpha: 255,255,255;
     --vessel-text-alpha: 26,21,16;
     --vessel-muted-alpha: 138,125,106;
@@ -282,7 +282,7 @@
     --vessel-surface: 260 14% 10%;         /* #16151c */
     --vessel-text: 35 18% 92%;             /* #f0ece4 */
     --vessel-muted: 33 10% 55%;            /* #8a8578 */
-    --vessel-gold: 42 56% 53%;             /* #C8A24A */
+    --vessel-gold: 40 62% 56%;             /* #D4A843 */
     --vessel-surface-alpha: 22,21,28;
     --vessel-text-alpha: 240,236,228;
     --vessel-muted-alpha: 138,133,120;
@@ -516,9 +516,9 @@
 
   .gold-gradient-text {
     background: linear-gradient(135deg, 
-      hsl(42 55% 65%) 0%, 
-      hsl(42 50% 54%) 40%, 
-      hsl(42 60% 45%) 100%);
+      hsl(38 65% 67%) 0%, 
+      hsl(40 62% 56%) 40%, 
+      hsl(40 68% 47%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -526,8 +526,8 @@
 
   .text-gradient-gold {
     background: linear-gradient(135deg, 
-      hsl(42 55% 65%) 0%, 
-      hsl(42 50% 54%) 100%);
+      hsl(38 65% 67%) 0%, 
+      hsl(40 62% 56%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -569,8 +569,8 @@
 
   .bg-gradient-gold {
     background: linear-gradient(135deg, 
-      hsl(42 50% 50%) 0%, 
-      hsl(42 60% 40%) 100%);
+      hsl(40 62% 52%) 0%, 
+      hsl(40 68% 42%) 100%);
   }
 
   .bg-gradient-crystal {

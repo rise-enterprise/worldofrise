@@ -29,7 +29,7 @@ function HaloRing({ radius, speed, phase, isSpeaking, isProcessing, isCrisis }: 
   return (
     <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
       <ringGeometry args={[radius - 0.005, radius + 0.005, 128]} />
-      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#D4A843"} transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
@@ -46,7 +46,7 @@ function AmbientGlow({ isCrisis, offset = 0 }: { isCrisis?: boolean; offset?: nu
   return (
     <mesh ref={ref} rotation={[Math.PI / 2, 0, 0]}>
       <ringGeometry args={[1.0, 1.02, 96]} />
-      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#d4b86a"} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#E0C06A"} transparent opacity={0.05} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} />
     </mesh>
   );
 }
@@ -71,7 +71,7 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
     return () => geom.dispose();
   }, [font]);
 
-  const baseColor = isCrisis ? new THREE.Color("#b84a4a") : new THREE.Color("#C8A24A");
+  const baseColor = isCrisis ? new THREE.Color("#b84a4a") : new THREE.Color("#D4A843");
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -87,7 +87,7 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
     if (frameRef.current) frameRef.current.rotation.z = t * 0.008;
   });
 
-  if (!textGeom) return <mesh><sphereGeometry args={[0.15, 16, 16]} /><meshBasicMaterial color="#C8A24A" transparent opacity={0.3} /></mesh>;
+  if (!textGeom) return <mesh><sphereGeometry args={[0.15, 16, 16]} /><meshBasicMaterial color="#D4A843" transparent opacity={0.3} /></mesh>;
 
   return (
     <group>
@@ -113,18 +113,18 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
       {/* Thin champagne gold torus frame */}
       <mesh ref={frameRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.4, 0.01, 8, 128]} />
-        <meshStandardMaterial color="#C8A24A" metalness={0.95} roughness={0.15} transparent opacity={0.25} />
+        <meshStandardMaterial color="#D4A843" metalness={0.95} roughness={0.15} transparent opacity={0.25} />
       </mesh>
       {/* Inner halo ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.8, 0.004, 8, 128]} />
-        <meshBasicMaterial color="#d4b86a" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#E0C06A" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
       {/* Floor ambient circle */}
       <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[2.5, 64]} />
-        <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#C8A24A"} transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color={isCrisis ? "#b84a4a" : "#D4A843"} transparent opacity={0.015} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );

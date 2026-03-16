@@ -20,9 +20,9 @@ const CITY_COORDS: Record<string, [number, number]> = {
 };
 
 const BRAND_COLORS: Record<string, string> = {
-  noir: "#C8A24A",
+  noir: "#D4A843",
   sasso: "#E8A87C",
-  both: "#C8A24A",
+  both: "#D4A843",
 };
 
 const AI_INSIGHTS: Record<string, string> = {
@@ -92,7 +92,7 @@ export default function InteractiveMap() {
       const coords = CITY_COORDS[loc.city];
       if (!coords) return;
 
-      const color = BRAND_COLORS[loc.brand] || "#C8A24A";
+      const color = BRAND_COLORS[loc.brand] || "#D4A843";
       const icon = L.divIcon({
         className: "custom-map-pin",
         html: `

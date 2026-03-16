@@ -19,7 +19,7 @@ export default function ScanSweep({ isCrisis = false }: ScanSweepProps) {
       if (isCrisis) {
         mat.color.lerp(new THREE.Color("#b84a4a"), 0.03);
       } else {
-        mat.color.lerp(new THREE.Color("#C8A24A"), 0.03);
+        mat.color.lerp(new THREE.Color("#D4A843"), 0.03);
       }
     }
   });
@@ -34,7 +34,7 @@ export default function ScanSweep({ isCrisis = false }: ScanSweepProps) {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.95, 0]}>
       <shapeGeometry args={[shape]} />
       <meshBasicMaterial
-        color={isCrisis ? "#b84a4a" : "#C8A24A"}
+        color={isCrisis ? "#b84a4a" : "#D4A843"}
         transparent
         opacity={0.012}
         blending={THREE.AdditiveBlending}

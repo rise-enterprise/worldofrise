@@ -34,7 +34,7 @@ function latLngToSphere(lat: number, lng: number, radius: number): THREE.Vector3
 /* ── Elegant globe with soft gold outlines ── */
 function LuxuryGlobe() {
   const globeRef = useRef<THREE.Group>(null);
-  const gold = "#C8A24A";
+  const gold = "#D4A843";
 
   useFrame(({ clock }) => {
     if (globeRef.current) {
@@ -117,7 +117,7 @@ function LuxuryGlobe() {
       <mesh rotation={[Math.PI / 2 + 0.2, 0.12, 0]}>
         <ringGeometry args={[GLOBE_R + 0.48, GLOBE_R + 0.49, 128]} />
         <meshBasicMaterial
-          color="#d4b86a"
+        color="#E0C06A"
           transparent
           opacity={0.025}
           blending={THREE.AdditiveBlending}
@@ -139,7 +139,7 @@ function RouteArc({ from, to }: { from: THREE.Vector3; to: THREE.Vector3 }) {
     const pts = curve.getPoints(48);
     const geom = new THREE.BufferGeometry().setFromPoints(pts);
     const mat = new THREE.LineBasicMaterial({
-      color: "#C8A24A",
+      color: "#D4A843",
       transparent: true,
       opacity: 0.06,
       blending: THREE.AdditiveBlending,
@@ -162,7 +162,7 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
   const ringRef = useRef<THREE.Mesh>(null);
   const beamRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  const gold = "#C8A24A";
+  const gold = "#D4A843";
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -241,7 +241,7 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
               {city.name}
             </Text>
             <Text position={[-0.55, 0.1, 0.01]} fontSize={0.035} color="#8a8578" anchorX="left" font={undefined}>Members</Text>
-            <Text position={[0.55, 0.1, 0.01]} fontSize={0.038} color="#d4b86a" anchorX="right" font={undefined}>
+            <Text position={[0.55, 0.1, 0.01]} fontSize={0.038} color="#E0C06A" anchorX="right" font={undefined}>
               {city.id === "doha" ? "2,841" : city.id === "riyadh" ? "412" : "287"}
             </Text>
             <Text position={[-0.55, -0.03, 0.01]} fontSize={0.035} color="#8a8578" anchorX="left" font={undefined}>Revenue</Text>

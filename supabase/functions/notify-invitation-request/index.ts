@@ -110,11 +110,11 @@ const handler = async (req: Request): Promise<Response> => {
     // Confirmation email to applicant - luxury ceremonial tone
     const applicantEmailHtml = `
       <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #07080A;">
-        <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(200, 162, 74, 0.2); border-radius: 12px;">
+        <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(212, 168, 67, 0.2); border-radius: 12px;">
           
           <div style="text-align: center; margin-bottom: 40px;">
-            <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(200, 162, 74, 0.3); border-radius: 4px;">
-              <h1 style="margin: 0; font-size: 20px; color: #C8A24A; letter-spacing: 0.3em; font-weight: 300;">WORLD OF RISE</h1>
+            <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(212, 168, 67, 0.3); border-radius: 4px;">
+              <h1 style="margin: 0; font-size: 20px; color: #D4A843; letter-spacing: 0.3em; font-weight: 300;">WORLD OF RISE</h1>
             </div>
           </div>
           
@@ -123,7 +123,7 @@ const handler = async (req: Request): Promise<Response> => {
             <h2 style="color: #ffffff; font-size: 24px; font-weight: 300; margin: 0; letter-spacing: 0.05em;">Dear ${data.fullName},</h2>
           </div>
           
-          <div style="border-top: 1px solid rgba(200, 162, 74, 0.15); border-bottom: 1px solid rgba(200, 162, 74, 0.15); padding: 30px 0; margin: 0 20px;">
+          <div style="border-top: 1px solid rgba(212, 168, 67, 0.15); border-bottom: 1px solid rgba(212, 168, 67, 0.15); padding: 30px 0; margin: 0 20px;">
             <p style="color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.8; margin: 0 0 20px; text-align: center;">
               We have received your interest in joining our circle. Each application is reviewed with care and consideration.
             </p>
@@ -133,7 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="text-align: center; margin-top: 35px;">
-            <p style="color: rgba(200, 162, 74, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
+            <p style="color: rgba(212, 168, 67, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
               NOIR &middot; SASSO
             </p>
             <p style="color: rgba(255,255,255,0.3); font-size: 11px; margin: 15px 0 0; letter-spacing: 0.1em;">

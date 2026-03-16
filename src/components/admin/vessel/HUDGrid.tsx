@@ -17,7 +17,7 @@ function GridFloor() {
     <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
       <planeGeometry args={[50, 50, 50, 50]} />
       <meshBasicMaterial
-        color="#C8A24A"
+        color="#D4A843"
         wireframe
         transparent
         opacity={0.02}
@@ -34,7 +34,7 @@ function GridFloorSecondary() {
     <mesh rotation={[-Math.PI / 2, 0, Math.PI / 4]} position={[0, -3.03, 0]}>
       <planeGeometry args={[40, 40, 20, 20]} />
       <meshBasicMaterial
-        color="#d4b86a"
+        color="#E0C06A"
         wireframe
         transparent
         opacity={0.008}
@@ -81,7 +81,7 @@ function LuminousParticles({ count = 250 }: { count?: number }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.02}
-        color="#C8A24A"
+        color="#D4A843"
         transparent
         opacity={0.08}
         sizeAttenuation
@@ -117,7 +117,7 @@ function AmbientParticles({ count = 80 }: { count?: number }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.025}
-        color="#d4b86a"
+        color="#E0C06A"
         transparent
         opacity={0.06}
         sizeAttenuation

@@ -14,7 +14,7 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
   const ringRefs = useRef<(THREE.Mesh | null)[]>([]);
   const particlesRef = useRef<THREE.Points>(null);
 
-  const baseColor = isCrisis ? new THREE.Color("#ff3333") : new THREE.Color("#C8A24A");
+  const baseColor = isCrisis ? new THREE.Color("#ff3333") : new THREE.Color("#D4A843");
   const activeColor = new THREE.Color("#f0d878");
 
   // Particle positions for micro field
@@ -109,7 +109,7 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
         >
           <torusGeometry args={[radius, 0.008, 8, 128]} />
           <meshBasicMaterial
-            color={isCrisis ? "#ff4444" : i % 2 === 0 ? "#00d4ff" : "#C8A24A"}
+            color={isCrisis ? "#ff4444" : i % 2 === 0 ? "#00d4ff" : "#D4A843"}
             transparent
             opacity={0.3 - i * 0.05}
             blending={THREE.AdditiveBlending}
@@ -121,9 +121,9 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
       {/* HUD arc segments — Jarvis-style partial arcs */}
       {[
         { radius: 2.6, arc: 0.6, speed: 0.12, color: "#00d4ff", opacity: 0.2 },
-        { radius: 3.0, arc: 0.35, speed: -0.08, color: "#C8A24A", opacity: 0.15 },
+        { radius: 3.0, arc: 0.35, speed: -0.08, color: "#D4A843", opacity: 0.15 },
         { radius: 3.4, arc: 0.5, speed: 0.15, color: "#00d4ff", opacity: 0.12 },
-        { radius: 3.8, arc: 0.25, speed: -0.1, color: "#C8A24A", opacity: 0.1 },
+        { radius: 3.8, arc: 0.25, speed: -0.1, color: "#D4A843", opacity: 0.1 },
       ].map((hud, i) => (
         <mesh
           key={`hud-arc-${i}`}
@@ -153,7 +153,7 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
         </bufferGeometry>
         <pointsMaterial
           size={0.025}
-          color={isCrisis ? "#ff6644" : "#C8A24A"}
+          color={isCrisis ? "#ff6644" : "#D4A843"}
           transparent
           opacity={0.4}
           sizeAttenuation
