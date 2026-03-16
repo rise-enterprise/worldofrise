@@ -175,7 +175,7 @@ async function sendApprovalEmail(email: string, name: string) {
         </div>
         
         <div style="text-align: center; margin-top: 35px;">
-          <p style="color: rgba(200, 162, 74, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
+          <p style="color: rgba(212, 168, 67, 0.7); font-size: 12px; letter-spacing: 0.15em; margin: 0;">
             NOIR &middot; SASSO
           </p>
         </div>
