@@ -14,7 +14,7 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
   const ringRefs = useRef<(THREE.Mesh | null)[]>([]);
   const particlesRef = useRef<THREE.Points>(null);
 
-  const baseColor = isCrisis ? new THREE.Color("#ff3333") : new THREE.Color("#C8A24A");
+  const baseColor = isCrisis ? new THREE.Color("#ff3333") : new THREE.Color("#D4A843");
   const activeColor = new THREE.Color("#f0d878");
 
   // Particle positions for micro field
