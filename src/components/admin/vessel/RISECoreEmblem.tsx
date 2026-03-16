@@ -71,7 +71,7 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
     return () => geom.dispose();
   }, [font]);
 
-  const baseColor = isCrisis ? new THREE.Color("#b84a4a") : new THREE.Color("#C8A24A");
+  const baseColor = isCrisis ? new THREE.Color("#b84a4a") : new THREE.Color("#D4A843");
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
