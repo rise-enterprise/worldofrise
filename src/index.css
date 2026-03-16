@@ -196,9 +196,9 @@
     --ring: 38 68% 44%;
     
     /* Adjusted Gold for Light Mode */
-    --gold: 42 60% 42%;
-    --gold-light: 42 50% 75%;
-    --gold-shadow: 42 50% 60%;
+    --gold: 38 68% 44%;
+    --gold-light: 38 60% 76%;
+    --gold-shadow: 36 58% 58%;
     
     /* Crystal in Light Mode */
     --crystal-white: 0 0% 100%;
