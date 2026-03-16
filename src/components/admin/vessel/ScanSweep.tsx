@@ -19,7 +19,7 @@ export default function ScanSweep({ isCrisis = false }: ScanSweepProps) {
       if (isCrisis) {
         mat.color.lerp(new THREE.Color("#b84a4a"), 0.03);
       } else {
-        mat.color.lerp(new THREE.Color("#C8A24A"), 0.03);
+        mat.color.lerp(new THREE.Color("#D4A843"), 0.03);
       }
     }
   });
