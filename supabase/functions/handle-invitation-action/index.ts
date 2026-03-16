@@ -155,8 +155,8 @@ async function sendApprovalEmail(email: string, name: string) {
       <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(212, 168, 67, 0.2); border-radius: 12px;">
         
         <div style="text-align: center; margin-bottom: 40px;">
-          <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(200, 162, 74, 0.3); border-radius: 4px;">
-            <h1 style="margin: 0; font-size: 20px; color: #C8A24A; letter-spacing: 0.3em; font-weight: 300;">WORLD OF RISE</h1>
+            <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(212, 168, 67, 0.3); border-radius: 4px;">
+              <h1 style="margin: 0; font-size: 20px; color: #D4A843; letter-spacing: 0.3em; font-weight: 300;">WORLD OF RISE</h1>
           </div>
         </div>
         
