@@ -152,7 +152,7 @@ async function sendApprovalEmail(email: string, name: string) {
 
   const html = `
     <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #07080A;">
-      <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(200, 162, 74, 0.2); border-radius: 12px;">
+      <div style="background: linear-gradient(135deg, #0E1116 0%, #07080A 100%); padding: 40px 30px; border: 1px solid rgba(212, 168, 67, 0.2); border-radius: 12px;">
         
         <div style="text-align: center; margin-bottom: 40px;">
           <div style="display: inline-block; padding: 12px 24px; border: 1px solid rgba(200, 162, 74, 0.3); border-radius: 4px;">
