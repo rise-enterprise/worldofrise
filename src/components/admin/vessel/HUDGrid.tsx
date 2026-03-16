@@ -81,7 +81,7 @@ function LuminousParticles({ count = 250 }: { count?: number }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.02}
-        color="#C8A24A"
+        color="#D4A843"
         transparent
         opacity={0.08}
         sizeAttenuation
