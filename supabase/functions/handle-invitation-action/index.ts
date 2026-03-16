@@ -345,7 +345,7 @@ function renderRejectForm(requestId: string, token: string, name: string, error?
     textarea {
       width: 100%;
       background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(200, 162, 74, 0.2);
+      border: 1px solid rgba(212, 168, 67, 0.2);
       border-radius: 8px;
       padding: 12px;
       color: #fff;
