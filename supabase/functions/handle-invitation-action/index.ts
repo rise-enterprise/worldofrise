@@ -165,7 +165,7 @@ async function sendApprovalEmail(email: string, name: string) {
           <h2 style="color: #ffffff; font-size: 24px; font-weight: 300; margin: 0; letter-spacing: 0.05em;">Dear ${name},</h2>
         </div>
         
-        <div style="border-top: 1px solid rgba(200, 162, 74, 0.15); border-bottom: 1px solid rgba(200, 162, 74, 0.15); padding: 30px 0; margin: 0 20px;">
+        <div style="border-top: 1px solid rgba(212, 168, 67, 0.15); border-bottom: 1px solid rgba(212, 168, 67, 0.15); padding: 30px 0; margin: 0 20px;">
           <p style="color: rgba(255,255,255,0.8); font-size: 15px; line-height: 1.8; margin: 0 0 20px; text-align: center;">
             Your request to join our private circle has been <span style="color: #C8A24A;">approved</span>.
           </p>
