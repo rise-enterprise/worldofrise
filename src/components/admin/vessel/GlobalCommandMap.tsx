@@ -34,7 +34,7 @@ function latLngToSphere(lat: number, lng: number, radius: number): THREE.Vector3
 /* ── Elegant globe with soft gold outlines ── */
 function LuxuryGlobe() {
   const globeRef = useRef<THREE.Group>(null);
-  const gold = "#C8A24A";
+  const gold = "#D4A843";
 
   useFrame(({ clock }) => {
     if (globeRef.current) {
