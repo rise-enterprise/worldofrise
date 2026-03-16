@@ -108,7 +108,7 @@ const Gate = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           style={{
-            backgroundImage: `linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--neon-purple-light)) 50%, hsl(var(--foreground)) 100%)`,
+            backgroundImage: `linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(var(--gold)) 50%, hsl(var(--foreground)) 100%)`,
             backgroundSize: "200% 100%",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
