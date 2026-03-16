@@ -118,7 +118,7 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
       {/* Inner halo ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.8, 0.004, 8, 128]} />
-        <meshBasicMaterial color="#d4b86a" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#E0C06A" transparent opacity={0.06} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
       {/* Floor ambient circle */}
