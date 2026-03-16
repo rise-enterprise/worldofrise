@@ -144,10 +144,10 @@ const Gate = () => {
         <motion.button
           className="px-14 py-4 rounded-lg text-[10px] tracking-[0.3em] uppercase font-medium transition-all duration-300"
           style={{
-            background: 'linear-gradient(135deg, hsl(var(--neon-purple)) 0%, hsl(var(--neon-magenta)) 100%)',
-            color: 'white',
+            background: 'linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-dark)) 100%)',
+            color: 'hsl(var(--gold-foreground, 0 0% 10%))',
           }}
-          whileHover={{ scale: 1.02, boxShadow: "0 8px 30px -8px hsl(var(--neon-purple) / 0.4)" }}
+          whileHover={{ scale: 1.02, boxShadow: "0 8px 30px -8px hsl(var(--gold) / 0.4)" }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowLogin(true)}
         >
