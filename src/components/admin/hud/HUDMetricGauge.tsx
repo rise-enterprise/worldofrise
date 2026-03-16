@@ -11,7 +11,7 @@ interface HUDMetricGaugeProps {
 }
 
 const colorMap = {
-  gold: { stroke: "hsl(42, 50%, 54%)", glow: "hsl(42, 50%, 54%)" },
+  gold: { stroke: "hsl(40, 62%, 56%)", glow: "hsl(40, 62%, 56%)" },
   teal: { stroke: "hsl(195, 62%, 32%)", glow: "hsl(195, 62%, 45%)" },
   burgundy: { stroke: "hsl(350, 55%, 30%)", glow: "hsl(350, 55%, 40%)" },
   sapphire: { stroke: "hsl(215, 60%, 35%)", glow: "hsl(215, 60%, 50%)" },

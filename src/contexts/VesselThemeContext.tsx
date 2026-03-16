@@ -16,8 +16,8 @@ interface VesselThemeContextValue {
 const COLORS = {
   bg: "#faf8f5",
   surface: "#ffffff",
-  accent: "#C8A24A",
-  accentLight: "#d4b86a",
+  accent: "#D4A843",
+  accentLight: "#E0C06A",
   text: "#1a1510",
   textMuted: "#8a7d6a",
   border: "rgba(200,162,74,0.08)",

@@ -24,7 +24,7 @@
     --popover-foreground: 220 20% 93%;
     
     /* Primary — Gilded Gold */
-    --primary: 42 50% 54%;                 /* #C8A24A - Gilded Gold */
+    --primary: 40 62% 56%;                 /* Warm Champagne Gold */
     --primary-foreground: 220 14% 4%;      /* Onyx for contrast */
     
     /* Secondary — Deep Obsidian */
@@ -44,10 +44,10 @@
     ═══════════════════════════════════════════════════════════ */
     
     /* Gold Spectrum */
-    --gold: 42 50% 54%;                    /* #C8A24A - Gilded Gold */
-    --gold-light: 42 55% 70%;              /* Champagne Shimmer */
-    --gold-shadow: 42 60% 26%;             /* #6F5418 - Antique Gold */
-    --gold-foil: 45 65% 58%;               /* Bright Gold Foil */
+    --gold: 40 62% 56%;                    /* Warm Champagne Gold */
+    --gold-light: 38 65% 72%;              /* Rich Champagne Shimmer */
+    --gold-shadow: 36 70% 28%;             /* Deep Warm Amber */
+    --gold-foil: 42 72% 60%;               /* Saturated Gold Foil */
     
     /* Burgundy Spectrum */
     --burgundy: 350 65% 18%;               /* #4A0F18 - Burgundy Velvet */
@@ -96,10 +96,10 @@
     /* Borders & Inputs — Crystal Lines */
     --border: 220 15% 20%;
     --input: 220 12% 15%;
-    --ring: 42 50% 54%;                    /* Gold focus ring */
+    --ring: 40 62% 56%;                    /* Gold focus ring */
     
     /* Chart Colors */
-    --chart-1: 42 50% 54%;                 /* Gold */
+    --chart-1: 40 62% 56%;                 /* Gold */
     --chart-2: 195 62% 32%;                /* Teal */
     --chart-3: 350 55% 30%;                /* Burgundy */
     --chart-4: 220 20% 40%;                /* Silver */
@@ -112,24 +112,24 @@
     --tier-crystal: 220 20% 75%;           /* Silver/White Crystal */
     --tier-onyx: 220 10% 15%;              /* Deep Black */
     --tier-obsidian: 220 12% 10%;          /* Black with depth */
-    --tier-royal: 42 60% 50%;              /* Pure Gold */
+    --tier-royal: 40 68% 52%;              /* Rich Royal Gold */
     
     /* Legacy Tier Colors */
     --tier-initiation: 220 10% 50%;
     --tier-connoisseur: 35 50% 45%;
     --tier-elite: 38 60% 50%;
     --tier-inner-circle: 40 70% 55%;
-    --tier-black: 42 50% 54%;
+    --tier-black: 40 62% 56%;
     
     /* Sidebar — Noir Depths */
     --sidebar-background: 220 14% 5%;
     --sidebar-foreground: 220 20% 93%;
-    --sidebar-primary: 42 50% 54%;
+    --sidebar-primary: 40 62% 56%;
     --sidebar-primary-foreground: 220 14% 4%;
     --sidebar-accent: 220 10% 12%;
     --sidebar-accent-foreground: 220 20% 93%;
     --sidebar-border: 220 15% 15%;
-    --sidebar-ring: 42 50% 54%;
+    --sidebar-ring: 40 62% 56%;
     
     /* ═══════════════════════════════════════════════════════════
        CRYSTAL GLASS MATERIAL TOKENS
@@ -179,7 +179,7 @@
     --popover: 40 10% 99%;
     --popover-foreground: 220 14% 10%;
     
-    --primary: 42 60% 42%;                 /* Deeper gold for light mode */
+    --primary: 38 68% 44%;                 /* Deeper champagne gold for light mode */
     --primary-foreground: 0 0% 100%;
     
     --secondary: 40 10% 94%;
@@ -188,17 +188,17 @@
     --muted: 40 8% 92%;
     --muted-foreground: 220 10% 45%;
     
-    --accent: 42 40% 92%;                  /* Light champagne */
+    --accent: 38 50% 92%;                  /* Warm champagne */
     --accent-foreground: 220 14% 10%;
     
     --border: 40 15% 85%;
     --input: 40 10% 96%;
-    --ring: 42 60% 42%;
+    --ring: 38 68% 44%;
     
     /* Adjusted Gold for Light Mode */
-    --gold: 42 60% 42%;
-    --gold-light: 42 50% 75%;
-    --gold-shadow: 42 50% 60%;
+    --gold: 38 68% 44%;
+    --gold-light: 38 60% 76%;
+    --gold-shadow: 36 58% 58%;
     
     /* Crystal in Light Mode */
     --crystal-white: 0 0% 100%;
@@ -207,7 +207,7 @@
     /* Sidebar Light */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 220 14% 10%;
-    --sidebar-primary: 42 60% 42%;
+    --sidebar-primary: 38 68% 44%;
     --sidebar-border: 40 15% 88%;
     
     /* Light Mode Glass */
