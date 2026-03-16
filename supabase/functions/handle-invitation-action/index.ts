@@ -161,7 +161,7 @@ async function sendApprovalEmail(email: string, name: string) {
         </div>
         
         <div style="text-align: center; margin-bottom: 35px;">
-          <p style="color: rgba(200, 162, 74, 0.8); font-size: 11px; letter-spacing: 0.2em; margin: 0 0 20px; text-transform: uppercase;">Welcome to the Circle</p>
+          <p style="color: rgba(212, 168, 67, 0.8); font-size: 11px; letter-spacing: 0.2em; margin: 0 0 20px; text-transform: uppercase;">Welcome to the Circle</p>
           <h2 style="color: #ffffff; font-size: 24px; font-weight: 300; margin: 0; letter-spacing: 0.05em;">Dear ${name},</h2>
         </div>
         
