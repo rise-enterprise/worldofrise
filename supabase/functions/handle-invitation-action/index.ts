@@ -232,7 +232,7 @@ function renderHtmlResponse(title: string, message: string, type: "success" | "e
     }
     .card {
       background: linear-gradient(135deg, #0E1116 0%, #07080A 100%);
-      border: 1px solid rgba(200, 162, 74, 0.2);
+      border: 1px solid rgba(212, 168, 67, 0.2);
       border-radius: 12px;
       padding: 40px;
       max-width: 500px;
