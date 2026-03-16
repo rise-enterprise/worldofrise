@@ -199,8 +199,8 @@ export default {
           "50%": { opacity: "0.7" },
         },
         "border-glow": {
-          "0%, 100%": { borderColor: "rgba(200, 162, 74, 0.2)" },
-          "50%": { borderColor: "rgba(200, 162, 74, 0.4)" },
+          "0%, 100%": { borderColor: "rgba(212, 168, 67, 0.2)" },
+          "50%": { borderColor: "rgba(212, 168, 67, 0.4)" },
         },
       },
       animation: {
