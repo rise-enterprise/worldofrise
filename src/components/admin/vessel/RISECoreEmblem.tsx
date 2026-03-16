@@ -87,7 +87,7 @@ export default function RISECoreEmblem({ isActive = false, isCrisis = false, pul
     if (frameRef.current) frameRef.current.rotation.z = t * 0.008;
   });
 
-  if (!textGeom) return <mesh><sphereGeometry args={[0.15, 16, 16]} /><meshBasicMaterial color="#C8A24A" transparent opacity={0.3} /></mesh>;
+  if (!textGeom) return <mesh><sphereGeometry args={[0.15, 16, 16]} /><meshBasicMaterial color="#D4A843" transparent opacity={0.3} /></mesh>;
 
   return (
     <group>
