@@ -239,7 +239,7 @@ function renderHtmlResponse(title: string, message: string, type: "success" | "e
       text-align: center;
     }
     .logo {
-      color: #C8A24A;
+      color: #D4A843;
       font-size: 18px;
       letter-spacing: 0.3em;
       margin-bottom: 30px;
