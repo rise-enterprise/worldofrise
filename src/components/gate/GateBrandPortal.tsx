@@ -57,7 +57,7 @@ export function GateBrandPortal({ onEnter, theme }: GateBrandPortalProps) {
 
             <div
               className="h-14 w-px"
-              style={{ background: 'linear-gradient(180deg, transparent, hsl(var(--neon-purple) / 0.3), transparent)' }}
+              style={{ background: 'linear-gradient(180deg, transparent, hsl(var(--gold) / 0.3), transparent)' }}
             />
 
             <div className="flex flex-col items-center">
