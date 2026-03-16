@@ -67,7 +67,7 @@ function AIOrbitSatellite({ metric, index, total }: { metric: AIMetric; index: n
         </mesh>
 
         {/* AI tag */}
-        <Text position={[-0.38, 0.22, 0]} fontSize={0.04} color="#d4b86a" anchorX="left" anchorY="middle" font={undefined} letterSpacing={0.18}>
+        <Text position={[-0.38, 0.22, 0]} fontSize={0.04} color="#E0C06A" anchorX="left" anchorY="middle" font={undefined} letterSpacing={0.18}>
           AI
         </Text>
 
