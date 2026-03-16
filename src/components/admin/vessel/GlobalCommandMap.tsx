@@ -162,7 +162,7 @@ function CityBeacon({ city, position }: { city: CityNode; position: THREE.Vector
   const ringRef = useRef<THREE.Mesh>(null);
   const beamRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  const gold = "#C8A24A";
+  const gold = "#D4A843";
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
