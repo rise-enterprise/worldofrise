@@ -34,7 +34,7 @@ function GridFloorSecondary() {
     <mesh rotation={[-Math.PI / 2, 0, Math.PI / 4]} position={[0, -3.03, 0]}>
       <planeGeometry args={[40, 40, 20, 20]} />
       <meshBasicMaterial
-        color="#d4b86a"
+        color="#E0C06A"
         wireframe
         transparent
         opacity={0.008}
