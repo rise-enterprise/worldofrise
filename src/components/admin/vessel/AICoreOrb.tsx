@@ -109,7 +109,7 @@ export default function AICoreOrb({ isActive = false, isCrisis = false, pulseInt
         >
           <torusGeometry args={[radius, 0.008, 8, 128]} />
           <meshBasicMaterial
-            color={isCrisis ? "#ff4444" : i % 2 === 0 ? "#00d4ff" : "#C8A24A"}
+            color={isCrisis ? "#ff4444" : i % 2 === 0 ? "#00d4ff" : "#D4A843"}
             transparent
             opacity={0.3 - i * 0.05}
             blending={THREE.AdditiveBlending}
