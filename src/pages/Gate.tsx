@@ -63,11 +63,13 @@ const Gate = () => {
           key={i}
           className="absolute w-px h-px rounded-full"
           style={{
-            background: i % 3 === 0
-              ? "hsl(var(--neon-purple) / 0.5)"
-              : i % 3 === 1
-                ? "hsl(var(--neon-magenta) / 0.4)"
-                : "hsl(var(--neon-blue) / 0.4)",
+          background: i % 4 === 0
+              ? "hsl(var(--gold) / 0.5)"
+              : i % 3 === 0
+                ? "hsl(var(--neon-purple) / 0.4)"
+                : i % 3 === 1
+                  ? "hsl(var(--neon-magenta) / 0.3)"
+                  : "hsl(var(--gold) / 0.35)",
             left: `${10 + i * 11}%`,
             top: `${15 + (i % 4) * 20}%`,
             boxShadow: `0 0 6px currentColor`,
