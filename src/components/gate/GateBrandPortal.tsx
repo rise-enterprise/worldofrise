@@ -30,7 +30,7 @@ export function GateBrandPortal({ onEnter, theme }: GateBrandPortalProps) {
         <div
           className="absolute top-0 left-0 right-0 h-px opacity-40 group-hover:opacity-80 transition-opacity duration-500"
           style={{
-            background: 'linear-gradient(90deg, transparent, hsl(var(--neon-purple) / 0.4), hsl(var(--neon-magenta) / 0.2), transparent)',
+            background: 'linear-gradient(90deg, transparent, hsl(var(--gold) / 0.4), hsl(var(--primary) / 0.2), transparent)',
           }}
         />
 
