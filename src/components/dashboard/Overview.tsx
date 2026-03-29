@@ -16,7 +16,7 @@ interface OverviewProps {
 
 const brandLabels: Record<string, { members: string; visits: string }> = {
   all: { members: 'Across all regions', visits: 'Combined brands' },
-  noir: { members: 'NOIR Cafe only', visits: 'NOIR locations' },
+  noir: { members: 'NOIR Café only', visits: 'NOIR locations' },
   sasso: { members: 'SASSO only', visits: 'SASSO locations' },
 };
 
@@ -25,12 +25,12 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
   const vipGuests = guests.slice(0, 4);
 
   return (
-    <div className="p-4 md:p-6 space-y-6">
-      {/* KPI Row */}
+    <div className="p-6 md:p-8 space-y-8">
+      {/* KPI */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard title="Total Members" value={metrics.totalMembers.toLocaleString()} subtitle={labels.members} icon={Users} trend={{ value: 12, label: 'this month' }} delay={0} />
-        <MetricCard title="Visits This Month" value={metrics.totalVisitsThisMonth.toLocaleString()} subtitle={labels.visits} icon={TrendingUp} trend={{ value: 8, label: 'vs last month' }} delay={100} />
-        <MetricCard title="VIP Members" value={metrics.vipGuestsCount} subtitle="Inner Circle & RISE Black" icon={Crown} delay={200} />
+        <MetricCard title="Monthly Visits" value={metrics.totalVisitsThisMonth.toLocaleString()} subtitle={labels.visits} icon={TrendingUp} trend={{ value: 8, label: 'vs last month' }} delay={100} />
+        <MetricCard title="Distinguished" value={metrics.vipGuestsCount} subtitle="Inner Circle & Royal" icon={Crown} delay={200} />
         <MetricCard title="Re-engagement" value={metrics.churnRiskCount} subtitle="30+ days inactive" icon={AlertTriangle} delay={300} />
       </div>
 
@@ -50,14 +50,11 @@ export function Overview({ metrics, guests, activeBrand }: OverviewProps) {
         <CountryMetrics visitsByCountry={metrics.visitsByCountry} />
       </div>
 
-      {/* VIP Guests */}
+      {/* Distinguished Members */}
       {vipGuests.length > 0 && (
-        <Card className="border-border/15 bg-card/50 backdrop-blur-sm">
+        <Card>
           <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-primary/30" />
-              <CardTitle className="text-base tracking-wide">Distinguished Members</CardTitle>
-            </div>
+            <CardTitle className="text-base font-display font-normal">Distinguished Members</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
