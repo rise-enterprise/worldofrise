@@ -5,22 +5,13 @@ import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Gift,
-  Settings,
-  Crown,
-  BrainCircuit,
-  Coffee,
-  UtensilsCrossed,
-  Sparkles,
-  ShieldCheck,
-  Bell,
-  BarChart3,
-  FileEdit,
+  LayoutDashboard, Users, Calendar, Gift, Settings, Crown,
+  BrainCircuit, Coffee, UtensilsCrossed, Sparkles, ShieldCheck,
+  Bell, BarChart3, FileEdit, ChevronLeft, ChevronRight,
 } from "lucide-react";
+import { useState } from "react";
 
 interface SidebarProps {
   activeView: string;
@@ -31,260 +22,170 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
-const brandFilters: { id: Brand; labelKey: string; icon: React.ElementType }[] = [
-  { id: "all", labelKey: "brands.allBrands", icon: Crown },
-  { id: "noir", labelKey: "brands.noir", icon: Coffee },
-  { id: "sasso", labelKey: "brands.sasso", icon: UtensilsCrossed },
+const brandFilters: { id: Brand; label: string; icon: React.ElementType }[] = [
+  { id: "all", label: "All Brands", icon: Crown },
+  { id: "noir", label: "NOIR", icon: Coffee },
+  { id: "sasso", label: "SASSO", icon: UtensilsCrossed },
 ];
 
-// Demo admin for open-access mode
-const demoAdmin = {
-  name: "Administrator",
-  email: "admin@rise.com",
-  role: "super_admin" as const,
-};
+const navigation = [
+  { id: "dashboard", label: "Overview", icon: LayoutDashboard },
+  { id: "guests", label: "Members", icon: Users },
+  { id: "insights", label: "AI Insights", icon: Sparkles },
+  { id: "privileges", label: "Privileges", icon: Gift },
+  { id: "rewards", label: "Rewards", icon: Gift },
+  { id: "events", label: "Events", icon: Calendar },
+  { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "settings", label: "Settings", icon: Settings },
+];
+
+const adminNavigation = [
+  { id: "admins", label: "Admin Users", icon: ShieldCheck },
+  { id: "cms", label: "Content", icon: FileEdit },
+];
 
 function SidebarContent({
-  activeView,
-  setActiveView,
-  activeBrand,
-  setActiveBrand,
-  onNavClick,
-}: SidebarProps & { onNavClick?: () => void }) {
-  const { t } = useTranslation();
-  const { isRTL } = useLanguage();
-  const isSuperAdmin = demoAdmin.role === "super_admin";
-
-  const navigation = [
-    { id: "dashboard", labelKey: "nav.overview", icon: LayoutDashboard },
-    { id: "guests", labelKey: "nav.guests", icon: Users },
-    { id: "insights", labelKey: "nav.aiInsights", icon: Sparkles },
-    { id: "privileges", labelKey: "nav.privileges", icon: Gift },
-    { id: "rewards", labelKey: "nav.rewards", icon: Gift },
-    { id: "events", labelKey: "nav.events", icon: Calendar },
-    { id: "analytics", labelKey: "nav.analytics", icon: BarChart3 },
-    { id: "notifications", labelKey: "nav.notifications", icon: Bell },
-    { id: "settings", labelKey: "nav.settings", icon: Settings },
-  ];
-
+  activeView, setActiveView, activeBrand, setActiveBrand, onNavClick, collapsed,
+}: SidebarProps & { onNavClick?: () => void; collapsed?: boolean }) {
   const navigate = useNavigate();
 
-  const superAdminNavigation = [
-    { id: "admins", labelKey: "nav.adminUsers", icon: ShieldCheck },
-    { id: "cms", labelKey: "nav.cms", icon: FileEdit },
-  ];
+  const handleNav = (id: string) => { setActiveView(id); onNavClick?.(); };
+  const handleBrand = (id: Brand) => { setActiveBrand(id); onNavClick?.(); };
 
-  const handleNavClick = (id: string) => {
-    setActiveView(id);
-    onNavClick?.();
-  };
-
-  const handleBrandClick = (id: Brand) => {
-    setActiveBrand(id);
-    onNavClick?.();
-  };
+  const NavButton = ({ id, label, icon: Icon, isActive }: { id: string; label: string; icon: React.ElementType; isActive: boolean }) => (
+    <button
+      onClick={() => handleNav(id)}
+      className={cn(
+        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200",
+        collapsed && "justify-center px-0",
+        isActive
+          ? "text-primary font-medium"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
+      )}
+      style={isActive ? { background: 'hsl(var(--primary) / 0.08)' } : undefined}
+      title={collapsed ? label : undefined}
+    >
+      <Icon className={cn("w-4 h-4 shrink-0", isActive && "text-primary")} />
+      {!collapsed && <span>{label}</span>}
+    </button>
+  );
 
   return (
-    <div className="flex h-full flex-col bg-gradient-to-b from-card/98 via-card/95 to-card/90 backdrop-blur-2xl relative overflow-hidden">
-      {/* Crystal glass inner glow */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.03] via-transparent to-transparent pointer-events-none" />
-
-      {/* Crystal vertical accent line */}
-      <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-primary/20 to-transparent" />
-
-      {/* Subtle sparkle particles in background */}
-      <div
-        className="absolute top-20 left-8 w-1 h-1 bg-primary/30 rounded-full animate-pulse"
-        style={{ animationDelay: "0s" }}
-      />
-      <div
-        className="absolute top-40 left-16 w-0.5 h-0.5 bg-primary/20 rounded-full animate-pulse"
-        style={{ animationDelay: "1s" }}
-      />
-      <div
-        className="absolute top-60 left-4 w-0.5 h-0.5 bg-primary/25 rounded-full animate-pulse"
-        style={{ animationDelay: "2s" }}
-      />
-
+    <div className="flex h-full flex-col" style={{ background: "hsl(var(--sidebar-background, var(--card)))" }}>
       {/* Logo */}
-      <div className="flex h-24 items-center justify-center border-b border-primary/15 relative">
-        {/* Diamond icon glow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.05] to-transparent pointer-events-none" />
-        <div className="text-center relative">
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <Sparkles className="h-4 w-4 text-primary animate-pulse" style={{ animationDuration: "3s" }} />
-            <h1 className="font-display text-3xl font-medium text-primary tracking-[0.2em] drop-shadow-[0_0_10px_rgba(200,162,74,0.3)]">
-              RISE
-            </h1>
-            <Sparkles
-              className="h-4 w-4 text-primary animate-pulse"
-              style={{ animationDuration: "3s", animationDelay: "1.5s" }}
-            />
-          </div>
-          <div className="h-px w-16 mx-auto bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-          <p className="text-[10px] tracking-[0.4em] text-muted-foreground/60 uppercase font-body mt-2">Holding</p>
-        </div>
+      <div className={cn(
+        "flex items-center gap-3 h-14 shrink-0 border-b border-border/10",
+        collapsed ? "justify-center px-0" : "px-5"
+      )}>
+        <Sparkles className="h-5 w-5 text-primary shrink-0" />
+        {!collapsed && (
+          <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-foreground/80">
+            RISE Command
+          </span>
+        )}
       </div>
 
       {/* Brand Filter */}
-      <div className="p-5 border-b border-primary/15 relative">
-        {/* Crystal divider glow */}
-        <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 font-body">
-          {t("brands.brandView")}
-        </p>
-        <div className="space-y-1">
-          {brandFilters.map((brand) => (
-            <button
-              key={brand.id}
-              onClick={() => handleBrandClick(brand.id)}
-              className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out",
-                isRTL && "flex-row-reverse",
-                activeBrand === brand.id
-                  ? "bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_30px_rgba(200,162,74,0.08)]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-card",
-              )}
-            >
-              <brand.icon className={cn("h-4 w-4", activeBrand === brand.id && "text-primary")} />
-              <span className="font-medium tracking-refined">{t(brand.labelKey)}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-5 overflow-y-auto">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 font-body">
-          {t("nav.navigation")}
-        </p>
-        <div className="space-y-1">
-          {navigation.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out",
-                isRTL && "flex-row-reverse",
-                activeView === item.id
-                  ? "bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_30px_rgba(200,162,74,0.08)]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-card",
-              )}
-            >
-              <item.icon className={cn("h-4 w-4", activeView === item.id && "text-primary")} />
-              <span className="tracking-refined">{t(item.labelKey)}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Super Admin Navigation */}
-        {isSuperAdmin && (
-          <>
-            {/* Crystal divider */}
-            <div className="my-6 relative">
-              <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-primary/20 rotate-45" />
-            </div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/50 mb-4 px-2 font-body">
-              {t("nav.administration")}
-            </p>
-            <div className="space-y-1">
-              {superAdminNavigation.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out",
-                    isRTL && "flex-row-reverse",
-                    activeView === item.id
-                      ? "bg-primary/10 text-primary border-l-2 border-primary shadow-[inset_0_0_30px_rgba(200,162,74,0.08)]"
-                      : "text-muted-foreground hover:text-foreground hover:bg-card",
-                  )}
-                >
-                  <item.icon className={cn("h-4 w-4", activeView === item.id && "text-primary")} />
-                  <span className="tracking-refined">{t(item.labelKey)}</span>
-                </button>
-              ))}
-
-              {/* RISE Intelligent Link */}
+      {!collapsed && (
+        <div className="px-3 py-3 border-b border-border/10">
+          <p className="text-[9px] uppercase tracking-[0.3em] text-muted-foreground/40 mb-2 px-2">Brand</p>
+          <div className="flex gap-1">
+            {brandFilters.map((b) => (
               <button
-                onClick={() => navigate("/admin")}
+                key={b.id}
+                onClick={() => handleBrand(b.id)}
                 className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all duration-300 ease-out",
-                  isRTL && "flex-row-reverse",
-                  "text-primary/80 hover:text-primary hover:bg-primary/5 border border-primary/15 hover:border-primary/30 mt-2",
+                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-[11px] transition-all duration-200",
+                  activeBrand === b.id
+                    ? "bg-primary/10 text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
                 )}
               >
-                <BrainCircuit className="h-4 w-4" />
-                <span className="tracking-refined font-medium">{t("nav.RISE Intelligent", "RISE AI Panel")}</span>
+                <b.icon className="w-3 h-3" />
+                <span>{b.label}</span>
               </button>
-            </div>
-          </>
-        )}
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Nav */}
+      <nav className="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+        {navigation.map((item) => (
+          <NavButton key={item.id} {...item} isActive={activeView === item.id} />
+        ))}
+
+        {/* Admin Section */}
+        <div className="my-3 mx-2 h-px bg-border/10" />
+        <p className={cn("text-[9px] uppercase tracking-[0.3em] text-muted-foreground/40 mb-2", collapsed ? "text-center" : "px-3")}>Admin</p>
+        {adminNavigation.map((item) => (
+          <NavButton key={item.id} {...item} isActive={activeView === item.id} />
+        ))}
+
+        {/* AI Panel Link */}
+        <button
+          onClick={() => navigate("/admin")}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 mt-2",
+            collapsed && "justify-center px-0",
+            "text-neon-purple/70 hover:text-neon-purple hover:bg-neon-purple/5 border border-neon-purple/10 hover:border-neon-purple/20"
+          )}
+          title={collapsed ? "RISE AI" : undefined}
+        >
+          <BrainCircuit className="w-4 h-4 shrink-0" />
+          {!collapsed && <span>RISE AI</span>}
+          {!collapsed && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse" />}
+        </button>
       </nav>
 
-      {/* User Info */}
-      <div className="p-5 border-t border-primary/10 space-y-4">
-        <div className="px-4 py-3 rounded-lg bg-background/50 border border-primary/10">
-          <p className="text-sm font-medium text-foreground truncate tracking-refined">{demoAdmin.name}</p>
-          <p className="text-xs text-muted-foreground/60 truncate">{demoAdmin.email}</p>
+      {/* Footer */}
+      <div className="p-2 border-t border-border/10 space-y-1">
+        <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between px-2")}>
+          {!collapsed && <span className="text-[9px] text-muted-foreground/40 uppercase tracking-widest">Theme</span>}
+          <ThemeToggle className="h-8 w-8" />
         </div>
       </div>
     </div>
   );
 }
 
-export function Sidebar({
-  activeView,
-  setActiveView,
-  activeBrand,
-  setActiveBrand,
-  mobileOpen,
-  onMobileClose,
-}: SidebarProps) {
+export function Sidebar(props: SidebarProps) {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const { isRTL } = useLanguage();
   const useDrawer = isMobile || isTablet;
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Mobile & Tablet: Sheet drawer
   if (useDrawer) {
     return (
-      <Sheet open={mobileOpen} onOpenChange={(open) => !open && onMobileClose?.()}>
+      <Sheet open={props.mobileOpen} onOpenChange={(open) => !open && props.onMobileClose?.()}>
         <SheetContent
           side={isRTL ? "right" : "left"}
-          className={cn(isTablet ? "w-80" : "w-72", "p-0 bg-card border-primary/10")}
+          className={cn(isTablet ? "w-72" : "w-64", "p-0 bg-card border-border/10")}
         >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Navigation Menu</SheetTitle>
-          </SheetHeader>
-          <SidebarContent
-            activeView={activeView}
-            setActiveView={setActiveView}
-            activeBrand={activeBrand}
-            setActiveBrand={setActiveBrand}
-            onNavClick={onMobileClose}
-          />
+          <SheetHeader className="sr-only"><SheetTitle>Navigation</SheetTitle></SheetHeader>
+          <SidebarContent {...props} onNavClick={props.onMobileClose} />
         </SheetContent>
       </Sheet>
     );
   }
 
-  // Desktop: Fixed sidebar with crystal styling
   return (
     <aside
       className={cn(
-        "fixed top-0 z-40 h-screen w-64 bg-card/98 backdrop-blur-xl border-primary/10",
-        isRTL ? "right-0 border-l" : "left-0 border-r",
+        "fixed top-0 z-40 h-screen shrink-0 transition-all duration-300 ease-out border-border/15",
+        collapsed ? "w-[64px]" : "w-64",
+        isRTL ? "right-0 border-l" : "left-0 border-r"
       )}
     >
-      <SidebarContent
-        activeView={activeView}
-        setActiveView={setActiveView}
-        activeBrand={activeBrand}
-        setActiveBrand={setActiveBrand}
-      />
+      <SidebarContent {...props} collapsed={collapsed} />
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="absolute bottom-14 -right-3 z-50 w-6 h-6 rounded-full bg-card border border-border/20 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+      </button>
     </aside>
   );
 }
