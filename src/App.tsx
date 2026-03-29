@@ -9,7 +9,11 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 // Critical: Load Gate immediately as it's the landing page
 import Gate from "./pages/Gate";
 
-// Lazy load all other routes to reduce initial bundle size
+// Lazy load all other routes
+const About = lazy(() => import("./pages/About"));
+const Locations = lazy(() => import("./pages/Locations"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Contact = lazy(() => import("./pages/Contact"));
 const RequestInvitation = lazy(() => import("./pages/RequestInvitation"));
 const VerificationPending = lazy(() => import("./pages/VerificationPending"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -38,8 +42,12 @@ const App = () => (
         <BrowserRouter>
           <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <Routes>
-              {/* Entry Experience */}
+              {/* Public Pages */}
               <Route path="/" element={<Gate />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/locations" element={<Locations />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/request-invitation" element={<RequestInvitation />} />
               <Route path="/verification-pending" element={<VerificationPending />} />
               
@@ -49,7 +57,7 @@ const App = () => (
               <Route path="/admin" element={<AdminAuthGuard><AdminPanel /></AdminAuthGuard>} />
               <Route path="/admin/operator" element={<AdminAuthGuard><AIOperatorPage /></AdminAuthGuard>} />
               
-              {/* Member Routes - Require Login */}
+              {/* Member Routes */}
               <Route path="/member/welcome" element={<MemberAuthGuard><MemberWelcome /></MemberAuthGuard>} />
               <Route path="/member" element={<MemberAuthGuard><MemberPortal /></MemberAuthGuard>} />
               <Route path="/member/history" element={<MemberAuthGuard><MemberHistory /></MemberAuthGuard>} />
