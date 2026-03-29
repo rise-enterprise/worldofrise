@@ -1,6 +1,7 @@
 import { useDashboardMetrics } from "@/hooks/useDashboardMetrics";
-import { Users, TrendingUp, Crown, AlertTriangle, ArrowUpRight, Map, Brain } from "lucide-react";
+import { Users, TrendingUp, Crown, AlertTriangle, ArrowUpRight, Map, Brain, BarChart3 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 interface Props {
   onNavigate: (view: string) => void;
@@ -26,34 +27,10 @@ export default function DashboardOverview({ onNavigate }: Props) {
   const m = metrics as any;
 
   const statCards = [
-    {
-      label: "Total Members",
-      value: (m.totalMembers ?? 0).toLocaleString(),
-      icon: Users,
-      change: "+12%",
-      color: "hsl(var(--gold))",
-    },
-    {
-      label: "Visits This Month",
-      value: (m.totalVisitsThisMonth ?? 0).toLocaleString(),
-      icon: TrendingUp,
-      change: "+8%",
-      color: "hsl(var(--success))",
-    },
-    {
-      label: "VIP Members",
-      value: (m.vipGuestsCount ?? 0).toLocaleString(),
-      icon: Crown,
-      change: "+5%",
-      color: "hsl(var(--gold))",
-    },
-    {
-      label: "Churn Risk",
-      value: (m.churnRiskCount ?? 0).toLocaleString(),
-      icon: AlertTriangle,
-      change: "-3%",
-      color: "hsl(var(--destructive))",
-    },
+    { label: "Total Members", value: (m.totalMembers ?? 0).toLocaleString(), icon: Users, change: "+12%", positive: true },
+    { label: "Visits This Month", value: (m.totalVisitsThisMonth ?? 0).toLocaleString(), icon: TrendingUp, change: "+8%", positive: true },
+    { label: "VIP Members", value: (m.vipGuestsCount ?? 0).toLocaleString(), icon: Crown, change: "+5%", positive: true },
+    { label: "Churn Risk", value: (m.churnRiskCount ?? 0).toLocaleString(), icon: AlertTriangle, change: "-3%", positive: false },
   ];
 
   const tierDist = m.tierDistribution ?? {};
@@ -64,123 +41,106 @@ export default function DashboardOverview({ onNavigate }: Props) {
     <div className="p-6 space-y-6 max-w-[1400px]">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-foreground tracking-tight">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">RISE Holding loyalty intelligence overview</p>
+        <h1 className="text-2xl font-display font-medium text-foreground tracking-crystal">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">RISE loyalty intelligence overview</p>
       </div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((card) => (
-          <div
+        {statCards.map((card, i) => (
+          <motion.div
             key={card.label}
-            className="rounded-xl p-4 border border-border/40 transition-all duration-300 hover:border-primary/20 group"
-            style={{
-              background: "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card) / 0.8) 100%)",
-            }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08 }}
+            className="rounded-xl p-5 border border-border/15 bg-card/50 backdrop-blur-sm transition-all duration-200 hover:border-primary/15 group"
           >
-            <div className="flex items-center justify-between mb-3">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: `${card.color}15` }}
-              >
-                <card.icon className="w-4 h-4" style={{ color: card.color }} />
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                style={{ background: card.positive ? 'hsl(var(--gold) / 0.08)' : 'hsl(var(--destructive) / 0.08)' }}>
+                <card.icon className="w-4 h-4" style={{ color: card.positive ? 'hsl(var(--gold))' : 'hsl(var(--destructive))' }} />
               </div>
-              <span
-                className="text-xs font-medium px-2 py-0.5 rounded-full"
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full"
                 style={{
-                  background: card.change.startsWith("+") ? "hsl(var(--success) / 0.1)" : "hsl(var(--destructive) / 0.1)",
-                  color: card.change.startsWith("+") ? "hsl(var(--success))" : "hsl(var(--destructive))",
-                }}
-              >
+                  background: card.positive ? 'hsl(var(--success) / 0.08)' : 'hsl(var(--destructive) / 0.08)',
+                  color: card.positive ? 'hsl(var(--success))' : 'hsl(var(--destructive))',
+                }}>
                 {card.change}
               </span>
             </div>
-            <div className="text-2xl font-bold text-foreground tracking-tight">{card.value}</div>
+            <div className="text-2xl font-display font-medium text-foreground tracking-tight">{card.value}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{card.label}</div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      {/* Grid: Tier Distribution + Brand Performance */}
+      {/* Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Tier Distribution */}
-        <div
-          className="rounded-xl p-5 border border-border/40"
-          style={{ background: "hsl(var(--card))" }}
-        >
-          <h3 className="text-sm font-semibold text-foreground mb-4">Tier Distribution</h3>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="rounded-xl p-5 border border-border/15 bg-card/50 backdrop-blur-sm">
+          <h3 className="text-sm font-medium text-foreground mb-5">Tier Distribution</h3>
           <div className="space-y-3">
             {Object.entries(tierDist).map(([tier, count]) => {
               const total = Object.values(tierDist).reduce((a: number, b) => a + Number(b), 0) as number;
               const pct = total > 0 ? (Number(count) / total) * 100 : 0;
               return (
                 <div key={tier}>
-                  <div className="flex justify-between text-xs mb-1">
+                  <div className="flex justify-between text-xs mb-1.5">
                     <span className="text-muted-foreground capitalize">{tier.replace("-", " ")}</span>
                     <span className="text-foreground font-medium">{Number(count).toLocaleString()}</span>
                   </div>
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "hsl(var(--muted))" }}>
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{
-                        width: `${pct}%`,
-                        background: "linear-gradient(90deg, hsl(var(--gold)), hsl(var(--gold) / 0.6))",
-                      }}
-                    />
+                  <div className="h-1.5 rounded-full overflow-hidden bg-muted/30">
+                    <motion.div className="h-full rounded-full"
+                      initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, delay: 0.4 }}
+                      style={{ background: 'linear-gradient(90deg, hsl(var(--gold)), hsl(var(--gold) / 0.5))' }} />
                   </div>
                 </div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Brand Performance */}
-        <div
-          className="rounded-xl p-5 border border-border/40"
-          style={{ background: "hsl(var(--card))" }}
-        >
-          <h3 className="text-sm font-semibold text-foreground mb-4">Performance</h3>
+        {/* Performance */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+          className="rounded-xl p-5 border border-border/15 bg-card/50 backdrop-blur-sm">
+          <h3 className="text-sm font-medium text-foreground mb-5">Performance</h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg p-3" style={{ background: "hsl(var(--muted) / 0.3)" }}>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">NOIR Visits</div>
-              <div className="text-xl font-bold text-foreground">{(brandVisits.noir ?? 0).toLocaleString()}</div>
-            </div>
-            <div className="rounded-lg p-3" style={{ background: "hsl(var(--muted) / 0.3)" }}>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">SASSO Visits</div>
-              <div className="text-xl font-bold text-foreground">{(brandVisits.sasso ?? 0).toLocaleString()}</div>
-            </div>
-            <div className="rounded-lg p-3" style={{ background: "hsl(var(--muted) / 0.3)" }}>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Qatar</div>
-              <div className="text-xl font-bold text-foreground">{(countryVisits.doha ?? 0).toLocaleString()}</div>
-            </div>
-            <div className="rounded-lg p-3" style={{ background: "hsl(var(--muted) / 0.3)" }}>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Riyadh</div>
-              <div className="text-xl font-bold text-foreground">{(countryVisits.riyadh ?? 0).toLocaleString()}</div>
-            </div>
+            {[
+              { label: 'NOIR Visits', value: brandVisits.noir ?? 0 },
+              { label: 'SASSO Visits', value: brandVisits.sasso ?? 0 },
+              { label: 'Qatar', value: countryVisits.doha ?? 0 },
+              { label: 'Riyadh', value: countryVisits.riyadh ?? 0 },
+            ].map(item => (
+              <div key={item.label} className="rounded-lg p-3 bg-background/40 border border-border/10">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{item.label}</div>
+                <div className="text-xl font-display font-medium text-foreground">{item.value.toLocaleString()}</div>
+              </div>
+            ))}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Interactive Map", desc: "Explore location performance", icon: Map, view: "map" },
-          { label: "AI Intelligence", desc: "Chat with RISE ONE", icon: Brain, view: "ai" },
-          { label: "Member Directory", desc: "Browse loyalty members", icon: Users, view: "members" },
-        ].map((action) => (
-          <button
-            key={action.label}
+          { label: "Location Map", desc: "Explore venues", icon: Map, view: "map" },
+          { label: "RISE AI", desc: "Intelligence chat", icon: Brain, view: "ai" },
+          { label: "Members", desc: "Member directory", icon: Users, view: "members" },
+          { label: "Analytics", desc: "Data insights", icon: BarChart3, view: "analytics" },
+        ].map((action, i) => (
+          <motion.button key={action.label}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.05 }}
             onClick={() => onNavigate(action.view)}
-            className="rounded-xl p-4 border border-border/40 text-left transition-all duration-300 hover:border-primary/25 hover:shadow-lg group"
-            style={{ background: "hsl(var(--card))" }}
-          >
+            className="rounded-xl p-4 border border-border/15 bg-card/30 text-left transition-all duration-200 hover:border-primary/15 hover:bg-card/50 group">
             <div className="flex items-center justify-between mb-2">
-              <action.icon className="w-5 h-5 text-primary" />
-              <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <action.icon className="w-4 h-4 text-primary/70" />
+              <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground/30 group-hover:text-primary transition-colors" />
             </div>
             <div className="text-sm font-medium text-foreground">{action.label}</div>
             <div className="text-xs text-muted-foreground mt-0.5">{action.desc}</div>
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>
