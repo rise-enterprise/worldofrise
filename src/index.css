@@ -1,5 +1,3 @@
-/* Fonts are loaded asynchronously in index.html for performance */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,293 +5,193 @@
 @layer base {
   :root {
     /* ═══════════════════════════════════════════════════════════
-       RISE LUXURY LOYALTY — Crystal Elite Design System
-       Premium Crystal Glass UI with Gold Prestige Detailing
+       RISE — Luxury Maison Design System
+       Inspired by: Dior, Hermès, Loro Piana, Brunello Cucinelli
+       Philosophy: Calm luxury, heritage, craftsmanship
     ═══════════════════════════════════════════════════════════ */
     
-    /* Base Surfaces — Deep Noir Foundation */
-    --background: 220 14% 4%;              /* #07080A - Onyx Noir */
-    --foreground: 220 20% 93%;             /* #E9EEF7 - Crystal Silver */
+    /* Base Surfaces — Warm Ivory */
+    --background: 40 25% 97%;             /* #FAF8F4 warm ivory */
+    --foreground: 30 10% 12%;             /* #201D18 deep warm charcoal */
     
-    /* Cards & Elevated Surfaces — Polished Obsidian */
-    --card: 220 12% 7%;                    /* #0E1116 - Obsidian Surface */
-    --card-foreground: 220 20% 93%;
+    /* Cards — Pure White with warmth */
+    --card: 40 20% 99%;                   /* #FEFDFB */
+    --card-foreground: 30 10% 12%;
     
-    /* Popover & Overlays — Deep Crystal */
-    --popover: 220 12% 6%;
-    --popover-foreground: 220 20% 93%;
+    /* Popover */
+    --popover: 40 20% 99%;
+    --popover-foreground: 30 10% 12%;
     
-    /* Primary — Gilded Gold */
-    --primary: 40 62% 56%;                 /* Warm Champagne Gold */
-    --primary-foreground: 220 14% 4%;      /* Onyx for contrast */
+    /* Primary — Muted Gold / Champagne */
+    --primary: 38 35% 48%;                /* #A48B5C muted gold */
+    --primary-foreground: 40 25% 97%;     /* Ivory */
     
-    /* Secondary — Deep Obsidian */
-    --secondary: 220 10% 10%;
-    --secondary-foreground: 220 20% 93%;
+    /* Secondary — Warm Sand */
+    --secondary: 35 18% 93%;              /* #F0ECE6 */
+    --secondary-foreground: 30 10% 12%;
     
-    /* Muted — Charcoal Depths */
-    --muted: 220 10% 12%;                  /* #1A1D24 */
-    --muted-foreground: 220 10% 60%;       /* #8A92A3 */
+    /* Muted — Soft Warm Grey */
+    --muted: 35 12% 92%;                  /* #EDEBE6 */
+    --muted-foreground: 30 8% 50%;        /* #847E74 warm grey */
     
-    /* Accent — Royal Teal */
-    --accent: 195 62% 32%;                 /* #1F6E86 - Royal Teal */
-    --accent-foreground: 220 20% 93%;
+    /* Accent — Champagne */
+    --accent: 35 20% 94%;                 /* #F2EFE8 */
+    --accent-foreground: 30 10% 12%;
     
-    /* ═══════════════════════════════════════════════════════════
-       LUXURY ACCENT PALETTE — Crystal Material Colors
-    ═══════════════════════════════════════════════════════════ */
+    /* Status */
+    --success: 145 30% 42%;
+    --success-foreground: 40 25% 97%;
+    --destructive: 0 45% 50%;
+    --destructive-foreground: 40 25% 97%;
+    
+    /* Borders — Almost invisible */
+    --border: 35 15% 88%;                 /* #E3DFD8 */
+    --input: 35 12% 93%;
+    --ring: 38 35% 48%;
     
     /* Gold Spectrum */
-    --gold: 40 62% 56%;                    /* Warm Champagne Gold */
-    --gold-light: 38 65% 72%;              /* Rich Champagne Shimmer */
-    --gold-shadow: 36 70% 28%;             /* Deep Warm Amber */
-    --gold-foil: 42 72% 60%;               /* Saturated Gold Foil */
+    --gold: 38 35% 48%;
+    --gold-light: 38 30% 65%;
+    --gold-shadow: 36 30% 38%;
+    --gold-foil: 40 40% 55%;
     
-    /* Burgundy Spectrum */
-    --burgundy: 350 65% 18%;               /* #4A0F18 - Burgundy Velvet */
-    --burgundy-crystal: 350 55% 30%;       /* Lighter burgundy for accents */
-    --burgundy-light: 350 45% 45%;         /* Ruby glow */
+    /* Luxury Accents */
+    --burgundy: 350 35% 28%;
+    --burgundy-crystal: 350 30% 40%;
+    --sapphire: 215 35% 35%;
+    --teal: 195 30% 40%;
+    --crystal-white: 40 20% 99%;
+    --crystal-silver: 30 8% 70%;
     
-    /* Sapphire Spectrum */
-    --sapphire: 215 70% 22%;               /* Deep Midnight Sapphire */
-    --sapphire-light: 215 60% 35%;         /* Sapphire glow */
-    --sapphire-bright: 220 65% 50%;        /* Vivid sapphire */
-    
-    /* ═══════════════════════════════════════════════════════════
-       AI NEON SPECTRUM — Cyberpunk Intelligence Palette
-    ═══════════════════════════════════════════════════════════ */
-    --neon-purple: 270 70% 55%;            /* #8B5CF6 - Core neon purple */
-    --neon-purple-light: 270 80% 72%;      /* Lighter purple glow */
-    --neon-purple-dark: 270 60% 35%;       /* Deep purple */
-    --neon-magenta: 320 75% 55%;           /* #EC4899 - Hot magenta */
-    --neon-magenta-light: 320 85% 72%;     /* Pink glow */
-    --neon-blue: 210 100% 60%;             /* #3B82F6 - Electric blue */
-    --neon-blue-light: 210 100% 75%;       /* Light electric blue */
-    --neon-cyan: 185 90% 50%;              /* #06B6D4 - Cyan accent */
-    --neon-glow: 270 70% 55%;              /* Primary AI glow color */
-    
-    /* Teal Spectrum */
-    --teal: 195 62% 32%;                   /* #1F6E86 - Royal Teal */
-    --teal-light: 195 50% 45%;             /* Aquamarine */
-    
-    /* Crystal Whites */
-    --crystal-white: 220 20% 98%;          /* Crystal White */
-    --crystal-silver: 220 15% 85%;         /* Silver sheen */
-    --crystal-pearl: 40 20% 96%;           /* Pearl white with warmth */
+    /* Neon — disabled for luxury, mapped to gold subtly */
+    --neon-purple: 38 35% 48%;
+    --neon-purple-light: 38 30% 65%;
+    --neon-magenta: 38 35% 48%;
+    --neon-magenta-light: 38 30% 65%;
+    --neon-blue: 215 25% 50%;
+    --neon-blue-light: 215 20% 65%;
+    --neon-cyan: 195 25% 50%;
+    --neon-glow: 38 35% 48%;
     
     /* Brand Colors */
-    --noir: 220 12% 7%;
-    --noir-accent: 220 10% 15%;
-    --sasso: 25 30% 20%;
-    --sasso-accent: 25 40% 35%;
-    
-    /* Status Colors */
-    --success: 152 45% 35%;
-    --success-foreground: 220 20% 93%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-    
-    /* Borders & Inputs — Crystal Lines */
-    --border: 220 15% 20%;
-    --input: 220 12% 15%;
-    --ring: 40 62% 56%;                    /* Gold focus ring */
+    --noir: 30 10% 12%;
+    --noir-accent: 30 8% 22%;
+    --sasso: 25 25% 25%;
+    --sasso-accent: 25 30% 40%;
     
     /* Chart Colors */
-    --chart-1: 40 62% 56%;                 /* Gold */
-    --chart-2: 195 62% 32%;                /* Teal */
-    --chart-3: 350 55% 30%;                /* Burgundy */
-    --chart-4: 220 20% 40%;                /* Silver */
-    --chart-5: 215 60% 35%;                /* Sapphire */
+    --chart-1: 38 35% 48%;
+    --chart-2: 30 8% 50%;
+    --chart-3: 350 30% 40%;
+    --chart-4: 215 25% 50%;
+    --chart-5: 145 25% 45%;
     
-    /* Radius */
-    --radius: 0.75rem;
+    /* Radius — Softer */
+    --radius: 0.5rem;
     
-    /* Tier Crystal Colors */
-    --tier-crystal: 220 20% 75%;           /* Silver/White Crystal */
-    --tier-onyx: 220 10% 15%;              /* Deep Black */
-    --tier-obsidian: 220 12% 10%;          /* Black with depth */
-    --tier-royal: 40 68% 52%;              /* Rich Royal Gold */
+    /* Tier Colors */
+    --tier-crystal: 30 8% 70%;
+    --tier-onyx: 30 10% 15%;
+    --tier-obsidian: 30 8% 10%;
+    --tier-royal: 38 40% 50%;
+    --tier-initiation: 30 8% 60%;
+    --tier-connoisseur: 38 30% 50%;
+    --tier-elite: 38 35% 48%;
+    --tier-inner-circle: 38 40% 45%;
+    --tier-black: 30 10% 12%;
     
-    /* Legacy Tier Colors */
-    --tier-initiation: 220 10% 50%;
-    --tier-connoisseur: 35 50% 45%;
-    --tier-elite: 38 60% 50%;
-    --tier-inner-circle: 40 70% 55%;
-    --tier-black: 40 62% 56%;
+    /* Sidebar */
+    --sidebar-background: 40 25% 97%;
+    --sidebar-foreground: 30 10% 12%;
+    --sidebar-primary: 38 35% 48%;
+    --sidebar-primary-foreground: 40 25% 97%;
+    --sidebar-accent: 35 18% 93%;
+    --sidebar-accent-foreground: 30 10% 12%;
+    --sidebar-border: 35 15% 90%;
+    --sidebar-ring: 38 35% 48%;
     
-    /* Sidebar — Noir Depths */
-    --sidebar-background: 220 14% 5%;
-    --sidebar-foreground: 220 20% 93%;
-    --sidebar-primary: 40 62% 56%;
-    --sidebar-primary-foreground: 220 14% 4%;
-    --sidebar-accent: 220 10% 12%;
-    --sidebar-accent-foreground: 220 20% 93%;
-    --sidebar-border: 220 15% 15%;
-    --sidebar-ring: 40 62% 56%;
+    /* Material Tokens */
+    --blur-glass: 16px;
+    --blur-heavy: 24px;
+    --transition-luxury: 350ms;
+    --transition-slow: 550ms;
+    --easing-luxury: cubic-bezier(0.25, 0.1, 0.25, 1);
     
-    /* ═══════════════════════════════════════════════════════════
-       CRYSTAL GLASS MATERIAL TOKENS
-    ═══════════════════════════════════════════════════════════ */
+    /* Glass Panel — light, paper-like */
+    --glass-panel: linear-gradient(180deg, hsl(40 20% 99%) 0%, hsl(40 25% 97%) 100%);
+    --glass-panel-elevated: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(40 20% 98%) 100%);
     
-    --blur-glass: 20px;
-    --blur-heavy: 32px;
-    --blur-crystal: 40px;
-    --transition-luxury: 280ms;
-    --transition-slow: 450ms;
-    --easing-luxury: cubic-bezier(0.23, 1, 0.32, 1);
-    --easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Bevel — paper emboss feel */
+    --bevel-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.7);
+    --bevel-shadow: inset 0 -1px 0 0 hsl(30 10% 50% / 0.06);
+    --bevel-gold: inset 0 1px 0 0 hsl(38 30% 65% / 0.2);
     
-    /* Crystal Refraction */
-    --refraction-primary: linear-gradient(135deg, 
-      hsl(var(--gold) / 0.1) 0%, 
-      transparent 25%, 
-      hsl(var(--sapphire) / 0.05) 50%, 
-      transparent 75%, 
-      hsl(var(--burgundy-crystal) / 0.08) 100%);
-    
-    /* Glass Panel Backgrounds */
-    --glass-panel: linear-gradient(180deg, 
-      hsl(var(--card) / 0.85) 0%, 
-      hsl(var(--card) / 0.75) 100%);
-    
-    --glass-panel-elevated: linear-gradient(180deg, 
-      hsl(220 12% 10% / 0.9) 0%, 
-      hsl(220 12% 7% / 0.85) 100%);
-    
-    /* Bevel Effects */
-    --bevel-highlight: inset 0 1px 0 0 hsl(var(--crystal-silver) / 0.08);
-    --bevel-shadow: inset 0 -1px 0 0 hsl(0 0% 0% / 0.3);
-    --bevel-gold: inset 0 1px 0 0 hsl(var(--gold-light) / 0.2);
-  }
-
-  /* ═══════════════════════════════════════════════════════════
-     LIGHT MODE — Crystal Daylight / Day Mode
-  ═══════════════════════════════════════════════════════════ */
-  .light {
-    --background: 40 15% 97%;              /* Warm Crystal White */
-    --foreground: 220 14% 10%;             /* Deep Noir for text */
-    
-    --card: 0 0% 100%;
-    --card-foreground: 220 14% 10%;
-    
-    --popover: 40 10% 99%;
-    --popover-foreground: 220 14% 10%;
-    
-    --primary: 38 68% 44%;                 /* Deeper champagne gold for light mode */
-    --primary-foreground: 0 0% 100%;
-    
-    --secondary: 40 10% 94%;
-    --secondary-foreground: 220 14% 10%;
-    
-    --muted: 40 8% 92%;
-    --muted-foreground: 220 10% 45%;
-    
-    --accent: 38 50% 92%;                  /* Warm champagne */
-    --accent-foreground: 220 14% 10%;
-    
-    --border: 40 15% 85%;
-    --input: 40 10% 96%;
-    --ring: 38 68% 44%;
-    
-    /* Adjusted Gold for Light Mode */
-    --gold: 38 68% 44%;
-    --gold-light: 38 60% 76%;
-    --gold-shadow: 36 58% 58%;
-    
-    /* Crystal in Light Mode */
-    --crystal-white: 0 0% 100%;
-    --crystal-silver: 220 10% 70%;
-    
-    /* Sidebar Light */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 14% 10%;
-    --sidebar-primary: 38 68% 44%;
-    --sidebar-border: 40 15% 88%;
-    
-    /* Light Mode Glass */
-    --glass-panel: linear-gradient(180deg, 
-      hsl(0 0% 100% / 0.92) 0%, 
-      hsl(40 10% 99% / 0.88) 100%);
-    
-    --glass-panel-elevated: linear-gradient(180deg, 
-      hsl(0 0% 100% / 0.95) 0%, 
-      hsl(40 10% 98% / 0.9) 100%);
-    
-    /* Bevel for light mode */
-    --bevel-highlight: inset 0 1px 0 0 hsl(0 0% 100% / 0.8);
-    --bevel-shadow: inset 0 -1px 0 0 hsl(220 10% 50% / 0.1);
-    --bevel-gold: inset 0 1px 0 0 hsl(var(--gold-light) / 0.4);
-
-    /* Vessel tokens for Light mode */
-    --vessel-bg: 40 15% 97%;
+    /* Vessel tokens */
+    --vessel-bg: 40 25% 97%;
     --vessel-surface: 0 0% 100%;
-    --vessel-text: 220 14% 10%;
-    --vessel-muted: 220 10% 45%;
-    --vessel-gold: 42 60% 42%;
+    --vessel-text: 30 10% 12%;
+    --vessel-muted: 30 8% 50%;
+    --vessel-gold: 38 35% 48%;
     --vessel-surface-alpha: 255,255,255;
-    --vessel-text-alpha: 26,21,16;
-    --vessel-muted-alpha: 138,125,106;
-    --vessel-gold-alpha: 200,162,74;
+    --vessel-text-alpha: 32,29,24;
+    --vessel-muted-alpha: 132,126,116;
+    --vessel-gold-alpha: 164,139,92;
     --vessel-green-alpha: 90,138,106;
     --vessel-red-alpha: 184,74,74;
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     VESSEL TOKENS — Light Mode (Pearl/Sand)
-  ═══════════════════════════════════════════════════════════ */
-  :root {
-    --vessel-bg: 40 25% 97%;               /* #faf8f5 */
-    --vessel-surface: 0 0% 100%;           /* #ffffff */
-    --vessel-text: 30 18% 9%;              /* #1a1510 */
-    --vessel-muted: 33 13% 47%;            /* #8a7d6a */
-    --vessel-gold: 40 62% 56%;             /* #D4A843 */
-    --vessel-surface-alpha: 255,255,255;
-    --vessel-text-alpha: 26,21,16;
-    --vessel-muted-alpha: 138,125,106;
-    --vessel-gold-alpha: 200,162,74;
-    --vessel-green-alpha: 90,138,106;
-    --vessel-red-alpha: 184,74,74;
-  }
-
-  /* Dark mode — Velvet Noir */
   .dark {
-    --background: 260 20% 4%;              /* #0c0b10 */
-    --foreground: 35 18% 92%;              /* #f0ece4 */
-    --card: 260 14% 10%;                   /* #16151c */
-    --card-foreground: 35 18% 92%;
-    --popover: 260 16% 8%;
-    --popover-foreground: 35 18% 92%;
-    --primary: 42 50% 54%;
-    --primary-foreground: 260 20% 4%;
-    --secondary: 260 10% 12%;
-    --secondary-foreground: 35 18% 92%;
-    --muted: 260 10% 14%;
-    --muted-foreground: 33 10% 55%;
-    --accent: 195 62% 32%;
-    --accent-foreground: 35 18% 92%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 260 12% 20%;
-    --input: 260 12% 16%;
-    --ring: 42 50% 54%;
-
-    /* Vessel tokens — Dark */
-    --vessel-bg: 260 20% 4%;               /* #0c0b10 */
-    --vessel-surface: 260 14% 10%;         /* #16151c */
-    --vessel-text: 35 18% 92%;             /* #f0ece4 */
-    --vessel-muted: 33 10% 55%;            /* #8a8578 */
-    --vessel-gold: 40 62% 56%;             /* #D4A843 */
-    --vessel-surface-alpha: 22,21,28;
-    --vessel-text-alpha: 240,236,228;
-    --vessel-muted-alpha: 138,133,120;
-    --vessel-gold-alpha: 200,162,74;
+    --background: 30 12% 6%;              /* #100E0C */
+    --foreground: 35 15% 90%;             /* #EBE7E0 */
+    --card: 30 10% 9%;                    /* #181513 */
+    --card-foreground: 35 15% 90%;
+    --popover: 30 10% 8%;
+    --popover-foreground: 35 15% 90%;
+    --primary: 38 40% 52%;                /* Warm gold */
+    --primary-foreground: 30 12% 6%;
+    --secondary: 30 8% 13%;
+    --secondary-foreground: 35 15% 90%;
+    --muted: 30 8% 15%;
+    --muted-foreground: 30 8% 55%;
+    --accent: 30 10% 14%;
+    --accent-foreground: 35 15% 90%;
+    --destructive: 0 50% 40%;
+    --destructive-foreground: 35 15% 90%;
+    --border: 30 8% 18%;
+    --input: 30 8% 14%;
+    --ring: 38 40% 52%;
+    
+    --gold: 38 40% 52%;
+    --gold-light: 38 35% 65%;
+    --gold-shadow: 36 35% 35%;
+    
+    --sidebar-background: 30 12% 5%;
+    --sidebar-foreground: 35 15% 90%;
+    --sidebar-border: 30 8% 15%;
+    
+    --glass-panel: linear-gradient(180deg, hsl(30 10% 9%) 0%, hsl(30 12% 7%) 100%);
+    --glass-panel-elevated: linear-gradient(180deg, hsl(30 10% 11%) 0%, hsl(30 10% 8%) 100%);
+    
+    --bevel-highlight: inset 0 1px 0 0 hsl(35 15% 90% / 0.04);
+    --bevel-shadow: inset 0 -1px 0 0 hsl(0 0% 0% / 0.3);
+    --bevel-gold: inset 0 1px 0 0 hsl(38 35% 65% / 0.12);
+    
+    --vessel-bg: 30 12% 6%;
+    --vessel-surface: 30 10% 9%;
+    --vessel-text: 35 15% 90%;
+    --vessel-muted: 30 8% 55%;
+    --vessel-gold: 38 40% 52%;
+    --vessel-surface-alpha: 24,21,19;
+    --vessel-text-alpha: 235,231,224;
+    --vessel-muted-alpha: 140,133,120;
+    --vessel-gold-alpha: 180,150,80;
     --vessel-green-alpha: 90,138,106;
     --vessel-red-alpha: 184,74,74;
+  }
 
-    /* Sidebar Dark */
-    --sidebar-background: 260 18% 5%;
-    --sidebar-foreground: 35 18% 92%;
-    --sidebar-border: 260 12% 16%;
+  /* Legacy .light class */
+  .light {
+    /* Uses :root defaults */
   }
 }
 
@@ -309,41 +207,37 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
+    font-family: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* RTL Support */
   [dir="rtl"] body {
     font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
   }
 
-  /* Ceremonial Headings — Luxury Serif */
+  /* Editorial Serif Headings */
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Cormorant Garamond", "Playfair Display", "Noto Naskh Arabic", serif;
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-family: "Cormorant Garamond", "Noto Naskh Arabic", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
   }
 
-  [dir="rtl"] h1,
-  [dir="rtl"] h2,
-  [dir="rtl"] h3,
-  [dir="rtl"] h4,
-  [dir="rtl"] h5,
-  [dir="rtl"] h6 {
-    font-family: "Noto Naskh Arabic", "Playfair Display", serif;
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
+  [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+    font-family: "Noto Naskh Arabic", serif;
     letter-spacing: 0;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   LUXURY UTILITY CLASSES — Crystal Glass Materials
+   LUXURY UTILITY CLASSES
 ═══════════════════════════════════════════════════════════ */
 
 @layer utilities {
-  /* Font Families */
   .font-display {
-    font-family: "Cormorant Garamond", "Playfair Display", "Noto Naskh Arabic", serif;
+    font-family: "Cormorant Garamond", "Noto Naskh Arabic", Georgia, serif;
   }
 
   .font-arabic-display {
@@ -351,16 +245,15 @@
   }
 
   .font-body {
-    font-family: "IBM Plex Sans Arabic", "Inter", sans-serif;
+    font-family: "Inter", "IBM Plex Sans Arabic", sans-serif;
   }
 
-  /* Refined Tracking */
   .tracking-refined {
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
   }
 
   .tracking-ceremonial {
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
   }
 
   .tracking-regal {
@@ -368,74 +261,41 @@
   }
 
   .tracking-crystal {
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     CRYSTAL GLASS PANELS — Premium Glass Morphism
-  ═══════════════════════════════════════════════════════════ */
+  /* ═══ PANELS — Paper-like surfaces ═══ */
 
   .crystal-panel {
-    background: var(--glass-panel);
-    backdrop-filter: blur(var(--blur-glass)) saturate(1.2);
-    -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.2);
-    border: 1px solid hsl(var(--crystal-silver) / 0.1);
-    box-shadow: 
-      var(--bevel-highlight),
-      var(--bevel-shadow),
-      0 8px 32px -8px hsl(0 0% 0% / 0.4),
-      0 0 0 1px hsl(var(--gold) / 0.03);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 3px 0 hsl(0 0% 0% / 0.04);
   }
 
   .crystal-panel-elevated {
-    background: var(--glass-panel-elevated);
-    backdrop-filter: blur(var(--blur-heavy)) saturate(1.3);
-    -webkit-backdrop-filter: blur(var(--blur-heavy)) saturate(1.3);
-    border: 1px solid hsl(var(--crystal-silver) / 0.12);
-    box-shadow: 
-      var(--bevel-highlight),
-      var(--bevel-shadow),
-      0 16px 48px -12px hsl(0 0% 0% / 0.5),
-      0 0 0 1px hsl(var(--gold) / 0.04);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 2px 8px -2px hsl(0 0% 0% / 0.06), 0 1px 2px 0 hsl(0 0% 0% / 0.03);
   }
 
   .crystal-panel-gold {
-    background: var(--glass-panel);
-    backdrop-filter: blur(var(--blur-glass)) saturate(1.2);
-    -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(1.2);
-    border: 1px solid hsl(var(--gold) / 0.25);
-    box-shadow: 
-      var(--bevel-gold),
-      var(--bevel-shadow),
-      0 8px 32px -8px hsl(var(--gold) / 0.15),
-      0 0 60px -20px hsl(var(--gold) / 0.1);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--gold) / 0.2);
+    box-shadow: 0 2px 12px -4px hsl(var(--gold) / 0.08);
   }
 
-  /* Crystal Refraction Effect */
-  .crystal-refraction {
-    position: relative;
-  }
-
-  .crystal-refraction::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--refraction-primary);
-    pointer-events: none;
-    opacity: 0.5;
-    mix-blend-mode: overlay;
-  }
-
-  /* Beveled Crystal Edges */
   .crystal-bevel {
     border-radius: var(--radius);
-    box-shadow: 
-      var(--bevel-highlight),
-      var(--bevel-shadow),
-      0 4px 20px -4px hsl(0 0% 0% / 0.3);
+    box-shadow: 0 1px 3px 0 hsl(0 0% 0% / 0.04);
   }
 
-  /* Gold Foil Accents */
+  /* Legacy classes mapped to new style */
+  .glass-panel { @apply crystal-panel; }
+  .glass-panel-heavy { @apply crystal-panel-elevated; }
+  .obsidian-panel { @apply crystal-panel; }
+  .obsidian-panel-hover { @apply crystal-panel transition-all duration-300; }
+  .obsidian-panel-hover:hover { border-color: hsl(var(--gold) / 0.25); }
+
   .gold-foil-accent {
     position: relative;
   }
@@ -444,262 +304,90 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    left: 15%;
+    right: 15%;
     height: 1px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      hsl(var(--gold-light) / 0.5) 20%, 
-      hsl(var(--gold-foil) / 0.7) 50%, 
-      hsl(var(--gold-light) / 0.5) 80%, 
-      transparent 100%);
+    background: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.15), transparent);
   }
 
-  /* Legacy Glass Panels */
-  .glass-panel {
-    background-color: hsl(var(--card) / 0.95);
-    @apply backdrop-blur-xl border border-border/50 crystal-bevel;
-  }
-
-  .glass-panel-heavy {
-    background-color: hsl(var(--card) / 0.98);
-    @apply backdrop-blur-2xl border border-border/30 crystal-bevel;
-    box-shadow: 
-      var(--bevel-highlight),
-      0 12px 40px -8px hsl(0 0% 0% / 0.5);
-  }
-
-  /* Obsidian Panels with Crystal Edge */
-  .obsidian-panel {
-    @apply bg-card border border-border/40 rounded-xl;
-    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
-    box-shadow: 
-      var(--bevel-highlight),
-      var(--bevel-shadow),
-      0 8px 32px -8px hsl(0 0% 0% / 0.5);
-  }
-
-  .obsidian-panel-hover {
-    @apply obsidian-panel transition-all duration-300;
-  }
-
-  .obsidian-panel-hover:hover {
-    border-color: hsl(var(--gold) / 0.35);
-    box-shadow: 
-      var(--bevel-gold),
-      var(--bevel-shadow),
-      0 12px 40px -8px hsl(0 0% 0% / 0.6),
-      inset 0 0 60px -20px hsl(var(--gold) / 0.05);
-  }
-
-  /* Light Shift Hover Effect */
-  .light-shift {
-    @apply transition-all duration-300;
-    transition-timing-function: var(--easing-luxury);
-  }
-
-  .light-shift:hover {
-    border-color: hsl(var(--gold) / 0.3);
-    box-shadow: 
-      var(--bevel-gold),
-      0 8px 32px -8px hsl(0 0% 0% / 0.4),
-      inset 0 0 40px -10px hsl(var(--gold) / 0.03);
-  }
-
-  /* ═══════════════════════════════════════════════════════════
-     GOLD TEXT & GRADIENTS
-  ═══════════════════════════════════════════════════════════ */
-
-  .gold-text {
-    @apply text-primary;
-  }
+  /* ═══ GOLD TEXT ═══ */
+  .gold-text { @apply text-primary; }
 
   .gold-gradient-text {
-    background: linear-gradient(135deg, 
-      hsl(38 65% 67%) 0%, 
-      hsl(40 62% 56%) 40%, 
-      hsl(40 68% 47%) 100%);
+    background: linear-gradient(135deg, hsl(38 35% 55%) 0%, hsl(38 35% 42%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-gradient-gold {
-    background: linear-gradient(135deg, 
-      hsl(38 65% 67%) 0%, 
-      hsl(40 62% 56%) 100%);
+    background: linear-gradient(135deg, hsl(38 35% 55%) 0%, hsl(38 35% 42%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .text-platinum {
-    background: linear-gradient(135deg, 
-      hsl(220 15% 75%) 0%, 
-      hsl(220 20% 85%) 50%, 
-      hsl(220 15% 70%) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(30 8% 50%);
   }
 
-  /* Gold Emboss Effect */
   .gold-emboss {
     color: hsl(var(--gold));
-    text-shadow: 
-      0 1px 0 hsl(var(--gold-shadow)),
-      0 2px 4px hsl(0 0% 0% / 0.3);
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     BACKGROUND GRADIENTS
-  ═══════════════════════════════════════════════════════════ */
-
+  /* ═══ BACKGROUNDS ═══ */
   .bg-gradient-luxury {
-    background: linear-gradient(180deg, 
-      hsl(var(--card)) 0%, 
-      hsl(var(--background)) 100%);
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--background)) 100%);
   }
-
-  .bg-gradient-card {
-    background: linear-gradient(145deg, 
-      hsl(var(--card) / 0.95) 0%, 
-      hsl(var(--background) / 0.9) 100%);
-  }
-
+  .bg-gradient-card { @apply bg-gradient-luxury; }
   .bg-gradient-gold {
-    background: linear-gradient(135deg, 
-      hsl(40 62% 52%) 0%, 
-      hsl(40 68% 42%) 100%);
+    background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-shadow)) 100%);
   }
-
   .bg-gradient-crystal {
-    background: linear-gradient(180deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--card)) 50%,
-      hsl(var(--background)) 100%);
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--background)) 100%);
   }
-
-  .bg-gradient-burgundy {
-    background: linear-gradient(135deg,
-      hsl(var(--burgundy)) 0%,
-      hsl(var(--burgundy-crystal)) 100%);
-  }
-
-  .bg-gradient-sapphire {
-    background: linear-gradient(135deg,
-      hsl(var(--sapphire)) 0%,
-      hsl(var(--sapphire-light)) 100%);
-  }
-
-  .noir-gradient {
-    background: linear-gradient(180deg, 
-      hsl(var(--card)) 0%, 
-      hsl(var(--background)) 100%);
-  }
-
+  .noir-gradient { @apply bg-gradient-luxury; }
   .noir-gradient-radial {
-    background: radial-gradient(ellipse at top, 
-      hsl(var(--muted)) 0%, 
-      hsl(var(--background)) 70%);
+    background: radial-gradient(ellipse at top, hsl(var(--muted)) 0%, hsl(var(--background)) 70%);
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     CRYSTAL BORDERS
-  ═══════════════════════════════════════════════════════════ */
+  /* ═══ BORDERS ═══ */
+  .crystal-border { border: 1px solid hsl(var(--border)); }
+  .crystal-border-gold { border: 1px solid hsl(var(--gold) / 0.2); }
 
-  .crystal-border {
-    border: 1px solid hsl(var(--crystal-silver) / 0.12);
+  /* ═══ SHADOWS — Minimal, paper-like ═══ */
+  .gold-glow { box-shadow: 0 0 16px -8px hsl(var(--gold) / 0.1); }
+  .gold-glow-strong { box-shadow: 0 0 24px -8px hsl(var(--gold) / 0.15); }
+  .gold-glow-subtle { box-shadow: 0 0 12px -6px hsl(var(--gold) / 0.08); }
+  .crystal-glow { box-shadow: 0 0 20px -10px hsl(var(--gold) / 0.06); }
+  .shadow-luxury { box-shadow: 0 8px 30px -12px hsl(0 0% 0% / 0.08); }
+  .shadow-crystal { box-shadow: 0 2px 8px -2px hsl(0 0% 0% / 0.06); }
+  .shadow-glass { box-shadow: 0 1px 4px -1px hsl(0 0% 0% / 0.04); }
+  .shadow-medallion { box-shadow: 0 4px 16px -4px hsl(var(--gold) / 0.1); }
+
+  /* ═══ TRANSITIONS — Slow, deliberate ═══ */
+  .transition-luxury { transition: all 350ms ease; }
+  .transition-ceremonial { transition: all 550ms ease; }
+  .transition-crystal { transition: all var(--transition-luxury) var(--easing-luxury); }
+
+  .light-shift {
+    @apply transition-all duration-300;
+  }
+  .light-shift:hover {
+    border-color: hsl(var(--gold) / 0.25);
   }
 
-  .crystal-border-gold {
-    border: 1px solid hsl(var(--gold) / 0.25);
-  }
-
-  .crystal-border-glow {
-    border: 1px solid hsl(var(--crystal-silver) / 0.15);
-    box-shadow: 
-      0 0 20px -5px hsl(var(--gold) / 0.1),
-      inset 0 0 20px -10px hsl(var(--crystal-silver) / 0.05);
-  }
-
-  /* ═══════════════════════════════════════════════════════════
-     GLOW & SHADOW EFFECTS
-  ═══════════════════════════════════════════════════════════ */
-
-  .gold-glow {
-    box-shadow: 0 0 30px -5px hsl(var(--gold) / 0.2);
-  }
-
-  .gold-glow-strong {
-    box-shadow: 0 0 50px -5px hsl(var(--gold) / 0.3);
-  }
-
-  .gold-glow-subtle {
-    box-shadow: 0 0 20px -8px hsl(var(--gold) / 0.15);
-  }
-
-  .crystal-glow {
-    box-shadow: 
-      0 0 40px -10px hsl(var(--crystal-silver) / 0.15),
-      0 0 80px -20px hsl(var(--gold) / 0.08);
-  }
-
-  .shadow-luxury {
-    box-shadow: 0 24px 60px -15px hsl(0 0% 0% / 0.5);
-  }
-
-  .shadow-crystal {
-    box-shadow: 
-      0 8px 32px -8px hsl(0 0% 0% / 0.4),
-      0 0 0 1px hsl(var(--crystal-silver) / 0.05);
-  }
-
-  .shadow-glass {
-    box-shadow: 
-      0 4px 24px -4px hsl(0 0% 0% / 0.3),
-      var(--bevel-highlight);
-  }
-
-  .shadow-medallion {
-    box-shadow: 
-      0 8px 32px -8px hsl(var(--gold) / 0.2),
-      0 0 0 1px hsl(var(--gold) / 0.1);
-  }
-
-  /* ═══════════════════════════════════════════════════════════
-     TRANSITIONS
-  ═══════════════════════════════════════════════════════════ */
-
-  .transition-luxury {
-    transition: all 280ms ease-out;
-  }
-
-  .transition-ceremonial {
-    transition: all 450ms ease-out;
-  }
-
-  .transition-crystal {
-    transition: all var(--transition-luxury) var(--easing-luxury);
-  }
+  /* Crystal refraction — disabled for luxury */
+  .crystal-refraction {}
+  .crystal-refraction::before { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ANIMATION KEYFRAMES — Slow, Deliberate, Expensive
+   ANIMATIONS — Minimal, gentle
 ═══════════════════════════════════════════════════════════ */
 
-@keyframes goldSweep {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes crystalPrism {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-}
-
 @keyframes softReveal {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -708,19 +396,14 @@
   50% { opacity: 0.7; }
 }
 
-@keyframes noirFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-@keyframes medallionShine {
-  0% { background-position: -100% 0; }
+@keyframes goldSweep {
+  0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-@keyframes borderGlow {
-  0%, 100% { border-color: hsl(var(--gold) / 0.2); }
-  50% { border-color: hsl(var(--gold) / 0.4); }
+@keyframes gateShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 @keyframes crystalFadeIn {
@@ -729,6 +412,11 @@
 }
 
 @keyframes crystalSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes crystalReveal {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -738,107 +426,27 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes crystalReveal {
-  from { opacity: 0; transform: translateY(24px); filter: blur(4px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
-
-@keyframes lightShift {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.8; }
-}
-
-@keyframes crystalRefraction {
-  0% { transform: rotate(0deg) scale(1); opacity: 0.3; }
-  50% { transform: rotate(180deg) scale(1.1); opacity: 0.5; }
-  100% { transform: rotate(360deg) scale(1); opacity: 0.3; }
-}
-
-@keyframes prismShift {
-  0%, 100% { 
-    background-position: 0% 0%;
-    filter: hue-rotate(0deg);
-  }
-  50% { 
-    background-position: 100% 100%;
-    filter: hue-rotate(10deg);
-  }
-}
-
-@keyframes goldShimmer {
-  0% { 
-    opacity: 0;
-    transform: translateX(-100%) skewX(-15deg);
-  }
-  50% { 
-    opacity: 0.5;
-  }
-  100% { 
-    opacity: 0;
-    transform: translateX(100%) skewX(-15deg);
-  }
-}
-
 /* Animation Classes */
-.animate-gold-sweep {
-  animation: goldSweep 3s ease-in-out infinite;
-}
+.animate-soft-reveal { animation: softReveal 600ms ease-out forwards; }
+.animate-gentle-pulse { animation: gentlePulse 3s ease-in-out infinite; }
+.animate-gold-sweep { animation: goldSweep 3s ease-in-out infinite; }
+.animate-fade-in { animation: crystalFadeIn 600ms ease-out forwards; }
+.animate-slide-up { animation: crystalSlideUp 700ms ease-out forwards; }
+.animate-crystal-reveal { animation: crystalReveal 800ms ease-out forwards; }
+.animate-scale-in { animation: crystalScaleIn 500ms ease-out forwards; }
+.animate-light-shift { animation: gentlePulse 4s ease-in-out infinite; }
+.animate-border-glow { /* disabled */ }
+.animate-noir-float { /* disabled */ }
+.animate-medallion-shine { /* disabled */ }
+.animate-crystal-prism { /* disabled */ }
+.animate-crystal-refraction { /* disabled */ }
+.animate-prism-shift { /* disabled */ }
+.animate-gold-shimmer { /* disabled */ }
 
-.animate-crystal-prism {
-  animation: crystalPrism 4s ease-in-out infinite;
-}
-
-.animate-soft-reveal {
-  animation: softReveal 600ms ease-out forwards;
-}
-
-.animate-gentle-pulse {
-  animation: gentlePulse 3s ease-in-out infinite;
-}
-
-.animate-noir-float {
-  animation: noirFloat 6s ease-in-out infinite;
-}
-
-.animate-medallion-shine {
-  animation: medallionShine 4s ease-in-out infinite;
-}
-
-.animate-border-glow {
-  animation: borderGlow 3s ease-in-out infinite;
-}
-
-.animate-fade-in {
-  animation: crystalFadeIn 600ms ease-out forwards;
-}
-
-.animate-slide-up {
-  animation: crystalSlideUp 700ms ease-out forwards;
-}
-
-.animate-scale-in {
-  animation: crystalScaleIn 500ms ease-out forwards;
-}
-
-.animate-crystal-reveal {
-  animation: crystalReveal 800ms ease-out forwards;
-}
-
-.animate-light-shift {
-  animation: lightShift 3s ease-in-out infinite;
-}
-
-.animate-crystal-refraction {
-  animation: crystalRefraction 20s linear infinite;
-}
-
-.animate-prism-shift {
-  animation: prismShift 8s ease-in-out infinite;
-}
-
-.animate-gold-shimmer {
-  animation: goldShimmer 3s ease-in-out infinite;
-}
+/* Legacy crystal background animations — minimal */
+.animate-crystal-strand { animation: gentlePulse 6s ease-in-out infinite; }
+.animate-crystal-twinkle { /* disabled */ }
+.animate-crystal-glint { /* disabled */ }
 
 /* Stagger delays */
 .reveal-delay-1 { animation-delay: 100ms; }
@@ -848,360 +456,94 @@
 .reveal-delay-5 { animation-delay: 500ms; }
 
 /* ═══════════════════════════════════════════════════════════
-   CRYSTAL BACKGROUND EFFECTS
+   SCROLLBAR — Minimal
 ═══════════════════════════════════════════════════════════ */
 
-@keyframes crystalStrandGlow {
-  0%, 100% { opacity: 0.15; transform: scaleY(1); }
-  50% { opacity: 0.35; transform: scaleY(1.02); }
-}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: hsl(var(--background)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--gold) / 0.4); }
 
-@keyframes crystalTwinkle {
-  0%, 100% { opacity: 0; transform: scale(0.8) rotate(0deg); }
-  50% { opacity: 0.8; transform: scale(1) rotate(45deg); }
-}
-
-@keyframes crystalGlint {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 0.6; }
-}
-
-.animate-crystal-strand {
-  animation: crystalStrandGlow var(--strand-duration, 4s) ease-in-out infinite;
-  animation-delay: var(--strand-delay, 0s);
-  will-change: opacity, transform;
-}
-
-.animate-crystal-twinkle {
-  animation: crystalTwinkle var(--sparkle-duration, 3s) ease-in-out infinite;
-  animation-delay: var(--sparkle-delay, 0s);
-  will-change: opacity, transform;
-}
-
-.animate-crystal-glint {
-  animation: crystalGlint var(--glint-duration, 2s) ease-in-out infinite;
-  animation-delay: var(--glint-delay, 0s);
-  will-change: opacity;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   SCROLLBAR STYLING — Refined Crystal
-═══════════════════════════════════════════════════════════ */
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(220 15% 25%);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--gold) / 0.6);
-}
-
-/* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(220 15% 25%) hsl(var(--background));
+  scrollbar-color: hsl(var(--border)) hsl(var(--background));
 }
 
 /* ═══════════════════════════════════════════════════════════
-   FORM FOCUS STATES — Crystal Gold Ring
+   FORM FOCUS — Subtle gold
 ═══════════════════════════════════════════════════════════ */
 
-input:focus,
-textarea:focus,
-select:focus {
+input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: hsl(var(--gold) / 0.5);
-  box-shadow: 
-    0 0 0 3px hsl(var(--gold) / 0.1),
-    inset 0 0 20px hsl(var(--gold) / 0.03);
+  border-color: hsl(var(--gold) / 0.4);
+  box-shadow: 0 0 0 2px hsl(var(--gold) / 0.08);
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SELECTION — Gold Highlight
+   SELECTION
 ═══════════════════════════════════════════════════════════ */
-
-@keyframes micRipple {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
-
-@keyframes neuralBeamPulse {
-  0%, 100% {
-    opacity: 0.2;
-    transform: translateX(-50%) scaleY(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: translateX(-50%) scaleY(1.05);
-  }
-}
 
 ::selection {
-  background: hsl(var(--gold) / 0.3);
-  color: hsl(220 20% 93%);
+  background: hsl(var(--gold) / 0.15);
+  color: hsl(var(--foreground));
 }
 
 ::-moz-selection {
-  background: hsl(var(--gold) / 0.3);
-  color: hsl(220 20% 93%);
+  background: hsl(var(--gold) / 0.15);
+  color: hsl(var(--foreground));
 }
 
 /* ═══════════════════════════════════════════════════════════
-   LIGHT MODE SPECIFIC ADJUSTMENTS
+   DARK MODE ADJUSTMENTS
 ═══════════════════════════════════════════════════════════ */
 
-.light ::-webkit-scrollbar-track {
-  background: hsl(40 10% 95%);
-}
+.dark ::-webkit-scrollbar-track { background: hsl(30 12% 6%); }
+.dark ::-webkit-scrollbar-thumb { background: hsl(30 8% 22%); }
+.dark ::-webkit-scrollbar-thumb:hover { background: hsl(var(--gold) / 0.5); }
 
-.light ::-webkit-scrollbar-thumb {
-  background: hsl(40 15% 75%);
-}
-
-.light ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--gold));
-}
-
-.light ::selection {
+.dark ::selection {
   background: hsl(var(--gold) / 0.25);
-  color: hsl(220 14% 10%);
+  color: hsl(35 15% 90%);
 }
 
-.light input:focus,
-.light textarea:focus,
-.light select:focus {
-  border-color: hsl(var(--gold) / 0.6);
-  box-shadow: 
-    0 0 0 3px hsl(var(--gold) / 0.15),
-    inset 0 0 20px hsl(var(--gold) / 0.05);
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+  border-color: hsl(var(--gold) / 0.5);
+  box-shadow: 0 0 0 2px hsl(var(--gold) / 0.1);
 }
 
-/* ═══════════════════════════════════════════════════════════
-   LIGHT MODE — Panel & Shadow Overrides
-═══════════════════════════════════════════════════════════ */
-
-.light .crystal-panel {
-  box-shadow: 
-    0 1px 3px 0 hsl(0 0% 0% / 0.06),
-    0 4px 16px -4px hsl(0 0% 0% / 0.08),
-    0 0 0 1px hsl(var(--border));
-  border-color: hsl(var(--border));
+.dark .crystal-panel {
+  box-shadow: 0 1px 4px 0 hsl(0 0% 0% / 0.2);
 }
 
-.light .crystal-panel-elevated {
-  box-shadow: 
-    0 2px 6px 0 hsl(0 0% 0% / 0.06),
-    0 8px 24px -8px hsl(0 0% 0% / 0.1),
-    0 0 0 1px hsl(var(--border));
-  border-color: hsl(var(--border));
-}
-
-.light .crystal-panel-gold {
-  box-shadow: 
-    0 4px 16px -4px hsl(var(--gold) / 0.1),
-    0 0 0 1px hsl(var(--gold) / 0.2);
-}
-
-.light .obsidian-panel,
-.light .obsidian-panel-hover {
-  background: hsl(var(--card));
-  box-shadow: 
-    0 1px 3px 0 hsl(0 0% 0% / 0.05),
-    0 4px 16px -4px hsl(0 0% 0% / 0.07);
-  border-color: hsl(var(--border));
-}
-
-.light .obsidian-panel-hover:hover {
-  box-shadow: 
-    0 2px 8px 0 hsl(var(--gold) / 0.08),
-    0 8px 24px -8px hsl(0 0% 0% / 0.1);
-}
-
-.light .glass-panel {
-  box-shadow: 
-    0 1px 3px 0 hsl(0 0% 0% / 0.05),
-    0 4px 12px -4px hsl(0 0% 0% / 0.06);
-}
-
-.light .glass-panel-heavy {
-  box-shadow: 
-    0 2px 6px 0 hsl(0 0% 0% / 0.06),
-    0 8px 24px -8px hsl(0 0% 0% / 0.08);
-}
-
-.light .crystal-bevel {
-  box-shadow: 
-    0 1px 2px 0 hsl(0 0% 0% / 0.04),
-    0 2px 8px -2px hsl(0 0% 0% / 0.06);
-}
-
-.light .light-shift:hover {
-  border-color: hsl(var(--gold) / 0.4);
-  box-shadow: 
-    0 2px 8px 0 hsl(var(--gold) / 0.06),
-    0 4px 16px -4px hsl(0 0% 0% / 0.08);
-}
-
-.light .shadow-luxury {
-  box-shadow: 0 12px 32px -8px hsl(0 0% 0% / 0.1);
-}
-
-.light .shadow-crystal {
-  box-shadow: 
-    0 4px 16px -4px hsl(0 0% 0% / 0.08),
-    0 0 0 1px hsl(var(--border));
-}
-
-.light .shadow-glass {
-  box-shadow: 
-    0 2px 12px -2px hsl(0 0% 0% / 0.06);
-}
-
-.light .gold-glow,
-.light .gold-glow-strong,
-.light .gold-glow-subtle {
-  box-shadow: 0 0 16px -4px hsl(var(--gold) / 0.1);
-}
-
-.light .crystal-glow {
-  box-shadow: 0 0 20px -8px hsl(var(--gold) / 0.06);
-}
-
-/* Reduce crystal background effects in light mode */
-.light .crystal-strand-glow,
-.light .crystal-strand-glow-slow {
-  opacity: 0.04 !important;
-}
-
-.light .crystal-twinkle {
-  opacity: 0.3 !important;
-}
-
-.light .crystal-glint {
-  opacity: 0.2 !important;
-}
-
-.light .crystal-ambient-1,
-.light .crystal-ambient-2,
-.light .crystal-ambient-3 {
-  opacity: 0.3;
-}
-
-.light .crystal-shimmer {
-  opacity: 0.02 !important;
-}
-
-/* DiamondSparkles — reduce glow and visibility in light mode */
-.light .light-mode-dim-effects {
-  opacity: 0.3;
+.dark .crystal-panel-elevated {
+  box-shadow: 0 4px 16px -4px hsl(0 0% 0% / 0.3);
 }
 
 /* ═══════════════════════════════════════════════════════════
-   SAFE AREA SUPPORT — iPhone Notch / Dynamic Island
+   SAFE AREA & UTILITIES
 ═══════════════════════════════════════════════════════════ */
 
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+.fixed-bottom-safe { padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); }
+.touch-target { min-height: 44px; min-width: 44px; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 
-.pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
-}
+/* Legacy HUD animations — mapped to no-ops */
+.hud-scanline { display: none; }
+.hud-pulse { animation: gentlePulse 3s ease-in-out infinite; }
+.hud-glow { /* disabled */ }
 
-/* Ensure fixed bottom elements respect safe areas */
-.fixed-bottom-safe {
-  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
-}
-
-/* Touch target minimum for Apple HIG compliance */
-.touch-target {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-/* Hide scrollbar utility */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   NOIR AI HUD — Scanline & Grid Effects
-═══════════════════════════════════════════════════════════ */
-
-@keyframes hudScanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-
-@keyframes hudPulse {
-  0%, 100% { opacity: 0.4; box-shadow: 0 0 4px hsl(var(--primary) / 0.1); }
-  50% { opacity: 0.8; box-shadow: 0 0 12px hsl(var(--primary) / 0.3); }
-}
-
-@keyframes hudGlow {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.15); }
-}
-
-.hud-scanline {
-  animation: hudScanline 8s linear infinite;
-  opacity: 0.03;
-}
-
-.hud-pulse {
-  animation: hudPulse 3s ease-in-out infinite;
-}
-
-.hud-glow {
-  animation: hudGlow 4s ease-in-out infinite;
-}
-
-/* ═══ React Grid Layout — Crystal Theme Overrides ═══ */
-.editable-grid-layout .react-grid-item {
-  transition: all 200ms ease;
-  overflow: hidden;
-}
-
-.editable-grid-layout.is-editing .react-grid-item {
-  border: 1px dashed hsl(var(--primary) / 0.25);
-  border-radius: 0.75rem;
-}
-
-.editable-grid-layout.is-editing .react-grid-item:hover {
-  border-color: hsl(var(--primary) / 0.5);
-}
-
-.editable-grid-layout .react-grid-item > .react-resizable-handle {
-  background: none;
-}
-
-.editable-grid-layout.is-editing .react-grid-item > .react-resizable-handle::after {
-  border-color: hsl(var(--primary) / 0.5);
-}
-
+/* React Grid Layout */
+.editable-grid-layout .react-grid-item { transition: all 200ms ease; overflow: hidden; }
+.editable-grid-layout.is-editing .react-grid-item { border: 1px dashed hsl(var(--gold) / 0.2); border-radius: var(--radius); }
+.editable-grid-layout.is-editing .react-grid-item:hover { border-color: hsl(var(--gold) / 0.4); }
+.editable-grid-layout .react-grid-item > .react-resizable-handle { background: none; }
+.editable-grid-layout.is-editing .react-grid-item > .react-resizable-handle::after { border-color: hsl(var(--gold) / 0.4); }
 .editable-grid-layout .react-grid-placeholder {
-  background: hsl(var(--primary) / 0.1) !important;
-  border: 1px dashed hsl(var(--primary) / 0.4);
-  border-radius: 0.75rem;
+  background: hsl(var(--gold) / 0.06) !important;
+  border: 1px dashed hsl(var(--gold) / 0.3);
+  border-radius: var(--radius);
   opacity: 1 !important;
 }
