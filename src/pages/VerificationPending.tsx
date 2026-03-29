@@ -1,83 +1,72 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
-import { CrystalPageWrapper } from '@/components/effects/CrystalPageWrapper';
-import { CrystalEmblem } from '@/components/effects/CrystalEmblem';
 import { Button } from '@/components/ui/button';
 
 export default function VerificationPending() {
   const navigate = useNavigate();
 
   return (
-    <CrystalPageWrapper variant="tiffany" sparkleCount={25}>
-      <div className="flex flex-col items-center justify-center min-h-screen px-6">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      {/* Ambient */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: `
+          radial-gradient(ellipse 50% 30% at 50% 30%, hsl(var(--gold) / 0.04) 0%, transparent 60%),
+          radial-gradient(ellipse 30% 25% at 70% 70%, hsl(var(--neon-purple) / 0.03) 0%, transparent 50%)
+        `,
+      }} />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 text-center max-w-lg"
+      >
+        {/* Pulsing clock icon */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center max-w-lg"
+          animate={{ scale: [1, 1.05, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          className="relative mb-10"
         >
-          {/* Insignia */}
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-8 h-[1px] bg-gradient-to-r from-transparent to-primary/40" />
-            <span className="text-primary/60 text-xs tracking-[0.3em] uppercase">
-              RISE
-            </span>
-            <div className="w-8 h-[1px] bg-gradient-to-l from-transparent to-primary/40" />
+          <div className="w-20 h-20 mx-auto rounded-full border border-primary/20 flex items-center justify-center bg-card/30 backdrop-blur-xl">
+            <Clock className="w-8 h-8 text-primary/50" />
           </div>
-
-          {/* Animated Crystal Emblem with Clock */}
           <motion.div
-            animate={{ 
-              scale: [1, 1.05, 1],
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="relative mb-8"
-          >
-            <div className="w-24 h-24 mx-auto rounded-full border-2 border-primary/30 flex items-center justify-center bg-background/50 backdrop-blur-xl">
-              <Clock className="w-10 h-10 text-primary/60" />
-            </div>
-            {/* Rotating outer ring */}
-            <motion.div
-              className="absolute inset-0 w-24 h-24 mx-auto rounded-full border border-primary/20"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.div>
-          
-          <h1 className="text-2xl md:text-3xl font-display tracking-crystal text-foreground mb-4">
-            Verification in Progress
-          </h1>
-          
-          <p className="text-muted-foreground/70 mb-4 leading-relaxed">
-            Your request is being reviewed with the attention it deserves.
-          </p>
-          
-          <p className="text-sm text-muted-foreground/50 mb-12 leading-relaxed">
-            We will reach out to you shortly. In the meantime, 
-            feel free to visit one of our establishments.
-          </p>
-
-          {/* Status Indicator */}
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-background/50 border border-primary/20 rounded-lg mb-12 backdrop-blur-sm">
-            <div className="w-2 h-2 rounded-full bg-primary/60 animate-pulse" />
-            <span className="text-xs text-muted-foreground/60 tracking-widest uppercase">
-              Under Review
-            </span>
-          </div>
-          
-          <div className="flex flex-col gap-3">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="text-muted-foreground/60 hover:text-primary"
-            >
-              Return to Gate
-            </Button>
-          </div>
+            className="absolute inset-0 w-20 h-20 mx-auto rounded-full border border-primary/10"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
         </motion.div>
-      </div>
-    </CrystalPageWrapper>
+
+        <span className="text-[10px] tracking-[0.4em] uppercase text-primary/40 font-body block mb-6">
+          RISE
+        </span>
+        
+        <h1 className="text-2xl md:text-3xl font-display tracking-wide text-foreground mb-4">
+          Verification in Progress
+        </h1>
+        
+        <p className="text-muted-foreground/50 mb-3 leading-relaxed text-sm">
+          Your request is being reviewed with the attention it deserves.
+        </p>
+        <p className="text-xs text-muted-foreground/30 mb-12 leading-relaxed">
+          We will reach out to you shortly.
+        </p>
+
+        {/* Status pill */}
+        <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-card/30 border border-border/10 rounded-full mb-12 backdrop-blur-sm">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary/50 animate-pulse" />
+          <span className="text-[10px] text-muted-foreground/40 tracking-[0.2em] uppercase font-body">
+            Under Review
+          </span>
+        </div>
+        
+        <div>
+          <Button variant="ghost" onClick={() => navigate('/')} className="text-muted-foreground/40 hover:text-primary text-sm">
+            Return Home
+          </Button>
+        </div>
+      </motion.div>
+    </div>
   );
 }
