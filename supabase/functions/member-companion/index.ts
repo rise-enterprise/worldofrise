@@ -7,6 +7,67 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// ── Zapier AI Chatbot call ──
+async function callZapierAI(
+  webhookUrl: string,
+  messages: Array<{ role: string; content: string }>,
+  systemPrompt: string,
+): Promise<string> {
+  const lastUserMsg = messages.filter(m => m.role === "user").pop()?.content ?? "";
+  const conversationContext = messages.slice(-10).map(m => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`).join("\n");
+
+  const resp = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: lastUserMsg,
+      conversation_history: conversationContext,
+      system_prompt: systemPrompt,
+      timestamp: new Date().toISOString(),
+    }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`Zapier webhook error ${resp.status}: ${errText}`);
+  }
+
+  const data = await resp.json();
+  return data.reply || data.message || data.output || data.response || data.text || data.content || JSON.stringify(data);
+}
+
+// ── Convert text to SSE stream ──
+function textToSSEStream(text: string): ReadableStream {
+  const encoder = new TextEncoder();
+  const words = text.split(/(\s+)/);
+  const chunks: string[] = [];
+  let current = "";
+  for (const word of words) {
+    current += word;
+    if (current.length >= 15) {
+      chunks.push(current);
+      current = "";
+    }
+  }
+  if (current) chunks.push(current);
+
+  let index = 0;
+  return new ReadableStream({
+    pull(controller) {
+      if (index < chunks.length) {
+        const sseData = JSON.stringify({
+          choices: [{ delta: { content: chunks[index] } }],
+        });
+        controller.enqueue(encoder.encode(`data: ${sseData}\n\n`));
+        index++;
+      } else {
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      }
+    },
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -15,11 +76,11 @@ serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const ZAPIER_AI_WEBHOOK_URL = Deno.env.get("ZAPIER_AI_WEBHOOK_URL");
 
-    if (!LOVABLE_API_KEY) {
+    if (!ZAPIER_AI_WEBHOOK_URL && !LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI not configured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -30,8 +91,7 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await anonClient.auth.getUser(token);
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -41,8 +101,7 @@ serve(async (req) => {
     const { data: memberId } = await serviceClient.rpc("get_member_id", { _user_id: user.id });
     if (!memberId) {
       return new Response(JSON.stringify({ error: "Member not found" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -90,13 +149,11 @@ serve(async (req) => {
       ? Math.floor((now.getTime() - lastVisit.getTime()) / (1000 * 60 * 60 * 24))
       : null;
 
-    // Visit frequency analysis
     const last30DayVisits = visits.filter((v: any) => {
       const d = new Date(v.visit_datetime);
       return (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24) <= 30;
     }).length;
 
-    // Brand preference
     const brandCounts: Record<string, number> = {};
     const locationCounts: Record<string, number> = {};
     const dayOfWeekCounts: Record<number, number> = {};
@@ -114,17 +171,14 @@ serve(async (req) => {
     const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const preferredDay = favDay ? dayNames[Number(favDay[0])] : "unknown";
 
-    // Tier progression
     const allTiers = await serviceClient.from("tiers").select("*").eq("is_active", true).order("min_visits", { ascending: true });
     const tiers = allTiers.data ?? [];
     const currentTierIndex = tiers.findIndex((t: any) => t.id === tierInfo?.id || t.name === tierInfo?.name);
     const nextTier = tiers[currentTierIndex + 1];
     const visitsToNextTier = nextTier ? nextTier.min_visits - (member?.total_visits || 0) : 0;
 
-    // Affordable rewards
     const affordableRewards = availableRewards.filter((r: any) => r.points_cost <= (member?.total_points || 0));
 
-    // Compute Gulf time mood (UTC+3)
     const gulfHour = (new Date().getUTCHours() + 3) % 24;
     const mood = gulfHour >= 6 && gulfHour < 12
       ? "morning — energetic, fresh start. Suggest coffee at NOIR, breakfast vibes."
@@ -201,6 +255,26 @@ TONE EXAMPLES:
 ✗ "Based on my analysis of your data patterns..." (too robotic)
 ✗ "Don't miss out on this limited time offer!" (too salesy)`;
 
+    // ── ZAPIER AI CHATBOT PATH ──
+    if (ZAPIER_AI_WEBHOOK_URL) {
+      try {
+        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt);
+        return new Response(textToSSEStream(zapierReply), {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        });
+      } catch (zapierErr) {
+        console.error("Zapier AI error, falling back to Lovable AI:", zapierErr);
+        // Fall through to Lovable AI fallback
+      }
+    }
+
+    // ── LOVABLE AI FALLBACK ──
+    if (!LOVABLE_API_KEY) {
+      return new Response(JSON.stringify({ error: "AI not configured" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -220,21 +294,18 @@ TONE EXAMPLES:
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Please wait a moment before trying again." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errText = await response.text();
       console.error("AI gateway error:", response.status, errText);
       return new Response(JSON.stringify({ error: "AI service unavailable" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -244,8 +315,7 @@ TONE EXAMPLES:
   } catch (e) {
     console.error("member-companion error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

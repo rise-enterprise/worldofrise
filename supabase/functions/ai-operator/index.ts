@@ -113,30 +113,19 @@ async function executeTool(
         return { result: data, requiresConfirmation: false };
       }
       if (qt === "segment_distribution") {
-        const { data } = await supabase
-          .from("guest_segments")
-          .select("segment_type, segment_label")
-          .limit(1000);
+        const { data } = await supabase.from("guest_segments").select("segment_type, segment_label").limit(1000);
         const dist: Record<string, Record<string, number>> = {};
         for (const row of data ?? []) {
-          const t = (row as any).segment_type;
-          const l = (row as any).segment_label;
+          const t = (row as any).segment_type, l = (row as any).segment_label;
           if (!dist[t]) dist[t] = {};
           dist[t][l] = (dist[t][l] ?? 0) + 1;
         }
         return { result: dist, requiresConfirmation: false };
       }
       if (qt === "tier_distribution") {
-        const { data } = await supabase
-          .from("guest_segments")
-          .select("segment_label")
-          .eq("segment_type", "computed_tier")
-          .limit(1000);
+        const { data } = await supabase.from("guest_segments").select("segment_label").eq("segment_type", "computed_tier").limit(1000);
         const dist: Record<string, number> = {};
-        for (const row of data ?? []) {
-          const l = (row as any).segment_label;
-          dist[l] = (dist[l] ?? 0) + 1;
-        }
+        for (const row of data ?? []) { const l = (row as any).segment_label; dist[l] = (dist[l] ?? 0) + 1; }
         return { result: dist, requiresConfirmation: false };
       }
       if (qt === "contact_count") {
@@ -144,26 +133,17 @@ async function executeTool(
         return { result: { total_contacts: count }, requiresConfirmation: false };
       }
       if (qt === "import_history") {
-        const { data } = await supabase
-          .from("import_runs")
-          .select("*")
-          .order("created_at", { ascending: false })
-          .limit(10);
+        const { data } = await supabase.from("import_runs").select("*").order("created_at", { ascending: false }).limit(10);
         return { result: data, requiresConfirmation: false };
       }
       if (qt === "recent_activity") {
-        const { data } = await supabase
-          .from("audit_logs")
-          .select("action_type, entity_type, created_at")
-          .order("created_at", { ascending: false })
-          .limit(20);
+        const { data } = await supabase.from("audit_logs").select("action_type, entity_type, created_at").order("created_at", { ascending: false }).limit(20);
         return { result: data, requiresConfirmation: false };
       }
       return { result: { error: "Unknown query type" }, requiresConfirmation: false };
     }
 
     case "run_classification": {
-      // Call the classify-contacts function
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const results: unknown[] = [];
       let offset = 0;
@@ -171,10 +151,7 @@ async function executeTool(
       while (!done) {
         const resp = await fetch(`${supabaseUrl}/functions/v1/classify-contacts`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authHeader,
-          },
+          headers: { "Content-Type": "application/json", Authorization: authHeader },
           body: JSON.stringify({ batchSize: 1000, offset }),
         });
         const data = await resp.json();
@@ -239,14 +216,10 @@ async function executeTool(
       }
 
       if (rt === "segment_summary") {
-        const { data } = await supabase
-          .from("guest_segments")
-          .select("segment_type, segment_label")
-          .limit(5000);
+        const { data } = await supabase.from("guest_segments").select("segment_type, segment_label").limit(5000);
         const summary: Record<string, Record<string, number>> = {};
         for (const r of data ?? []) {
-          const t = (r as any).segment_type;
-          const l = (r as any).segment_label;
+          const t = (r as any).segment_type, l = (r as any).segment_label;
           if (!summary[t]) summary[t] = {};
           summary[t][l] = (summary[t][l] ?? 0) + 1;
         }
@@ -267,7 +240,6 @@ async function executeTool(
     }
 
     case "create_segment": {
-      // Insert segment rules as an AI insight for now
       await supabase.from("ai_insights").insert({
         insight_type: "custom_segment",
         title: `Custom Segment: ${args.name}`,
@@ -283,6 +255,67 @@ async function executeTool(
   }
 }
 
+// ── Zapier AI Chatbot call ──
+async function callZapierAI(
+  webhookUrl: string,
+  messages: Array<{ role: string; content: string }>,
+  systemPrompt: string,
+): Promise<string> {
+  const lastUserMsg = messages.filter(m => m.role === "user").pop()?.content ?? "";
+  const conversationContext = messages.slice(-10).map(m => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`).join("\n");
+
+  const resp = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: lastUserMsg,
+      conversation_history: conversationContext,
+      system_prompt: systemPrompt,
+      timestamp: new Date().toISOString(),
+    }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`Zapier webhook error ${resp.status}: ${errText}`);
+  }
+
+  const data = await resp.json();
+  return data.reply || data.message || data.output || data.response || data.text || data.content || JSON.stringify(data);
+}
+
+// ── Convert text to SSE stream ──
+function textToSSEStream(text: string): ReadableStream {
+  const encoder = new TextEncoder();
+  const words = text.split(/(\s+)/);
+  const chunks: string[] = [];
+  let current = "";
+  for (const word of words) {
+    current += word;
+    if (current.length >= 15) {
+      chunks.push(current);
+      current = "";
+    }
+  }
+  if (current) chunks.push(current);
+
+  let index = 0;
+  return new ReadableStream({
+    pull(controller) {
+      if (index < chunks.length) {
+        const sseData = JSON.stringify({
+          choices: [{ delta: { content: chunks[index] } }],
+        });
+        controller.enqueue(encoder.encode(`data: ${sseData}\n\n`));
+        index++;
+      } else {
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      }
+    },
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -291,8 +324,9 @@ Deno.serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const ZAPIER_AI_WEBHOOK_URL = Deno.env.get("ZAPIER_AI_WEBHOOK_URL");
 
-    if (!LOVABLE_API_KEY) {
+    if (!ZAPIER_AI_WEBHOOK_URL && !LOVABLE_API_KEY) {
       return new Response(JSON.stringify({ error: "AI not configured" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -335,13 +369,11 @@ Deno.serve(async (req) => {
     const metrics = metricsResult.data ?? {};
     const segCounts: Record<string, Record<string, number>> = {};
     for (const r of segmentResult.data ?? []) {
-      const t = (r as any).segment_type;
-      const l = (r as any).segment_label;
+      const t = (r as any).segment_type, l = (r as any).segment_label;
       if (!segCounts[t]) segCounts[t] = {};
       segCounts[t][l] = (segCounts[t][l] ?? 0) + 1;
     }
 
-    // Compute Gulf time mood (UTC+3)
     const gulfHour = (new Date().getUTCHours() + 3) % 24;
     const mood = gulfHour >= 6 && gulfHour < 12
       ? "morning — deliver morning briefings, fresh data summaries."
@@ -377,7 +409,88 @@ You operate with full authority within the RISE platform. Execute commands decis
 MOOD: It's currently ${mood} Adapt your greeting and report style accordingly.
 LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic. If English, respond in English. Match their language naturally. Tool names and technical terms can remain in English.`;
 
-    // Use tool-calling model
+    // ── ZAPIER AI CHATBOT PATH ──
+    if (ZAPIER_AI_WEBHOOK_URL) {
+      try {
+        // For tool-calling, still use Lovable AI if available
+        if (LOVABLE_API_KEY) {
+          const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "openai/gpt-5.2",
+              messages: [{ role: "system", content: systemPrompt }, ...messages],
+              tools: TOOLS,
+              tool_choice: "auto",
+              stream: false,
+            }),
+          });
+
+          if (aiResp.ok) {
+            const aiData = await aiResp.json();
+            const choice = aiData.choices?.[0];
+
+            if (choice?.message?.tool_calls?.length > 0) {
+              const toolResults: Array<{ role: string; tool_call_id: string; content: string }> = [];
+
+              for (const tc of choice.message.tool_calls) {
+                const startTime = Date.now();
+                const args = typeof tc.function.arguments === "string" ? JSON.parse(tc.function.arguments) : tc.function.arguments;
+                const { result, requiresConfirmation } = await executeTool(
+                  tc.function.name, args, serviceClient, (admin as any).id, authHeader,
+                );
+
+                await serviceClient.from("ai_operator_logs").insert({
+                  admin_id: (admin as any).id,
+                  action_type: tc.function.name,
+                  intent: messages[messages.length - 1]?.content ?? "",
+                  input_params: args,
+                  output_result: typeof result === "object" ? result : { value: result },
+                  status: requiresConfirmation ? "pending" : "completed",
+                  requires_confirmation: requiresConfirmation,
+                  ai_rationale: `Tool ${tc.function.name} called via AI Operator (Zapier mode)`,
+                  execution_time_ms: Date.now() - startTime,
+                });
+
+                toolResults.push({ role: "tool", tool_call_id: tc.id, content: JSON.stringify(result) });
+              }
+
+              // Use Zapier for the follow-up response
+              const toolContext = toolResults.map(tr => `Tool Result: ${tr.content}`).join("\n");
+              const enrichedMessages = [
+                ...messages,
+                { role: "assistant", content: `I executed the following tools and got results:\n${toolContext}` },
+                { role: "user", content: "Based on the tool results above, provide a clear summary and response." },
+              ];
+
+              const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, enrichedMessages, systemPrompt);
+              return new Response(textToSSEStream(zapierReply), {
+                headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+              });
+            }
+          }
+        }
+
+        // No tools needed — send directly to Zapier
+        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt);
+        return new Response(textToSSEStream(zapierReply), {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        });
+      } catch (zapierErr) {
+        console.error("Zapier AI error, falling back to Lovable AI:", zapierErr);
+      }
+    }
+
+    // ── LOVABLE AI FALLBACK PATH ──
+    if (!LOVABLE_API_KEY) {
+      return new Response(JSON.stringify({ error: "AI not configured" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -419,14 +532,9 @@ LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely 
         const args = typeof tc.function.arguments === "string" ? JSON.parse(tc.function.arguments) : tc.function.arguments;
 
         const { result, requiresConfirmation } = await executeTool(
-          tc.function.name,
-          args,
-          serviceClient,
-          (admin as any).id,
-          authHeader,
+          tc.function.name, args, serviceClient, (admin as any).id, authHeader,
         );
 
-        // Log to ai_operator_logs
         await serviceClient.from("ai_operator_logs").insert({
           admin_id: (admin as any).id,
           action_type: tc.function.name,
@@ -439,11 +547,7 @@ LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely 
           execution_time_ms: Date.now() - startTime,
         });
 
-        toolResults.push({
-          role: "tool",
-          tool_call_id: tc.id,
-          content: JSON.stringify(result),
-        });
+        toolResults.push({ role: "tool", tool_call_id: tc.id, content: JSON.stringify(result) });
       }
 
       // Second AI call with tool results
@@ -476,7 +580,7 @@ LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely 
       });
     }
 
-    // No tool calls - stream the response directly using a second streaming call
+    // No tool calls - stream the response
     const streamResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {

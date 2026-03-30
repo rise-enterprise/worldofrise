@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// ── Tool definitions (merged from ai-operator + new tools) ──
+// ── Tool definitions ──
 const TOOLS = [
   {
     type: "function",
@@ -275,7 +275,6 @@ async function executeTool(
           return { result: { error: "No image generated", text: imgData.choices?.[0]?.message?.content }, requiresConfirmation: false };
         }
 
-        // Upload to storage to avoid large base64 in stream
         const base64 = images[0].image_url.url;
         const base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
         const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
@@ -331,7 +330,71 @@ async function executeTool(
   }
 }
 
-// ── AI gateway call with retry ──
+// ── Zapier AI Chatbot call ──
+async function callZapierAI(
+  webhookUrl: string,
+  messages: Array<{ role: string; content: string }>,
+  systemPrompt: string,
+): Promise<string> {
+  // Build a single prompt from messages for Zapier
+  const lastUserMsg = messages.filter(m => m.role === "user").pop()?.content ?? "";
+  const conversationContext = messages.slice(-10).map(m => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`).join("\n");
+
+  const resp = await fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: lastUserMsg,
+      conversation_history: conversationContext,
+      system_prompt: systemPrompt,
+      timestamp: new Date().toISOString(),
+    }),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`Zapier webhook error ${resp.status}: ${errText}`);
+  }
+
+  const data = await resp.json();
+  // Zapier AI Chatbot typically returns { reply: "..." } or { message: "..." } or { output: "..." }
+  return data.reply || data.message || data.output || data.response || data.text || data.content || JSON.stringify(data);
+}
+
+// ── Convert text to SSE stream ──
+function textToSSEStream(text: string): ReadableStream {
+  const encoder = new TextEncoder();
+  // Split into chunks to simulate streaming
+  const words = text.split(/(\s+)/);
+  const chunks: string[] = [];
+  let current = "";
+  for (const word of words) {
+    current += word;
+    if (current.length >= 15) {
+      chunks.push(current);
+      current = "";
+    }
+  }
+  if (current) chunks.push(current);
+
+  let index = 0;
+  return new ReadableStream({
+    pull(controller) {
+      if (index < chunks.length) {
+        const sseData = JSON.stringify({
+          choices: [{ delta: { content: chunks[index] } }],
+        });
+        controller.enqueue(encoder.encode(`data: ${sseData}\n\n`));
+        index++;
+      } else {
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      }
+    },
+  });
+}
+
+// ── Lovable AI gateway call with retry (fallback) ──
 async function callAIWithRetry(
   body: Record<string, unknown>,
   apiKey: string,
@@ -361,9 +424,10 @@ serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const ZAPIER_AI_WEBHOOK_URL = Deno.env.get("ZAPIER_AI_WEBHOOK_URL");
 
-    if (!LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ error: "AI not configured" }), {
+    if (!ZAPIER_AI_WEBHOOK_URL && !LOVABLE_API_KEY) {
+      return new Response(JSON.stringify({ error: "AI not configured. Set ZAPIER_AI_WEBHOOK_URL or LOVABLE_API_KEY." }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -454,6 +518,85 @@ AVAILABLE TOOLS: query_analytics, run_classification, create_admin_user, update_
 MOOD: It's currently ${mood} Adapt your energy, greetings, and suggestions accordingly.
 LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely in Arabic (RTL). If English, respond in English. Brand names stay in English.`;
 
+    // ── ZAPIER AI CHATBOT PATH ──
+    if (ZAPIER_AI_WEBHOOK_URL) {
+      try {
+        // For Zapier, we first try tool calling via Lovable AI (if available) for tool execution,
+        // then use Zapier for the final conversational response
+        if (LOVABLE_API_KEY) {
+          // First call: non-streaming with tools via Lovable AI
+          const firstResp = await callAIWithRetry({
+            model: "openai/gpt-5.2",
+            messages: [{ role: "system", content: systemPrompt }, ...messages],
+            tools: TOOLS,
+            tool_choice: "auto",
+            stream: false,
+          }, LOVABLE_API_KEY);
+
+          if (firstResp.ok) {
+            const firstData = await firstResp.json();
+            const choice = firstData.choices?.[0];
+
+            // Handle tool calls
+            if (choice?.message?.tool_calls?.length > 0) {
+              const toolResults: Array<{ role: string; tool_call_id: string; content: string }> = [];
+
+              for (const tc of choice.message.tool_calls) {
+                const startTime = Date.now();
+                const args = typeof tc.function.arguments === "string" ? JSON.parse(tc.function.arguments) : tc.function.arguments;
+                const { result, requiresConfirmation } = await executeTool(
+                  tc.function.name, args, serviceClient, (admin as any).id, authHeader, LOVABLE_API_KEY, SUPABASE_URL,
+                );
+
+                await serviceClient.from("ai_operator_logs").insert({
+                  admin_id: (admin as any).id,
+                  action_type: tc.function.name,
+                  intent: messages[messages.length - 1]?.content ?? "",
+                  input_params: args,
+                  output_result: typeof result === "object" ? result : { value: result },
+                  status: requiresConfirmation ? "pending" : "completed",
+                  requires_confirmation: requiresConfirmation,
+                  ai_rationale: `Tool ${tc.function.name} called via AI Copilot (Zapier mode)`,
+                  execution_time_ms: Date.now() - startTime,
+                });
+
+                toolResults.push({ role: "tool", tool_call_id: tc.id, content: JSON.stringify(result) });
+              }
+
+              // Use Zapier for the follow-up response with tool results context
+              const toolContext = toolResults.map(tr => `Tool Result: ${tr.content}`).join("\n");
+              const enrichedMessages = [
+                ...messages,
+                { role: "assistant", content: `I executed the following tools and got results:\n${toolContext}` },
+                { role: "user", content: "Based on the tool results above, provide a clear summary and response." },
+              ];
+
+              const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, enrichedMessages, systemPrompt);
+              return new Response(textToSSEStream(zapierReply), {
+                headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+              });
+            }
+          }
+        }
+
+        // No tools needed or no Lovable API key — send directly to Zapier
+        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt);
+        return new Response(textToSSEStream(zapierReply), {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        });
+      } catch (zapierErr) {
+        console.error("Zapier AI error, falling back to Lovable AI:", zapierErr);
+        // Fall through to Lovable AI fallback below
+      }
+    }
+
+    // ── LOVABLE AI FALLBACK PATH ──
+    if (!LOVABLE_API_KEY) {
+      return new Response(JSON.stringify({ error: "AI not configured" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // First call: non-streaming with tools
     const firstResp = await callAIWithRetry({
       model: "openai/gpt-5.2",
@@ -502,7 +645,6 @@ LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely 
           tc.function.name, args, serviceClient, (admin as any).id, authHeader, LOVABLE_API_KEY, SUPABASE_URL,
         );
 
-        // Audit log
         await serviceClient.from("ai_operator_logs").insert({
           admin_id: (admin as any).id,
           action_type: tc.function.name,
@@ -518,7 +660,6 @@ LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely 
         toolResults.push({ role: "tool", tool_call_id: tc.id, content: JSON.stringify(result) });
       }
 
-      // Follow-up streaming call with tool results
       const followUp = await callAIWithRetry({
         model: "openai/gpt-5.2",
         messages: [
