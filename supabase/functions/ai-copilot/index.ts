@@ -330,6 +330,54 @@ async function executeTool(
   }
 }
 
+const ZAPIER_REPLY_KEYS = ["reply", "message", "output", "response", "text", "content", "answer", "result"];
+
+function isZapierMetadataPayload(value: Record<string, unknown>): boolean {
+  const keys = Object.keys(value);
+  if (keys.length === 0) return false;
+  return keys.every((key) => ["attempt", "id", "request_id", "status"].includes(key));
+}
+
+function extractZapierReply(payload: unknown): string | null {
+  if (typeof payload === "string") {
+    const trimmed = payload.trim();
+    if (!trimmed) return null;
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      const nestedReply = extractZapierReply(parsed);
+      if (nestedReply) return nestedReply;
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed) && isZapierMetadataPayload(parsed as Record<string, unknown>)) {
+        return null;
+      }
+    } catch {
+      return trimmed;
+    }
+
+    return trimmed;
+  }
+
+  if (Array.isArray(payload)) {
+    for (const item of payload) {
+      const nestedReply = extractZapierReply(item);
+      if (nestedReply) return nestedReply;
+    }
+    return null;
+  }
+
+  if (!payload || typeof payload !== "object") return null;
+
+  const record = payload as Record<string, unknown>;
+  if (isZapierMetadataPayload(record)) return null;
+
+  for (const key of ZAPIER_REPLY_KEYS) {
+    const nestedReply = extractZapierReply(record[key]);
+    if (nestedReply) return nestedReply;
+  }
+
+  return null;
+}
+
 // ── Zapier AI Chatbot call ──
 async function callZapierAI(
   webhookUrl: string,
@@ -356,9 +404,21 @@ async function callZapierAI(
     throw new Error(`Zapier webhook error ${resp.status}: ${errText}`);
   }
 
-  const data = await resp.json();
-  // Zapier AI Chatbot typically returns { reply: "..." } or { message: "..." } or { output: "..." }
-  return data.reply || data.message || data.output || data.response || data.text || data.content || JSON.stringify(data);
+  const rawBody = await resp.text();
+  let payload: unknown = rawBody;
+
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    payload = rawBody;
+  }
+
+  const reply = extractZapierReply(payload);
+  if (!reply) {
+    throw new Error(`Zapier webhook returned metadata-only payload: ${rawBody.slice(0, 300)}`);
+  }
+
+  return reply;
 }
 
 // ── Convert text to SSE stream ──
