@@ -324,8 +324,15 @@ TONE EXAMPLES:
           headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
         });
       } catch (zapierErr) {
-        console.error("Zapier AI error, falling back to Lovable AI:", zapierErr);
-        // Fall through to Lovable AI fallback
+        console.error("Zapier AI error:", zapierErr);
+        const errMsg = zapierErr instanceof Error ? zapierErr.message : "Unknown Zapier error";
+        const isMetadata = errMsg.includes("metadata-only payload");
+        const userMessage = isMetadata
+          ? "Your Zapier AI Chatbot is not returning a reply. Please check your Zap's 'Return a Response' action and make sure it maps the AI output text to a JSON field like {\"reply\": \"...\"}."
+          : `Zapier AI error: ${errMsg}`;
+        return new Response(textToSSEStream(userMessage), {
+          headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+        });
       }
     }
 
