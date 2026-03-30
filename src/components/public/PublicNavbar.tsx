@@ -76,10 +76,13 @@ export default function PublicNavbar() {
             </button>
           </div>
 
-          {/* Mobile menu button */}
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 text-foreground">
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Mobile actions */}
+          <div className="flex md:hidden items-center gap-1">
+            <ThemeToggle className="h-8 w-8 text-muted-foreground hover:text-foreground" />
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-foreground">
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </motion.nav>
 
