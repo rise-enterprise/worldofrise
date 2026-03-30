@@ -114,7 +114,6 @@ export function CrystalObject({
           color="#a48b5c"
           anchorX="center"
           anchorY="middle"
-          font="/fonts/inter-var.woff2"
           fillOpacity={0.7}
         >
           {memberName.toUpperCase()}
@@ -128,7 +127,6 @@ export function CrystalObject({
           color="#c4a87a"
           anchorX="center"
           anchorY="middle"
-          font="/fonts/inter-var.woff2"
           fillOpacity={0.5}
         >
           {tierName.toUpperCase()}
@@ -142,7 +140,6 @@ export function CrystalObject({
           color="#a48b5c"
           anchorX="center"
           anchorY="middle"
-          font="/fonts/inter-var.woff2"
           fillOpacity={0.3}
         >
           RISE PRIVATE MEMBERSHIP
