@@ -66,7 +66,8 @@ export default function PublicNavbar() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-5">
+          <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle className="h-8 w-8 text-muted-foreground hover:text-foreground" />
             <button
               onClick={() => navigate("/?login=true")}
               className="text-[11px] tracking-[0.12em] uppercase font-body text-muted-foreground hover:text-foreground transition-colors duration-300"

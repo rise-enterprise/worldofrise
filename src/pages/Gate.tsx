@@ -14,7 +14,7 @@ const Gate = () => {
   }, [searchParams]);
 
   return (
-    <div className="fixed inset-0 bg-[#0a0908]">
+    <div className="fixed inset-0 bg-background">
       <GoldenBeatsScene
         onEnter={() => setShowLogin(true)}
         onRequestMembership={() => navigate("/request-invitation")}
