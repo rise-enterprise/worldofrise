@@ -14,7 +14,7 @@ const Gate = () => {
   }, [searchParams]);
 
   return (
-    <div className="fixed inset-0 bg-[#0a0908]">
+    <div className="fixed inset-0 bg-background">
       <GoldenBeatsScene
         onEnter={() => setShowLogin(true)}
         onRequestMembership={() => navigate("/request-invitation")}
@@ -28,7 +28,7 @@ const Gate = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
             className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: "rgba(10,9,8,0.92)" }}
+            style={{ background: "hsl(var(--background) / 0.92)" }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
