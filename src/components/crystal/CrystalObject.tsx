@@ -179,7 +179,7 @@ export function CrystalObject({
                 color={activeLayer === i ? '#d4b896' : '#8a8070'}
                 anchorX="center"
                 anchorY="middle"
-                font="/fonts/inter-var.woff2"
+                
               >
                 {privilege.toUpperCase()}
               </Text>
