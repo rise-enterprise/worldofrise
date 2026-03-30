@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -14,10 +14,6 @@ interface AIAvatarProps {
   clickLabel?: string;
 }
 
-/**
- * RISE Identity Orb — a Siri-inspired living sphere
- * with muted gold / champagne light language.
- */
 export default function AIAvatar({
   state,
   className,
@@ -29,7 +25,15 @@ export default function AIAvatar({
 }: AIAvatarProps) {
   const isMobile = useIsMobile();
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef = useRef<number>(0);
   const [cursorPos, setCursorPos] = useState({ x: 0.5, y: 0.5 });
+
+  const sizeMap = { sm: 88, md: 120, lg: 200 };
+  const px = sizeMap[size];
+  const isActive = state !== "idle";
+  const al = state === "speaking" ? audioLevel : 0;
+  const il = state === "listening" ? inputLevel : 0;
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isMobile || !containerRef.current) return;
@@ -48,28 +52,135 @@ export default function AIAvatar({
     return () => el.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove, isMobile]);
 
-  const sizeMap = { sm: 96, md: 128, lg: 220 };
-  const px = sizeMap[size];
-  const sizeClasses = { sm: "w-24 h-24", md: "w-32 h-32", lg: "w-[220px] h-[220px]" };
-  const isActive = state !== "idle";
-  const al = state === "speaking" ? audioLevel : 0;
-  const il = state === "listening" ? inputLevel : 0;
+  // Canvas-based orb rendering for premium quality
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  const glowX = isMobile ? 0 : (cursorPos.x - 0.5) * 20;
-  const glowY = isMobile ? 0 : (cursorPos.y - 0.5) * 20;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = px * dpr;
+    canvas.width = w;
+    canvas.height = w;
+    canvas.style.width = `${px}px`;
+    canvas.style.height = `${px}px`;
 
-  // Color scheme based on state
-  const stateColor = state === "listening"
-    ? "180 35% 55%"   // soft teal
-    : state === "thinking"
-      ? "220 30% 55%" // cool blue
-      : "38 35% 55%"; // warm gold (idle & speaking)
+    let startTime = performance.now();
 
-  const stateColorAlt = state === "listening"
-    ? "170 30% 45%"
-    : state === "thinking"
-      ? "240 25% 50%"
-      : "30 25% 45%";
+    const draw = (now: number) => {
+      const t = (now - startTime) / 1000;
+      ctx.clearRect(0, 0, w, w);
+
+      const cx = w / 2;
+      const cy = w / 2;
+      const r = w * 0.42;
+
+      // Breathing
+      const breathe = 1 + Math.sin(t * 0.8) * 0.012;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(breathe, breathe);
+      ctx.translate(-cx, -cy);
+
+      // 1. Deep shadow underneath
+      const shadowGrad = ctx.createRadialGradient(cx, cy + r * 0.6, 0, cx, cy + r * 0.6, r * 1.2);
+      shadowGrad.addColorStop(0, "rgba(20, 16, 10, 0.25)");
+      shadowGrad.addColorStop(1, "rgba(20, 16, 10, 0)");
+      ctx.fillStyle = shadowGrad;
+      ctx.fillRect(0, 0, w, w);
+
+      // 2. Main sphere body — dark glass
+      const bodyGrad = ctx.createRadialGradient(
+        cx - r * 0.2, cy - r * 0.25, r * 0.1,
+        cx, cy, r
+      );
+      bodyGrad.addColorStop(0, "rgba(245, 238, 225, 0.12)");
+      bodyGrad.addColorStop(0.3, "rgba(180, 160, 120, 0.08)");
+      bodyGrad.addColorStop(0.6, "rgba(60, 50, 35, 0.65)");
+      bodyGrad.addColorStop(0.85, "rgba(25, 20, 14, 0.9)");
+      bodyGrad.addColorStop(1, "rgba(10, 8, 5, 0.95)");
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = bodyGrad;
+      ctx.fill();
+
+      // 3. Internal luminance — state-driven color
+      const hueShift = state === "listening" ? 0.6 : state === "thinking" ? 0.3 : 0;
+      const lumR = state === "listening" ? 120 : state === "thinking" ? 100 : 200;
+      const lumG = state === "listening" ? 180 : state === "thinking" ? 130 : 170;
+      const lumB = state === "listening" ? 180 : state === "thinking" ? 200 : 120;
+      const lumIntensity = isActive ? 0.12 + al * 0.15 + il * 0.1 : 0.06 + Math.sin(t * 0.5) * 0.02;
+
+      const lumGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 0.7);
+      lumGrad.addColorStop(0, `rgba(${lumR}, ${lumG}, ${lumB}, ${lumIntensity * 1.5})`);
+      lumGrad.addColorStop(0.5, `rgba(${lumR}, ${lumG}, ${lumB}, ${lumIntensity * 0.5})`);
+      lumGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 0.85, 0, Math.PI * 2);
+      ctx.fillStyle = lumGrad;
+      ctx.fill();
+
+      // 4. Caustic light bands (speaking)
+      if (state === "speaking" && al > 0.02) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.clip();
+        for (let i = 0; i < 4; i++) {
+          const yOff = cy + (i - 1.5) * r * 0.18 + Math.sin(t * 2 + i) * r * 0.05;
+          const bandGrad = ctx.createLinearGradient(cx - r, yOff, cx + r, yOff);
+          bandGrad.addColorStop(0, "rgba(200, 180, 130, 0)");
+          bandGrad.addColorStop(0.3, `rgba(220, 200, 150, ${al * 0.08})`);
+          bandGrad.addColorStop(0.5, `rgba(240, 225, 180, ${al * 0.12})`);
+          bandGrad.addColorStop(0.7, `rgba(220, 200, 150, ${al * 0.08})`);
+          bandGrad.addColorStop(1, "rgba(200, 180, 130, 0)");
+          ctx.fillStyle = bandGrad;
+          ctx.fillRect(cx - r, yOff - r * 0.02, r * 2, r * 0.04 + al * r * 0.06);
+        }
+        ctx.restore();
+      }
+
+      // 5. Specular highlight — top-left crescent
+      const specX = cx - r * 0.3;
+      const specY = cy - r * 0.35;
+      const specGrad = ctx.createRadialGradient(specX, specY, 0, specX, specY, r * 0.55);
+      specGrad.addColorStop(0, `rgba(255, 252, 245, ${isActive ? 0.35 + al * 0.1 : 0.25})`);
+      specGrad.addColorStop(0.3, `rgba(240, 230, 210, ${isActive ? 0.12 : 0.08})`);
+      specGrad.addColorStop(0.6, "rgba(200, 185, 155, 0.02)");
+      specGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = specGrad;
+      ctx.fill();
+
+      // 6. Rim light — bottom edge
+      const rimGrad = ctx.createRadialGradient(cx, cy + r * 0.1, r * 0.7, cx, cy, r);
+      rimGrad.addColorStop(0, "rgba(0, 0, 0, 0)");
+      rimGrad.addColorStop(0.85, "rgba(0, 0, 0, 0)");
+      rimGrad.addColorStop(0.95, `rgba(${lumR}, ${lumG}, ${lumB}, ${isActive ? 0.08 + al * 0.06 : 0.04})`);
+      rimGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = rimGrad;
+      ctx.fill();
+
+      // 7. Glass edge — crisp circle border
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(200, 185, 155, ${isActive ? 0.08 + al * 0.04 : 0.05})`;
+      ctx.lineWidth = dpr * 0.8;
+      ctx.stroke();
+
+      ctx.restore();
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [px, state, audioLevel, inputLevel, isActive, al, il]);
 
   return (
     <div
@@ -83,199 +194,78 @@ export default function AIAvatar({
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {/* Deep ambient glow */}
+      {/* Atmospheric glow behind orb */}
       <div
-        className="absolute rounded-full pointer-events-none transition-all duration-700"
+        className="absolute rounded-full pointer-events-none"
         style={{
-          width: px * 2.2,
-          height: px * 2.2,
-          background: `radial-gradient(circle at ${50 + glowX}% ${50 + glowY}%, hsl(${stateColor} / ${isActive ? 0.18 + al * 0.15 : 0.1}) 0%, hsl(${stateColorAlt} / ${isActive ? 0.08 : 0.04}) 40%, transparent 70%)`,
-          filter: `blur(${isActive ? 40 + al * 20 : 30}px)`,
-          transform: `translate(${glowX * 0.2}px, ${glowY * 0.2}px) scale(${isActive ? 1.05 + al * 0.15 : 1})`,
+          width: px * 1.8,
+          height: px * 1.8,
+          background: state === "listening"
+            ? `radial-gradient(circle, rgba(120,180,180,${isActive ? 0.06 + il * 0.08 : 0.03}) 0%, transparent 65%)`
+            : state === "thinking"
+              ? `radial-gradient(circle, rgba(100,130,200,${0.05}) 0%, transparent 65%)`
+              : `radial-gradient(circle, rgba(200,170,120,${isActive ? 0.06 + al * 0.06 : 0.03}) 0%, transparent 65%)`,
+          filter: `blur(${px * 0.2}px)`,
+          transition: "background 800ms ease",
         }}
       />
 
-      {/* Breathing rings */}
-      {[0, 1, 2].map((i) => {
-        const ringLevel = state === "listening" ? il : state === "speaking" ? al : 0;
-        const ringStep = size === "lg" ? 30 : size === "md" ? 22 : 16;
-        const baseSize = px + i * ringStep + 12;
-        return (
-          <div
-            key={`ring-${i}`}
-            className="absolute rounded-full pointer-events-none"
-            style={{
-              width: baseSize,
-              height: baseSize,
-              border: `${i === 0 ? 1.2 : 0.8}px solid hsl(${stateColor} / ${
-                state === "thinking" ? 0.12 + i * 0.04 : isActive ? 0.06 + ringLevel * 0.25 : 0.05
-              })`,
-              boxShadow: ringLevel > 0.05
-                ? `0 0 ${ringLevel * 14}px hsl(${stateColor} / ${ringLevel * 0.1})`
-                : "none",
-              animation: state === "thinking"
-                ? `riseRingPulse ${2.2 + i * 0.3}s ease-out ${i * 0.25}s infinite`
-                : state === "listening"
-                  ? `riseRingBreath ${1.6 + i * 0.3}s ease-in-out ${i * 0.15}s infinite`
-                  : `riseIdleBreath ${5 + i * 1.2}s ease-in-out ${i * 0.8}s infinite`,
-              transition: "border-color 400ms, box-shadow 400ms",
-            }}
-          />
-        );
-      })}
-
-      {/* Thinking: rotating arcs */}
-      {state === "thinking" && [0, 1].map((i) => (
-        <div
-          key={`arc-${i}`}
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            width: px * 1.15,
-            height: px * 1.15,
-            border: "1.5px solid transparent",
-            borderTopColor: `hsl(${stateColor} / 0.25)`,
-            borderRightColor: i === 0 ? `hsl(${stateColorAlt} / 0.15)` : "transparent",
-            animation: `riseScanRotate ${3.5 + i * 1.5}s linear infinite ${i === 1 ? "reverse" : ""}`,
-          }}
-        />
-      ))}
-
-      {/* The Orb */}
+      {/* Canvas orb */}
       <div className={cn(
-        "relative rounded-full",
-        sizeClasses[size],
-        onClick && "group-hover:scale-[1.03] group-active:scale-[0.97] transition-transform duration-500"
+        "relative",
+        onClick && "group-hover:scale-[1.02] group-active:scale-[0.97] transition-transform duration-500"
       )}>
-        {/* Core sphere — layered radial gradients */}
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: `
-              radial-gradient(circle at ${45 + glowX * 0.5}% ${40 + glowY * 0.5}%, 
-                hsl(40 30% 85% / 0.9) 0%, 
-                hsl(${stateColor} / 0.5) 30%, 
-                hsl(${stateColorAlt} / 0.35) 55%, 
-                hsl(30 15% 12% / 0.9) 85%
-              )
-            `,
-            animation: "riseOrbBreathe 4.5s ease-in-out infinite",
-          }}
-        />
+        <canvas ref={canvasRef} className="block" />
 
-        {/* Specular highlight — top-left */}
-        <div
-          className="absolute rounded-full pointer-events-none"
-          style={{
-            top: "8%",
-            left: "15%",
-            width: "45%",
-            height: "35%",
-            background: `radial-gradient(ellipse at 50% 50%, hsl(40 30% 95% / ${isActive ? 0.4 + al * 0.2 : 0.3}) 0%, transparent 70%)`,
-            filter: "blur(6px)",
-            transform: `translate(${glowX * 0.3}px, ${glowY * 0.3}px)`,
-            transition: "transform 300ms ease-out",
-          }}
-        />
-
-        {/* Inner luminance */}
-        <div
-          className="absolute inset-[15%] rounded-full pointer-events-none"
-          style={{
-            background: `radial-gradient(circle, hsl(${stateColor} / ${isActive ? 0.15 + al * 0.2 : 0.08}) 0%, transparent 70%)`,
-            filter: "blur(8px)",
-            animation: "riseInnerGlow 3s ease-in-out infinite",
-          }}
-        />
-
-        {/* Outer rim glow */}
-        <div
-          className="absolute inset-0 rounded-full pointer-events-none"
-          style={{
-            boxShadow: `
-              inset 0 0 ${20 + al * 15}px hsl(${stateColor} / ${isActive ? 0.12 + al * 0.12 : 0.06}),
-              0 0 ${isActive ? 25 + al * 25 : 15}px hsl(${stateColor} / ${isActive ? 0.15 + al * 0.15 : 0.08}),
-              0 0 ${isActive ? 50 + al * 35 : 30}px hsl(${stateColorAlt} / ${isActive ? 0.06 + al * 0.08 : 0.03})
-            `,
-            transition: "box-shadow 150ms ease-out",
-          }}
-        />
-
-        {/* RISE monogram — embedded in the orb */}
+        {/* RISE monogram over canvas */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span
-            className="font-display font-light tracking-[0.25em] select-none"
+            className="font-display font-light select-none"
             style={{
-              fontSize: px * 0.16,
-              color: `hsl(40 30% 92% / ${isActive ? 0.7 + al * 0.2 : 0.5})`,
-              textShadow: `0 0 ${8 + al * 10}px hsl(${stateColor} / ${isActive ? 0.3 : 0.15})`,
-              transition: "color 300ms, text-shadow 150ms",
+              fontSize: px * 0.14,
+              letterSpacing: px * 0.025,
+              color: `rgba(240, 232, 215, ${isActive ? 0.55 + al * 0.15 : 0.4})`,
+              textShadow: `0 0 ${6 + al * 8}px rgba(200,175,120, ${isActive ? 0.2 : 0.1})`,
+              transition: "color 400ms, text-shadow 200ms",
             }}
           >
             RISE
           </span>
         </div>
-
-        {/* Speaking: wave pulse bands */}
-        {state === "speaking" && al > 0.02 && (
-          <div className="absolute inset-0 rounded-full pointer-events-none overflow-hidden">
-            {[0, 1, 2].map(i => (
-              <div
-                key={`wave-${i}`}
-                className="absolute left-0 right-0 pointer-events-none"
-                style={{
-                  top: `${42 + i * 8}%`,
-                  height: `${2 + al * 6}%`,
-                  background: `linear-gradient(90deg, transparent 5%, hsl(${stateColor} / ${(0.15 - i * 0.03) * al * 3}) 30%, hsl(40 30% 85% / ${(0.1 - i * 0.02) * al * 3}) 50%, hsl(${stateColor} / ${(0.15 - i * 0.03) * al * 3}) 70%, transparent 95%)`,
-                  filter: `blur(${1 + i}px)`,
-                  animation: `riseWaveDrift ${1.2 + i * 0.3}s ease-in-out infinite alternate`,
-                  transition: "height 80ms ease-out",
-                }}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Listening: subtle ripple */}
-        {state === "listening" && (
-          <div
-            className="absolute inset-[-4px] rounded-full pointer-events-none"
-            style={{
-              border: `1.5px solid hsl(${stateColor} / ${0.15 + il * 0.35})`,
-              boxShadow: `0 0 ${12 + il * 20}px hsl(${stateColor} / ${0.08 + il * 0.12})`,
-              animation: "riseListenPulse 1.4s ease-in-out infinite",
-              transition: "border-color 120ms, box-shadow 120ms",
-            }}
-          />
-        )}
-
-        {/* Hover glow — desktop only */}
-        {onClick && !isMobile && (
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-600"
-            style={{
-              boxShadow: `0 0 40px hsl(38 35% 55% / 0.15), inset 0 0 20px hsl(38 35% 55% / 0.05)`,
-            }}
-          />
-        )}
       </div>
 
+      {/* Subtle outer ring — only one, very refined */}
+      <div
+        className="absolute rounded-full pointer-events-none"
+        style={{
+          width: px + 24,
+          height: px + 24,
+          border: `0.5px solid rgba(200, 185, 155, ${isActive ? 0.08 + al * 0.06 : 0.04})`,
+          transition: "border-color 500ms",
+        }}
+      />
+
       {/* State label */}
-      <div className={cn("flex flex-col items-center gap-1.5", size === "md" ? "mt-4" : size === "sm" ? "mt-3" : "mt-5")}>
+      <div className={cn("flex flex-col items-center gap-1", size === "sm" ? "mt-2.5" : "mt-4")}>
         <span
-          className="text-[9px] uppercase tracking-[0.3em] font-body transition-colors duration-500"
+          className="text-[9px] uppercase font-body transition-colors duration-700"
           style={{
+            letterSpacing: "0.3em",
             color: isActive
-              ? `hsl(${stateColor})`
-              : "hsl(var(--muted-foreground) / 0.35)",
+              ? state === "listening" ? "rgba(140,195,195,0.6)"
+                : state === "thinking" ? "rgba(140,155,210,0.6)"
+                : "rgba(200,175,130,0.5)"
+              : "rgba(160,150,130,0.25)",
           }}
         >
           {state === "idle" ? "RISE" : state === "listening" ? "LISTENING" : state === "thinking" ? "THINKING" : "SPEAKING"}
         </span>
         {clickLabel && state === "idle" && (
           <span
-            className="text-[8px] uppercase tracking-[0.2em] animate-fade-in font-body"
+            className="text-[8px] uppercase font-body animate-fade-in"
             style={{
-              color: "hsl(38 35% 55% / 0.25)",
+              letterSpacing: "0.2em",
+              color: "rgba(180,160,120,0.2)",
               animationDelay: "2s",
               animationFillMode: "both",
             }}
@@ -284,41 +274,6 @@ export default function AIAvatar({
           </span>
         )}
       </div>
-
-      <style>{`
-        @keyframes riseOrbBreathe {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.015); }
-        }
-        @keyframes riseInnerGlow {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 1; }
-        }
-        @keyframes riseRingPulse {
-          0% { transform: scale(1); opacity: 0.3; }
-          100% { transform: scale(1.5); opacity: 0; }
-        }
-        @keyframes riseRingBreath {
-          0%, 100% { transform: scale(1); opacity: 0.12; }
-          50% { transform: scale(1.08); opacity: 0.4; }
-        }
-        @keyframes riseIdleBreath {
-          0%, 100% { transform: scale(1); opacity: 0.05; }
-          50% { transform: scale(1.03); opacity: 0.1; }
-        }
-        @keyframes riseScanRotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes riseListenPulse {
-          0%, 100% { transform: scale(1); opacity: 0.3; }
-          50% { transform: scale(1.03); opacity: 0.6; }
-        }
-        @keyframes riseWaveDrift {
-          0% { transform: translateX(-3%); }
-          100% { transform: translateX(3%); }
-        }
-      `}</style>
     </div>
   );
 }
