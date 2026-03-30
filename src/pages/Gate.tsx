@@ -1,6 +1,6 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { CrystalScene } from "@/components/crystal/CrystalScene";
+import { GoldenBeatsScene } from "@/components/crystal/GoldenBeatsScene";
 import UnifiedLoginForm from "@/components/auth/UnifiedLoginForm";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,13 +15,11 @@ const Gate = () => {
 
   return (
     <div className="fixed inset-0 bg-[#0a0908]">
-      {/* Crystal experience — always present */}
-      <CrystalScene
+      <GoldenBeatsScene
         onEnter={() => setShowLogin(true)}
         onRequestMembership={() => navigate("/request-invitation")}
       />
 
-      {/* Login overlay */}
       <AnimatePresence>
         {showLogin && (
           <motion.div
@@ -30,7 +28,7 @@ const Gate = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
             className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(10,9,8,0.92)' }}
+            style={{ background: "rgba(10,9,8,0.92)" }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
