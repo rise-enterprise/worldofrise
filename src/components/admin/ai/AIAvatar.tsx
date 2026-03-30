@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import aiAvatarImg from "@/assets/ai-avatar.png";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export type AIState = "idle" | "listening" | "thinking" | "speaking";
@@ -15,15 +14,10 @@ interface AIAvatarProps {
   clickLabel?: string;
 }
 
-interface Particle {
-  id: number;
-  angle: number;
-  radius: number;
-  speed: number;
-  size: number;
-  hue: number;
-}
-
+/**
+ * RISE Identity Orb — a Siri-inspired living sphere
+ * with muted gold / champagne light language.
+ */
 export default function AIAvatar({
   state,
   className,
@@ -34,26 +28,9 @@ export default function AIAvatar({
   clickLabel,
 }: AIAvatarProps) {
   const isMobile = useIsMobile();
-  const [cursorPos, setCursorPos] = useState({ x: 0.5, y: 0.5 });
-  const [blinkState, setBlinkState] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [cursorPos, setCursorPos] = useState({ x: 0.5, y: 0.5 });
 
-  // Reduce particle count on mobile for performance
-  const particleCount = isMobile ? 18 : 32;
-
-  const particles = useMemo<Particle[]>(() =>
-    Array.from({ length: particleCount }, (_, i) => ({
-      id: i,
-      angle: (i / particleCount) * Math.PI * 2,
-      radius: 0.55 + Math.random() * 0.35,
-      speed: 0.3 + Math.random() * 0.6,
-      size: 1.5 + Math.random() * 2.5,
-      hue: i % 3 === 0 ? 270 : i % 3 === 1 ? 320 : 200,
-    })),
-    [particleCount]
-  );
-
-  // Cursor tracking — skip on mobile (no hover)
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (isMobile || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -71,79 +48,58 @@ export default function AIAvatar({
     return () => el.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove, isMobile]);
 
-  // Natural blinking
-  useEffect(() => {
-    const blink = () => {
-      setBlinkState(true);
-      setTimeout(() => setBlinkState(false), 150);
-    };
-    const interval = setInterval(blink, 3000 + Math.random() * 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const sizeMap = { sm: 128, md: 160, lg: 280 };
+  const sizeMap = { sm: 96, md: 128, lg: 220 };
   const px = sizeMap[size];
-  const sizeClasses = { sm: "w-32 h-32", md: "w-40 h-40", lg: "w-[280px] h-[280px]" };
+  const sizeClasses = { sm: "w-24 h-24", md: "w-32 h-32", lg: "w-[220px] h-[220px]" };
   const isActive = state !== "idle";
   const al = state === "speaking" ? audioLevel : 0;
   const il = state === "listening" ? inputLevel : 0;
 
-  const glowX = isMobile ? 0 : (cursorPos.x - 0.5) * 30;
-  const glowY = isMobile ? 0 : (cursorPos.y - 0.5) * 30;
+  const glowX = isMobile ? 0 : (cursorPos.x - 0.5) * 20;
+  const glowY = isMobile ? 0 : (cursorPos.y - 0.5) * 20;
+
+  // Color scheme based on state
+  const stateColor = state === "listening"
+    ? "180 35% 55%"   // soft teal
+    : state === "thinking"
+      ? "220 30% 55%" // cool blue
+      : "38 35% 55%"; // warm gold (idle & speaking)
+
+  const stateColorAlt = state === "listening"
+    ? "170 30% 45%"
+    : state === "thinking"
+      ? "240 25% 50%"
+      : "30 25% 45%";
 
   return (
     <div
       ref={containerRef}
-      className={cn("relative flex items-center justify-center flex-col", onClick && "cursor-pointer group", className)}
+      className={cn(
+        "relative flex items-center justify-center flex-col",
+        onClick && "cursor-pointer group",
+        className
+      )}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
       {/* Deep ambient glow */}
       <div
-        className="absolute rounded-full pointer-events-none transition-all duration-500"
+        className="absolute rounded-full pointer-events-none transition-all duration-700"
         style={{
-          width: px * 2,
-          height: px * 2,
-          background: `radial-gradient(circle at ${50 + glowX}% ${50 + glowY}%, hsl(var(--neon-purple) / ${isActive ? 0.3 + al * 0.25 : 0.15}) 0%, hsl(var(--neon-magenta) / ${isActive ? 0.15 + al * 0.15 : 0.06}) 35%, hsl(var(--neon-blue) / 0.04) 60%, transparent 80%)`,
-          filter: `blur(${isActive ? 50 + al * 25 : 35}px)`,
-          transform: `translate(${glowX * 0.3}px, ${glowY * 0.3}px) scale(${isActive ? 1.1 + al * 0.2 : 1})`,
+          width: px * 2.2,
+          height: px * 2.2,
+          background: `radial-gradient(circle at ${50 + glowX}% ${50 + glowY}%, hsl(${stateColor} / ${isActive ? 0.18 + al * 0.15 : 0.1}) 0%, hsl(${stateColorAlt} / ${isActive ? 0.08 : 0.04}) 40%, transparent 70%)`,
+          filter: `blur(${isActive ? 40 + al * 20 : 30}px)`,
+          transform: `translate(${glowX * 0.2}px, ${glowY * 0.2}px) scale(${isActive ? 1.05 + al * 0.15 : 1})`,
         }}
       />
 
-      {/* Orbital particle field */}
-      <div className="absolute pointer-events-none" style={{ width: px * 1.8, height: px * 1.8 }}>
-        {particles.map((p) => {
-          const speed = p.speed * (isActive ? 1.5 + al * 2 : 1);
-          const orbitRadius = p.radius * px * 0.9;
-          return (
-            <div
-              key={p.id}
-              className="absolute rounded-full"
-              style={{
-                width: p.size,
-                height: p.size,
-                left: "50%",
-                top: "50%",
-                backgroundColor: `hsl(${p.hue} 80% 70%)`,
-                opacity: isActive ? 0.4 + al * 0.5 : 0.2,
-                boxShadow: `0 0 ${4 + al * 8}px hsl(${p.hue} 80% 70% / ${0.4 + al * 0.3})`,
-                animation: `orbitalParticle ${8 / speed}s linear infinite`,
-                animationDelay: `${-p.angle * 1.5}s`,
-                transformOrigin: `0 0`,
-                ["--orbit-r" as any]: `${orbitRadius}px`,
-              }}
-            />
-          );
-        })}
-      </div>
-
-      {/* Scanning rings */}
-      {[0, 1, 2, 3].map((i) => {
+      {/* Breathing rings */}
+      {[0, 1, 2].map((i) => {
         const ringLevel = state === "listening" ? il : state === "speaking" ? al : 0;
-        const ringStep = size === "lg" ? 36 : size === "md" ? 24 : 18;
-        const baseSize = px + i * ringStep;
-        const hue = state === "listening" ? "--neon-cyan" : state === "thinking" ? "--neon-blue" : "--neon-purple";
+        const ringStep = size === "lg" ? 30 : size === "md" ? 22 : 16;
+        const baseSize = px + i * ringStep + 12;
         return (
           <div
             key={`ring-${i}`}
@@ -151,230 +107,175 @@ export default function AIAvatar({
             style={{
               width: baseSize,
               height: baseSize,
-              border: `${i === 0 ? 1.5 : 1}px solid hsl(var(${hue}) / ${
-                state === "thinking" ? 0.15 + i * 0.05 : isActive ? 0.08 + ringLevel * 0.35 : 0.06
+              border: `${i === 0 ? 1.2 : 0.8}px solid hsl(${stateColor} / ${
+                state === "thinking" ? 0.12 + i * 0.04 : isActive ? 0.06 + ringLevel * 0.25 : 0.05
               })`,
               boxShadow: ringLevel > 0.05
-                ? `0 0 ${ringLevel * 18}px hsl(var(${hue}) / ${ringLevel * 0.15}), inset 0 0 ${ringLevel * 10}px hsl(var(${hue}) / ${ringLevel * 0.05})`
+                ? `0 0 ${ringLevel * 14}px hsl(${stateColor} / ${ringLevel * 0.1})`
                 : "none",
               animation: state === "thinking"
-                ? `aiScanRing ${2.5 + i * 0.4}s ease-out ${i * 0.3}s infinite`
+                ? `riseRingPulse ${2.2 + i * 0.3}s ease-out ${i * 0.25}s infinite`
                 : state === "listening"
-                  ? `aiPulseRing ${1.8 + i * 0.3}s ease-in-out ${i * 0.2}s infinite`
-                  : `aiIdleRing ${5 + i * 1.5}s ease-in-out ${i * 1.2}s infinite`,
+                  ? `riseRingBreath ${1.6 + i * 0.3}s ease-in-out ${i * 0.15}s infinite`
+                  : `riseIdleBreath ${5 + i * 1.2}s ease-in-out ${i * 0.8}s infinite`,
+              transition: "border-color 400ms, box-shadow 400ms",
             }}
           />
         );
       })}
 
-      {/* Thinking: rotating scan arcs */}
+      {/* Thinking: rotating arcs */}
       {state === "thinking" && [0, 1].map((i) => (
         <div
           key={`arc-${i}`}
           className="absolute rounded-full pointer-events-none"
           style={{
-            width: px * 1.25,
-            height: px * 1.25,
-            border: "2px solid transparent",
-            borderTopColor: `hsl(var(--neon-purple) / 0.3)`,
-            borderRightColor: i === 0 ? `hsl(var(--neon-blue) / 0.2)` : "transparent",
-            animation: `aiRotateScan ${3 + i}s linear infinite ${i === 1 ? "reverse" : ""}`,
+            width: px * 1.15,
+            height: px * 1.15,
+            border: "1.5px solid transparent",
+            borderTopColor: `hsl(${stateColor} / 0.25)`,
+            borderRightColor: i === 0 ? `hsl(${stateColorAlt} / 0.15)` : "transparent",
+            animation: `riseScanRotate ${3.5 + i * 1.5}s linear infinite ${i === 1 ? "reverse" : ""}`,
           }}
         />
       ))}
 
-      {/* Avatar container */}
-      <div className={cn("relative", sizeClasses[size], onClick && "group-hover:scale-[1.02] group-active:scale-[0.97] transition-transform duration-500")}>
-        {/* Holographic glass overlay */}
+      {/* The Orb */}
+      <div className={cn(
+        "relative rounded-full",
+        sizeClasses[size],
+        onClick && "group-hover:scale-[1.03] group-active:scale-[0.97] transition-transform duration-500"
+      )}>
+        {/* Core sphere — layered radial gradients */}
         <div
-          className="absolute inset-[-3px] rounded-full pointer-events-none z-20"
+          className="absolute inset-0 rounded-full"
           style={{
-            background: `conic-gradient(from 0deg, transparent 0%, hsl(var(--neon-purple) / 0.06) 15%, transparent 30%, hsl(var(--neon-blue) / 0.04) 50%, transparent 65%, hsl(var(--neon-magenta) / 0.05) 80%, transparent 100%)`,
-            animation: "aiHolographicRotate 12s linear infinite",
-          }}
-        />
-
-        {/* Premium border frame */}
-        <div
-          className="absolute inset-[-2px] rounded-full pointer-events-none z-10"
-          style={{
-            border: `1.5px solid hsl(var(--neon-purple) / ${isActive ? 0.2 + al * 0.2 : 0.12})`,
-            boxShadow: `
-              0 0 ${isActive ? 15 + al * 20 : 10}px hsl(var(--neon-purple) / ${isActive ? 0.1 + al * 0.1 : 0.06}),
-              inset 0 0 ${isActive ? 10 + al * 10 : 6}px hsl(var(--neon-purple) / ${isActive ? 0.05 + al * 0.05 : 0.03})
+            background: `
+              radial-gradient(circle at ${45 + glowX * 0.5}% ${40 + glowY * 0.5}%, 
+                hsl(40 30% 85% / 0.9) 0%, 
+                hsl(${stateColor} / 0.5) 30%, 
+                hsl(${stateColorAlt} / 0.35) 55%, 
+                hsl(30 15% 12% / 0.9) 85%
+              )
             `,
-            transition: "all 150ms ease-out",
+            animation: "riseOrbBreathe 4.5s ease-in-out infinite",
           }}
         />
 
-        {/* Main avatar image */}
-        <div className="relative w-full h-full rounded-full overflow-hidden">
-          <img
-            src={aiAvatarImg}
-            alt="RISE AI"
-            className="w-full h-full object-cover object-top transition-all duration-300"
+        {/* Specular highlight — top-left */}
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            top: "8%",
+            left: "15%",
+            width: "45%",
+            height: "35%",
+            background: `radial-gradient(ellipse at 50% 50%, hsl(40 30% 95% / ${isActive ? 0.4 + al * 0.2 : 0.3}) 0%, transparent 70%)`,
+            filter: "blur(6px)",
+            transform: `translate(${glowX * 0.3}px, ${glowY * 0.3}px)`,
+            transition: "transform 300ms ease-out",
+          }}
+        />
+
+        {/* Inner luminance */}
+        <div
+          className="absolute inset-[15%] rounded-full pointer-events-none"
+          style={{
+            background: `radial-gradient(circle, hsl(${stateColor} / ${isActive ? 0.15 + al * 0.2 : 0.08}) 0%, transparent 70%)`,
+            filter: "blur(8px)",
+            animation: "riseInnerGlow 3s ease-in-out infinite",
+          }}
+        />
+
+        {/* Outer rim glow */}
+        <div
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            boxShadow: `
+              inset 0 0 ${20 + al * 15}px hsl(${stateColor} / ${isActive ? 0.12 + al * 0.12 : 0.06}),
+              0 0 ${isActive ? 25 + al * 25 : 15}px hsl(${stateColor} / ${isActive ? 0.15 + al * 0.15 : 0.08}),
+              0 0 ${isActive ? 50 + al * 35 : 30}px hsl(${stateColorAlt} / ${isActive ? 0.06 + al * 0.08 : 0.03})
+            `,
+            transition: "box-shadow 150ms ease-out",
+          }}
+        />
+
+        {/* RISE monogram — embedded in the orb */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <span
+            className="font-display font-light tracking-[0.25em] select-none"
             style={{
-              filter: `brightness(${state === "speaking" ? 1.08 + al * 0.12 : state === "thinking" ? 0.92 : 1.02}) saturate(${isActive ? 1.15 + al * 0.25 : 1.05}) contrast(${isActive ? 1.02 : 1})`,
-              animation: "aiBreathe 5s ease-in-out infinite",
+              fontSize: px * 0.16,
+              color: `hsl(40 30% 92% / ${isActive ? 0.7 + al * 0.2 : 0.5})`,
+              textShadow: `0 0 ${8 + al * 10}px hsl(${stateColor} / ${isActive ? 0.3 : 0.15})`,
+              transition: "color 300ms, text-shadow 150ms",
             }}
-          />
-
-          {/* Blink overlay */}
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none transition-opacity"
-            style={{
-              background: "linear-gradient(180deg, transparent 30%, hsl(var(--background) / 0.03) 45%, transparent 55%)",
-              opacity: blinkState ? 0.6 : 0,
-              transitionDuration: blinkState ? "60ms" : "200ms",
-            }}
-          />
-
-          {/* Neon rim light */}
-          <div
-            className="absolute inset-0 rounded-full pointer-events-none"
-            style={{
-              boxShadow: `
-                inset 0 0 40px hsl(var(--neon-purple) / ${isActive ? 0.12 + al * 0.18 : 0.08}),
-                inset 0 0 80px hsl(var(--neon-magenta) / ${isActive ? 0.06 + al * 0.1 : 0.03}),
-                inset 0 -${px * 0.15}px ${px * 0.3}px hsl(var(--neon-purple) / ${isActive ? 0.08 + al * 0.08 : 0.04}),
-                0 0 ${isActive ? 35 + al * 35 : 20}px hsl(var(--neon-purple) / ${isActive ? 0.18 + al * 0.18 : 0.12}),
-                0 0 ${isActive ? 70 + al * 50 : 45}px hsl(var(--neon-magenta) / ${isActive ? 0.08 + al * 0.12 : 0.05})
-              `,
-              transition: "box-shadow 120ms ease-out",
-            }}
-          />
-
-          {/* Cursor-reactive highlight spot — desktop only */}
-          {!isMobile && (
-            <div
-              className="absolute inset-0 rounded-full pointer-events-none transition-all duration-300"
-              style={{
-                background: `radial-gradient(circle at ${cursorPos.x * 100}% ${cursorPos.y * 100}%, hsl(var(--neon-purple) / 0.08) 0%, transparent 50%)`,
-              }}
-            />
-          )}
-
-          {/* Listening pulse overlay */}
-          {state === "listening" && (
-            <div
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{
-                border: `2px solid hsl(var(--neon-cyan) / ${0.25 + il * 0.5})`,
-                boxShadow: `
-                  0 0 ${18 + il * 30}px hsl(var(--neon-cyan) / ${0.12 + il * 0.18}),
-                  inset 0 0 ${10 + il * 15}px hsl(var(--neon-cyan) / ${0.04 + il * 0.06})
-                `,
-                animation: "aiListenPulse 1.5s ease-in-out infinite",
-                transition: "border-color 100ms, box-shadow 100ms",
-              }}
-            />
-          )}
-
-          {/* Speaking: mouth light band */}
-          {state === "speaking" && (
-            <>
-              <div
-                className="absolute left-1/2 -translate-x-1/2 pointer-events-none"
-                style={{
-                  bottom: `${20 - al * 2}%`,
-                  width: `${28 + al * 16}%`,
-                  height: `${3 + al * 10}%`,
-                  borderRadius: "50%",
-                  background: `radial-gradient(ellipse, hsl(var(--neon-magenta) / ${0.2 + al * 0.4}) 0%, hsl(var(--neon-purple) / ${0.1 + al * 0.15}) 60%, transparent 100%)`,
-                  filter: `blur(${3 + al * 3}px)`,
-                  transition: "all 60ms ease-out",
-                }}
-              />
-              <div
-                className="absolute bottom-0 left-0 right-0 pointer-events-none"
-                style={{
-                  height: "35%",
-                  background: `linear-gradient(to top, hsl(var(--neon-magenta) / ${0.03 + al * 0.06}), transparent)`,
-                  transition: "all 80ms ease-out",
-                }}
-              />
-            </>
-          )}
-
-          {/* Thinking: scan line */}
-          {state === "thinking" && (
-            <div
-              className="absolute inset-0 pointer-events-none overflow-hidden rounded-full"
-              style={{
-                background: "linear-gradient(180deg, transparent 0%, hsl(var(--neon-purple) / 0.06) 48%, hsl(var(--neon-blue) / 0.08) 50%, hsl(var(--neon-purple) / 0.06) 52%, transparent 100%)",
-                backgroundSize: "100% 400%",
-                animation: "aiScanLine 2s ease-in-out infinite",
-              }}
-            />
-          )}
+          >
+            RISE
+          </span>
         </div>
 
-        {/* Hover glow — desktop only */}
-        {onClick && !isMobile && (
+        {/* Speaking: wave pulse bands */}
+        {state === "speaking" && al > 0.02 && (
+          <div className="absolute inset-0 rounded-full pointer-events-none overflow-hidden">
+            {[0, 1, 2].map(i => (
+              <div
+                key={`wave-${i}`}
+                className="absolute left-0 right-0 pointer-events-none"
+                style={{
+                  top: `${42 + i * 8}%`,
+                  height: `${2 + al * 6}%`,
+                  background: `linear-gradient(90deg, transparent 5%, hsl(${stateColor} / ${(0.15 - i * 0.03) * al * 3}) 30%, hsl(40 30% 85% / ${(0.1 - i * 0.02) * al * 3}) 50%, hsl(${stateColor} / ${(0.15 - i * 0.03) * al * 3}) 70%, transparent 95%)`,
+                  filter: `blur(${1 + i}px)`,
+                  animation: `riseWaveDrift ${1.2 + i * 0.3}s ease-in-out infinite alternate`,
+                  transition: "height 80ms ease-out",
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Listening: subtle ripple */}
+        {state === "listening" && (
           <div
-            className="absolute inset-0 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            className="absolute inset-[-4px] rounded-full pointer-events-none"
             style={{
-              boxShadow: "0 0 50px hsl(var(--neon-purple) / 0.2), inset 0 0 25px hsl(var(--neon-purple) / 0.06)",
+              border: `1.5px solid hsl(${stateColor} / ${0.15 + il * 0.35})`,
+              boxShadow: `0 0 ${12 + il * 20}px hsl(${stateColor} / ${0.08 + il * 0.12})`,
+              animation: "riseListenPulse 1.4s ease-in-out infinite",
+              transition: "border-color 120ms, box-shadow 120ms",
             }}
           />
         )}
 
-        {/* Corner data brackets — scale with size */}
-        {size !== "sm" && [
-          { pos: "-top-2 -left-2", border: "border-t border-l", color: "border-neon-purple/30" },
-          { pos: "-top-2 -right-2", border: "border-t border-r", color: "border-neon-purple/30" },
-          { pos: "-bottom-2 -left-2", border: "border-b border-l", color: "border-neon-magenta/20" },
-          { pos: "-bottom-2 -right-2", border: "border-b border-r", color: "border-neon-magenta/20" },
-        ].map((c, i) => (
-          <div key={i} className={cn("absolute pointer-events-none", c.pos, c.border, c.color, size === "md" ? "w-4 h-4" : "w-5 h-5")} />
-        ))}
+        {/* Hover glow — desktop only */}
+        {onClick && !isMobile && (
+          <div
+            className="absolute inset-0 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-600"
+            style={{
+              boxShadow: `0 0 40px hsl(38 35% 55% / 0.15), inset 0 0 20px hsl(38 35% 55% / 0.05)`,
+            }}
+          />
+        )}
       </div>
 
-      {/* Sound wave arcs */}
-      {state === "speaking" && al > 0.05 && (
-        <div className="absolute" style={{ bottom: size === "lg" ? -24 : size === "md" ? -16 : -12 }}>
-          {[0, 1, 2].map((i) => {
-            const scale = size === "md" ? 0.75 : size === "sm" ? 0.6 : 1;
-            return (
-              <div
-                key={`wave-${i}`}
-                className="absolute left-1/2 -translate-x-1/2 pointer-events-none rounded-full"
-                style={{
-                  width: (44 + i * 28 + al * 24) * scale,
-                  height: (18 + i * 10 + al * 10) * scale,
-                  border: `1px solid hsl(var(--neon-purple) / ${(0.35 - i * 0.08) * al})`,
-                  boxShadow: `0 0 ${al * 8}px hsl(var(--neon-purple) / ${al * 0.1})`,
-                  bottom: -(i * 7 * scale),
-                  transition: "all 80ms ease-out",
-                }}
-              />
-            );
-          })}
-        </div>
-      )}
-
       {/* State label */}
-      <div className={cn("flex flex-col items-center gap-1.5", size === "md" ? "mt-4" : "mt-5")}>
+      <div className={cn("flex flex-col items-center gap-1.5", size === "md" ? "mt-4" : size === "sm" ? "mt-3" : "mt-5")}>
         <span
-          className="text-[9px] uppercase tracking-[0.3em] font-medium transition-colors duration-300"
+          className="text-[9px] uppercase tracking-[0.3em] font-body transition-colors duration-500"
           style={{
-            color:
-              state === "listening"
-                ? "hsl(var(--neon-cyan))"
-                : state === "thinking"
-                  ? "hsl(var(--neon-purple-light))"
-                  : state === "speaking"
-                    ? "hsl(var(--neon-magenta-light))"
-                    : "hsl(var(--muted-foreground) / 0.4)",
+            color: isActive
+              ? `hsl(${stateColor})`
+              : "hsl(var(--muted-foreground) / 0.35)",
           }}
         >
-          {state === "idle" ? "RISE ONE" : state === "listening" ? "LISTENING" : state === "thinking" ? "ANALYZING" : "SPEAKING"}
+          {state === "idle" ? "RISE" : state === "listening" ? "LISTENING" : state === "thinking" ? "THINKING" : "SPEAKING"}
         </span>
         {clickLabel && state === "idle" && (
           <span
-            className="text-[8px] uppercase tracking-[0.2em] animate-fade-in"
+            className="text-[8px] uppercase tracking-[0.2em] animate-fade-in font-body"
             style={{
-              color: "hsl(var(--neon-purple) / 0.25)",
+              color: "hsl(38 35% 55% / 0.25)",
               animationDelay: "2s",
               animationFillMode: "both",
             }}
@@ -385,42 +286,37 @@ export default function AIAvatar({
       </div>
 
       <style>{`
-        @keyframes aiBreathe {
+        @keyframes riseOrbBreathe {
           0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.012); }
+          50% { transform: scale(1.015); }
         }
-        @keyframes aiScanRing {
-          0% { transform: scale(1); opacity: 0.4; }
-          100% { transform: scale(1.6); opacity: 0; }
+        @keyframes riseInnerGlow {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
         }
-        @keyframes aiPulseRing {
-          0%, 100% { transform: scale(1); opacity: 0.15; }
-          50% { transform: scale(1.12); opacity: 0.45; }
+        @keyframes riseRingPulse {
+          0% { transform: scale(1); opacity: 0.3; }
+          100% { transform: scale(1.5); opacity: 0; }
         }
-        @keyframes aiIdleRing {
-          0%, 100% { transform: scale(1); opacity: 0.06; }
-          50% { transform: scale(1.04); opacity: 0.12; }
+        @keyframes riseRingBreath {
+          0%, 100% { transform: scale(1); opacity: 0.12; }
+          50% { transform: scale(1.08); opacity: 0.4; }
         }
-        @keyframes aiHolographicRotate {
+        @keyframes riseIdleBreath {
+          0%, 100% { transform: scale(1); opacity: 0.05; }
+          50% { transform: scale(1.03); opacity: 0.1; }
+        }
+        @keyframes riseScanRotate {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes aiRotateScan {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes riseListenPulse {
+          0%, 100% { transform: scale(1); opacity: 0.3; }
+          50% { transform: scale(1.03); opacity: 0.6; }
         }
-        @keyframes aiListenPulse {
-          0%, 100% { transform: scale(1); opacity: 0.35; }
-          50% { transform: scale(1.04); opacity: 0.65; }
-        }
-        @keyframes aiScanLine {
-          0% { background-position: 0 0%; }
-          50% { background-position: 0 100%; }
-          100% { background-position: 0 0%; }
-        }
-        @keyframes orbitalParticle {
-          from { transform: rotate(0deg) translateX(var(--orbit-r)) rotate(0deg); }
-          to { transform: rotate(360deg) translateX(var(--orbit-r)) rotate(-360deg); }
+        @keyframes riseWaveDrift {
+          0% { transform: translateX(-3%); }
+          100% { transform: translateX(3%); }
         }
       `}</style>
     </div>
