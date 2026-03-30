@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { GoldenBeatsScene } from "@/components/crystal/GoldenBeatsScene";
 import UnifiedLoginForm from "@/components/auth/UnifiedLoginForm";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const Gate = () => {
   const navigate = useNavigate();
@@ -15,6 +16,9 @@ const Gate = () => {
 
   return (
     <div className="fixed inset-0 bg-background">
+      <div className="absolute top-5 right-5 z-40">
+        <ThemeToggle className="h-9 w-9 text-muted-foreground hover:text-foreground" />
+      </div>
       <GoldenBeatsScene
         onEnter={() => setShowLogin(true)}
         onRequestMembership={() => navigate("/request-invitation")}
