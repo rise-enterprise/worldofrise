@@ -55,15 +55,27 @@ function extractZapierReply(payload: unknown): string | null {
   return null;
 }
 
-// ── Zapier AI Chatbot call ──
+// ── Zapier AI Chatbot call (async callback pattern) ──
 async function callZapierAI(
   webhookUrl: string,
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
+  serviceClient: ReturnType<typeof createClient>,
+  supabaseUrl: string,
 ): Promise<string> {
   const lastUserMsg = messages.filter(m => m.role === "user").pop()?.content ?? "";
   const conversationContext = messages.slice(-10).map(m => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`).join("\n");
+  const requestId = crypto.randomUUID();
+  const callbackUrl = `${supabaseUrl}/functions/v1/zapier-callback`;
 
+  // Insert pending message row
+  await serviceClient.from("ai_messages").insert({
+    request_id: requestId,
+    source: "member-companion",
+    status: "pending",
+  });
+
+  // Fire-and-forget to Zapier
   const resp = await fetch(webhookUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -72,6 +84,8 @@ async function callZapierAI(
       conversation_history: conversationContext,
       system_prompt: systemPrompt,
       timestamp: new Date().toISOString(),
+      request_id: requestId,
+      callback_url: callbackUrl,
     }),
   });
 
@@ -80,21 +94,29 @@ async function callZapierAI(
     throw new Error(`Zapier webhook error ${resp.status}: ${errText}`);
   }
 
-  const rawBody = await resp.text();
-  let payload: unknown = rawBody;
+  // Poll for response (up to 90 seconds, check every 2s)
+  const maxWait = 90_000;
+  const interval = 2_000;
+  const start = Date.now();
 
-  try {
-    payload = JSON.parse(rawBody);
-  } catch {
-    payload = rawBody;
+  while (Date.now() - start < maxWait) {
+    await new Promise(r => setTimeout(r, interval));
+    const { data } = await serviceClient
+      .from("ai_messages")
+      .select("response_text, status")
+      .eq("request_id", requestId)
+      .maybeSingle();
+
+    if (data?.status === "completed" && data.response_text) {
+      // Clean up
+      await serviceClient.from("ai_messages").delete().eq("request_id", requestId);
+      return data.response_text;
+    }
   }
 
-  const reply = extractZapierReply(payload);
-  if (!reply) {
-    throw new Error(`Zapier webhook returned metadata-only payload: ${rawBody.slice(0, 300)}`);
-  }
-
-  return reply;
+  // Timeout - clean up and throw
+  await serviceClient.from("ai_messages").delete().eq("request_id", requestId);
+  throw new Error("Zapier AI response timed out after 90 seconds. Check your Zap is configured to POST back to the callback_url.");
 }
 
 // ── Convert text to SSE stream ──
@@ -319,7 +341,7 @@ TONE EXAMPLES:
     // ── ZAPIER AI CHATBOT PATH ──
     if (ZAPIER_AI_WEBHOOK_URL) {
       try {
-        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt);
+        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt, serviceClient, SUPABASE_URL);
         return new Response(textToSSEStream(zapierReply), {
           headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
         });
