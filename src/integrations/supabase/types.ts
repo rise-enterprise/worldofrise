@@ -126,6 +126,36 @@ export type Database = {
           },
         ]
       }
+      ai_messages: {
+        Row: {
+          created_at: string
+          id: string
+          request_id: string
+          responded_at: string | null
+          response_text: string | null
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_id: string
+          responded_at?: string | null
+          response_text?: string | null
+          source?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_id?: string
+          responded_at?: string | null
+          response_text?: string | null
+          source?: string
+          status?: string
+        }
+        Relationships: []
+      }
       ai_operator_logs: {
         Row: {
           action_type: string
