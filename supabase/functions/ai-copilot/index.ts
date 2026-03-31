@@ -647,7 +647,7 @@ LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely 
                 { role: "user", content: "Based on the tool results above, provide a clear summary and response." },
               ];
 
-              const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, enrichedMessages, systemPrompt);
+              const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, enrichedMessages, systemPrompt, serviceClient, SUPABASE_URL);
               return new Response(textToSSEStream(zapierReply), {
                 headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
               });
