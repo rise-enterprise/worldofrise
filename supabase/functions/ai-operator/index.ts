@@ -553,7 +553,7 @@ LANGUAGE: Detect the user's language. If they write in Arabic, respond entirely 
         }
 
         // No tools needed — send directly to Zapier
-        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt);
+        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt, serviceClient, SUPABASE_URL);
         return new Response(textToSSEStream(zapierReply), {
           headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
         });
