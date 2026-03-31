@@ -533,7 +533,9 @@ serve(async (req) => {
       });
     }
 
-    const { messages, attachments } = await req.json();
+    const body = await req.json();
+    const messages = Array.isArray(body.messages) ? body.messages : [{ role: "user", content: body.message || body.messages || "" }];
+    const attachments = body.attachments;
 
     // Gulf time mood
     const gulfHour = (new Date().getUTCHours() + 3) % 24;
