@@ -341,7 +341,7 @@ TONE EXAMPLES:
     // ── ZAPIER AI CHATBOT PATH ──
     if (ZAPIER_AI_WEBHOOK_URL) {
       try {
-        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt);
+        const zapierReply = await callZapierAI(ZAPIER_AI_WEBHOOK_URL, messages, systemPrompt, serviceClient, SUPABASE_URL);
         return new Response(textToSSEStream(zapierReply), {
           headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
         });
