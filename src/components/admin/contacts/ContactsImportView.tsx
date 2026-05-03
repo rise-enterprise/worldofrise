@@ -21,6 +21,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CONTACT_COLUMNS, HEADER_TO_DB_MAP } from "./contactColumns";
 import { autoMapHeaders, normalizeRow, deduplicateRows } from "./contactUtils";
 import { useContactsCount } from "@/hooks/useContacts";
+import { useAdminAuthContext } from "@/contexts/AdminAuthContext";
+import { Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type ImportStep = "upload" | "parsing" | "mapping" | "confirm" | "importing" | "done";
 
@@ -143,6 +146,11 @@ export default function ContactsImportView() {
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const { data: existingCount = 0 } = useContactsCount();
+  const { admin } = useAdminAuthContext();
+  const isSuperAdmin = admin?.role === "super_admin";
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
 
   const [step, setStep] = useState<ImportStep>("upload");
   const [fileName, setFileName] = useState("");
@@ -402,12 +410,80 @@ export default function ContactsImportView() {
 
   const isLargeFile = fileSize > 100 * 1024 * 1024;
 
+  const handleResetAll = async () => {
+    if (resetConfirmText !== "RESET") return;
+    setIsResetting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("reset-contacts", { body: {} });
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Reset failed");
+      toast.success(`Deleted ${(data.contactsDeleted ?? 0).toLocaleString()} contacts. Database is clean.`);
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      queryClient.invalidateQueries({ queryKey: ["contacts-count"] });
+      setShowResetDialog(false);
+      setResetConfirmText("");
+      reset();
+    } catch (err) {
+      toast.error(`Reset failed: ${(err as Error).message}`);
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
-      <div>
-        <h2 className="text-xl font-semibold text-foreground">Import / Replace Database</h2>
-        <p className="text-sm text-muted-foreground">Upload a CSV or XLSX file to replace all existing contact records.</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground">Import / Replace Database</h2>
+          <p className="text-sm text-muted-foreground">Upload a CSV or XLSX file to replace all existing contact records.</p>
+          {existingCount > 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Currently storing <span className="font-medium text-foreground">{existingCount.toLocaleString()}</span> contacts.
+            </p>
+          )}
+        </div>
+        {isSuperAdmin && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => setShowResetDialog(true)}
+            disabled={isResetting || existingCount === 0}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Reset Imported Data
+          </Button>
+        )}
       </div>
+
+      <AlertDialog open={showResetDialog} onOpenChange={(o) => { setShowResetDialog(o); if (!o) setResetConfirmText(""); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset all imported data?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all <strong>{existingCount.toLocaleString()}</strong> contacts,
+              along with staging rows and import history. This action cannot be undone.
+              <br /><br />
+              Type <strong>RESET</strong> to confirm.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input
+            value={resetConfirmText}
+            onChange={(e) => setResetConfirmText(e.target.value)}
+            placeholder="Type RESET"
+            autoFocus
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleResetAll(); }}
+              disabled={resetConfirmText !== "RESET" || isResetting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isResetting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Deleting...</> : "Delete Everything"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {errors.length > 0 && (
         <Card className="border-destructive/50 bg-destructive/5">
