@@ -146,6 +146,11 @@ export default function ContactsImportView() {
   const queryClient = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const { data: existingCount = 0 } = useContactsCount();
+  const { admin } = useAdminAuthContext();
+  const isSuperAdmin = admin?.role === "super_admin";
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [isResetting, setIsResetting] = useState(false);
 
   const [step, setStep] = useState<ImportStep>("upload");
   const [fileName, setFileName] = useState("");
