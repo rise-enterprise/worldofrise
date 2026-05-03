@@ -21,6 +21,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { CONTACT_COLUMNS, HEADER_TO_DB_MAP } from "./contactColumns";
 import { autoMapHeaders, normalizeRow, deduplicateRows } from "./contactUtils";
 import { useContactsCount } from "@/hooks/useContacts";
+import { useAdminAuthContext } from "@/contexts/AdminAuthContext";
+import { Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type ImportStep = "upload" | "parsing" | "mapping" | "confirm" | "importing" | "done";
 
